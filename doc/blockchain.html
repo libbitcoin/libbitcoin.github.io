@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5. Fun With The Bitcoin Blockchain &mdash; libbitcoin 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="top" title="libbitcoin 1 documentation" href="index.html" />
+    <link rel="next" title="6. Network Protocol" href="network.html" />
+    <link rel="prev" title="4. Crypto and Private Keys" href="crypto.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="network.html" title="6. Network Protocol"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="crypto.html" title="4. Crypto and Private Keys"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="fun-with-the-bitcoin-blockchain">
+<span id="tut-blockchain"></span><h1>5. Fun With The Bitcoin Blockchain<a class="headerlink" href="#fun-with-the-bitcoin-blockchain" title="Permalink to this headline">¶</a></h1>
+<p>For this tutorial we will use the <tt class="xref cpp cpp-class docutils literal"><span class="pre">leveldb_blockchain</span></tt> backend, which
+uses the LevelDB database to store the Bitcoin blockchain.
+Backends implement the <tt class="xref cpp cpp-class docutils literal"><span class="pre">blockchain</span></tt> interface. Starting and stopping
+a backend is down to the individual implementation.</p>
+<p>The blockchain can consume a large number of open file handles during normal
+operation. In particular, the LevelDB backend may accumulate a number of data
+files. The creation of numerous data files is normal. Most operating
+systems can change the open-files limit using the <tt class="docutils literal"><span class="pre">ulimit</span> <span class="pre">-n</span></tt> command.
+Example:</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="n">ulimit</span> <span class="o">-</span><span class="n">n</span> <span class="mi">4096</span>
+</pre></div>
+</div>
+<p>However, this only changes the limit for the current shell session. Changing the
+limit on a system-wide, permanent basis varies more between systems. See
+<a class="reference external" href="http://docs.basho.com/riak/latest/cookbooks/Open-Files-Limit/">this guide</a>
+for more information on open files limits.</p>
+<div class="section" id="initialization-importing-the-genesis-block">
+<h2>5.1. Initialization: Importing The Genesis Block<a class="headerlink" href="#initialization-importing-the-genesis-block" title="Permalink to this headline">¶</a></h2>
+<p>Before we can use <tt class="xref cpp cpp-class docutils literal"><span class="pre">leveldb_blockchain</span></tt>, the database needs to be
+initialised.</p>
+<ol class="arabic simple">
+<li>Create a <tt class="xref cpp cpp-class docutils literal"><span class="pre">leveldb_blockchain</span></tt> object. If no database exists in the
+specified path, it will automatically be created.</li>
+<li>Recreate the genesis block. The first block in the Bitcoin blockchain is
+part of the specification for the Bitcoin standard.</li>
+<li>Import the genesis block at height 0 in the blockchain.</li>
+</ol>
+<p>You now have a working <tt class="xref cpp cpp-class docutils literal"><span class="pre">leveldb_blockchain</span></tt>.</p>
+<p>To create the database which initialises a new one if one doesn&#8217;t already
+exist, we call <tt class="xref cpp cpp-func docutils literal"><span class="pre">leveldb_blockchain::start()</span></tt> with a root path. The
+completion handler is called passing an <tt class="xref cpp cpp-class docutils literal"><span class="pre">std::error_code</span></tt> that
+indicates whether the operation was successful or not.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// Threadpool context containing 1 thread.</span>
+<span class="n">threadpool</span> <span class="nf">pool</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">// leveldb_blockchain operations execute in pool&#39;s thread.</span>
+<span class="n">leveldb_blockchain</span> <span class="nf">chain</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+<span class="c1">// Completion handler for starting the leveldb_blockchain.</span>
+<span class="c1">// Does nothing.</span>
+<span class="k">auto</span> <span class="n">blockchain_start</span> <span class="o">=</span> <span class="p">[](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span> <span class="p">{};</span>
+<span class="c1">// Start blockchain with a database path.</span>
+<span class="n">chain</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">blockchain_start</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The function <tt class="xref cpp cpp-func docutils literal"><span class="pre">genesis_block()</span></tt> returns a genesis block.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// First block is the genesis block.</span>
+<span class="n">block_type</span> <span class="n">first_block</span> <span class="o">=</span> <span class="n">genesis_block</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>We call <tt class="xref cpp cpp-func docutils literal"><span class="pre">blockchain::import()</span></tt> to save a block in the blockchain
+at a specified height directly. It doesn&#8217;t validate or perform any safety
+checks on the imported block. Instead the block is written directly.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// Completion handler for import method.</span>
+<span class="k">auto</span> <span class="n">import_finished</span> <span class="o">=</span>
+    <span class="p">[</span><span class="o">&amp;</span><span class="n">ec_promise</span><span class="p">](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">ec_promise</span><span class="p">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">ec</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="c1">// Import the genesis block at height 0.</span>
+<span class="c1">// Doesn&#39;t validate or perform checks on the block.</span>
+<span class="n">chain</span><span class="p">.</span><span class="n">import</span><span class="p">(</span><span class="n">first_block</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">import_finished</span><span class="p">);</span>
+<span class="c1">// Wait until std::error_code is set by</span>
+<span class="c1">// import_finished completion handler.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span> <span class="o">=</span> <span class="n">ec_promise</span><span class="p">.</span><span class="n">get_future</span><span class="p">().</span><span class="n">get</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Importing genesis block failed: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>All operations need to finish on <tt class="xref cpp cpp-class docutils literal"><span class="pre">leveldb_blockchain</span></tt> before it can
+be closed properly so we first stop the threadpool before calling
+<tt class="xref cpp cpp-func docutils literal"><span class="pre">leveldb_blockchain::stop()</span></tt>.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// All threadpools stopping in parallel...</span>
+<span class="n">pool</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+<span class="c1">// ... Make them all join main thread and wait until they finish.</span>
+<span class="n">pool</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="c1">// Now safely close leveldb_blockchain.</span>
+<span class="n">chain</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#blockchain::store__block_typeCR.store_block_handler" title="blockchain::store"><tt class="xref cpp cpp-func docutils literal"><span class="pre">blockchain::store()</span></tt></a> is the recommended way to add new blocks to
+the blockchain. It finds the correct height by looking up the previous block,
+handles reorganisations, validates the blocks and calls the subscription
+handlers.</p>
+<dl class="function">
+<dt id="blockchain::store__block_typeCR.store_block_handler">
+void <tt class="descclassname">blockchain::</tt><tt class="descname">store</tt><big>(</big>const block_type&amp; <em>block</em>, store_block_handler <em>handle_store</em><big>)</big><a class="headerlink" href="#blockchain::store__block_typeCR.store_block_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a new block.</p>
+<p>Subscriber is notified exactly once of changes to the blockchain
+and needs to re-subscribe to continue being notified.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_store</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>   <span class="c1">// Status of operation</span>
+    <span class="n">block_info</span> <span class="n">info</span>              <span class="c1">// Status and height of block</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>The full sourcecode can be found in <a class="reference internal" href="examples/initchain.html#examples-initchain"><em>examples/initchain.cpp</em></a>.</p>
+</div>
+<div class="section" id="fetch-and-display-block-info">
+<h2>5.2. Fetch and Display Block Info<a class="headerlink" href="#fetch-and-display-block-info" title="Permalink to this headline">¶</a></h2>
+<p>Services like blockchain do not block. Methods return immediately and upon
+completion call a completion handler. The semantics of the blockchain reflect
+this with the <tt class="docutils literal"><span class="pre">set/get_*</span></tt> methods being equivalently called <tt class="docutils literal"><span class="pre">store/fetch_*</span></tt>.</p>
+<p>The only thing we add to the blockchain is new blocks. There is one method called
+<a class="reference internal" href="#blockchain::store__block_typeCR.store_block_handler" title="blockchain::store"><tt class="xref cpp cpp-func docutils literal"><span class="pre">blockchain::store()</span></tt></a>. This method handles the internal details of
+validating the block against the current blockchain, returning competing blocks
+to the orphan pool (if needed), insertion into the database and processing
+any dependent blocks.</p>
+<p>In our example we want to fetch and display the last block header. To fetch
+the last height number, we use <a class="reference internal" href="#blockchain::fetch_last_height__fetch_handler_last_height" title="blockchain::fetch_last_height"><tt class="xref cpp cpp-func docutils literal"><span class="pre">blockchain::fetch_last_height()</span></tt></a>. To fetch
+the block header for a height number, we use
+<a class="reference internal" href="#blockchain::fetch_block_header__s.fetch_handler_block_header" title="blockchain::fetch_block_header"><tt class="xref cpp cpp-func docutils literal"><span class="pre">blockchain::fetch_block_header()</span></tt></a>.</p>
+<dl class="function">
+<dt id="blockchain::fetch_block_header__s.fetch_handler_block_header">
+void <tt class="descclassname">blockchain::</tt><tt class="descname">fetch_block_header</tt><big>(</big>size_t <em>height</em>, fetch_handler_block_header <em>handle_fetch</em><big>)</big><a class="headerlink" href="#blockchain::fetch_block_header__s.fetch_handler_block_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the block header by height.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_fetch</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>      <span class="c1">// Status of operation</span>
+    <span class="k">const</span> <span class="n">block_header_type</span><span class="o">&amp;</span> <span class="n">blk</span>    <span class="c1">// Block header</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="blockchain::fetch_last_height__fetch_handler_last_height">
+void <tt class="descclassname">blockchain::</tt><tt class="descname">fetch_last_height</tt><big>(</big>fetch_handler_last_height <em>handle_fetch</em><big>)</big><a class="headerlink" href="#blockchain::fetch_last_height__fetch_handler_last_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the height of the last block in our blockchain.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_fetch</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="c1">// Status of operation</span>
+    <span class="kt">size_t</span> <span class="n">block_height</span>        <span class="c1">// Height of last block</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>All the blockchain fetch methods give you access to all of the data in the
+blockchain to reconstruct or link any piece of data. Full navigation around
+the chain is possible.</p>
+<p>Starting at the basic level, we start with an application to start the
+blockchain otherwise report the error back.</p>
+<p>We create a threadpool, blockchain, and then call start. Then after when
+the user is ready to exit, we stop and join the threadpool, and safely
+close the blockchain.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="cp">#include &lt;bitcoin/bitcoin.hpp&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">bc</span><span class="p">;</span>
+
+<span class="n">blockchain</span><span class="o">*</span> <span class="n">chain</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+<span class="c1">// Completion handler for when the blockchain has finished initializing.</span>
+<span class="kt">void</span> <span class="nf">blockchain_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// std::error_code&#39;s can be tested like bools, and</span>
+    <span class="c1">// compared against specific error enums.</span>
+    <span class="c1">// See &lt;bitcoin/error.hpp&gt; for a full list of them.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Blockchain failed to start: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Blockchain has safely started.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Blockchain started.&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Define a threadpool with 1 thread.</span>
+    <span class="n">threadpool</span> <span class="n">pool</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="c1">// Create a LevelDB blockchain.</span>
+    <span class="n">leveldb_blockchain</span> <span class="n">ldb_chain</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+    <span class="c1">// Initialize our global &#39;chain&#39; pointer from above.</span>
+    <span class="n">chain</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldb_chain</span><span class="p">;</span>
+    <span class="c1">// Start the database using its implementation specific method.</span>
+    <span class="n">ldb_chain</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="s">&quot;../database&quot;</span><span class="p">,</span> <span class="n">blockchain_started</span><span class="p">);</span>
+    <span class="c1">// Keep running until the user presses enter.</span>
+    <span class="c1">// Since libbitcoin is asynchronous, you need to synchronise with</span>
+    <span class="c1">// them to know when to exit safely.</span>
+    <span class="c1">// For these examples we just pause until enter for simplicity sake.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="c1">// Begin stopping the threadpools in parallel (only 1 here).</span>
+    <span class="n">pool</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="c1">// Join them one by one.</span>
+    <span class="n">pool</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="c1">// Finally stop the blockchain safely now everything has stopped.</span>
+    <span class="n">ldb_chain</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After the blockchain has started, we want to begin the entire process.
+The process starts with getting the last height in our blockchain, then
+fetching the block header at that height, and finally displaying the
+block header to the screen.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// Completion handler for when the blockchain has finished initializing.</span>
+<span class="kt">void</span> <span class="nf">blockchain_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">);</span>
+<span class="c1">// Fetch the last block now that we have the height.</span>
+<span class="kt">void</span> <span class="nf">height_fetched</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">last_height</span><span class="p">);</span>
+<span class="c1">// Result: print the block header.</span>
+<span class="kt">void</span> <span class="nf">display_block_header</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">block_header_type</span><span class="o">&amp;</span> <span class="n">header</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>After the blockchain has started, we begin the operation to fetch the last
+height, calling <tt class="xref cpp cpp-func docutils literal"><span class="pre">height_fetched()</span></tt> after it&#8217;s finished.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">blockchain_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// std::error_code&#39;s can be tested like bools, and</span>
+    <span class="c1">// compared against specific error enums.</span>
+    <span class="c1">// See &lt;bitcoin/error.hpp&gt; for a full list of them.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Blockchain failed to start: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Blockchain has safely started.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Blockchain started.&quot;</span><span class="p">;</span>
+    <span class="c1">// chain should&#39;ve been set inside main().</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">chain</span><span class="p">);</span>
+    <span class="c1">// Begin fetching the last height number.</span>
+    <span class="n">chain</span><span class="o">-&gt;</span><span class="n">fetch_last_height</span><span class="p">(</span><span class="n">height_fetched</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After <tt class="xref cpp cpp-func docutils literal"><span class="pre">height_fetched()</span></tt> has been called, we know the block number and
+begin fetching the block header.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">height_fetched</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">last_height</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Failed to fetch last height: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Display the block number.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Height: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">last_height</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">chain</span><span class="p">);</span>
+    <span class="c1">// Begin fetching the block header.</span>
+    <span class="n">chain</span><span class="o">-&gt;</span><span class="n">fetch_block_header</span><span class="p">(</span><span class="n">last_height</span><span class="p">,</span> <span class="n">display_block_header</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now finally the block header is received, and can be displayed. This is
+the final operation in this sequence.</p>
+<p>As we only requested the block header, the transactions list will be
+empty. Getting a full block involves getting the transaction hashes
+associated with that block, and fetching each one which is provided
+by the composed operation <a class="reference internal" href="#fetch_block__blockchainR.s.blockchain_fetch_handler_block" title="fetch_block"><tt class="xref cpp cpp-func docutils literal"><span class="pre">fetch_block()</span></tt></a>.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">display_block_header</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">block_header_type</span><span class="o">&amp;</span> <span class="n">header</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Failure fetching block header: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// 32 byte std::array of uint8_t</span>
+    <span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">blk_hash</span> <span class="o">=</span> <span class="n">hash_block_header</span><span class="p">(</span><span class="n">header</span><span class="p">);</span>
+    <span class="c1">// Encode block hash into a pretty hex string.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;hash: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">encode_hex</span><span class="p">(</span><span class="n">blk_hash</span><span class="p">);</span>
+    <span class="c1">// Display a few fields from the block header.</span>
+    <span class="c1">// See &lt;bitcoin/primitives.hpp&gt; for the definition of block_type.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;version: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">version</span><span class="p">;</span>
+    <span class="c1">// hash_digest can be used directly in log_info(),</span>
+    <span class="c1">// implicity calling encode_hex() on the hash_digest.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;previous_block_hash: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">previous_block_hash</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;merkle: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">merkle</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;timestamp: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">timestamp</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;bits: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">bits</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;nonce: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">nonce</span><span class="p">;</span>
+    <span class="c1">// A goodbye message.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Finished.&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The full example is in <a class="reference internal" href="examples/display-last.html#examples-display-last"><em>examples/display-last.cpp</em></a>.</p>
+</div>
+<div class="section" id="message-from-satoshi-bitcoin-s-creator">
+<h2>5.3. Message from Satoshi, Bitcoin&#8217;s creator<a class="headerlink" href="#message-from-satoshi-bitcoin-s-creator" title="Permalink to this headline">¶</a></h2>
+<p>Satoshi left us a message inside the first Bitcoin <em>genesis</em> block.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// The Times 03/Jan/2009 Chancellor on brink of second bailout for banks</span>
+</pre></div>
+</div>
+<p>The message is inside the first input, of the first transaction, of the
+first Bitcoin block.</p>
+<p>Block 0 is predefined by Bitcoin. All blockchains must begin with
+the same block otherwise they aren&#8217;t Bitcoin. <tt class="xref cpp cpp-func docutils literal"><span class="pre">genesis_block()</span></tt>
+recreates a copy of block 0.</p>
+<ol class="arabic simple">
+<li>Create genesis block.</li>
+<li>Lookup first transaction in block (the coinbase transaction).</li>
+<li>Get the first input from the coinbase transaction.</li>
+<li>Serialize the input&#8217;s script back into raw form.</li>
+<li>Display the raw input script.</li>
+</ol>
+<p>The input script for the first input of the coinbase transaction inside the
+genesis block contains the message from Satoshi.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// examples/satoshiwords.cpp</span>
+<span class="cp">#include &lt;bitcoin/bitcoin.hpp&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">bc</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Create genesis block.</span>
+    <span class="n">block_type</span> <span class="n">genblk</span> <span class="o">=</span> <span class="n">genesis_block</span><span class="p">();</span>
+    <span class="c1">// Genesis block contains a single coinbase transaction.</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">genblk</span><span class="p">.</span><span class="n">transactions</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="c1">// Get first transaction in block (coinbase).</span>
+    <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">coinbase_tx</span> <span class="o">=</span> <span class="n">genblk</span><span class="p">.</span><span class="n">transactions</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="c1">// Coinbase tx has a single input.</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">coinbase_tx</span><span class="p">.</span><span class="n">inputs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">transaction_input_type</span><span class="o">&amp;</span> <span class="n">coinbase_input</span> <span class="o">=</span> <span class="n">coinbase_tx</span><span class="p">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="c1">// Get the input script (sometimes called scriptSig).</span>
+    <span class="k">const</span> <span class="n">script</span><span class="o">&amp;</span> <span class="n">input_script</span> <span class="o">=</span> <span class="n">coinbase_input</span><span class="p">.</span><span class="n">input_script</span><span class="p">;</span>
+    <span class="c1">// Convert this to its raw format.</span>
+    <span class="k">const</span> <span class="n">data_chunk</span><span class="o">&amp;</span> <span class="n">raw_block_message</span> <span class="o">=</span> <span class="n">save_script</span><span class="p">(</span><span class="n">input_script</span><span class="p">);</span>
+    <span class="c1">// Convert this to an std::string.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">message</span><span class="p">;</span>
+    <span class="n">message</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">raw_block_message</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">copy</span><span class="p">(</span><span class="n">raw_block_message</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">raw_block_message</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span>
+        <span class="n">message</span><span class="p">.</span><span class="n">begin</span><span class="p">());</span>
+    <span class="c1">// Display the genesis block message.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">message</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reconstruct-block-transactions">
+<h2>5.4. Reconstruct Block Transactions<a class="headerlink" href="#reconstruct-block-transactions" title="Permalink to this headline">¶</a></h2>
+<p>To reconstruct an entire block from a block header, first obtain a list of
+transaction hashes that makeup that block. Then iterate the list of
+transaction hashes, fetching the transactions one by one.</p>
+<dl class="function">
+<dt id="blockchain::fetch_block_transaction_hashes__hash_digestCR.fetch_handler_block_transaction_hashes">
+void <tt class="descclassname">blockchain::</tt><tt class="descname">fetch_block_transaction_hashes</tt><big>(</big><a class="reference internal" href="overview.html#hash_digest" title="hash_digest">const hash_digest&amp;</a> <em>block_hash</em>, fetch_handler_block_transaction_hashes <em>handle_fetch</em><big>)</big><a class="headerlink" href="#blockchain::fetch_block_transaction_hashes__hash_digestCR.fetch_handler_block_transaction_hashes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches list of transaction hashes in a block given the block hash.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_fetch</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>      <span class="c1">// Status of operation</span>
+    <span class="k">const</span> <span class="n">inventory_list</span><span class="o">&amp;</span> <span class="n">hashes</span>    <span class="c1">// List of hashes</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="blockchain::fetch_transaction__hash_digestCR.fetch_handler_transaction">
+void <tt class="descclassname">blockchain::</tt><tt class="descname">fetch_transaction</tt><big>(</big><a class="reference internal" href="overview.html#hash_digest" title="hash_digest">const hash_digest&amp;</a> <em>transaction_hash</em>, fetch_handler_transaction <em>handle_fetch</em><big>)</big><a class="headerlink" href="#blockchain::fetch_transaction__hash_digestCR.fetch_handler_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches a transaction by hash</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_fetch</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>  <span class="c1">// Status of operation</span>
+    <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span>  <span class="c1">// Transaction</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="fetch-block-and-composed-operations">
+<span id="composed-operations"></span><h3>5.4.1. <a class="reference internal" href="#fetch_block__blockchainR.s.blockchain_fetch_handler_block" title="fetch_block"><tt class="xref cpp cpp-func docutils literal"><span class="pre">fetch_block()</span></tt></a> and Composed Operations<a class="headerlink" href="#fetch-block-and-composed-operations" title="Permalink to this headline">¶</a></h3>
+<p>libbitcoin provides a convenience function <a class="reference internal" href="#fetch_block__blockchainR.s.blockchain_fetch_handler_block" title="fetch_block"><tt class="xref cpp cpp-func docutils literal"><span class="pre">fetch_block()</span></tt></a> to wrap the
+details of fetching a full block. These kind of operations that wrap a bunch
+of other operations are called <em>composed operations</em>.</p>
+<p>A general <a class="reference internal" href="introduction.html#intro-design"><em>design principle of libbitcoin</em></a> is to keep the implementation simple
+and not pollute class interfaces. Instead composed operations wrap lower
+level class methods to simplify common operations.</p>
+<dl class="function">
+<dt id="fetch_block__blockchainR.s.blockchain_fetch_handler_block">
+void <tt class="descname">fetch_block</tt><big>(</big>blockchain&amp; <em>chain</em>, size_t <em>height</em>, blockchain_fetch_handler_block <em>handle_fetch</em><big>)</big><a class="headerlink" href="#fetch_block__blockchainR.s.blockchain_fetch_handler_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch a block by height.
+If the blockchain reorganises, operation may fail halfway.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_fetch</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>  <span class="c1">// Status of operation</span>
+    <span class="k">const</span> <span class="n">block_type</span><span class="o">&amp;</span> <span class="n">blk</span>       <span class="c1">// Block header</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="polling-blocks-from-nodes">
+<span id="tut-poller"></span><h2>5.5. Polling Blocks From Nodes<a class="headerlink" href="#polling-blocks-from-nodes" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref cpp cpp-class docutils literal"><span class="pre">poller</span></tt> service downloads blocks from nodes into the blockchain.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="c1">// ...</span>
+
+<span class="kt">void</span> <span class="nf">connection_established</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">,</span>
+    <span class="n">poller</span><span class="o">&amp;</span> <span class="n">poll</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+    <span class="c1">// getblocks request asking node for a list of blocks to download.</span>
+    <span class="c1">// Usually you call query() on the first node you connect to.</span>
+    <span class="n">poll</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+    <span class="c1">// Monitor for inventory packets containing blocks we don&#39;t have.</span>
+    <span class="c1">// Then request and attempt to store the blocks in the blockchain.</span>
+    <span class="n">poll</span><span class="p">.</span><span class="n">monitor</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">threadpool</span> <span class="n">pool</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">leveldb_blockchain</span> <span class="n">chain</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+    <span class="c1">// ...</span>
+    <span class="n">poller</span> <span class="n">poll</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">chain</span><span class="p">);</span>
+    <span class="c1">// ...</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><tt class="xref cpp cpp-class docutils literal"><span class="pre">poller</span></tt> handles the details of watching for notification of new blocks,
+sending requests as needed and storing them in the blockchain by calling
+<a class="reference internal" href="#blockchain::store__block_typeCR.store_block_handler" title="blockchain::store"><tt class="xref cpp cpp-func docutils literal"><span class="pre">blockchain::store()</span></tt></a>.</p>
+<div class="section" id="reorganizations-and-new-blocks">
+<h3>5.5.1. Reorganizations And New Blocks<a class="headerlink" href="#reorganizations-and-new-blocks" title="Permalink to this headline">¶</a></h3>
+<p>While polling new blocks from the network, callbacks registered with
+<a class="reference internal" href="#blockchain::subscribe_reorganize__reorganize_handler" title="blockchain::subscribe_reorganize"><tt class="xref cpp cpp-func docutils literal"><span class="pre">blockchain::subscribe_reorganize()</span></tt></a> will be notified of any changes
+to the blockchain.</p>
+<dl class="function">
+<dt id="blockchain::subscribe_reorganize__reorganize_handler">
+void <tt class="descclassname">blockchain::</tt><tt class="descname">subscribe_reorganize</tt><big>(</big>reorganize_handler <em>handle_reorganize</em><big>)</big><a class="headerlink" href="#blockchain::subscribe_reorganize__reorganize_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Be notified of the next blockchain change.</p>
+<p>Subscriber is notified exactly once of changes to the blockchain
+and needs to re-subscribe to continue being notified.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_reorganize</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>   <span class="c1">// Status of operation</span>
+    <span class="kt">size_t</span> <span class="n">fork_point</span><span class="p">,</span>           <span class="c1">// Index where blockchain forks</span>
+    <span class="k">const</span> <span class="n">block_list</span><span class="o">&amp;</span> <span class="n">added</span><span class="p">,</span>     <span class="c1">// New blocks added to blockchain</span>
+    <span class="k">const</span> <span class="n">block_list</span><span class="o">&amp;</span> <span class="n">removed</span>    <span class="c1">// Blocks removed (empty if none)</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">fork_point</span></tt> gives the height of the ancestor block before the split.
+Both lists are ordered from lowest height first.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">added_blocks</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">size_t</span> <span class="n">height</span> <span class="o">=</span> <span class="n">fork_point</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">const</span> <span class="n">block_type</span><span class="o">&amp;</span> <span class="n">blk</span> <span class="o">=</span> <span class="o">*</span><span class="n">added_blocks</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="optimization-techniques">
+<h2>5.6. Optimization Techniques<a class="headerlink" href="#optimization-techniques" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Create a separate partition for the database directory with the
+<em>noatime</em> parameter set.</li>
+<li>Lower VM <a class="reference external" href="http://en.wikipedia.org/wiki/Swappiness">swappiness</a>.</li>
+<li>Increase the <a class="reference external" href="http://stackoverflow.com/questions/34588/how-do-i-change-the-number-of-open-files-limit-in-linux">max number of open files</a>.</li>
+<li>Disable filesystem caching to prevent double caching by database and
+operating system.</li>
+<li>Make heavy use of replication i.e multiple <tt class="xref cpp cpp-class docutils literal"><span class="pre">blockchain</span></tt> instances
+each with their own database.</li>
+<li>Follow the <a class="reference external" href="http://docs.basho.com/riak/latest/tutorials/choosing-a-backend/LevelDB/">guidelines here</a>.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. Fun With The Bitcoin Blockchain</a><ul>
+<li><a class="reference internal" href="#initialization-importing-the-genesis-block">5.1. Initialization: Importing The Genesis Block</a></li>
+<li><a class="reference internal" href="#fetch-and-display-block-info">5.2. Fetch and Display Block Info</a></li>
+<li><a class="reference internal" href="#message-from-satoshi-bitcoin-s-creator">5.3. Message from Satoshi, Bitcoin&#8217;s creator</a></li>
+<li><a class="reference internal" href="#reconstruct-block-transactions">5.4. Reconstruct Block Transactions</a><ul>
+<li><a class="reference internal" href="#fetch-block-and-composed-operations">5.4.1. <tt class="docutils literal"><span class="pre">fetch_block()</span></tt> and Composed Operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#polling-blocks-from-nodes">5.5. Polling Blocks From Nodes</a><ul>
+<li><a class="reference internal" href="#reorganizations-and-new-blocks">5.5.1. Reorganizations And New Blocks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optimization-techniques">5.6. Optimization Techniques</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="crypto.html"
+                        title="previous chapter">4. Crypto and Private Keys</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="network.html"
+                        title="next chapter">6. Network Protocol</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/blockchain.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="network.html" title="6. Network Protocol"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="crypto.html" title="4. Crypto and Private Keys"
+             >previous</a> |</li>
+        <li><a href="index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, libbitcoin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

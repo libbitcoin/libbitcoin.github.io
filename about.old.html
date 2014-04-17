@@ -1,0 +1,92 @@
+<h3>What is it?</h3>
+<h3>Why does it exist?</h3>
+
+<p>
+The current Bitcoin setup is not developer friendly. It's broken in so many
+ways. We have a big monolithic codebase with bad design, and a poorly defined
+RPC interface bolted on top as an afterthought. The software is continually
+optimised for user desktops, not servers which is where the future of Bitcoin
+nodes is.
+</p>
+
+<p>
+The wallet is mixed in the same process as the blockchain which is a massive
+security risk. The blockchain should be a persistant background process, while
+the wallet should be local to the user. That way you can properly sandbox the
+wallet, encrypt it and have multiple user accounts using standard UNIX concepts.
+</p>
+
+<p>
+I found how to scale blockchain queries up massively so that they're super fast.
+I implemented the <a href="http://en.wikipedia.org/wiki/Seqlock">sequence lock algorithm</a>.
+Writes always have priority, but so long as a write isn't occuring (which is
+rare because block updates happen roughly every 10 mins), then reads occur
+in parallel without any locking needed.
+</p>
+
+<blockquote>
+The reader never blocks, but it may have to retry if a write is in progress;
+this speeds up the readers in the case where the data was not modified, since
+they do not have to acquire the lock as they would with a traditional read-write
+lock. Also, writers do not wait for readers, whereas with traditional read-write
+locks they do, leading to potential resource starvation in a situation where
+there are a number of readers (because the writer must wait for there to be no
+readers). Because of these two factors, seqlocks are more efficient than
+traditional read-write locks for the situation where there are many readers and
+few writers.
+</blockquote>
+
+<p>
+I took my fullnode implementation, and added an RPC interface (Apache Thrift)
+for request-reply method calls (and exposed the libbitcoin API over the
+network). Then I added ZeroMQ to push new validated confirmed blocks, and new
+validated unconfirmed transactions over the network. Make that the master node.
+</p>
+
+<p>
+The you have a bunch of dummy slave nodes which just replicate the database,
+and remain synchronised with the master by copying new blocks as they come in
+from the master. Then you make a query layer in the front which takes queries
+in from outside the system and load balances them across the slaves by
+distributing requests.
+</p>
+
+<p>
+If you need a faster blockchain query, then add more slaves. If some part of
+your infrastructure crashes or goes down, then it still operates because of
+redundancy. The master node doing all the heavy lifting is insulated from the
+outside world. This is Bitcoin on a massive scale.
+</p>
+
+<p>
+Good design is anything like a UNIX system. The concepts are standard and have
+been well tested from a <a href="http://en.wikipedia.org/wiki/Worse_is_better">software development standpoint</a> for decades.
+For system software, you want to keep the implementation simple and in bricks
+(see <a href="http://libbitcoin.dyne.org/doc/introduction.html#design">libbitcoin design</a>).
+Generic minimal interfaces with small bricks that snap together means that
+you can focus on making that brick good without additional complication.
+You can swap out other bricks, and you keep the interface simple. It's the UNIX
+principle.
+</p>
+
+<p>
+Simple implementation can sometimes mean difficult interface because you have
+to fill in the gaps and do everything manually yourself. All the basics are
+exposed and nothing is hidden. That's what wrappers are for. Wrappers are the
+next level up. They <i>wrap</i> code into another easier interface.
+We're talking about system software at the bottom which must be
+simple, intuitive and single focus.
+</p>
+
+<p>
+Application software is different. It can be a simple interface with complex
+internals. I'm talking instead about making a resilient infrastructure.
+</p>
+
+<h3>Taster</h3>
+(determ + mpk + N to btc addr)
+<h3>Getting started</h3>
+<a href="http://libbitcoin.dyne.org/doc/">The libbitcoin Tutorial</a>.
+<h3>History</h3>
+<h3>Projects using libbitcoin</h3>
+

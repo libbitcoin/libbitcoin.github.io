@@ -1,0 +1,157 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>examples/determ.cpp &mdash; libbitcoin 1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="top" title="libbitcoin 1 documentation" href="../index.html" />
+    <link rel="next" title="examples/initchain.cpp" href="initchain.html" />
+    <link rel="prev" title="examples/priv.cpp" href="priv.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="initchain.html" title="examples/initchain.cpp"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="priv.html" title="examples/priv.cpp"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples-determ-cpp">
+<span id="examples-determ"></span><h1>examples/determ.cpp<a class="headerlink" href="#examples-determ-cpp" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="cp">#include &lt;bitcoin/bitcoin.hpp&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">bc</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">deterministic_wallet</span> <span class="n">wallet</span><span class="p">;</span>
+    <span class="c1">// Set seed.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">wallet</span><span class="p">.</span><span class="n">set_seed</span><span class="p">(</span><span class="s">&quot;a219213f9b12422aa206d988e3e49607&quot;</span><span class="p">))</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error setting seed.&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Get an address from wallet...</span>
+    <span class="n">data_chunk</span> <span class="n">pubkey</span> <span class="o">=</span> <span class="n">wallet</span><span class="p">.</span><span class="n">generate_public_key</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">payment_address</span> <span class="n">addr</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">set_public_key</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">pubkey</span><span class="p">))</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error setting public key.&quot;</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">addr</span><span class="p">.</span><span class="n">encoded</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;1E4vM9q25xsyDwWwdqHUWnwshdWC9PykmL&quot;</span><span class="p">);</span>
+
+    <span class="c1">// ... Get the corresponding private key.</span>
+    <span class="c1">// Extract the secret parameter.</span>
+    <span class="n">secret_parameter</span> <span class="n">secret</span> <span class="o">=</span> <span class="n">wallet</span><span class="p">.</span><span class="n">generate_secret</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">encode_hex</span><span class="p">(</span><span class="n">secret</span><span class="p">)</span> <span class="o">==</span> <span class="s">&quot;33cc7e35fbb78d17d207e53d0fe950d1db571be889b3ff87aec653e501759264&quot;</span><span class="p">);</span>
+    <span class="c1">// The secret parameter is used to compute the private key</span>
+    <span class="c1">// by the elliptic curve formula.</span>
+    <span class="n">elliptic_curve_key</span> <span class="n">privkey</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">privkey</span><span class="p">.</span><span class="n">set_secret</span><span class="p">(</span><span class="n">secret</span><span class="p">))</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error set private key.&quot;</span><span class="p">;</span>
+    <span class="c1">// Wallet generated public key should match corresponding public key</span>
+    <span class="c1">// in the private key.</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">privkey</span><span class="p">.</span><span class="n">public_key</span><span class="p">()</span> <span class="o">==</span> <span class="n">pubkey</span><span class="p">);</span>
+
+    <span class="c1">// Master public key</span>
+    <span class="n">data_chunk</span> <span class="n">mpk</span> <span class="o">=</span> <span class="n">wallet</span><span class="p">.</span><span class="n">master_public_key</span><span class="p">();</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">encode_hex</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span> <span class="o">==</span> <span class="s">&quot;d996c1a50ca4a57a9dface614338a1d837cb339e08361cfaf66ffd7da8e21786a7142a014056439d579654d7bb58dd5724b93372b5efae62e76783300f2b6cb5&quot;</span><span class="p">);</span>
+
+    <span class="c1">// A master key can only generate public keys and not the private keys.</span>
+    <span class="n">deterministic_wallet</span> <span class="n">wallet2</span><span class="p">;</span>
+    <span class="n">wallet2</span><span class="p">.</span><span class="n">set_master_public_key</span><span class="p">(</span><span class="n">mpk</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">wallet2</span><span class="p">.</span><span class="n">generate_public_key</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">pubkey</span><span class="p">);</span>
+    <span class="c1">// Trying to generate the secret parameter will always return null_hash.</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">wallet2</span><span class="p">.</span><span class="n">generate_secret</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">null_hash</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="priv.html"
+                        title="previous chapter">examples/priv.cpp</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="initchain.html"
+                        title="next chapter">examples/initchain.cpp</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/examples/determ.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="initchain.html" title="examples/initchain.cpp"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="priv.html" title="examples/priv.cpp"
+             >previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, libbitcoin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

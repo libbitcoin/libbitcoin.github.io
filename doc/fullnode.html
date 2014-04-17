@@ -1,0 +1,490 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7. Full Node Implementation &mdash; libbitcoin 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="top" title="libbitcoin 1 documentation" href="index.html" />
+    <link rel="next" title="examples/priv.cpp" href="examples/priv.html" />
+    <link rel="prev" title="6. Network Protocol" href="network.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="examples/priv.html" title="examples/priv.cpp"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="network.html" title="6. Network Protocol"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="full-node-implementation">
+<span id="tut-fullnode"></span><h1>7. Full Node Implementation<a class="headerlink" href="#full-node-implementation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="recap">
+<h2>7.1. Recap<a class="headerlink" href="#recap" title="Permalink to this headline">¶</a></h2>
+<p>The library is based around the concept of <em>services</em> which operate through
+<em>threadpools</em>. We&#8217;ve covered the basics of the different services present
+to build Bitcoin applications.</p>
+<p><a class="reference internal" href="introduction.html#tut-intro"><em>Chapter 1</em></a> talked about the design philosophy of libbitcoin.
+It was a largely theoretical text about the underpinnings of the library.</p>
+<p><a class="reference internal" href="quickstart.html#tut-quickstart"><em>Chapter 2</em></a> gave a quick practical example.</p>
+<p><a class="reference internal" href="overview.html#tut-overview"><em>Chapter 3</em></a> introduced core libbitcoin concepts, and
+an anatomy of the library. We looked at basic data types, the logging subsystem
+and useful snippets of the standard library.</p>
+<p><a class="reference internal" href="crypto.html#tut-crypto"><em>Chapter 4</em></a> covered basic crypto, working with keys,
+deterministic wallets and converting different key formats.</p>
+<p><a class="reference internal" href="blockchain.html#tut-blockchain"><em>Chapter 5</em></a> discussed how to operate the
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">blockchain</span></tt> and use the <tt class="xref cpp cpp-class docutils literal"><span class="pre">leveldb_blockchain</span></tt> backend.
+We saw how the <tt class="xref cpp cpp-class docutils literal"><span class="pre">poller</span></tt> service <a class="reference internal" href="blockchain.html#tut-poller"><em>polls new blocks from nodes</em></a>,
+and how new blocks/reorganisations are handled.</p>
+<p><a class="reference internal" href="network.html#tut-network"><em>Chapter 6</em></a> illustrated the networking concepts.
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">network</span></tt> is the base service that handles networking, while
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">protocol</span></tt> handles <a class="reference internal" href="network.html#tut-protocol"><em>joining the peer to peer network</em></a>.
+There are other services that manage different aspects of the Bitcoin
+network like <tt class="xref cpp cpp-class docutils literal"><span class="pre">handshake</span></tt> for the initialization handshake between
+2 nodes, or <tt class="xref cpp cpp-class docutils literal"><span class="pre">hosts</span></tt> for managing lists of Bitcoin hosts.</p>
+<p>In this chapter we will introduce the final puzzle piece: unconfirmed
+transactions. Putting it all together we will build a full Bitcoin node
+in under 200 lines of code.</p>
+<p>We will introduce 2 new services. <tt class="xref cpp cpp-class docutils literal"><span class="pre">transaction_pool</span></tt> is the unconfirmed
+transaction memory pool and validates incoming transactions for us.
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">session</span></tt> ties all the services together in a high level wrapper.
+It&#8217;s a convenience service dealing with details like requesting transactions
+from the network or starting the protocol service.</p>
+</div>
+<div class="section" id="source-code">
+<h2>7.2. Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<p>You can view the source code: <a class="reference internal" href="examples/fullnode.html#examples-fullnode"><em>examples/fullnode.cpp</em></a>.</p>
+<p>Before starting, make sure to have initialized a blockchain database.</p>
+<div class="highlight-cpp"><pre>$ cd examples/
+$ make
+$ mkdir database/
+$ ./initchain database
+Imported genesis block 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f
+$ ./fullnode
+...</pre>
+</div>
+</div>
+<div class="section" id="basic-outline">
+<h2>7.3. Basic Outline<a class="headerlink" href="#basic-outline" title="Permalink to this headline">¶</a></h2>
+<p>We will make a <tt class="xref cpp cpp-class docutils literal"><span class="pre">fullnode</span></tt> class that is responsible for holding all
+the <tt class="xref cpp cpp-class docutils literal"><span class="pre">threadpool</span></tt> and <tt class="xref cpp cpp-class docutils literal"><span class="pre">service</span></tt> objects. There are 2 class methods
+to <tt class="xref cpp cpp-func docutils literal"><span class="pre">start()</span></tt> and <tt class="xref cpp cpp-func docutils literal"><span class="pre">stop()</span></tt> it respectively.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="k">class</span> <span class="nc">fullnode</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">fullnode</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="nf">start</span><span class="p">();</span>
+    <span class="c1">// Should only be called from the main thread.</span>
+    <span class="c1">// It&#39;s an error to join() a thread from inside it.</span>
+    <span class="kt">void</span> <span class="nf">stop</span><span class="p">();</span>
+
+<span class="nl">private:</span>
+    <span class="c1">// ...</span>
+
+    <span class="c1">// Threadpools</span>
+    <span class="n">threadpool</span> <span class="n">net_pool_</span><span class="p">,</span> <span class="n">disk_pool_</span><span class="p">,</span> <span class="n">mem_pool_</span><span class="p">;</span>
+    <span class="c1">// Services</span>
+    <span class="n">hosts</span> <span class="n">hosts_</span><span class="p">;</span>
+    <span class="n">handshake</span> <span class="n">handshake_</span><span class="p">;</span>
+    <span class="n">network</span> <span class="n">network_</span><span class="p">;</span>
+    <span class="n">protocol</span> <span class="n">protocol_</span><span class="p">;</span>
+    <span class="n">leveldb_blockchain</span> <span class="n">chain_</span><span class="p">;</span>
+    <span class="n">poller</span> <span class="n">poller_</span><span class="p">;</span>
+    <span class="n">transaction_pool</span> <span class="n">txpool_</span><span class="p">;</span>
+    <span class="c1">// Mac OSX needs the bc:: namespace qualifier to compile.</span>
+    <span class="c1">// Other systems should be OK.</span>
+    <span class="n">bc</span><span class="o">::</span><span class="n">session</span> <span class="n">session_</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Our <tt class="xref cpp cpp-func docutils literal"><span class="pre">main()</span></tt> function instantiates the fullnode, starts it and then
+waits for the user to stop the node by pressing enter.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="n">fullnode</span> <span class="n">app</span><span class="p">;</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">start</span><span class="p">();</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The constructor of <tt class="xref cpp cpp-class docutils literal"><span class="pre">fullnode</span></tt> creates the threadpools and services,
+passing their dependencies into the constructor. Services generally use their
+constructor for specifying their dependencies.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="n">fullnode</span><span class="o">::</span><span class="n">fullnode</span><span class="p">()</span>
+    <span class="c1">// Threadpools and the number of threads they spawn.</span>
+    <span class="c1">// 6 threads spawned in total.</span>
+  <span class="o">:</span> <span class="n">net_pool_</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">disk_pool_</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">mem_pool_</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+    <span class="c1">// Networking related services.</span>
+    <span class="n">hosts_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">),</span> <span class="n">handshake_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">),</span> <span class="n">network_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">),</span>
+    <span class="n">protocol_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">,</span> <span class="n">hosts_</span><span class="p">,</span> <span class="n">handshake_</span><span class="p">,</span> <span class="n">network_</span><span class="p">),</span>
+    <span class="c1">// Blockchain database service.</span>
+    <span class="n">chain_</span><span class="p">(</span><span class="n">disk_pool_</span><span class="p">),</span>
+    <span class="c1">// Poll new blocks, and transaction memory pool.</span>
+    <span class="n">poller_</span><span class="p">(</span><span class="n">mem_pool_</span><span class="p">,</span> <span class="n">chain_</span><span class="p">),</span> <span class="n">txpool_</span><span class="p">(</span><span class="n">mem_pool_</span><span class="p">,</span> <span class="n">chain_</span><span class="p">),</span>
+    <span class="c1">// Session manager service. Convenience wrapper.</span>
+    <span class="n">session_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">,</span> <span class="p">{</span>
+        <span class="n">handshake_</span><span class="p">,</span> <span class="n">protocol_</span><span class="p">,</span> <span class="n">chain_</span><span class="p">,</span> <span class="n">poller_</span><span class="p">,</span> <span class="n">txpool_</span><span class="p">})</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We also define the <tt class="xref cpp cpp-func docutils literal"><span class="pre">start()</span></tt> and <tt class="xref cpp cpp-func docutils literal"><span class="pre">stop()</span></tt> methods of the
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">fullnode</span></tt>. If <tt class="xref cpp cpp-func docutils literal"><span class="pre">start()</span></tt> fails then <tt class="xref cpp cpp-func docutils literal"><span class="pre">fullnode::handle_start()</span></tt>
+will be called with <tt class="xref cpp cpp-class docutils literal"><span class="pre">std::error_code</span></tt> set. If the
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">std::error_code</span></tt> is set then the error message is displayed.</p>
+<p>It&#8217;s a mistake to call <tt class="xref cpp cpp-func docutils literal"><span class="pre">fullnode::stop()</span></tt> from within the same completion
+handler as we would then try to call <tt class="xref cpp cpp-func docutils literal"><span class="pre">threadpool::join()</span></tt> within the
+same thread causing a resource deadlock. Instead it is preferable to use
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">std::condition_variable</span></tt> to signal to <tt class="xref cpp cpp-func docutils literal"><span class="pre">main()</span></tt> that it&#8217;s time
+to exit. We leave this as an exercise to the reader.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">start</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Start blockchain. Must finish before any operations</span>
+    <span class="c1">// are performed on the database (or they will fail).</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">promise</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&gt;</span> <span class="n">ec_chain</span><span class="p">;</span>
+    <span class="k">auto</span> <span class="n">blockchain_started</span> <span class="o">=</span>
+        <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">ec_chain</span><span class="p">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">ec</span><span class="p">);</span>
+        <span class="p">};</span>
+    <span class="n">chain_</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="s">&quot;database&quot;</span><span class="p">,</span> <span class="n">blockchain_started</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span> <span class="o">=</span> <span class="n">ec_chain</span><span class="p">.</span><span class="n">get_future</span><span class="p">().</span><span class="n">get</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Problem starting blockchain: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Start transaction pool</span>
+    <span class="n">txpool_</span><span class="p">.</span><span class="n">start</span><span class="p">();</span>
+    <span class="c1">// Fire off app.</span>
+    <span class="k">auto</span> <span class="n">handle_start</span> <span class="o">=</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">handle_start</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">);</span>
+    <span class="n">session_</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">handle_start</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">stop</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">session_</span><span class="p">.</span><span class="n">stop</span><span class="p">([](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span><span class="p">)</span> <span class="p">{});</span>
+
+    <span class="c1">// Stop threadpools.</span>
+    <span class="n">net_pool_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="n">disk_pool_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="n">mem_pool_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="c1">// Join threadpools. Wait for them to finish.</span>
+    <span class="n">net_pool_</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="n">disk_pool_</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="n">mem_pool_</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+
+    <span class="c1">// Safely close blockchain database.</span>
+    <span class="n">chain_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">handle_start</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;fullnode: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="unconfirmed-transactions">
+<h2>7.4. Unconfirmed Transactions<a class="headerlink" href="#unconfirmed-transactions" title="Permalink to this headline">¶</a></h2>
+<p>Before bitcoin transactions make it into a block, they go into
+a transaction memory pool. <tt class="xref cpp cpp-class docutils literal"><span class="pre">transaction_pool</span></tt> encapsulates that functionality
+performing the neccessary validation of a transaction before accepting
+it into its internal buffer.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="n">threadpool</span> <span class="nf">pool</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">// transaction_pool needs access to the blockchain</span>
+<span class="n">blockchain</span><span class="o">*</span> <span class="n">chain</span> <span class="o">=</span> <span class="n">load_our_backend</span><span class="p">();</span>
+<span class="c1">// create and initialize the transaction memory pool</span>
+<span class="n">transaction_pool</span> <span class="nf">txpool</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="o">*</span><span class="n">chain</span><span class="p">);</span>
+<span class="n">txpool</span><span class="p">.</span><span class="n">start</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The <tt class="xref cpp cpp-class docutils literal"><span class="pre">session</span></tt> service automatically does the task of asking for new
+transactions that the <tt class="xref cpp cpp-class docutils literal"><span class="pre">transaction_pool</span></tt> doesn&#8217;t have. For every new
+connection, we must subscribe to new transactions from the network using
+<tt class="xref cpp cpp-func docutils literal"><span class="pre">channel::subscribe_transaction()</span></tt>.</p>
+<p>These new transactions must then be validated by attempting to store it in the
+transaction memory pool with <a class="reference internal" href="#transaction_pool::store__transaction_typeCR.confirm_handler.store_handler" title="transaction_pool::store"><tt class="xref cpp cpp-func docutils literal"><span class="pre">transaction_pool::store()</span></tt></a>.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="k">class</span> <span class="nc">fullnode</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="c1">// ...</span>
+
+<span class="nl">private:</span>
+    <span class="c1">// ...</span>
+
+    <span class="c1">// New connection has been started.</span>
+    <span class="c1">// Subscribe to new transaction messages from the network.</span>
+    <span class="kt">void</span> <span class="n">connection_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">);</span>
+    <span class="c1">// New transaction message from the network.</span>
+    <span class="c1">// Attempt to validate it by storing it in the transaction pool.</span>
+    <span class="kt">void</span> <span class="nf">recv_tx</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+        <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">);</span>
+    <span class="c1">// Result of store operation in transaction pool.</span>
+    <span class="kt">void</span> <span class="nf">new_unconfirm_valid_tx</span><span class="p">(</span>
+        <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="k">const</span> <span class="n">index_list</span><span class="o">&amp;</span> <span class="n">unconfirmed</span><span class="p">,</span>
+        <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">);</span>
+
+    <span class="c1">// ...</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>At the beginning of start, we subscribe to new connections.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">start</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Subscribe to new connections.</span>
+    <span class="n">protocol_</span><span class="p">.</span><span class="n">subscribe_channel</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">connection_started</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">));</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And for every new connection, we subscribe to transaction messages from the
+network by calling <tt class="xref cpp cpp-func docutils literal"><span class="pre">channel::subscribe_transaction()</span></tt>. We again call
+<a class="reference internal" href="network.html#protocol::subscribe_channel__channel_handler" title="protocol::subscribe_channel"><tt class="xref cpp cpp-func docutils literal"><span class="pre">protocol::subscribe_channel()</span></tt></a> to continue being notified of new
+connections.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">connection_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_warning</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Couldn&#39;t start connection: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Subscribe to transaction messages from this node.</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">subscribe_transaction</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">recv_tx</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">node</span><span class="p">));</span>
+    <span class="c1">// Stay subscribed to new connections.</span>
+    <span class="n">protocol_</span><span class="p">.</span><span class="n">subscribe_channel</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">connection_started</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="validating-the-transaction">
+<h3>7.4.1. Validating The Transaction<a class="headerlink" href="#validating-the-transaction" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="xref cpp cpp-class docutils literal"><span class="pre">transaction_pool</span></tt> interface is deliberately simple to minimise overhead.
+This class attempts no tracking of inputs or spends and only provides
+a store/fetch paradigm. Tracking must be performed externally and make
+use of <a class="reference internal" href="#transaction_pool::store__transaction_typeCR.confirm_handler.store_handler" title="transaction_pool::store"><tt class="xref cpp cpp-func docutils literal"><span class="pre">transaction_pool::store()</span></tt></a>&#8216;s <tt class="docutils literal"><span class="pre">handle_store</span></tt> and
+<tt class="docutils literal"><span class="pre">handle_confirm</span></tt> to manage changes in the state of memory pool transactions.</p>
+<dl class="function">
+<dt id="transaction_pool::store__transaction_typeCR.confirm_handler.store_handler">
+void <tt class="descclassname">transaction_pool::</tt><tt class="descname">store</tt><big>(</big>const transaction_type&amp; <em>stored_transaction</em>, confirm_handler <em>handle_confirm</em>, store_handler <em>handle_store</em><big>)</big><a class="headerlink" href="#transaction_pool::store__transaction_typeCR.confirm_handler.store_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to store a transaction.</p>
+<p><tt class="docutils literal"><span class="pre">handle_store</span></tt> is called on completion. The second argument is a list
+of unconfirmed input indexes. These inputs refer to a transaction
+that is not in the blockchain and is currently in the memory pool.</p>
+<p>In the case where store results in <tt class="xref cpp cpp-class docutils literal"><span class="pre">error::input_not_found</span></tt>, the
+unconfirmed field refers to the single problematic input.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_store</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>      <span class="c1">// Status of operation</span>
+    <span class="k">const</span> <span class="n">index_list</span><span class="o">&amp;</span> <span class="n">unconfirmed</span>   <span class="c1">// Unconfirmed input indexes</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">handle_confirm</span></tt> is called when the transaction makes it into a block
+(becoming confirmed) and is removed from the transaction pool.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="nf">handle_confirm</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span>    <span class="c1">// Status of operation</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>Upon receiving transactions in <tt class="xref cpp cpp-func docutils literal"><span class="pre">fullnode::recv_tx()</span></tt>, we validate the
+transaction by attempting to store it in the transaction pool.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">recv_tx</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Receive transaction: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Called when the transaction becomes confirmed in a block.</span>
+    <span class="k">auto</span> <span class="n">handle_confirm</span> <span class="o">=</span> <span class="p">[](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+                <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Confirm error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="p">};</span>
+    <span class="c1">// Validate the transaction from the network.</span>
+    <span class="c1">// Attempt to store in the transaction pool and check the result.</span>
+    <span class="n">txpool_</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">handle_confirm</span><span class="p">,</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">new_unconfirm_valid_tx</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">tx</span><span class="p">));</span>
+    <span class="c1">// Resubscribe to transaction messages from this node.</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">subscribe_transaction</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">recv_tx</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">node</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We now have the result of this sequence of operations. We know whether the
+transaction successfully passed validation or not.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">new_unconfirm_valid_tx</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="k">const</span> <span class="n">index_list</span><span class="o">&amp;</span> <span class="n">unconfirmed</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">tx_hash</span> <span class="o">=</span> <span class="n">hash_transaction</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span>
+            <span class="o">&lt;&lt;</span> <span class="s">&quot;Error storing memory pool transaction &quot;</span>
+            <span class="o">&lt;&lt;</span> <span class="n">tx_hash</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="k">auto</span> <span class="n">l</span> <span class="o">=</span> <span class="n">log_info</span><span class="p">();</span>
+        <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Accepted transaction &quot;</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">unconfirmed</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;(Unconfirmed inputs&quot;</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">idx</span><span class="o">:</span> <span class="n">unconfirmed</span><span class="p">)</span>
+                <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">idx</span><span class="p">;</span>
+            <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) &quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="n">tx_hash</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="requesting-dependencies">
+<h3>7.4.2. Requesting Dependencies<a class="headerlink" href="#requesting-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>If the transaction failed to validate because one of its inputs was missing,
+then <tt class="xref cpp cpp-class docutils literal"><span class="pre">error::input_not_found</span></tt> will be set as the
+<tt class="xref cpp cpp-class docutils literal"><span class="pre">std::error_code</span></tt>, and <tt class="docutils literal"><span class="pre">unconfirmed</span></tt> will be set to a single value
+of which input was missing in the transaction. From this we can request the
+missing dependency from the network.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="n">ec</span> <span class="o">==</span> <span class="n">error</span><span class="o">::</span><span class="n">input_not_found</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">BITCOIN_ASSERT</span><span class="p">(</span><span class="n">unconfirmed</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">BITCOIN_ASSERT</span><span class="p">(</span><span class="n">unconfirmed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">tx</span><span class="p">.</span><span class="n">inputs</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+    <span class="kt">size_t</span> <span class="n">missing_index</span> <span class="o">=</span> <span class="n">unconfirmed</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="n">prevout</span> <span class="o">=</span> <span class="n">tx</span><span class="p">.</span><span class="n">inputs</span><span class="p">[</span><span class="n">missing_index</span><span class="p">].</span><span class="n">previous_output</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Requesting dependency &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">encode_hex</span><span class="p">(</span><span class="n">prevout</span><span class="p">.</span><span class="n">hash</span><span class="p">)</span>
+        <span class="o">&lt;&lt;</span> <span class="s">&quot; for &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">encode_hex</span><span class="p">(</span><span class="n">tx_hash</span><span class="p">);</span>
+    <span class="n">get_data_type</span> <span class="n">getdata</span><span class="p">;</span>
+    <span class="n">getdata</span><span class="p">.</span><span class="n">inventories</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span>
+        <span class="p">{</span><span class="n">inventory_type_id</span><span class="o">::</span><span class="n">transaction</span><span class="p">,</span> <span class="n">prevout</span><span class="p">.</span><span class="n">hash</span><span class="p">});</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">send</span><span class="p">(</span><span class="n">getdata</span><span class="p">,</span> <span class="n">depends_requested</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Upon receipt of the dependency transaction from the remote host, and its
+successful validation in the <tt class="xref cpp cpp-class docutils literal"><span class="pre">transaction_pool</span></tt>, we must resubmit this
+transaction. Assuming no other inputs are missing, the resubmitted
+transaction should then pass validation.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7. Full Node Implementation</a><ul>
+<li><a class="reference internal" href="#recap">7.1. Recap</a></li>
+<li><a class="reference internal" href="#source-code">7.2. Source Code</a></li>
+<li><a class="reference internal" href="#basic-outline">7.3. Basic Outline</a></li>
+<li><a class="reference internal" href="#unconfirmed-transactions">7.4. Unconfirmed Transactions</a><ul>
+<li><a class="reference internal" href="#validating-the-transaction">7.4.1. Validating The Transaction</a></li>
+<li><a class="reference internal" href="#requesting-dependencies">7.4.2. Requesting Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="network.html"
+                        title="previous chapter">6. Network Protocol</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples/priv.html"
+                        title="next chapter">examples/priv.cpp</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fullnode.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="examples/priv.html" title="examples/priv.cpp"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="network.html" title="6. Network Protocol"
+             >previous</a> |</li>
+        <li><a href="index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, libbitcoin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

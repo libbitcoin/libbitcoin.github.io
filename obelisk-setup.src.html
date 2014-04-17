@@ -1,0 +1,30 @@
+<div class="box">
+    <h2>Quick setup guide</h2>
+    <p>Create a blockchain database:</p>
+    <pre>
+  $ mkdir worker/
+  $ cd worker/
+  $ mkdir blockchain/
+  $ sx initchain blockchain/
+    </pre>
+    <p>If you have a bitcoind bootstrap.dat (can also be downloaded off the
+    PirateBay), then you can bootstrap a blockchain. See libbitcoin/tools/ (run
+    'make' and see the bootstrap tool).</p>
+    <p>Now start the Bitcoin node which will begin the blockchain download.</p>
+    <pre>
+  $ screen -S worker
+  $ obworker
+    </pre>
+    <p>Press CTRL-C and wait if you want to stop the worker.</p>
+    <p>You can see the output using 'tail -f debug.log'.</p>
+    <p>Config files are in /install-prefix/etc/obelisk/</p>
+    <p>
+Important: each worker needs a separate copy of the blockchain
+database. Multiple workers cannot both use a blockchain database at the same time. Stop the
+worker, copy the blockchain directory to your other worker and restart
+obworker.</p>
+    <p>Running multiple workers is good for redundancy in case one crashes or
+has problems.</p>
+</div>
+
+

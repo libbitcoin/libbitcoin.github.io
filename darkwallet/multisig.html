@@ -1,0 +1,59 @@
+<p>
+<b>Amir</b><br>
+address: 1Fufjpf9RM2aQsGedhSpbSCGRHrmLMJ7yY<br>
+pubkey: 04cf2e5b02d6f02340f5a9defbbf710c388b8451c82145b1419fe9696837b1cdefc569a2a79baa6da2f747c3b25a102a081dfd5e799abc41262103e0d17114770b
+</p>
+
+<p>
+<b>Cody</b><br>
+address: 1PwarLme2KRRzv4Uvm7Z4bhngu8fnYBTSV<br>
+pubkey: 04e9d3ef27f5f113e559e7c17689e7e8557d6b0a4230b4133521b19491e139cce64d0950cdc52a120bd9cca3e7d1fffa19ba5dc07668710cf680a78cb7a620f7d7
+</p>
+
+<p>
+<b>Janislav</b><br>
+address: 1KpJ4dsxERXMGH8QaZWRb2dMe74CA3j1fY<br>
+pubkey: 0471ac3b184480506d3d5c870db51b0855e16a08dbfb9a9afb1f0df79e14b8747213ffb2a7fad8b19652208d518905e25ac59b9cb4b03aa05f1c529d3ae7d4f1ae
+</p>
+
+<p>
+<b>Pablo</b><br>
+address: 17aWcgixqWAFQAytsH3RwTHqvHjr9G8c76<br>
+pubkey: 04a96f4ec1a76380e70afc090c7e235c49be99a0ca18def91aaaa5e98dafd7b2a167d8a68304da3fde25ba5529c2ff0e44e63816be7b1a2a288317c4156ef3c11d
+</p>
+
+<p>
+<b>Vitalik</b><br>
+address: 1EmR8a2eYqf6RybnbqVZJSq1uHrcsMzoqR<br>
+pubkey: 0462bf92dc23d100c6c9f77f335201513ce29b2a6ea319dbdef96e55139d7313487ea715d308eea01f50f68d7234294e5bfe39c4f81d12d3533481dc61797ecf57
+</p>
+
+<p>Use the command 'echo PUBKEY | sx addr' to generate an address from the public keys listed here.</p>
+
+<p>We order keys in the multisig address based on the alphabetical order of the names (as above). So Amir's pubkey is before Janislav's pubkey.</p>
+
+<p>Command used to generate multisig script:</p>
+
+<pre>
+$ PUBKEY_AMIR=04cf2e5b02d6f02340f5a9defbbf710c388b8451c82145b1419fe9696837b1cdefc569a2a79baa6da2f747c3b25a102a081dfd5e799abc41262103e0d17114770b
+$ PUBKEY_CODY=04e9d3ef27f5f113e559e7c17689e7e8557d6b0a4230b4133521b19491e139cce64d0950cdc52a120bd9cca3e7d1fffa19ba5dc07668710cf680a78cb7a620f7d7
+$ PUBKEY_JANISLAV=0471ac3b184480506d3d5c870db51b0855e16a08dbfb9a9afb1f0df79e14b8747213ffb2a7fad8b19652208d518905e25ac59b9cb4b03aa05f1c529d3ae7d4f1ae
+$ PUBKEY_PABLO=04a96f4ec1a76380e70afc090c7e235c49be99a0ca18def91aaaa5e98dafd7b2a167d8a68304da3fde25ba5529c2ff0e44e63816be7b1a2a288317c4156ef3c11d
+$ PUBKEY_VITALIK=0462bf92dc23d100c6c9f77f335201513ce29b2a6ea319dbdef96e55139d7313487ea715d308eea01f50f68d7234294e5bfe39c4f81d12d3533481dc61797ecf57
+$ sx rawscript 3 [ $PUBKEY_AMIR ] [ $PUBKEY_CODY ] [ $PUBKEY_JANISLAV ] [ $PUBKEY_PABLO ] [ $PUBKEY_VITALIK ] 5 checkmultisig
+</pre>
+
+<p>Output should be:</p>
+
+<pre>
+534104cf2e5b02d6f02340f5a9defbbf710c388b8451c82145b1419fe9696837b1cdefc569a2a79baa6da2f747c3b25a102a081dfd5e799abc41262103e0d17114770b4104e9d3ef27f5f113e559e7c17689e7e8557d6b0a4230b4133521b19491e139cce64d0950cdc52a120bd9cca3e7d1fffa19ba5dc07668710cf680a78cb7a620f7d7410471ac3b184480506d3d5c870db51b0855e16a08dbfb9a9afb1f0df79e14b8747213ffb2a7fad8b19652208d518905e25ac59b9cb4b03aa05f1c529d3ae7d4f1ae4104a96f4ec1a76380e70afc090c7e235c49be99a0ca18def91aaaa5e98dafd7b2a167d8a68304da3fde25ba5529c2ff0e44e63816be7b1a2a288317c4156ef3c11d410462bf92dc23d100c6c9f77f335201513ce29b2a6ea319dbdef96e55139d7313487ea715d308eea01f50f68d7234294e5bfe39c4f81d12d3533481dc61797ecf5755ae
+</pre>
+
+<p>You can verify the script is correct using 'echo RAWSCRIPT | sx showscript'.</p>
+
+<p>Finally we generate the multisig address using 'echo RAWSCRIPT | sx scripthash'.</p>
+
+<pre>
+32wRDBezxnazSBxMrMqLWqD1ajwEqnDnMc
+</pre>
+

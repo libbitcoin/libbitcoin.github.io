@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>examples/txrad.cpp &mdash; libbitcoin 1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="top" title="libbitcoin 1 documentation" href="../index.html" />
+    <link rel="next" title="examples/fullnode.cpp" href="fullnode.html" />
+    <link rel="prev" title="examples/proto.cpp" href="proto.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fullnode.html" title="examples/fullnode.cpp"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="proto.html" title="examples/proto.cpp"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples-txrad-cpp">
+<span id="examples-txrad"></span><h1>examples/txrad.cpp<a class="headerlink" href="#examples-txrad-cpp" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="cp">#include &lt;bitcoin/bitcoin.hpp&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">bc</span><span class="p">;</span>
+
+<span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_2</span><span class="p">;</span>
+
+<span class="c1">// Watches transactions. Keeps a view count per seen tx hash, and</span>
+<span class="c1">// cleans up old expired tx hashes.</span>
+<span class="k">class</span> <span class="nc">tx_watch</span>
+  <span class="o">:</span> <span class="k">public</span> <span class="n">async_strand</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">tx_watch</span><span class="p">(</span><span class="n">threadpool</span><span class="o">&amp;</span> <span class="n">pool</span><span class="p">,</span> <span class="kt">time_t</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">200</span><span class="p">);</span>
+
+    <span class="c1">// Push a seen tx hash. If this entry exists then the count</span>
+    <span class="c1">// will be incremented.</span>
+    <span class="c1">// Else create a new entry in our list.</span>
+    <span class="kt">void</span> <span class="nf">push</span><span class="p">(</span><span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">tx_hash</span><span class="p">);</span>
+    <span class="c1">// Cleans up expired items. We could make this implicitly called</span>
+    <span class="c1">// by push() or display(), but single use methods with no side-effects</span>
+    <span class="c1">// is better code design.</span>
+    <span class="kt">void</span> <span class="nf">cleanup</span><span class="p">();</span>
+    <span class="c1">// Display transactions and their count. A better design would be to</span>
+    <span class="c1">// separate the view from the model and instead provide a method which</span>
+    <span class="c1">// fetches a copy of our list, but we keep it simple here.</span>
+    <span class="kt">void</span> <span class="nf">display</span><span class="p">();</span>
+
+<span class="nl">private:</span>
+    <span class="k">struct</span> <span class="n">entry_count</span>
+    <span class="p">{</span>
+        <span class="n">hash_digest</span> <span class="n">tx_hash</span><span class="p">;</span>
+        <span class="kt">size_t</span> <span class="n">count</span><span class="p">;</span>
+        <span class="c1">// Timestamp of when transaction hash was first seen.</span>
+        <span class="kt">time_t</span> <span class="n">timest</span><span class="p">;</span>
+    <span class="p">};</span>
+
+    <span class="k">typedef</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">entry_count</span><span class="o">&gt;</span> <span class="n">entry_list</span><span class="p">;</span>
+
+    <span class="c1">// The public methods push these methods to the threadpool to be</span>
+    <span class="c1">// executed and then return immediately.</span>
+    <span class="c1">// async_strand::queue() is a helper method which posts the work</span>
+    <span class="c1">// to the threadpool and serializes access.</span>
+    <span class="c1">// No 2 operations posted through the same async_strand using queue()</span>
+    <span class="c1">// will execute at the same time.</span>
+    <span class="kt">void</span> <span class="nf">do_push</span><span class="p">(</span><span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">tx_hash</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">do_cleanup</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="nf">do_display</span><span class="p">();</span>
+
+    <span class="n">entry_list</span> <span class="n">entries_</span><span class="p">;</span>
+    <span class="c1">// Time until an entry is ready to be removed.</span>
+    <span class="kt">time_t</span> <span class="n">timeout_</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">tx_watch</span><span class="o">::</span><span class="n">tx_watch</span><span class="p">(</span><span class="n">threadpool</span><span class="o">&amp;</span> <span class="n">pool</span><span class="p">,</span> <span class="kt">time_t</span> <span class="n">timeout</span><span class="p">)</span>
+  <span class="o">:</span> <span class="n">async_strand</span><span class="p">(</span><span class="n">pool</span><span class="p">),</span> <span class="n">timeout_</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">tx_watch</span><span class="o">::</span><span class="n">push</span><span class="p">(</span><span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">tx_hash</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">queue</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tx_watch</span><span class="o">::</span><span class="n">do_push</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">tx_hash</span><span class="p">));</span>
+    <span class="c1">// Returns immediately.</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">tx_watch</span><span class="o">::</span><span class="n">do_push</span><span class="p">(</span><span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">tx_hash</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// If tx_hash is found then increment count...</span>
+    <span class="kt">bool</span> <span class="n">is_found</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">entry_count</span><span class="o">&amp;</span> <span class="n">entry</span><span class="o">:</span> <span class="n">entries_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">entry</span><span class="p">.</span><span class="n">tx_hash</span> <span class="o">==</span> <span class="n">tx_hash</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="o">++</span><span class="n">entry</span><span class="p">.</span><span class="n">count</span><span class="p">;</span>
+            <span class="n">is_found</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="c1">// Else create a new entry with a count of 1.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">is_found</span><span class="p">)</span>
+        <span class="n">entries_</span><span class="p">.</span><span class="n">push_back</span><span class="p">({</span><span class="n">tx_hash</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">time</span><span class="p">(</span><span class="n">nullptr</span><span class="p">)});</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">tx_watch</span><span class="o">::</span><span class="n">cleanup</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">queue</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tx_watch</span><span class="o">::</span><span class="n">do_cleanup</span><span class="p">,</span> <span class="k">this</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">tx_watch</span><span class="o">::</span><span class="n">do_cleanup</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Erase entries where timest is older than (now - timeout_) seconds.</span>
+    <span class="kt">time_t</span> <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">(</span><span class="n">nullptr</span><span class="p">);</span>
+    <span class="k">auto</span> <span class="n">erase_pred</span> <span class="o">=</span>
+        <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">entry_count</span><span class="o">&amp;</span> <span class="n">entry</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="n">entry</span><span class="p">.</span><span class="n">timest</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">timeout_</span><span class="p">;</span>
+        <span class="p">};</span>
+    <span class="k">auto</span> <span class="n">erase_begin</span> <span class="o">=</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">remove_if</span><span class="p">(</span><span class="n">entries_</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">entries_</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">erase_pred</span><span class="p">);</span>
+    <span class="c1">// If we have old entries to delete then erase them.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">erase_begin</span> <span class="o">!=</span> <span class="n">entries_</span><span class="p">.</span><span class="n">end</span><span class="p">())</span>
+        <span class="n">entries_</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">erase_begin</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">tx_watch</span><span class="o">::</span><span class="n">display</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">queue</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tx_watch</span><span class="o">::</span><span class="n">do_display</span><span class="p">,</span> <span class="k">this</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">tx_watch</span><span class="o">::</span><span class="n">do_display</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Sort entries by count. Highest numbers at the top.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span><span class="n">entries_</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">entries_</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span>
+        <span class="p">[](</span><span class="k">const</span> <span class="n">entry_count</span><span class="o">&amp;</span> <span class="n">entry_a</span><span class="p">,</span> <span class="k">const</span> <span class="n">entry_count</span><span class="o">&amp;</span> <span class="n">entry_b</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="n">entry_a</span><span class="p">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">entry_b</span><span class="p">.</span><span class="n">count</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="c1">// Display the first 20 entries.</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">20</span> <span class="o">&amp;&amp;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">entries_</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">const</span> <span class="n">entry_count</span><span class="o">&amp;</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">entries_</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">entry</span><span class="p">.</span><span class="n">tx_hash</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">entry</span><span class="p">.</span><span class="n">count</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// We don&#39;t have a database open, and aren&#39;t doing any critical file</span>
+<span class="c1">// operations so we aren&#39;t worried about exiting suddenly.</span>
+<span class="kt">void</span> <span class="n">check_error</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ec</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="n">log_fatal</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+    <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Needed for the C callback capturing the signals.</span>
+<span class="kt">bool</span> <span class="n">stopped</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="kt">void</span> <span class="nf">signal_handler</span><span class="p">(</span><span class="kt">int</span> <span class="n">sig</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Caught signal: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">sig</span><span class="p">;</span>
+    <span class="n">stopped</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Started protocol. Node discovery complete.</span>
+<span class="kt">void</span> <span class="nf">handle_start</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">check_error</span><span class="p">(</span><span class="n">ec</span><span class="p">);</span>
+    <span class="n">log_debug</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Started.&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">connection_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">,</span>
+    <span class="n">protocol</span><span class="o">&amp;</span> <span class="n">prot</span><span class="p">,</span> <span class="n">tx_watch</span><span class="o">&amp;</span> <span class="n">watch</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">inventory_received</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="k">const</span> <span class="n">inventory_type</span><span class="o">&amp;</span> <span class="n">inv</span><span class="p">,</span>
+    <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">,</span> <span class="n">tx_watch</span><span class="o">&amp;</span> <span class="n">watch</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">connection_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">,</span>
+    <span class="n">protocol</span><span class="o">&amp;</span> <span class="n">prot</span><span class="p">,</span> <span class="n">tx_watch</span><span class="o">&amp;</span> <span class="n">watch</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_warning</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Couldn&#39;t start connection: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Connection established.&quot;</span><span class="p">;</span>
+    <span class="c1">// Subscribe to inventory packets.</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">subscribe_inventory</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">inventory_received</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">watch</span><span class="p">)));</span>
+    <span class="c1">// Resubscribe to new nodes.</span>
+    <span class="n">prot</span><span class="p">.</span><span class="n">subscribe_channel</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">connection_started</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">prot</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">watch</span><span class="p">)));</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">inventory_received</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="k">const</span> <span class="n">inventory_type</span><span class="o">&amp;</span> <span class="n">inv</span><span class="p">,</span>
+    <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">,</span> <span class="n">tx_watch</span><span class="o">&amp;</span> <span class="n">watch</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">check_error</span><span class="p">(</span><span class="n">ec</span><span class="p">);</span>
+    <span class="c1">// Loop through inventory hashes.</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">inventory_vector_type</span><span class="o">&amp;</span> <span class="n">ivec</span><span class="o">:</span> <span class="n">inv</span><span class="p">.</span><span class="n">inventories</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// We&#39;re only interested in transactions. Discard everything else.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ivec</span><span class="p">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">inventory_type_id</span><span class="o">::</span><span class="n">transaction</span><span class="p">)</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="n">watch</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">ivec</span><span class="p">.</span><span class="n">hash</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">// Resubscribe to inventory packets.</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">subscribe_inventory</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">inventory_received</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">watch</span><span class="p">)));</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">threadpool</span> <span class="n">pool</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+    <span class="c1">// Create dependencies for our protocol object.</span>
+    <span class="n">hosts</span> <span class="n">hst</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+    <span class="n">handshake</span> <span class="n">hs</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+    <span class="n">network</span> <span class="n">net</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+    <span class="c1">// protocol service.</span>
+    <span class="n">protocol</span> <span class="n">prot</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">hst</span><span class="p">,</span> <span class="n">hs</span><span class="p">,</span> <span class="n">net</span><span class="p">);</span>
+    <span class="c1">// Perform node discovery if needed and then creating connections.</span>
+    <span class="n">prot</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">handle_start</span><span class="p">);</span>
+    <span class="c1">// Our table tracking transaction counts.</span>
+    <span class="n">tx_watch</span> <span class="n">watch</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="mi">200</span><span class="p">);</span>
+    <span class="c1">// Notify us of new connections.</span>
+    <span class="n">prot</span><span class="p">.</span><span class="n">subscribe_channel</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">connection_started</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">prot</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">watch</span><span class="p">)));</span>
+    <span class="c1">// Catch C signals for stopping the program.</span>
+    <span class="n">signal</span><span class="p">(</span><span class="n">SIGABRT</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">);</span>
+    <span class="n">signal</span><span class="p">(</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">);</span>
+    <span class="n">signal</span><span class="p">(</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">stopped</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">watch</span><span class="p">.</span><span class="n">cleanup</span><span class="p">();</span>
+        <span class="n">watch</span><span class="p">.</span><span class="n">display</span><span class="p">();</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">// Safely close down.</span>
+    <span class="n">pool</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="n">pool</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="proto.html"
+                        title="previous chapter">examples/proto.cpp</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fullnode.html"
+                        title="next chapter">examples/fullnode.cpp</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/examples/txrad.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fullnode.html" title="examples/fullnode.cpp"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="proto.html" title="examples/proto.cpp"
+             >previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, libbitcoin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

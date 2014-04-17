@@ -1,0 +1,12 @@
+.. _test:
+
+examples/initchain.cpp
+######################
+
+foobar.
+::
+    int main()
+    {
+        return 0;
+    }
+

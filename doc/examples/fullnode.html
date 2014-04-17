@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>examples/fullnode.cpp &mdash; libbitcoin 1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="top" title="libbitcoin 1 documentation" href="../index.html" />
+    <link rel="prev" title="examples/txrad.cpp" href="txrad.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="txrad.html" title="examples/txrad.cpp"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples-fullnode-cpp">
+<span id="examples-fullnode"></span><h1>examples/fullnode.cpp<a class="headerlink" href="#examples-fullnode-cpp" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="cp">#include &lt;future&gt;</span>
+<span class="cp">#include &lt;bitcoin/bitcoin.hpp&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">bc</span><span class="p">;</span>
+
+<span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_2</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_3</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">output_to_file</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ofstream</span><span class="o">&amp;</span> <span class="n">file</span><span class="p">,</span> <span class="n">log_level</span> <span class="n">level</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">domain</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">body</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="n">file</span> <span class="o">&lt;&lt;</span> <span class="n">level_repr</span><span class="p">(</span><span class="n">level</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">domain</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="n">file</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; [&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">domain</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;]&quot;</span><span class="p">;</span>
+    <span class="n">file</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">body</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="nf">output_cerr_and_file</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">ofstream</span><span class="o">&amp;</span> <span class="n">file</span><span class="p">,</span> <span class="n">log_level</span> <span class="n">level</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">domain</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">body</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ostringstream</span> <span class="n">output</span><span class="p">;</span>
+    <span class="n">output</span> <span class="o">&lt;&lt;</span> <span class="n">level_repr</span><span class="p">(</span><span class="n">level</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">domain</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="n">output</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; [&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">domain</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;]&quot;</span><span class="p">;</span>
+    <span class="n">output</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">body</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">output</span><span class="p">.</span><span class="n">str</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">fullnode</span>
+<span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="n">fullnode</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="nf">start</span><span class="p">();</span>
+    <span class="c1">// Should only be called from the main thread.</span>
+    <span class="c1">// It&#39;s an error to join() a thread from inside it.</span>
+    <span class="kt">void</span> <span class="nf">stop</span><span class="p">();</span>
+
+<span class="nl">private:</span>
+    <span class="kt">void</span> <span class="nf">handle_start</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">);</span>
+
+    <span class="c1">// New connection has been started.</span>
+    <span class="c1">// Subscribe to new transaction messages from the network.</span>
+    <span class="kt">void</span> <span class="nf">connection_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">);</span>
+    <span class="c1">// New transaction message from the network.</span>
+    <span class="c1">// Attempt to validate it by storing it in the transaction pool.</span>
+    <span class="kt">void</span> <span class="nf">recv_tx</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+        <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">);</span>
+    <span class="c1">// Result of store operation in transaction pool.</span>
+    <span class="kt">void</span> <span class="nf">new_unconfirm_valid_tx</span><span class="p">(</span>
+        <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="k">const</span> <span class="n">index_list</span><span class="o">&amp;</span> <span class="n">unconfirmed</span><span class="p">,</span>
+        <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">);</span>
+
+    <span class="c1">// Threadpools</span>
+    <span class="n">threadpool</span> <span class="n">net_pool_</span><span class="p">,</span> <span class="n">disk_pool_</span><span class="p">,</span> <span class="n">mem_pool_</span><span class="p">;</span>
+    <span class="c1">// Services</span>
+    <span class="n">hosts</span> <span class="n">hosts_</span><span class="p">;</span>
+    <span class="n">handshake</span> <span class="n">handshake_</span><span class="p">;</span>
+    <span class="n">network</span> <span class="n">network_</span><span class="p">;</span>
+    <span class="n">protocol</span> <span class="n">protocol_</span><span class="p">;</span>
+    <span class="n">leveldb_blockchain</span> <span class="n">chain_</span><span class="p">;</span>
+    <span class="n">poller</span> <span class="n">poller_</span><span class="p">;</span>
+    <span class="n">transaction_pool</span> <span class="n">txpool_</span><span class="p">;</span>
+    <span class="c1">// Mac OSX needs the bc:: namespace qualifier to compile.</span>
+    <span class="c1">// Other systems should be OK.</span>
+    <span class="n">bc</span><span class="o">::</span><span class="n">session</span> <span class="n">session_</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">fullnode</span><span class="o">::</span><span class="n">fullnode</span><span class="p">()</span>
+    <span class="c1">// Threadpools and the number of threads they spawn.</span>
+    <span class="c1">// 6 threads spawned in total.</span>
+  <span class="o">:</span> <span class="n">net_pool_</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">disk_pool_</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">mem_pool_</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+    <span class="c1">// Networking related services.</span>
+    <span class="n">hosts_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">),</span> <span class="n">handshake_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">),</span> <span class="n">network_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">),</span>
+    <span class="n">protocol_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">,</span> <span class="n">hosts_</span><span class="p">,</span> <span class="n">handshake_</span><span class="p">,</span> <span class="n">network_</span><span class="p">),</span>
+    <span class="c1">// Blockchain database service.</span>
+    <span class="n">chain_</span><span class="p">(</span><span class="n">disk_pool_</span><span class="p">),</span>
+    <span class="c1">// Poll new blocks, and transaction memory pool.</span>
+    <span class="n">poller_</span><span class="p">(</span><span class="n">mem_pool_</span><span class="p">,</span> <span class="n">chain_</span><span class="p">),</span> <span class="n">txpool_</span><span class="p">(</span><span class="n">mem_pool_</span><span class="p">,</span> <span class="n">chain_</span><span class="p">),</span>
+    <span class="c1">// Session manager service. Convenience wrapper.</span>
+    <span class="n">session_</span><span class="p">(</span><span class="n">net_pool_</span><span class="p">,</span> <span class="p">{</span>
+        <span class="n">handshake_</span><span class="p">,</span> <span class="n">protocol_</span><span class="p">,</span> <span class="n">chain_</span><span class="p">,</span> <span class="n">poller_</span><span class="p">,</span> <span class="n">txpool_</span><span class="p">})</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">start</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Subscribe to new connections.</span>
+    <span class="n">protocol_</span><span class="p">.</span><span class="n">subscribe_channel</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">connection_started</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">));</span>
+    <span class="c1">// Start blockchain. Must finish before any operations</span>
+    <span class="c1">// are performed on the database (or they will fail).</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">promise</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&gt;</span> <span class="n">ec_chain</span><span class="p">;</span>
+    <span class="k">auto</span> <span class="n">blockchain_started</span> <span class="o">=</span>
+        <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">ec_chain</span><span class="p">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">ec</span><span class="p">);</span>
+        <span class="p">};</span>
+    <span class="n">chain_</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="s">&quot;database&quot;</span><span class="p">,</span> <span class="n">blockchain_started</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span> <span class="o">=</span> <span class="n">ec_chain</span><span class="p">.</span><span class="n">get_future</span><span class="p">().</span><span class="n">get</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Problem starting blockchain: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Start transaction pool</span>
+    <span class="n">txpool_</span><span class="p">.</span><span class="n">start</span><span class="p">();</span>
+    <span class="c1">// Fire off app.</span>
+    <span class="k">auto</span> <span class="n">handle_start</span> <span class="o">=</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">handle_start</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">);</span>
+    <span class="n">session_</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">handle_start</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">stop</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">session_</span><span class="p">.</span><span class="n">stop</span><span class="p">([](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span><span class="p">)</span> <span class="p">{});</span>
+
+    <span class="c1">// Stop threadpools.</span>
+    <span class="n">net_pool_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="n">disk_pool_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="n">mem_pool_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="c1">// Join threadpools. Wait for them to finish.</span>
+    <span class="n">net_pool_</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="n">disk_pool_</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="n">mem_pool_</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+
+    <span class="c1">// Safely close blockchain database.</span>
+    <span class="n">chain_</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">handle_start</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;fullnode: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">connection_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_warning</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Couldn&#39;t start connection: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Subscribe to transaction messages from this node.</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">subscribe_transaction</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">recv_tx</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">node</span><span class="p">));</span>
+    <span class="c1">// Stay subscribed to new connections.</span>
+    <span class="n">protocol_</span><span class="p">.</span><span class="n">subscribe_channel</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">connection_started</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">recv_tx</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">,</span> <span class="n">channel_ptr</span> <span class="n">node</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Receive transaction: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Called when the transaction becomes confirmed in a block.</span>
+    <span class="k">auto</span> <span class="n">handle_confirm</span> <span class="o">=</span> <span class="p">[](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+                <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Confirm error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="p">};</span>
+    <span class="c1">// Validate the transaction from the network.</span>
+    <span class="c1">// Attempt to store in the transaction pool and check the result.</span>
+    <span class="n">txpool_</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">handle_confirm</span><span class="p">,</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">new_unconfirm_valid_tx</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">tx</span><span class="p">));</span>
+    <span class="c1">// Resubscribe to transaction messages from this node.</span>
+    <span class="n">node</span><span class="o">-&gt;</span><span class="n">subscribe_transaction</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fullnode</span><span class="o">::</span><span class="n">recv_tx</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">node</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">fullnode</span><span class="o">::</span><span class="n">new_unconfirm_valid_tx</span><span class="p">(</span>
+    <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="k">const</span> <span class="n">index_list</span><span class="o">&amp;</span> <span class="n">unconfirmed</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">transaction_type</span><span class="o">&amp;</span> <span class="n">tx</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">tx_hash</span> <span class="o">=</span> <span class="n">hash_transaction</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span>
+            <span class="o">&lt;&lt;</span> <span class="s">&quot;Error storing memory pool transaction &quot;</span>
+            <span class="o">&lt;&lt;</span> <span class="n">tx_hash</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="k">auto</span> <span class="n">l</span> <span class="o">=</span> <span class="n">log_info</span><span class="p">();</span>
+        <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Accepted transaction &quot;</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">unconfirmed</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;(Unconfirmed inputs&quot;</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">idx</span><span class="o">:</span> <span class="n">unconfirmed</span><span class="p">)</span>
+                <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">idx</span><span class="p">;</span>
+            <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) &quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">l</span> <span class="o">&lt;&lt;</span> <span class="n">tx_hash</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">outfile</span><span class="p">(</span><span class="s">&quot;debug.log&quot;</span><span class="p">),</span> <span class="n">errfile</span><span class="p">(</span><span class="s">&quot;error.log&quot;</span><span class="p">);</span>
+    <span class="n">log_debug</span><span class="p">().</span><span class="n">set_output_function</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">output_to_file</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">outfile</span><span class="p">),</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">_3</span><span class="p">));</span>
+    <span class="n">log_info</span><span class="p">().</span><span class="n">set_output_function</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">output_to_file</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">outfile</span><span class="p">),</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">_3</span><span class="p">));</span>
+    <span class="n">log_warning</span><span class="p">().</span><span class="n">set_output_function</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">output_to_file</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">errfile</span><span class="p">),</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">_3</span><span class="p">));</span>
+    <span class="n">log_error</span><span class="p">().</span><span class="n">set_output_function</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">output_cerr_and_file</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">errfile</span><span class="p">),</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">_3</span><span class="p">));</span>
+    <span class="n">log_fatal</span><span class="p">().</span><span class="n">set_output_function</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="n">output_cerr_and_file</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ref</span><span class="p">(</span><span class="n">errfile</span><span class="p">),</span> <span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">_3</span><span class="p">));</span>
+
+    <span class="n">fullnode</span> <span class="n">app</span><span class="p">;</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">start</span><span class="p">();</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="txrad.html"
+                        title="previous chapter">examples/txrad.cpp</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/examples/fullnode.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="txrad.html" title="examples/txrad.cpp"
+             >previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, libbitcoin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

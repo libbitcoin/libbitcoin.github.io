@@ -1,0 +1,186 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>6. Publisher &mdash; obelisk 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="obelisk 0.1 documentation" href="index.html" />
+    <link rel="prev" title="5. Subscribe" href="subscribe.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="subscribe.html" title="5. Subscribe"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">obelisk 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="publisher">
+<span id="tut-publisher"></span><h1>6. Publisher<a class="headerlink" href="#publisher" title="Permalink to this headline">¶</a></h1>
+<p>The publisher is for discovering about new confirmed blocks and unconfirmed
+(but validated) transactions.</p>
+<p>In your config file, you should see something similar to:</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="cp"># Valid values: &quot;enabled&quot; / &quot;disabled&quot;</span>
+<span class="cp"># Next 2 values ignored if publisher equals &quot;disabled&quot;</span>
+<span class="n">publisher</span> <span class="o">=</span> <span class="s">&quot;disabled&quot;</span>
+<span class="n">block</span><span class="o">-</span><span class="n">publish</span> <span class="o">=</span> <span class="s">&quot;tcp://*:9093&quot;</span>
+<span class="n">tx</span><span class="o">-</span><span class="n">publish</span> <span class="o">=</span> <span class="s">&quot;tcp://*:9094&quot;</span>
+</pre></div>
+</div>
+<p>Set publisher to &#8220;enabled&#8221;. The worker will now make 2 PUBSUB ports available.
+In the example above, blocks arrive on port 9093, and transactions on port 9094.</p>
+<p>TODO: Obelisk should send the last update when a client connects. ZeroMQ has
+this feature, but I have to investigate how to implement this [genjix].</p>
+<div class="section" id="confirmed-blocks">
+<h2>6.1. Confirmed Blocks<a class="headerlink" href="#confirmed-blocks" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Fields</th>
+<th class="head">Type(Size)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>height</td>
+<td>uint32(4)</td>
+</tr>
+<tr class="row-odd"><td>hash</td>
+<td>sha256 hash(32)</td>
+</tr>
+<tr class="row-even"><td>header</td>
+<td>block header(80)</td>
+</tr>
+<tr class="row-odd"><td>number of transactions</td>
+<td>uint32(4)</td>
+</tr>
+<tr class="row-even"><td>transaction hashes</td>
+<td>sha256 hash(variable number of fields of 32 bytes)</td>
+</tr>
+</tbody>
+</table>
+<p>The hash can be used as a checksum by hashing the block_header. The
+transactions can be verified by checking the merkle root within the block
+header.</p>
+<p>The client should be buffering unconfirmed transactions, and only requesting
+the transactions which they need but don&#8217;t have in their buffer from the server.</p>
+</div>
+<div class="section" id="unconfirmed-validated-transactions">
+<h2>6.2. Unconfirmed Validated Transactions<a class="headerlink" href="#unconfirmed-validated-transactions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Fields</th>
+<th class="head">Type(Size)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>hash</td>
+<td>sha256 hash(32)</td>
+</tr>
+<tr class="row-odd"><td>transaction</td>
+<td>data</td>
+</tr>
+</tbody>
+</table>
+<p>Currently Obelisk doesn&#8217;t send an update when you first connect, but this will
+be changed. You should be able to handle being giving the last update (for
+both blocks and transactions) when you first connect.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">6. Publisher</a><ul>
+<li><a class="reference internal" href="#confirmed-blocks">6.1. Confirmed Blocks</a></li>
+<li><a class="reference internal" href="#unconfirmed-validated-transactions">6.2. Unconfirmed Validated Transactions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="subscribe.html"
+                        title="previous chapter">5. Subscribe</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/publisher.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="subscribe.html" title="5. Subscribe"
+             >previous</a> |</li>
+        <li><a href="index.html">obelisk 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, unSYSTEM/Calafou.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

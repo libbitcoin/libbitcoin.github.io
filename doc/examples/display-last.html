@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>examples/display-last.cpp &mdash; libbitcoin 1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="top" title="libbitcoin 1 documentation" href="../index.html" />
+    <link rel="next" title="examples/satoshiwords.cpp" href="satoshiwords.html" />
+    <link rel="prev" title="examples/initchain.cpp" href="initchain.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="satoshiwords.html" title="examples/satoshiwords.cpp"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="initchain.html" title="examples/initchain.cpp"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples-display-last-cpp">
+<span id="examples-display-last"></span><h1>examples/display-last.cpp<a class="headerlink" href="#examples-display-last-cpp" title="Permalink to this headline">¶</a></h1>
+<p>Fetches and displays info about the last block in a blockchain.</p>
+<p>You will need to call initchain on the database first before using this.
+Maybe even download a few blocks into the database.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="cp">#include &lt;bitcoin/bitcoin.hpp&gt;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">bc</span><span class="p">;</span>
+
+<span class="n">blockchain</span><span class="o">*</span> <span class="n">chain</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+<span class="c1">// Completion handler for when the blockchain has finished initializing.</span>
+<span class="kt">void</span> <span class="nf">blockchain_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">);</span>
+<span class="c1">// Fetch the last block now that we have the height.</span>
+<span class="kt">void</span> <span class="nf">height_fetched</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">last_height</span><span class="p">);</span>
+<span class="c1">// Result: print the block header.</span>
+<span class="kt">void</span> <span class="nf">display_block_header</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">block_header_type</span><span class="o">&amp;</span> <span class="n">header</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">blockchain_started</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// std::error_code&#39;s can be tested like bools, and</span>
+    <span class="c1">// compared against specific error enums.</span>
+    <span class="c1">// See &lt;bitcoin/error.hpp&gt; for a full list of them.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Blockchain failed to start: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Blockchain has safely started.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Blockchain started.&quot;</span><span class="p">;</span>
+    <span class="c1">// chain should&#39;ve been set inside main().</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">chain</span><span class="p">);</span>
+    <span class="c1">// Begin fetching the last height number.</span>
+    <span class="n">chain</span><span class="o">-&gt;</span><span class="n">fetch_last_height</span><span class="p">(</span><span class="n">height_fetched</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">height_fetched</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">last_height</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Failed to fetch last height: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// Display the block number.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;height: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">last_height</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">chain</span><span class="p">);</span>
+    <span class="c1">// Begin fetching the block header.</span>
+    <span class="n">chain</span><span class="o">-&gt;</span><span class="n">fetch_block_header</span><span class="p">(</span><span class="n">last_height</span><span class="p">,</span> <span class="n">display_block_header</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// This is not the full block, only the header.</span>
+<span class="c1">// For the full block use fetch_block() instead.</span>
+<span class="kt">void</span> <span class="nf">display_block_header</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">ec</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">block_header_type</span><span class="o">&amp;</span> <span class="n">header</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">log_error</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Failure fetching block header: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">message</span><span class="p">();</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// 32 byte std::array of uint8_t</span>
+    <span class="k">const</span> <span class="n">hash_digest</span><span class="o">&amp;</span> <span class="n">blk_hash</span> <span class="o">=</span> <span class="n">hash_block_header</span><span class="p">(</span><span class="n">header</span><span class="p">);</span>
+    <span class="c1">// Encode block hash into a pretty hex string.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;hash: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">encode_hex</span><span class="p">(</span><span class="n">blk_hash</span><span class="p">);</span>
+    <span class="c1">// Display a few fields from the block header.</span>
+    <span class="c1">// See &lt;bitcoin/primitives.hpp&gt; for the definition of block_type.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;version: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">version</span><span class="p">;</span>
+    <span class="c1">// hash_digest can be used directly in log_info(),</span>
+    <span class="c1">// implicity calling encode_hex() on the hash_digest.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;previous_block_hash: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">previous_block_hash</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;merkle: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">merkle</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;timestamp: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">timestamp</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;bits: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">bits</span><span class="p">;</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;nonce: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">header</span><span class="p">.</span><span class="n">nonce</span><span class="p">;</span>
+    <span class="c1">// A goodbye message.</span>
+    <span class="n">log_info</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Finished.&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Define a threadpool with 1 thread.</span>
+    <span class="n">threadpool</span> <span class="n">pool</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="c1">// Create a LevelDB blockchain.</span>
+    <span class="n">leveldb_blockchain</span> <span class="n">ldb_chain</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+    <span class="c1">// Initialize our global &#39;chain&#39; pointer from above.</span>
+    <span class="n">chain</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldb_chain</span><span class="p">;</span>
+    <span class="c1">// Start the database using its implementation specific method.</span>
+    <span class="n">ldb_chain</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="s">&quot;database&quot;</span><span class="p">,</span> <span class="n">blockchain_started</span><span class="p">);</span>
+    <span class="c1">// Keep running until the user presses enter.</span>
+    <span class="c1">// Since libbitcoin is asynchronous, you need to synchronise with</span>
+    <span class="c1">// them to know when to exit safely.</span>
+    <span class="c1">// For these examples we just pause until enter for simplicity sake.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="c1">// Begin stopping the threadpools in parallel (only 1 here).</span>
+    <span class="n">pool</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="c1">// Join them one by one.</span>
+    <span class="n">pool</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="c1">// Finally stop the blockchain safely now everything has stopped.</span>
+    <span class="n">ldb_chain</span><span class="p">.</span><span class="n">stop</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="initchain.html"
+                        title="previous chapter">examples/initchain.cpp</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="satoshiwords.html"
+                        title="next chapter">examples/satoshiwords.cpp</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/examples/display-last.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="satoshiwords.html" title="examples/satoshiwords.cpp"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="initchain.html" title="examples/initchain.cpp"
+             >previous</a> |</li>
+        <li><a href="../index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, libbitcoin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

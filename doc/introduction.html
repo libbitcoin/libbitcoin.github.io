@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Introduction &mdash; libbitcoin 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="top" title="libbitcoin 1 documentation" href="index.html" />
+    <link rel="next" title="2. Quickstart" href="quickstart.html" />
+    <link rel="prev" title="The libbitcoin Tutorial" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="quickstart.html" title="2. Quickstart"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="The libbitcoin Tutorial"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="tut-intro"></span><h1>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>libbitcoin is a Bitcoin library targeted towards high end use. The library
+places a heavy focus around asychronicity. This enables a big scope for future
+scalability as each component has its own thread pool. By increasing the number
+of threads for that component the library is able to scale outwards across CPU
+cores. This will be vital in the future as the demands of the Bitcoin network
+grow.</p>
+<p>Another core design principle is libbitcoin is not a framework, but a toolkit.
+Frameworks hinder development during the latter stages of a development cycle,
+enforce one style of coding and do not work well with other frameworks. By
+contrast, we have gone to great pains to make libbitcoin function as an
+independent set of mutual components with no dependencies between them.</p>
+<p>The approach we took to our threaded design is built not around the data, but
+around tasks. On a finer level: operations. libbitcoin is a toolkit library that
+uses the proactor design pattern. It implements the proactor pattern through the
+use of completion handlers like in boost::asio.</p>
+<ul class="simple">
+<li><strong>Scalability</strong>. The library should facilitate the development of applications
+that scale to thousands of concurrent operations.</li>
+<li><strong>Model concepts in an intuitive manner</strong>. The library models different
+subsystems of Bitcoin in a clear and intuitive manner. We choose abstractions
+that allow designing a wide range of applications that rely on Bitcoin.</li>
+<li><strong>Basis for further abstraction</strong>. The library should permit the development
+of other libraries that provide higher levels of abstraction. For example,
+implementations of the Bitcoin protocol in other networks such as Tor.</li>
+<li><strong>No blocking</strong>. No blocking ever occurs waiting for another thread to complete
+(except possibly on a low level within boost dispatches- but that is uncommon).</li>
+<li><strong>UNIX approach</strong>. The library attempts to provide small units of
+functionality that perform one single task. Our philosophy is to break down
+higher level functionality into small parts and to simply provide those
+parts. The cost is inconvenience. The benefit is flexibility.</li>
+</ul>
+<div class="section" id="design">
+<span id="intro-design"></span><h2>1.1. Design<a class="headerlink" href="#design" title="Permalink to this headline">¶</a></h2>
+<p>libbitcoin follows a few basic code design principles that quality does not
+necessarily increase with functionality. There is a point where less
+functionality is a preferable option in terms of practicality and usability.</p>
+<ul class="simple">
+<li><strong>Simplicity</strong>. It is more important for the implementation to be simple than
+the interface. Simplicity is the most important consideration in a design.</li>
+<li><strong>Correctness</strong>. The design should be correct in all aspects.</li>
+<li><strong>Consistency</strong>. The design must not be overly inconsistent. Consistency can
+be sacrificed for simplicity in some cases, but it is better to drop those
+parts of the design that deal with less common circumstances than to
+introduce either complexity or inconsistency in the implementation.</li>
+<li><strong>Completeness</strong>. The design must cover as many important situations as is
+practical. Completeness must be sacrificed whenever implementation simplicity
+is jeopardized.</li>
+</ul>
+<p>Unix and C are examples of this design. Small building blocks that are flexible
+in how they combine together.</p>
+<p>Generally the API focuses on implementation simplicity and only implements the
+bare neccessary functionality. Keep implementation simple and don&#8217;t pollute
+class interfaces. Instead composed operations wrap lower level class methods
+to simplify common operations.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="n">threadpool</span> <span class="nf">pool</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">network</span> <span class="nf">net</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+<span class="n">handshake</span> <span class="nf">shake</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+<span class="c1">// ...</span>
+<span class="n">connect</span><span class="p">(</span><span class="n">shake</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">8333</span><span class="p">,</span> <span class="n">handle_handshake</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Composed operations take the services they wrap as their primary arguments
+before their function parameters.</p>
+<p><strong>Classes do not implement more functionality than is neccessary.</strong></p>
+<div class="section" id="dependency-injection">
+<h3>1.1.1. Dependency Injection<a class="headerlink" href="#dependency-injection" title="Permalink to this headline">¶</a></h3>
+<p>Dependency injection is a software design pattern that allows removing
+hard-coded dependencies and making it possible to change them, whether at
+run-time or compile-time.</p>
+<p>Instead of having your objects creating a dependency or asking a factory
+object to make one for them, you pass the needed dependencies into the
+constructor.</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="n">threadpool</span> <span class="nf">pool</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">leveldb_blockchain</span> <span class="nf">chain</span><span class="p">(</span><span class="n">pool</span><span class="p">);</span>
+<span class="c1">// The dependencies for transaction_pool are passed into its constructor.</span>
+<span class="c1">// We could instead pass in a bdb_blockchain.</span>
+<span class="n">transaction_pool</span> <span class="nf">txpool</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">chain</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-zen-of-libbitcoin">
+<h2>1.2. The Zen of libbitcoin<a class="headerlink" href="#the-zen-of-libbitcoin" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Readability over speed.</div>
+<div class="line">Beauty over convenience.</div>
+<div class="line">Simplicity over complexity.</div>
+<div class="line">Architected, not hacked.</div>
+<div class="line">Flat, not nested.</div>
+<div class="line">Explicit, not implicit.</div>
+<div class="line">Errors should be loud.</div>
+<div class="line">Never is better than right now.</div>
+<div class="line">Now is better than never.</div>
+<div class="line">Be flexible and configurable.</div>
+<div class="line">Build houses from bricks, software from modules.</div>
+</div>
+</div>
+<div class="section" id="examples">
+<h2>1.3. Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Each section comes with its own example code listing. These can be found in
+the examples/ directory of the source libbitcoin package.</p>
+<ul class="simple">
+<li><a class="reference internal" href="examples/priv.html#examples-priv"><em>priv.cpp</em></a> generates new private keys, shows a Bitcoin address and sign or
+verify data using the private key.</li>
+<li><a class="reference internal" href="examples/determ.html#examples-determ"><em>determ.cpp</em></a> shows working with deterministic wallets, generating both
+public and private keys.</li>
+<li><a class="reference internal" href="examples/initchain.html#examples-initchain"><em>initchain.cpp</em></a>, initialize <tt class="xref cpp cpp-class docutils literal"><span class="pre">leveldb_blockchain</span></tt> by creating a
+blank new database and adding the genesis block at height 0.</li>
+<li><a class="reference internal" href="examples/display-last.html#examples-display-last"><em>display-last.cpp</em></a> fetches and displays the last
+block in a blockchain database.</li>
+<li><a class="reference internal" href="examples/satoshiwords.html#examples-satoshiwords"><em>satoshiwords.cpp</em></a> displays the genesis block
+message from Satoshi.</li>
+<li><a class="reference internal" href="examples/accept.html#examples-accept"><em>accept.cpp</em></a> listens for connections on port 8333,
+displaying the version&#8217;s user agent.</li>
+<li><a class="reference internal" href="examples/connect.html#examples-connect"><em>connect.cpp</em></a> connects to localhost on port 8333,
+and sends a single version message.</li>
+<li><a class="reference internal" href="examples/proto.html#examples-proto"><em>proto.cpp</em></a> joins to the p2p Bitcoin network.</li>
+<li><a class="reference internal" href="examples/txrad.html#examples-txrad"><em>txrad.cpp</em></a> implements a simple transaction radar.</li>
+<li><a class="reference internal" href="examples/fullnode.html#examples-fullnode"><em>fullnode.cpp</em></a> is a full node Bitcoin implementation. Blocks and
+unconfirmed transactions are validated.</li>
+</ul>
+<p>To run the examples invoke <tt class="docutils literal"><span class="pre">make</span></tt> in the <tt class="docutils literal"><span class="pre">examples/</span></tt> directory.</p>
+<div class="highlight-cpp"><pre>$ cd examples/
+$ make</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Introduction</a><ul>
+<li><a class="reference internal" href="#design">1.1. Design</a><ul>
+<li><a class="reference internal" href="#dependency-injection">1.1.1. Dependency Injection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-zen-of-libbitcoin">1.2. The Zen of libbitcoin</a></li>
+<li><a class="reference internal" href="#examples">1.3. Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">The libbitcoin Tutorial</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="next chapter">2. Quickstart</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/introduction.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="quickstart.html" title="2. Quickstart"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="The libbitcoin Tutorial"
+             >previous</a> |</li>
+        <li><a href="index.html">libbitcoin 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, libbitcoin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
