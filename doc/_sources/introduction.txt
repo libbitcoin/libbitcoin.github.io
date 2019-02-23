@@ -5,7 +5,7 @@ Introduction
 ***************
 
 libbitcoin is a Bitcoin library targeted towards high end use. The library
-places a heavy focus around asychronicity. This enables a big scope for future
+places a heavy focus around asynchronicity. This enables a big scope for future
 scalability as each component has its own thread pool. By increasing the number
 of threads for that component the library is able to scale outwards across CPU
 cores. This will be vital in the future as the demands of the Bitcoin network
@@ -108,7 +108,7 @@ The Zen of libbitcoin
 | Never is better than right now.
 | Now is better than never.
 | Be flexible and configurable.
-| Build houses from bricks, software from modules. 
+| Build houses from bricks, software from modules.
 
 Examples
 ========
@@ -140,4 +140,3 @@ To run the examples invoke ``make`` in the ``examples/`` directory.
 
     $ cd examples/
     $ make
-
