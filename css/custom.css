@@ -1,0 +1,399 @@
+@font-face {
+    font-family: fira;
+    src: url(../fonts/FiraSans-Regular.otf);
+}
+
+@font-face {
+      font-family: fira-medium;
+      src: url(../fonts/FiraSans-Medium.otf);
+}
+
+body {
+  font-family: fira;
+  line-height: 2.4rem;
+}
+
+.b {
+  font-weight: bold;
+  color: #ededed;
+
+}
+.jumbotron {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  margin: 0;
+}
+
+.navbar-inverse {
+  background: none;
+  border: none;
+}
+
+.navbar-nav {
+  float: right;
+
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  height: 80px;
+  display: block;
+  padding:30px;
+  color: #ffa022;
+  text-shadow: none;
+
+}
+
+.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:active  {
+  color: #c85637;
+}
+
+.presentation {
+  background: url('../img/bg-home.png');
+  background-size:cover;
+  height: 500px;
+  margin-right: auto;
+  margin-left: auto;
+
+}
+
+.logo-pres {
+  width: 23%;
+  height: auto;
+  display: block;
+  margin: auto;
+  padding-top: 4em;
+}
+
+.jumbotron .titulo {
+  color: #ffa022;
+  padding-top: 90px;
+  text-align: center;
+  font-family: fira-medium;
+}
+
+
+.ecosystem {
+  height: auto;
+  padding: 3rem;
+}
+
+.ecosystem h2, .mentions h2 {
+  text-align: center;
+  color: #c85637;
+  font-family: fira-medium;
+}
+
+.ecosystem .row {
+  padding: 4rem;
+}
+
+.ecosystem .col-md-4 .img-responsive {
+  margin: auto;
+}
+
+.features {
+  height: auto;
+  background: #272822;
+  padding: 3rem;
+}
+
+.features h2 {
+  color: #ffa022;
+  text-align: center;
+  font-family: fira-medium;
+  padding: 3rem;
+}
+
+.features h4 {
+  color: #c85637;
+  font-family: fira-medium;
+  float: left;
+}
+
+.features p {
+  color: #e6e6e6;
+  font-size: 14px;
+  line-height: 2.4rem;
+  font-family: fira;
+}
+
+.ft-img {
+  float: right;
+  padding: 0 0 3rem 3rem;
+}
+
+.btc-satoshi {
+  height:384px;
+  background: url(../img/bg-btc-satoshi.png);
+  background-size: cover;
+}
+
+.btc-satoshi h2 {
+  color: 272822;
+  text-align: center;
+  position: relative;
+  margin: 0;
+  padding-top:14rem;
+}
+
+.jumbotron .slogan {
+  color: #c85637;
+  text-align: center;
+}
+
+.principles {
+  padding: 3rem;
+}
+
+.principles h4 {
+  text-align: center;
+  line-height: 2.4rem;
+  padding: 6rem 3rem 3rem 3rem;
+}
+
+.princip {
+  display: block;
+  margin:auto;
+}
+
+.princip h4 {
+  color: #c85637;
+  font-family: fira-medium;
+  padding: 3rem 0 1em 0;
+}
+.princip .col-md-4 {
+  text-align: center;
+
+}
+
+.princip .bim {
+  height: 160px;
+  width: inherit;
+  display: table-cell;
+  vertical-align: middle;
+  padding: 1em 2em 2em 2em;
+}
+
+.princip .bim img {
+  position: relative;
+  margin: auto;
+}
+
+.r2, .r3  {
+  padding-top: 6em;
+}
+
+.r3 {
+  text-align: right;
+}
+
+.r2 .col-md-6 img, .r3 .col-md-6 img {
+  position: relative;
+  left: 50%;
+  margin: auto;
+}
+
+.mentions {
+  min-height: 400px;
+  padding: 0 0 3rem 0;
+}
+
+.mentions h2 {
+  padding: 9rem 0 6rem 0;
+}
+
+.mentions img {
+  width: 68%;
+}
+
+.mentions li  {
+  padding: 0 0 1rem 0;
+}
+
+.agpl {
+  background: url('../img/bg-agpl.png');
+  background-size:cover;
+  height: 500px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.agpl h2 {
+  color: #ffa022;
+  font-family: fira-medium;
+  text-align: center;
+  position: relative;
+  margin: 0;
+  padding:5rem 0;
+}
+
+.agpl img  {
+  display: block;
+  text-align: center;
+  position: relative;
+  margin: auto;
+  padding-top: 4em;
+}
+
+.agpl p {
+  color: white;
+  text-align: center;
+  font-size: 1em;
+  padding:  4em 8em;
+}
+
+a.linkcense   {
+  color: #ffa022;
+}
+
+
+a.linkcense:hover {
+  color: #fff;
+}
+.available {
+  padding-bottom: 11em;
+}
+
+.available h2 {
+  text-align: center;
+  padding: 3em;
+}
+
+.projects {
+  background: url('../img/bg-projects.png');
+  background-size:cover;
+  min-height: 600px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 2rem 2rem 2rem 4rem;
+}
+
+.projects h2 {
+  color: #ffa022;
+  font-family: fira-medium;
+  text-align: center;
+  position: relative;
+  margin: 0;
+  padding:4em 0 3em 0;
+}
+
+.projects .princip {
+  padding: 3rem 0;
+}
+
+
+.projects .col-md-4 {
+  padding: 0;
+  margin: 0;
+}
+
+.projects .col-md-6 .bim {
+  display: inline;
+
+}
+
+
+button.btn.btn-lg.dw {
+  background: #c85637;
+}
+
+a.dwb  {
+  color: #fff;
+}
+
+footer {
+ background: #272822;
+ padding: 4em 4em 6em 4em;
+}
+
+.foot {
+    width: 80%;
+}
+
+.foot li {
+  color: #ededed;
+  text-align: left;
+}
+
+footer .col-md-3  {
+  padding: 0 6rem;
+}
+
+footer .col-md-12, footer .col-md-12 ul li, footer .col-md-12 ul li img {
+  text-align: center;
+  display: block;
+  margin: auto;
+}
+
+footer h4 {
+
+}
+
+footer ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scrollup{
+    width:40px;
+    height:40px;
+    text-indent:-9999px;
+    opacity:0.3;
+    position:fixed;
+    bottom:50px;
+    right:100px;
+    display:none;
+    background: url('../img/icon_top.png') no-repeat;
+  }
+
+
+  /* MEDIA QUERIES */
+
+  /* Large desktops and laptops */
+  @media (min-width: 1200px) {
+
+  }
+
+  /* Landscape tablets and medium desktops */
+  @media (min-width: 992px) and (max-width: 1199px) {
+  .btc-satoshi {background-size: 100% 100%}
+
+  }
+
+  /* Portrait tablets and small desktops */
+  @media (min-width: 768px) and (max-width: 991px) {
+    .presentation {height: auto;}
+    .navbar-header {border-color: none;}
+    .navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form, .navbar-inverse .navbar-toggle {border-color: none;}
+    .logo-pres { width: 37%;  padding: 1em;}
+    .ecosystem .row {padding: 1rem;}
+    .eco1 img, .eco2 img, .eco3 img { padding: 3em;}
+    .princip .bim { width: 790px;}
+    .r2 .bim img, .r3 .bim img { left:0;}
+    .btc-satoshi { background-size: 100% 100%}
+    .mentions h2 { padding: 3rem 0 1rem 0}
+    .mentions img { width: 29%;}
+  }
+
+  /* Landscape phones and portrait tablets */
+  @media (max-width: 767px) {
+
+    .logo-pres { width: 41%;}
+    .ecosystem .row { padding: 1rem;}
+    .eco1 img, .eco2 img, .eco3 img { padding: 3em;}
+    .princip .bim { width: 600px;}
+    .r2 .bim img, .r3 .bim img { left:0;}
+    .btc-satoshi { height: auto; background-size: 100% 100%}
+    .btc-satoshi h2 { font-size: 1.6em; padding: 3rem; line-height: 1.5;}
+    .agpl p { padding: 3em 1em;}
+    .jumbotron .slogan { padding-bottom: 3rem; }
+    .mentions h2 { padding: 3rem 0 1rem 0}
+    .mentions img { width: 29%;}
+  }
+
+
+  /* Portrait phones and smaller */
+  @media (max-width: 480px) {
+
+  }

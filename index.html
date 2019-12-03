@@ -1,212 +1,313 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<!--
-Design by Free CSS Templates
-http://www.freecsstemplates.org
-Released for free under a Creative Commons Attribution 3.0 License
+<html>
+  <head>
+    <title>Libbitcoin</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="img/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="img/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="img/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="img/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="img/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="img/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="img/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="img/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
 
-Name       : Big Business 2.0
-Description: A two-column, fixed-width design with a bright color scheme.
-Version    : 1.0
-Released   : 20120624
--->
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta name="description" content="" />
-<meta name="keywords" content="" />
-<title>libbitcoin - modular, scalable, async</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="style.css" />
-<script type="text/javascript" src="jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="jquery.dropotron-1.0.js"></script>
-<script type="text/javascript" src="jquery.slidertron-1.1.js"></script>
-<script type="text/javascript">
-	$(function() {
-		$('#menu > ul').dropotron({
-			mode: 'fade',
-			globalOffsetY: 11,
-			offsetY: -15
-		});
-	});
-</script>
-</head>
-<body>
-<div id="wrapper">
-	<div id="header">
-		<div id="logo">
-			<h1><a href="#"><img src="images/libbitcoin-logo.png" height="145" alt="Logo" /></a></h1>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+      <!-- Optional theme -->
+    <link rel="stylesheet" href="css/bootstrap-theme.css">
+        <!-- custom theme -->
+    <link rel="stylesheet" href="css/custom.css">
+
+  </head>
+
+  <body>
+    <div class="jumbotron presentation">
+      <div class="container">
+        <!-- navbar-->
+        <nav class="navbar navbar-inverse" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <!--<a class="navbar-brand" href="#"><img src="img/libbitcoin-logo.svg" alt=""></a>-->
+            </div>
+
+          <!-- Collect the nav links for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav">
+                <li><a href="#anchor">Download</a></li>
+                <li><a href="#docs">Documentation</a></li>
+                <li><a href="#contact">Contact</a></li>
+              </ul>
+            </div><!-- /.navbar-collapse -->
+          </div>
+        </nav>
+
+        <!--<h1 class="titulo">Libbitcoin</h1>-->
+        <img class="logo-pres" src="img/libbitcoin-logo.svg"  alt="">
+
+      </div>
     </div>
-		<div id="slogan">
-			<h2>libbitcoin - Asynchronous C++ Bitcoin library</h2>
-		</div>
-	</div>
-	<div id="menu">
-		<ul>
-			<li class="first"><a href="index.html">Home</a></li>
-			<li>
-				<span class="opener">Resources<b></b></span>
-				<ul>
-					<li><a href="download.html">Download Latest Releases</a></li>
-					<li><a href="http://libbitcoin.dyne.org/api/">API Documentation</a></li>
-					<li><a href="http://libbitcoin.dyne.org/doc/">Tutorial</a></li>
-					<li><a href="libbitcoin.pdf">Presentation Slides</a></li>
-					<li>
-						<span>Examples<b></b></span>
-						<ul>
-							<li><a href="http://libbitcoin.dyne.org/examples/fullnode.cpp.html">fullnode.cpp</a></li>
-							<li><a href="http://libbitcoin.dyne.org/examples/connect.cpp.html">connect.cpp</a></li>
-							<li><a href="http://libbitcoin.dyne.org/examples/initchain.cpp.html">initchain.cpp</a></li>
-							<li><a href="http://libbitcoin.dyne.org/examples/determ.cpp.html">determ.cpp</a></li>
-							<li><a href="http://libbitcoin.dyne.org/examples/satoshiwords.cpp.html">satoshiwords.cpp</a></li>
-							<li><a href="http://libbitcoin.dyne.org/examples/priv.cpp.html">priv.cpp</a></li>
-                            <li><a href="http://libbitcoin.dyne.org/examples/accept.cpp.html">accept.cpp</a></li>
-                            <li><a href="http://libbitcoin.dyne.org/examples/proto.cpp.html">proto.cpp</a></li>
-                            <li><a href="http://libbitcoin.dyne.org/examples/txrad.cpp.html">txrad.cpp</a></li>
-                            <li><a href="http://libbitcoin.dyne.org/examples/display-last.cpp.html">display-last.cpp</a></li>
-						</ul>
-					</li>
-					<li><a href="https://github.com/spesmilo/libbitcoin/">Git Repository</a></li>
-					<li><a href="/roadmap.html">Roadmap</a></li>
-					<li><a href="/labs.html">Labs</a></li>
-				</ul>
-			</li>
-            <!--
-			<li><a href="#">Products</a></li>
-			<li><a href="#">Forum</a></li>
-			<li>
-				<span class="opener">Support<b></b></span>
-				<ul>
-					<li><a href="#">Technical</a></li>
-					<li><a href="#">Website</a></li>
-					<li><a href="#">Management</a></li>
-					<li>
-						
-					</li>
-					
-				</ul>
-			</li>
-			<li><a href="#">About</a></li>
-			<li class="last"><a href="#">Contact</a></li>
-            -->
-            <li><a href="http://sx.dyne.org/">sx tools</a></li>
-            <li>
-				<span class="opener">Obelisk<b></b></span>
-				<ul>
-					<li><a href="/download/obelisk-0.2.tar.bz2">Download Latest Release</a></li>
-                    <li><a href="/obelisk/">Protocol Documentation</a></li>
-                    <li><a href="obelisk-setup.html">Quick setup guide</a></li>
-					<li><a href="https://github.com/spesmilo/obelisk/">Git Repository</a></li>
-					<li><a href="https://wiki.unsystem.net/index.php/Obelisk/Servers">List of servers</a></li>
-                </ul>
-            </li>
-            <li><a href="libbitcoin-manifesto.pdf">Manifesto</a></li>
-			<li><a href="support.html">Support</a></li>
-			<li class="last"><a href="https://wiki.unsystem.net/index.php/Libbitcoin/Team">Team</a></li>
-	  </ul>
-		<br class="clearfix" />
-	</div>
-	<div id="page">
-		<div id="content">
 
-			<div class="box">
-				<h2>Welcome To The libbitcoin Community</h2>
-                <h3>Visit our <a href="https://wiki.unsystem.net/index.php/Libbitcoin/Team">team page</a> and learn more about us.</h3>
-				<p>
-					libbitcoin is a community of developers building the open source library, tools and implementation necesary for a free, independent and vibrant Bitcoin. In this way we are helping to build a better future.  
-				</p>
-              <p>libbitcoin believes in the revoltionary promise of Satoshi's original protocol. </p>  
-                    <p>The libbitcoin development project aims to create an extendable, scalable and configurable architecture, along with useful software. Making Bitcoin super-pluggable, highly configurable and easy to interact with.</p>
-                    <p>Communication, development and support occurs on the <a href="https://mailinglists.dyne.org/cgi-bin/mailman/listinfo/libbitcoin">libbitcoin mailing list</a>, <a href="http://webchat.freenode.net/?channels=%23libbitcoin&uio=d4">Freenode IRC #libbitcoin</a> and the <a href="https://wiki.unsystem.net/">unSYSTEM wiki</a>.</p>
-			</div>
-			<div class="box" id="content-box1">
-				<h3>Our Values</h3>
-				<ul class="section-list">
-					<li class="first">
-						<span><b>Privacy:</b> Bitcoin should always remain as private as possible for its users.</span></li>
-					<li>
-                <b>Scalability:</b> Bitcoin built today
-                with the future in mind.</li>
-					<li class="last">
-						<span><b>Integrity</b></span>: No individual or group should have enough power over the network to compromise its original aims.</li>
-				</ul>
-			</div>
-			<div class="box" id="content-box1">
-                <h3>Projects using libbitcoin</h3>
-                <ul>
-                    <li><a href="https://airbitz.co/">AirBitz</a> - secure Bitcoin wallet + business directory.</a></li>
-                    <li><a href="http://darkwallet.is">DarkWallet</a> - privacy and free market focused wallet.</a></li>
-                    <li><a href="http://sx.dyne.org/">sx command line utilities</a> - empower the sysadmin with Bitcoin tools.</a></li>
-                    <li><a href="http://bitcoinmagazine.com/6630/trustless-bitcoin-anonymity-here-at-last/">anontx CoinJoin</a> - trustless Bitcoin anonymity.</li>
-                    <li><a href="/obelisk/">Obelisk</a> - scalable blockchain query infrastructure.</li>
-                </ul>
-			</div>
+    <div class="container ecosystem">
+      <h2>A C++ Bitcoin toolkit library for asynchronous apps</h2>
+      <div class="row eco1">
+        <div class="col-md-4"><img src="img/navaja-suiza.svg" class="img-responsive" alt="Responsive image"></div>
+        <div class="col-md-8">
+          <p>Libbitcoin is a multipurpose bitcoin library targeted towards high end use. An ideal backend to build fast implementations on top: mobile apps, desktop clients and server API's. The library places a heavy focus around asychronicity, speed and availability.</p>
+        </div>
+      </div>
+      <div class="row eco2">
+        <div class="col-md-4"><img src="img/cpu-farm.svg" class="img-responsive" alt="Responsive image"></div>
+        <div class="col-md-8">
+          <p>It's enables a big scope for scalability as each component has its own thread pool. By increasing the number of threads for that component the library is able to scale outwards across CPU cores. This are vital as the demands of the bitcoin network grow.</p>
+        </div>
+      </div>
+      <div class="row eco3">
+        <div class="col-md-4"><img src="img/lang-basket.svg" class="img-responsive" alt="Responsive image"></div>
+        <div class="col-md-8"><p>Libbitcoin can be leveraged with different design patterns depending on the task or application: javascript, python, PHP, Ruby and so on.</p></div>
+      </div>
+    </div>
 
-<div class="box" id="content-box2">
-  <h3>Presentation of libbitcoin stack</h3>
-  <ul>
-    <li><a href="https://www.youtube.com/watch?v=_mMZls_c7JM">Presentaion</a> - Published on Mar 11, 2015 at SF Bitcoin Devs Seminar, William Swanson presents a deep dive into Libbitcoin, BX, and Obelisk.</li>
-    <li><a href="http://www.slideshare.net/swansontec/libbitcoin-slides">Slides</a> - available via SlideShare.</li>
-  </ul>
-</div>
+    <div class="jumbotron features">
+      <div class="container">
+        <h2>Features</h2>
+        <div class="row">
+          <div class="col-md-1"></div>
+          <div class="col-md-4">
+            <h4>Libbitcoin Server<h4>
+            <img src="img/lib-server.svg"  class="img-responsive ft-img" alt="Responsive image">
+            <p>A full Bitcoin peer-to-peer node, Libbitcoin Server is also a high performance blockchain query server.
+              Libbitcoin Server exposes a custom query TCP API built based on the <a href="https://zeromq.org">ZeroMQ</a> networking stack. It supports server, and optionally client, identity certificates and wire encryption via <a href="https://curvezmq.org">CurveZMQ</a> and the <a href="https://libsodium.org">Sodium</a> cryptographic library and supports simple and advanced scenarios, including stealth payment queries. The <a href="https://github.com/libbitcoin/libbitcoin-client">libbitcoin-client</a> library provides a calling API for building client applications. The server is complimented by <a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer (BX)</a>, the Bitcoin command line tool and successor to SX.</p>
+          </div>
+          <div class="col-md-1"></div>
+          <div class="col-md-1"></div>
+          <div class="col-md-4">
+            <h4>Libbitcoin Explorer (BX)<h4>
+            <img src="img/lib-explorer.svg" class="img-responsive ft-img" alt="Responsive image">
+            <p>BX exposes over <a href="https://github.com/libbitcoin/libbitcoin-explorer/wiki">80 commands</a> and supports network communication with libbitcoin-server or its predecessor Obelisk, and the P2P Bitcoin network. BX is well documented and supports simple and advanced scenarios, including <a href="https://wiki.unsystem.net/en/index.php/DarkWallet/Alpha#Stealth">stealth</a> and <a href="https://en.bitcoin.it/wiki/Multisignature">multisig</a>. BX is a rich command line tool for working with Bitcoin. It can be built as a single portable executable for Linux, OSX or Windows and is available for <a href="https://github.com/libbitcoin/libbitcoin-explorer/wiki/Download-BX">download as a signed single executable</a> for each.</p>
+          </div>
+          <div class="col-md-1"></div>
+        </div>
+      </div>
+    </div>
 
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-        var disqus_shortname = 'libbitcoin'; // required: replace example with your forum shortname
-        var disqus_identifier = 'libbitcoin';
+    <div class="container available">
+      <a name="anchor"></a>
+      <h2>Available for</h2>
+      <div class="row princip">
+        <div class="col-md-4">
+          <div class="bim"><a href="https://github.com/libbitcoin/libbitcoin#windows"><img src="img/win.svg" class="img-responsive" alt="Responsive image"></a></div>
+          <h4><a href="https://github.com/libbitcoin/libbitcoin#windows">Windows</a></h4>
+        </div>
+        <div class="col-md-4">
+          <div class="bim"><a href="https://github.com/libbitcoin/libbitcoin#debianubuntu"><img src="img/linux.svg" class="img-responsive" alt="Responsive image"></a></div>
+          <h4><a href="https://github.com/libbitcoin/libbitcoin#debianubuntu">Linux</a></h4>
+        </div>
+        <div class="col-md-4">
+          <div class="bim"><a href="https://github.com/libbitcoin/libbitcoin#macintosh"><img src="img/mac.svg" class="img-responsive" alt="Responsive image"></a></div>
+          <h4><a href="https://github.com/libbitcoin/libbitcoin#macintosh">OSX</a></h4>
+        </div>
+      </div>
+    </div>
 
-        /* * * DON'T EDIT BELOW THIS LINE * * */
-        (function() {
-            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-			
-		  <br class="clearfix" />
-		</div>
-<!--
-		<div id="sidebar">
-			<div class="box">
-				<h3>Media</h3>
-				<ul class="list">
-					<li class="first"><a href="#">Adipiscing tincidunt</a></li>
-					<li><a href="#">Euismod elit sollicitudin</a></li>
-					<li><a href="#">Dolor magnis et lacinia</a></li>
-					<li><a href="#">Mauris ornare aenean</a></li>
-					<li class="last"><a href="#">Ante semper fringilla</a></li>
-				</ul>
-			</div>
-			<div class="box">
-				<h3>Upcoming Events</h3>
-				<div class="date-list">
-					<ul class="list date-list">
-						<li class="first"><span class="date">2/08</span> <a href="#">Quam sed tempus</a></li>
-						<li><span class="date">2/05</span> <a href="#">Lorem et vestibulum</a></li>
-						<li><span class="date">2/01</span> <a href="#">Risus aenean tellus</a></li>
-						<li class="last"><span class="date">1/31</span> <a href="#">Tristique et primis</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
--->
-		<br class="clearfix" />
-	</div>
-	<div id="page-bottom">
-		<div id="page-bottom-content">
-			<h3>Donate</h3>
-			<p>
-                <a href="authors.html">libbitcoin Developers Bitcoin Addresses</a>
-		  </p>
-		</div>
-		<div id="page-bottom-sidebar">
-			<h3>Donate</h3>
-	    <img src="images/amir_qr.jpg" width="187" height="187" alt="bitcoin_qr" /></div>
-		<br class="clearfix" />
-  </div>
-</div>
-<div id="footer"></div>
-</body>
+    <div class="jumbotron btc-satoshi">
+      <h2>Libbitcoin believes in the revolutionary promise of Satoshi's original protocol </h2></div>
+
+    <div class="container principles">
+      <h4><p>The toolkit consists of libraries, examples, tests and applications.<br>The project was established on <a href="https://bitcointalk.org/index.php?topic=30646.msg384791#msg384791">three principles:</a></p></h4>
+      <div class="row princip">
+        <div class="col-md-4">
+          <h4>Privacy</h4>
+          <div class="bim"><img src="img/privacy.svg" class="img-responsive lala" alt="Responsive image"></div>
+          <p>Bitcoin should always remain as private as possible for its users.</p>
+        </div>
+        <div class="col-md-4">
+          <h4>scalability</h4>
+          <div class="bim"><img src="img/scalability.svg" class="img-responsive" alt="Responsive image"></div>
+          <p>Bitcoin built today with the future in mind.</p>
+        </div>
+        <div class="col-md-4">
+          <h4>Integrity</h4>
+          <div class="bim"><img src="img/integrity.svg" class="img-responsive" alt="Responsive image"></div>
+          <p>No individual or group should have enough power over the network to compromise its original aims.</p>
+        </div>
+      </div>
+
+      <div class="row princip r2">
+        <div class="col-md-6">
+          <div class="bim"><img src="img/setupable.svg" class="img-responsive" alt="Responsive image"></div>
+        </div>
+        <div class="col-md-6">
+          <div class="bim"><p>The libbitcoin development project aims to create an extendable, scalable and configurable architecture, along with useful software. Making Bitcoin super-pluggable, highly configurable and easy to interact with.</p></div>
+        </div>
+      </div>
+
+      <div class="row princip r3">
+        <div class="col-md-6">
+          <div class="bim"><p>By having a full featured C++ bitcoin library, it enables everybody to build apps really quickly using a common stable codebase.</p></div>
+        </div>
+        <div class="col-md-6">
+          <div class="bim"><img src="img/cmasmas.svg" class="img-responsive" alt="Responsive image"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="jumbotron projects">
+      <h2>Projects using Libbitcoin</h2>
+      <div class="row princip">
+        <div class="col-md-4">
+          <div class="bim"><a href="https://chip-chap.com"><img src="img/chipchap.svg" class="img-responsive" alt="Responsive image"></a></div>
+        </div>
+        <div class="col-md-4">
+          <div class="bim"><a href="https://darkwallet.is/"><img src="img/darkwallet.png" class="img-responsive" alt="Responsive image"></a></div>
+        <!--  <a href="https://wiki.unsystem.net/en/index.php/DarkWallet/ServerHowto" class="dwb"><button type="button" class="btn btn-lg dw">DW server howto</button></a>-->
+        </div>
+        <div class="col-md-4">
+          <div class="bim"><a href="https://airbitz.co/"><img src="img/airbitz.svg" class="img-responsive" alt="Responsive image"></a></div>
+        </div>
+      </div>
+      <div class="row princip">
+        <div class="col-md-4">
+          <div class="bim"><a href="http://joystream.co/"><img src="img/joystream.png" class="img-responsive" alt="Responsive image"></a></div>
+        </div>
+        <div class="col-md-4">
+          <div class="bim"><a href="https://darkleaks.com/"><img src="img/darkleaks.svg" class="img-responsive" alt="Responsive image"></a></div>
+        </div>
+        <div class="col-md-4">
+          <div class="bim"><a href="https://openbazaar.org/"><img src="img/openbazaar.svg" class="img-responsive" alt="Responsive image"></a></div>
+        </div>
+      </div>
+      <div class="row princip">
+        <div class="col-md-6">
+          <div class="bim"><a href="https://cancoin.co/"><img src="img/cancoin.svg" class="img-responsive" alt="Responsive image"></a></div>
+        </div>
+        <div class="col-md-6">
+          <div class="bim"><a href="http://slur.io/"><img src="img/slur.svg" class="img-responsive" alt="Responsive image"></a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mentions">
+      <h2>Mentions</h2>
+      <div class="row princip">
+        <div class="col-md-6">
+          <div class="bim"><img src="img/mentions.svg" class="img-responsive" alt="Responsive image"></div>
+        </div>
+        <div class="col-md-6">
+          <div class="bim">
+            <ul>
+                <li><a href="https://bitcoinmagazine.com/articles/bitcoin-always-needed-more-than-one-body-of-developers-an-interview-with-libbitcoin-s-eric-voskuil-1456762744">"Bitcoin Always Needed More Than One Body of Developers": An Interview With Libbitcoin's Eric Voskuil</a></li>
+                <li><a href="https://bitcoinmagazine.com/articles/what-libbitcoin-and-sx-are-and-why-they-matter-1376064919">What Libbitcoin and SX are And Why They Matter</a></li>
+                <li><a href="https://github.com/libbitcoin/libbitcoin-explorer/wiki/wright-decoded">Wright Decoded</a></li>
+                <li><a href="https://bitcoinmagazine.com/articles/lets-talk-libbitcoin-2-1397156427">Let's Talk Libbitcoin</a></li>
+                <li><a href="http://bravenewcoin.com/news/bitcoin-micropayments-to-incentivize-torrent-seeding/">Bitcoin MicroPayments To Incentivize Torrent Seeding</a></li>
+
+            </ul>
+          </div>
+        </div>
+              </div>
+    </div>
+
+    <div class="jumbotron agpl">
+      <h2>License</h2>
+      <img src="img/agpl.svg" class="img-responsive" alt="Responsive image">
+      <p>The project is licensed as <a class="linkcense" href="files/license.txt">AGPL with a lesser clause.</a> It may be used within a proprietary project, but the core library and any changes to it must be published online.<br> Source code for this library must always remain free for everybody to access.</p>
+    </div>
+
+
+    <a href="#" class="scrollup" style="display: none;">Scroll</a>
+
+
+    <footer>
+      <div class="row foot princip">
+        <div class="col-md-3">
+          <a name="docs"></a>
+          <h4>Documentation</h4>
+          <ul>
+            <li><a href="https://en.bitcoin.it/wiki/Libbitcoin">Bitcoin wiki</a></li>
+            <li><a href="https://github.com/libbitcoin">Github repository</a></li>
+            <li><a href="https://packages.qa.debian.org/libb/libbitcoin.html">Development references for Debian</a></li>
+            <li><a href="https://github.com/libbitcoin/libbitcoin-explorer/wiki">Documentation reference for bx command</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h4>Authors</h4>
+          <ul>
+            <li><a href="https://github.com/evoskuil">Eric Voskuil</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Amir_Taaki">Amir Taaki</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <a name="contact"></a>
+          <h4>Contact</h4>
+          <ul>
+<!--            <li><span class="b">Email:</span> dev_at_libbitcoin_dot_org</li> -->
+            <li><span class="b">IRC:</span> #libbitcoin at <a href="https://freenode.net/">freenode.net</a></li>
+<!--            <li><a href="https://forum.unsystem.net/category/projects/libbitcoin">unSYSTEM Forum</a></li> -->
+            <li><a href="https://mailinglists.dyne.org/cgi-bin/mailman/listinfo/libbitcoin">Mailing list</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h4>Old references</h4>
+          <ul>
+            <li><a href="https://github.com/spesmilo">Spesmilo</a></li>
+            <li><a href="http://libbitcoin.dyne.org/">Libbitcoin at dyne.org</a></li>
+            <li><a href="http://sx.dyne.org/">SX old manual</a></li>
+            <li><a href="http://libbitcoin.dyne.org/obelisk/">Obelisk old manual</a></li>
+<!--            <li><a href="https://github.com/spesmilo/obelisk">Obelisk at GIT</a></li> -->
+            <li><a href="https://github.com/libbitcoin/libbitcoin-server/wiki">Documentation reference for bs command </a></li>
+          </ul>
+          <h4>Other references</h4>
+          <ul>
+            <li><a href="https://bitcointalk.org/index.php?topic=30646.msg384791#msg384791">Bitcointalk</a></li>
+<!--           <li><a href="https://wiki.unsystem.net/">unSYSTEM Wiki</a></li> -->
+          </ul>
+        </div>
+        <div class="col-md-12">
+<!--          <h4>Donations</h4>
+          <ul>
+            <li><a href=""><img src="img/libbitcoin_qr.png" class="img-responsive" alt="Responsive image"></a></li>
+            <br>
+            <li><a href="">339Bsc4f6jeh4k15difzbr4TTfoeS9uEKP</a></li>
+          </ul>
+        </div>
+      </div> -->
+    </footer>
+
+
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+      			$(document).ready(function(){
+
+      			$(window).scroll(function(){
+      				if ($(this).scrollTop() > 100) {
+      					$('.scrollup').fadeIn();
+      				} else {
+      					$('.scrollup').fadeOut();
+      				}
+      			});
+
+      			$('.scrollup').click(function(){
+      				$("html, body").animate({ scrollTop: 0 }, 600);
+      				return false;
+      			});
+
+      		});
+		  </script>
+
+  </body>
 </html>
-
