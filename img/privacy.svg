@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="25.4mm"
+   height="11.240186mm"
+   viewBox="0 0 90.000003 39.827428"
+   id="svg8162"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="privacy.svg"
+   inkscape:export-filename="/media/data/ari/trabajo/libbitcoin/libbitcoin/img/bg-btc-satoshi.png"
+   inkscape:export-xdpi="84"
+   inkscape:export-ydpi="84">
+  <defs
+     id="defs8164">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5836">
+      <rect
+         inkscape:export-ydpi="84.150002"
+         inkscape:export-xdpi="84.150002"
+         y="-1821.4224"
+         x="1501.5691"
+         height="383.14114"
+         width="1352"
+         id="rect5838"
+         style="fill:#855f04;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="128.14616"
+     inkscape:cy="-51.006683"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata8167">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(4215.5025,2156.1949)">
+    <g
+       id="g5858"
+       transform="matrix(1.0831431,0,0,1.0831431,-4502.7868,-38.203665)"
+       inkscape:export-xdpi="84.150002"
+       inkscape:export-ydpi="84.150002">
+      <path
+         sodipodi:nodetypes="csc"
+         inkscape:connector-curvature="0"
+         id="path5845"
+         d="m 267.25,-1953.39 c 0,0 16.40311,20.4335 39.40165,20.0732 C 327.95189,-1933.6505 345,-1952.14 345,-1952.14"
+         style="fill:none;fill-rule:evenodd;stroke:#272822;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5847"
+         d="m 276.1252,-1944.6237 -8.39689,9.8111"
+         style="fill:none;fill-rule:evenodd;stroke:#272822;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5849"
+         d="m 290.70928,-1936.3152 -4.68459,12.286"
+         style="fill:none;fill-rule:evenodd;stroke:#272822;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5851"
+         d="m 306.53079,-1933.1332 0.0884,12.4627"
+         style="fill:none;fill-rule:evenodd;stroke:#272822;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5854"
+         d="m 322.88264,-1936.8455 5.12652,12.7279"
+         style="fill:none;fill-rule:evenodd;stroke:#272822;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5856"
+         d="m 337.37832,-1945.3308 8.92723,10.9601"
+         style="fill:none;fill-rule:evenodd;stroke:#272822;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>

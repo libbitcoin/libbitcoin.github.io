@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="22.037632mm"
+   height="21.141401mm"
+   viewBox="0 0 78.086098 74.910477"
+   id="svg8162"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="cpu-farm.svg">
+  <defs
+     id="defs8164" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="776.90019"
+     inkscape:cy="-496.83046"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata8167">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(1024.7573,39.378732)">
+    <g
+       id="g7116"
+       transform="matrix(0.89623358,0,0,0.89623358,-218.70545,2201.0797)"
+       inkscape:export-xdpi="84.150002"
+       inkscape:export-ydpi="84.150002">
+      <g
+         style="fill:#ffffff;fill-opacity:1;stroke:#272822;stroke-opacity:1"
+         transform="translate(-1088.0328,-2308.4416)"
+         id="g7062">
+        <path
+           style="fill:#ffffff;fill-opacity:1;stroke:#272822;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           inkscape:connector-curvature="0"
+           d="m 223.48878,-173.25135 c 0,-9.205 -7.462,-16.667 -16.666,-16.667 -9.205,0 -16.667,7.462 -16.667,16.667 l 0,63.888 10.667,0 17.111,0 0,-18.055 -8.154,0 13.71,-34.891 0,-10.942 z"
+           id="path7054" />
+      </g>
+      <g
+         style="fill:#ffffff;fill-opacity:1;stroke:#c85637;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="g7046"
+         transform="translate(-913.75,-2498.3313)">
+        <path
+           style="fill:#ffffff;fill-opacity:1;stroke:#c85637;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           sodipodi:nodetypes="cccccccccccc"
+           id="path7048"
+           d="M 90.63,33.119 63.89,22.221 37.147,33.119 l -9.37,23.826 5.556,0 0,23.61 19.444,0 22.223,0 19.444,0 0,-23.61 5.556,0 z"
+           inkscape:connector-curvature="0" />
+      </g>
+      <g
+         style="fill:#ffa022;fill-opacity:1"
+         transform="matrix(0.75176038,0,0,0.75176038,-868.24878,-2461.3802)"
+         id="g6953">
+        <g
+           style="fill:#ffa022;fill-opacity:1"
+           id="g6887">
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6889">
+            <rect
+               style="fill:#ffa022;fill-opacity:1"
+               x="16.4"
+               y="16.4"
+               width="15.1"
+               height="15.1"
+               id="rect6891" />
+            <path
+               style="fill:#ffa022;fill-opacity:1"
+               inkscape:connector-curvature="0"
+               d="M 9.1,9.1 9.1,39 39,39 39,9.1 9.1,9.1 Z m 24.5,24.5 -19.2,0 0,-19.2 19.1,0 0,19.2 z"
+               id="path6893" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6895">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="16,2.5 13,2.5 13,0.5 18,0.5 18,10.1 16,10.1 "
+               id="polygon6897" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6899">
+            <rect
+               style="fill:#ffa022;fill-opacity:1"
+               x="23"
+               y="1.5"
+               width="2"
+               height="8.6000004"
+               id="rect6901" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6903">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="30,0.5 35,0.5 35,2.5 32,2.5 32,10.1 30,10.1 "
+               id="polygon6905" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6907">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="13,45.5 16,45.5 16,37.9 18,37.9 18,47.5 13,47.5 "
+               id="polygon6909" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6911">
+            <rect
+               style="fill:#ffa022;fill-opacity:1"
+               x="23"
+               y="37.900002"
+               width="2"
+               height="8.6000004"
+               id="rect6913" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6915">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="30,37.9 32,37.9 32,45.5 35,45.5 35,47.5 30,47.5 "
+               id="polygon6917" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6919">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="45.5,32 37.9,32 37.9,30 47.5,30 47.5,35 45.5,35 "
+               id="polygon6921" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6923">
+            <rect
+               style="fill:#ffa022;fill-opacity:1"
+               x="37.900002"
+               y="23"
+               width="8.6000004"
+               height="2"
+               id="rect6925" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6927">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="37.9,16 45.5,16 45.5,13 47.5,13 47.5,18 37.9,18 "
+               id="polygon6929" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6931">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="0.5,30 10.1,30 10.1,32 2.5,32 2.5,35 0.5,35 "
+               id="polygon6933" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6935">
+            <rect
+               style="fill:#ffa022;fill-opacity:1"
+               x="1.5"
+               y="23"
+               width="8.6000004"
+               height="2"
+               id="rect6937" />
+          </g>
+          <g
+             style="fill:#ffa022;fill-opacity:1"
+             id="g6939">
+            <polygon
+               style="fill:#ffa022;fill-opacity:1"
+               points="0.5,13 2.5,13 2.5,16 10.1,16 10.1,18 0.5,18 "
+               id="polygon6941" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
