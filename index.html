@@ -600,18 +600,18 @@ const services = [
     ['loadtxfilter', Y, 'address index required'],
     ['rescanblocks', Y, 'address index required'],
     ['rescan', Y, 'address index required'],
+    ['stopnotifyreceived', Y, 'deprecated by btcd'],
+    ['stopnotifyspent', Y, 'deprecated by btcd'],
     ['node', W, ''],
     ['debuglevel', P, 'levels, read only'],
+    ['notifyreceived', P, 'deprecated by btcd, confirmed only until v5 tx pool'],
+    ['notifyspent', P, 'deprecated by btcd, confirmed only until v5 tx pool'],
     ['generate', N, 'v5 tx pool'],
     ['getgenerate', N, 'v5 tx pool'],
     ['gethashespersec', N, 'v5 tx pool'],
     ['setgenerate', N, 'v5 tx pool'],
     ['notifynewtransactions', N, 'v5 tx pool'],
-    ['stopnotifynewtransactions', N, 'v5 tx pool'],
-    ['notifyreceived', R, 'deprecated by btcd'],
-    ['stopnotifyreceived', R, 'deprecated by btcd'],
-    ['notifyspent', R, 'deprecated by btcd'],
-    ['stopnotifyspent', R, 'deprecated by btcd']
+    ['stopnotifynewtransactions', N, 'v5 tx pool']
   ]
 },
 {
