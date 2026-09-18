@@ -226,7 +226,7 @@
       and btcwallet, bitcoind tooling, or your own explorer at a single
       <strong>libbitcoin-server</strong>. Robust integrated html block explorer and administrative
       dashboard. Each interface on its own port, with its own credentials and/or certificates.
-      Below is every method it serves, and what each one answers.
+      Below is every interface and method it serves.
     </p>
   </header>
 
@@ -402,6 +402,7 @@ const services = [
     ['getcfheaders', Y, 'bip157, block filters required', '70015', ''],
     ['getcfcheckpt', Y, 'bip157, block filters required', '70015', ''],
     ['sendaddrv2', Y, 'bip155', '70016', 'enable_address_v2', ''],
+    ['addrv2', Y, 'bip155', '70016', 'enable_address_v2', ''],
     ['wtxidrelay', N, 'bip339, not negotiated, v5', '70016', ''],
     ['mempool', N, 'bip35, v5 tx pool', '60002', ''],
     ['feefilter', N, 'bip133, v5 tx pool', '70013', ''],
@@ -504,9 +505,9 @@ const services = [
     ['getprioritisedtransactions', N, 'v5 tx pool', 'mining'],
     ['prioritisetransaction', N, 'v5 tx pool', 'mining'],
     // network
-    ['getnetworkinfo', Y, 'ip networks only (no proxy transports)', 'network'],
+    ['getnetworkinfo', Y, '', 'network'],
     ['getconnectioncount', Y, '', 'network'],
-    ['getnodeaddresses', Y, 'ip networks only', 'network'],
+    ['getnodeaddresses', Y, '', 'network'],
     ['ping', Y, '', 'network'],
     ['setnetworkactive', Y, '', 'network'],
     ['disconnectnode', W, '', 'network'],
@@ -514,7 +515,7 @@ const services = [
     ['getpeerinfo', W, '', 'network'],
     ['addnode', P, 'remove and onetry not implemented', 'network'],
     ['exportasmap', P, 'no embedded asmap data', 'network'],
-    ['getaddrmaninfo', P, 'tried states are not tracked', 'network'],
+    ['getaddrmaninfo', Y, 'no tried table; addresses are dropped on failure', 'network'],
     ['getnettotals', P, 'byte counts are not tracked', 'network'],
     ['clearbanned', R, 'dos vector', 'network'],
     ['listbanned', R, 'dos vector', 'network'],
