@@ -369,9 +369,9 @@ const services = [
   spec: { Transport: 'tcp/s, http/s, ws/s', Framing: 'json-rpc 2.0', Auth: 'tls server, mutual', Channel: 'full duplex (subscriptions)' },
   methods: [
     ['server.features', Y, 'adds silent_payments to the Electrum response', '1.0+'],
-    ['blockchain.block.stats', W, 'bitcoind getblockstats subset', '1.0+'],
-    ['blockchain.silentpayments.subscribe', W, 'bip352, one subscription per scan key pair', '1.0+'],
-    ['blockchain.silentpayments.unsubscribe', W, 'returns the dropped scan address', '1.0+']
+    ['blockchain.block.stats', Y, 'bitcoind getblockstats subset', '1.0+'],
+    ['blockchain.silentpayments.subscribe', Y, 'bip352, one subscription per scan key pair', '1.0+'],
+    ['blockchain.silentpayments.unsubscribe', Y, 'returns the dropped scan address', '1.0+']
   ]
 },
 {
