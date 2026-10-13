@@ -358,8 +358,9 @@ const services = [
     ['blockchain.scriptpubkey.get_mempool', Y, '', '1.7+'],
     ['blockchain.transaction.broadcast', P, 'no replacement until v5 tx pool', '1.0+'],
     ['blockchain.transaction.broadcast_package', P, 'no replacement until v5 tx pool', '1.6+'],
-    ['mempool.get_fee_histogram', P, 'empty, pending', '1.2+'],
+    ['mempool.get_fee_histogram', Y, '', '1.2+'],
     ['mempool.get_info', P, 'configured limits only', '1.6+'],
+    ['mempool.recent', Y, '', '1.7+'],
     ['server.add_peer', R, 'dos vector', '1.1+']
   ]
 },
@@ -460,17 +461,17 @@ const services = [
     ['waitforblock', Y, '', 'blockchain'],
     ['waitforblockheight', Y, '', 'blockchain'],
     ['waitfornewblock', Y, '', 'blockchain'],
-    ['getmempoolancestors', N, '', 'blockchain'],
-    ['getmempoolcluster', N, '', 'blockchain'],
-    ['getmempooldescendants', N, '', 'blockchain'],
+    ['getmempoolancestors', Y, '', 'blockchain'],
+    ['getmempoolcluster', N, 'v5 tx pool', 'blockchain'],
+    ['getmempooldescendants', Y, '', 'blockchain'],
     ['getmempoolentry', Y, '', 'blockchain'],
     ['getmempoolinfo', Y, 'usage and maximum as store sizes', 'blockchain'],
     ['getrawmempool', Y, 'mempool sequence not tracked', 'blockchain'],
-    ['gettxspendingprevout', N, '', 'blockchain'],
-    ['importmempool', N, '', 'blockchain'],
+    ['gettxspendingprevout', Y, '', 'blockchain'],
+    ['importmempool', Y, 'fee deltas ignored', 'blockchain'],
     ['invalidateblock', N, 'requires stored invalidity', 'blockchain'],
     ['reconsiderblock', N, 'requires stored invalidity', 'blockchain'],
-    ['savemempool', N, '', 'blockchain'],
+    ['savemempool', Y, 'version 1 file in store directory', 'blockchain'],
     ['getblockfrompeer', R, 'no valid scenario', 'blockchain'],
     ['dumptxoutset', R, 'assumeutxo is a terrible idea', 'blockchain'],
     ['loadtxoutset', R, 'assumeutxo is a terrible idea', 'blockchain'],
@@ -493,7 +494,7 @@ const services = [
     ['testmempoolaccept', P, 'no replacement until v5 tx pool', 'transaction tooling'],
     ['abortprivatebroadcast', N, '', 'transaction tooling'],
     ['getprivatebroadcastinfo', N, '', 'transaction tooling'],
-    ['submitpackage', N, '', 'transaction tooling'],
+    ['submitpackage', P, 'no replacement until v5 tx pool', 'transaction tooling'],
     ['signrawtransactionwithkey', R, 'signing is a wallet function; keys never transit the server', 'transaction tooling'],
     ['descriptorprocesspsbt', R, 'signing is a wallet function; keys never transit the server', 'transaction tooling'],
     // mining
@@ -564,8 +565,8 @@ const services = [
     ['blockfilter', Y, 'block filters required', ''],
     ['blockfilterheaders', Y, 'block filters required', ''],
     ['fork_information', Y, '', ''],
-    ['mempool', N, '', ''],
-    ['mempool/info', N, '', '']
+    ['mempool', Y, 'mempool sequence not tracked', ''],
+    ['mempool/info', Y, 'usage and maximum as store sizes', '']
   ]
 },
 {
@@ -611,8 +612,8 @@ const services = [
     ['getgenerate', N, 'v5 tx pool'],
     ['gethashespersec', N, 'v5 tx pool'],
     ['setgenerate', N, 'v5 tx pool'],
-    ['notifynewtransactions', N, ''],
-    ['stopnotifynewtransactions', N, '']
+    ['notifynewtransactions', Y, ''],
+    ['stopnotifynewtransactions', Y, '']
   ]
 },
 {
@@ -624,10 +625,10 @@ const services = [
     ['tx_status', Y, ''],
     ['tx_merkleblock_proof', Y, ''],
     ['tx_merkle_proof', Y, ''],
-    ['tx_outspend', P, 'confirmed spenders only'],
-    ['tx_outspends', P, 'confirmed spenders only'],
+    ['tx_outspend', Y, ''],
+    ['tx_outspends', Y, ''],
     ['address_txs_chain', Y, ''],
-    ['address_utxo', P, 'confirmed only'],
+    ['address_utxo', Y, ''],
     ['block', Y, ''],
     ['block_header', Y, ''],
     ['block_status', Y, ''],
@@ -640,13 +641,13 @@ const services = [
     ['tip_hash', Y, ''],
     ['fee_estimates', Y, ''],
     ['broadcast', P, 'no replacement until v5 tx pool'],
-    ['address', P, 'mempool stats empty'],
-    ['address_txs', P, 'unconfirmed empty'],
-    ['address_txs_mempool', P, 'empty'],
+    ['address', Y, ''],
+    ['address_txs', Y, ''],
+    ['address_txs_mempool', Y, ''],
     ['mempool', Y, ''],
     ['mempool_txids', Y, ''],
     ['mempool_recent', Y, ''],
-    ['broadcast_package', N, '']
+    ['broadcast_package', P, 'no replacement until v5 tx pool']
   ]
 },
 {
