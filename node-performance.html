@@ -138,6 +138,10 @@
   .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 14px; margin-bottom: 56px; }
   .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; cursor: zoom-in; }
   .shot:hover, .shot:focus { border-color: var(--accent); outline: none; }
+  .menu { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 28px; padding: 10px 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .menu a { color: var(--ink-2); text-decoration: none; }
+  .menu a:hover, .menu a:focus { color: var(--heading); }
+  h2[id] { scroll-margin-top: 16px; }
   .subhead { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 22px 0 10px; }
   .shot h3 { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 0; }
   .shot img { display: block; width: 100%; height: auto; border-radius: 2px; }
@@ -243,8 +247,21 @@
     </p>
   </header>
 
+  <nav class="menu">
+    <a href="#milestone">Milestone</a>
+    <a href="#full-validation">Full validation</a>
+    <a href="#mainnet-and-testnets">Mainnet and testnets</a>
+    <a href="#hashing">Hashing</a>
+    <a href="#cryptography">Cryptography</a>
+    <a href="#batching">Batching</a>
+    <a href="#scanning">Scanning</a>
+    <a href="#store-size">Store size</a>
+    <a href="#analysis">Analysis</a>
+    <a href="#hardware-acceleration">Hardware acceleration</a>
+  </nav>
+
   <section>
-    <h2>Milestone</h2>
+    <h2 id="milestone">Milestone</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/shelly-milestone.png" tabindex="0">
         <h3>Threadripper PRO: comparative milestone</h3>
@@ -264,7 +281,7 @@
       </figure>
     </div>
 
-    <h2>Full validation</h2>
+    <h2 id="full-validation">Full validation</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/shelly-reindex.png" tabindex="0">
         <h3>Threadripper PRO: comparative validation</h3>
@@ -288,7 +305,7 @@
       </figure>
     </div>
 
-    <h2>Mainnet and testnets</h2>
+    <h2 id="mainnet-and-testnets">Mainnet and testnets</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/sync-mainnet-milestone.png" tabindex="0">
         <h3>Mainnet: milestone</h3>
@@ -316,7 +333,7 @@
       </figure>
     </div>
 
-    <h2>Hashing</h2>
+    <h2 id="hashing">Hashing</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/crypto-sha-neidermeyer.png" tabindex="0">
         <h3>SHA family: comparative, Ryzen 7 7735HS</h3>
@@ -332,7 +349,7 @@
       </figure>
     </div>
 
-    <h2>Cryptography</h2>
+    <h2 id="cryptography">Cryptography</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/crypto-secp-lanes.png" tabindex="0">
         <h3>Signature verification: scalar</h3>
@@ -344,7 +361,7 @@
       </figure>
     </div>
 
-    <h2>Batching</h2>
+    <h2 id="batching">Batching</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/crypto-secp-batch.png" tabindex="0">
         <h3>Signature verification: CPU and GPU batch</h3>
@@ -356,7 +373,7 @@
       </figure>
     </div>
 
-    <h2>Scanning</h2>
+    <h2 id="scanning">Scanning</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/scan-silent.png" tabindex="0">
         <h3>Silent payment scanning: CPU vs. GPU (log scale)</h3>
@@ -372,7 +389,7 @@
       </figure>
     </div>
 
-    <h2>Store size</h2>
+    <h2 id="store-size">Store size</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/store-sizes.png" tabindex="0">
         <h3>Comparative store size as a function of indexing</h3>
@@ -384,7 +401,7 @@
       </figure>
     </div>
 
-    <h2>Analysis</h2>
+    <h2 id="analysis">Analysis</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/machines-950k.png" tabindex="0">
         <h3>Eight machines to block 950,000</h3>
@@ -402,7 +419,7 @@
   </section>
 
   <section>
-    <h2>Hardware acceleration</h2>
+    <h2 id="hardware-acceleration">Hardware acceleration</h2>
     <h3 class="subhead">Intel (x86, x64)</h3>
     <div class="scroller"><table style="min-width:820px">
       <thead><tr><th style="width:200px">Acceleration</th><th style="width:150px">Algorithm</th><th style="width:250px">Applied to</th><th>Method</th></tr></thead>
