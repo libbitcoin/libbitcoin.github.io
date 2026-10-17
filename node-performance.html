@@ -473,7 +473,7 @@
         <tr><td class="m">BIP-324</td><td class="no">ephemeral secp256k1 key</td><td>key generation</td><td class="no">yes, blinded, full table reads, masked additions</td><td class="no">unblinded multiply, direct table lookups</td></tr>
         <tr><td class="m"></td><td class="no"></td><td>ECDH</td><td class="no">yes, blinded, fixed exponent inversion</td><td class="no">variable time multiply and inversion</td></tr>
         <tr><td class="m"></td><td class="no"></td><td>HKDF-SHA-256, FSChaCha20-Poly1305</td><td class="no">yes, by construction</td><td class="no"></td></tr>
-        <tr><td class="m">Silent payment scanning (server)</td><td class="no">client scan key</td><td>scan key multiply, CPU</td><td class="no">yes, constant time in the key</td><td class="no">variable time windowed multiply</td></tr>
+        <tr><td class="m">Silent payment scanning</td><td class="no">client scan key</td><td>scan key multiply, CPU</td><td class="no">yes, constant time in the key</td><td class="no">variable time windowed multiply</td></tr>
         <tr><td class="m"></td><td class="no"></td><td>scan key multiply, GPU</td><td class="no">no, variable time (omit CUDA to opt out)</td><td class="no"></td></tr>
       </tbody>
     </table></div>
