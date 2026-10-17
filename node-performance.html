@@ -258,6 +258,7 @@
     <a href="#store-size">Store size</a>
     <a href="#analysis">Analysis</a>
     <a href="#hardware-acceleration">Hardware acceleration</a>
+    <a href="#constant-time-considerations">Constant time considerations</a>
   </nav>
 
   <section>
@@ -459,6 +460,29 @@
       </tbody>
     </table></div>
     <p class="lede">All are supported on all operating systems and compilers, except CUDA on macOS. CPU intrinsics are selected at build time. CUDA is selected at runtime when an NVIDIA driver is present, otherwise batches run on the CPU.</p>
+  </section>
+
+  <section>
+    <h2 id="constant-time-considerations">Constant time considerations</h2>
+    <div class="scroller"><table style="min-width:1000px">
+      <thead><tr><th style="width:190px">Use</th><th style="width:180px">Secret</th><th style="width:230px">Operation</th><th style="width:250px">Constant time</th><th>Faster alternative avoided</th></tr></thead>
+      <tbody>
+        <tr><td class="m">TLS record layer</td><td class="no">session keys</td><td>AES-GCM, hardware</td><td class="no">yes</td><td class="no">none</td></tr>
+        <tr><td class="m"></td><td class="no"></td><td>AES-GCM, no AES instructions</td><td class="no">yes, bitsliced AES and portable GHASH</td><td class="no">table lookups</td></tr>
+        <tr><td class="m"></td><td class="no"></td><td>ChaCha20-Poly1305</td><td class="no">yes, by construction</td><td class="no">none</td></tr>
+        <tr><td class="m">TLS key exchange</td><td class="no">ephemeral private key</td><td>X25519</td><td class="no">yes, conditional swap ladder, fixed exponent inversion</td><td class="no">variable time inversion</td></tr>
+        <tr><td class="m"></td><td class="no"></td><td>ECDHE P-256, P-384</td><td class="no">yes, full table reads</td><td class="no">variable time windowed multiply</td></tr>
+        <tr><td class="m">TLS key schedule</td><td class="no">shared and traffic secrets</td><td>HKDF with HMAC-SHA-256/384</td><td class="no">yes, by construction</td><td class="no">none</td></tr>
+        <tr><td class="m">TLS server signature</td><td class="no">certificate private key</td><td>ECDSA P-256, P-384, RFC 6979 nonce</td><td class="no">yes, full table reads</td><td class="no">variable time windowed multiply</td></tr>
+        <tr><td class="m">BIP-324</td><td class="no">ephemeral secp256k1 key</td><td>key generation</td><td class="no">yes, blinded, full table reads, masked additions</td><td class="no">unblinded multiply, direct table lookups</td></tr>
+        <tr><td class="m"></td><td class="no"></td><td>ECDH</td><td class="no">yes, blinded, fixed exponent inversion</td><td class="no">variable time multiply and inversion</td></tr>
+        <tr><td class="m"></td><td class="no"></td><td>HKDF-SHA-256, FSChaCha20-Poly1305</td><td class="no">yes, by construction</td><td class="no">none</td></tr>
+        <tr><td class="m">ZeroMQ CurveZMQ</td><td class="no">Curve25519 keys</td><td>X25519</td><td class="no">yes, conditional swap ladder, fixed exponent inversion</td><td class="no">variable time inversion</td></tr>
+        <tr><td class="m"></td><td class="no"></td><td>XSalsa20-Poly1305</td><td class="no">yes, by construction</td><td class="no">none</td></tr>
+        <tr><td class="m">HTTP basic authentication</td><td class="no">configured password</td><td>SHA-256 of the header, digest comparison</td><td class="no">no, comparison may exit early</td><td class="no">none, exit reveals only the hash</td></tr>
+      </tbody>
+    </table></div>
+    <p class="lede">Authentication tag and TLS Finished comparisons are constant time. Operations on public values, including block and transaction signature verification, TLS client certificate verification, and ElligatorSwift decoding, use the faster variable time paths.</p>
   </section>
 
   <div class="lightbox" id="lightbox" hidden><img alt=""></div>
