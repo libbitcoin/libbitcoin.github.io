@@ -76,6 +76,7 @@
   h1 { color: var(--heading); font-family: var(--mono); font-size: clamp(28px, 4.4vw, 44px); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
   .lede { max-width: 66ch; color: var(--ink-2); font-size: 16px; }
   .lede strong { color: var(--ink); font-weight: 600; }
+  .lede.after { margin: 14px 0 40px; }
 
   .tag { display: inline-block; padding: 2px 7px; border-radius: 2px; font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; white-space: nowrap; border: 1px solid currentColor; }
   .tag.yes { color: var(--yes); }
@@ -243,8 +244,118 @@
   </header>
 
   <section>
-    <h2>Queries</h2>
-    <p class="lede">Measurements in progress.</p>
+    <h2>Native REST Interface</h2>
+    <p class="lede after">Measurements pending.</p>
+  </section>
+
+  <section>
+    <h2>Electrum Interface</h2>
+    <div class="gallery">
+      <figure class="shot" data-full="performance/server-electrum.png" tabindex="0">
+        <h3>Chain object rate: comparative (log scale)</h3>
+        <img src="performance/server-electrum.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Sparrow Interface</h2>
+    <div class="gallery">
+      <figure class="shot" data-full="performance/server-sp-gpu.png" tabindex="0">
+        <h3>Silent payments scan rate, GPU: comparative (log scale)</h3>
+        <img src="performance/server-sp-gpu.png" alt="Silent payments scan rate, GPU: comparative (log scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-sp-cpu.png" tabindex="0">
+        <h3>Silent payments scan rate, CPU: comparative (log scale)</h3>
+        <img src="performance/server-sp-cpu.png" alt="Silent payments scan rate, CPU: comparative (log scale)" loading="lazy">
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bitcoin P2P Interface</h2>
+    <p class="lede after">Measurements pending.</p>
+  </section>
+
+  <section>
+    <h2>Bitcoind JSON-RPC Interface</h2>
+    <div class="gallery">
+      <figure class="shot" data-full="performance/server-bitcoind.png" tabindex="0">
+        <h3>Chain object rate: comparative (log scale)</h3>
+        <img src="performance/server-bitcoind.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bitcoind REST Interface</h2>
+    <div class="gallery">
+      <figure class="shot" data-full="performance/server-rest.png" tabindex="0">
+        <h3>Chain object rate: comparative (log scale)</h3>
+        <img src="performance/server-rest.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bitcoind ZMQ Interface</h2>
+    <p class="lede after">Measurements pending.</p>
+  </section>
+
+  <section>
+    <h2>BTCD Interface</h2>
+    <p class="lede after">Measurements pending.</p>
+  </section>
+
+  <section>
+    <h2>Esplora Interface</h2>
+    <p class="lede after">Measurements pending.</p>
+  </section>
+
+  <section>
+    <h2>Methodology</h2>
+    <p class="lede">
+      All servers run on one machine, shelly (Threadripper PRO 9985WX, 512 GB, Windows 11), one
+      stack at a time, each with a store at block 950,000 on its own volume. The client is on the
+      same machine, over loopback, making sequential calls on one connection.
+      <strong>Libbitcoin 4.0</strong> serves from its own store (address index load factor 5).
+      <strong>Bitcoin Core 32.0</strong> has txindex, txospenderindex and the basic block filter
+      index, with networking disabled. <strong>Fulcrum 2.1.3</strong> indexes from that Bitcoin Core, at
+      default settings and tuned to its maximum caches. <strong>Frigate 1.6.1</strong> indexes silent
+      payments from that Bitcoin Core. The Electrum interface is compared with Fulcrum, the Sparrow
+      interface with Frigate, and the bitcoind JSON-RPC and REST interfaces with Bitcoin Core.
+    </p>
+    <p class="lede">
+      Each method is called with 300 unique requests, drawn from random blocks over the whole
+      chain: a block, a transaction and an output script from each. Addresses are grouped by
+      history size, and the largest class adds 27 addresses of 100k to 2.2M entries.
+    </p>
+    <p class="lede">
+      Each server starts once and runs until idle. Each of three repetitions, on its own requests,
+      empties working sets and purges the standby list, sends 5 s of untimed pings, then makes a
+      cold pass in shuffled order and a warm pass on the same requests in another order.
+    </p>
+    <p class="lede">
+      A call is timed from request to the last response byte, received into a preallocated
+      buffer, with parsing after timing. Rates are calls per second (1000 / mean ms), and address
+      history rates are entries returned per second of call time. Bitcoin Core and Fulcrum hold all
+      headers in memory, so they have no cold header query, and their warm header bars are
+      hatched.
+    </p>
+    <p class="lede after">
+      A silent payments scan subscribes one scan key to a range of blocks ending at 950,000, and is
+      timed from the subscription to the notification of completion. Each of three repetitions
+      purges the standby list, scans cold with a new key, then scans warm with the same key. Rates
+      are blocks of the range per second, and each range is labeled with its approximate span of
+      time. GPU scans use each server's default GPU backend. CPU scans use Frigate's CPU backend,
+      UltrafastSecp256k1 field arithmetic on BMI2/ADX, which has no SIMD path, and Libbitcoin's
+      AVX-512 IFMA scan. A scan the server ended without completing, other than by timeout, is
+      marked as a server failure.
+      Libbitcoin's other CPU paths are shown warm, in order of rate above the Libbitcoin AVX-512
+      IFMA warm bar.
+      AVX-512F builds the IFMA 52 bit multiply-add from 32 bit multiplies, and AVX-IFMA is measured
+      as AVX-512 IFMA restricted to its 256 bit registers.
+    </p>
   </section>
 
   <div class="lightbox" id="lightbox" hidden><img alt=""></div>
