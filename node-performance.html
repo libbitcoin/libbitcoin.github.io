@@ -144,6 +144,10 @@
   h2[id] { scroll-margin-top: 16px; }
   .lede.after { margin: 14px 0 40px; }
   table.fit th, table.fit td { white-space: normal; overflow-wrap: anywhere; }
+  .terms { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .term { margin: 0; border: 1px solid #c856374d; border-radius: 3px; background: var(--surface); padding: 10px 14px; }
+  .term figcaption { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+  .term pre { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); overflow-x: auto; }
   .subhead { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 22px 0 10px; }
   .shot h3 { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 0; }
   .shot img { display: block; width: 100%; height: auto; border-radius: 2px; }
@@ -461,7 +465,32 @@
         <tr><td class="m">CUDA</td><td>secp256k1</td><td class="no">batch ECDSA and Schnorr verification, silent payment indexing and scanning</td><td class="no">one signature or output per GPU thread</td></tr>
       </tbody>
     </table></div>
-    <p class="lede after">All are supported on all operating systems and compilers, except CUDA on macOS. CPU intrinsics are selected at build time. CUDA is selected at runtime when an NVIDIA driver is present, otherwise batches run on the CPU.</p>
+    <p class="lede">All are supported on all operating systems and compilers, except CUDA on macOS. CPU intrinsics are selected at build time. CUDA is selected at runtime when an NVIDIA driver is present, otherwise batches run on the CPU.</p>
+    <h3 class="subhead">Hardware report</h3>
+    <div class="terms">
+      <figure class="term"><figcaption>Threadripper PRO 9985WX, RTX PRO 6000</figcaption><pre>bs --hardware
+Hardware configuration (x64)...
+aesni....... platform:1 compiled:1.
+vaes........ platform:1 compiled:1.
+shani....... platform:1 compiled:1.
+sha512...... platform:0 compiled:0.
+sse41....... platform:1 compiled:1.
+avx2........ platform:1 compiled:1.
+avx512...... platform:1 compiled:1.
+avxifma..... platform:0 compiled:0.
+avx512ifma.. platform:1 compiled:1.
+cuda........ platform:1 compiled:1.
+cuda ecc.... platform:1 enabled:0.</pre></figure>
+      <figure class="term"><figcaption>Raspberry Pi 5</figcaption><pre>bs --hardware
+Hardware configuration (arm64)...
+aes......... platform:1 compiled:1.
+sha......... platform:1 compiled:1.
+sha3........ platform:0 compiled:0.
+neon........ platform:1 compiled:1.
+cuda........ platform:0 compiled:1.
+cuda ecc.... platform:0 enabled:0.</pre></figure>
+    </div>
+    <p class="lede after">Platform is what the processor or GPU supports, compiled is what the build includes. A feature with platform 1 and compiled 0 is available but unused, and is enabled by building with its option. CUDA ECC reports whether the GPU has error correcting memory enabled, which is required for strict equivalence of GPU and CPU signature verification. It is enabled by the GPU owner.</p>
   </section>
 
   <section>
