@@ -138,6 +138,7 @@
   .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 14px; margin-bottom: 56px; }
   .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; cursor: zoom-in; }
   .shot:hover, .shot:focus { border-color: var(--accent); outline: none; }
+  .subhead { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 22px 0 10px; }
   .shot h3 { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 0; }
   .shot img { display: block; width: 100%; height: auto; border-radius: 2px; }
   .shot figcaption { color: var(--ink-2); font-size: 13px; line-height: 1.45; }
@@ -398,6 +399,45 @@
         <img src="performance/boundedness-950k.png" alt="Boundedness by resource" loading="lazy">
       </figure>
     </div>
+  </section>
+
+  <section>
+    <h2>Hardware acceleration</h2>
+    <h3 class="subhead">Intel (x86, x64)</h3>
+    <div class="scroller"><table style="min-width:820px">
+      <thead><tr><th style="width:200px">Acceleration</th><th style="width:150px">Algorithm</th><th style="width:250px">Applied to</th><th>Method</th></tr></thead>
+      <tbody>
+        <tr><td class="m">SSE4.1, AVX2, AVX-512</td><td>SHA-256</td><td class="no">block and transaction hashing, merkle roots</td><td class="no">4, 8 or 16 messages per vector</td></tr>
+        <tr><td class="m">SSE4.1, AVX2, AVX-512</td><td>SHA-512</td><td class="no">SHA-512 hashing</td><td class="no">2, 4 or 8 messages per vector</td></tr>
+        <tr><td class="m">SSE4.1, AVX2, AVX-512</td><td>ChaCha20</td><td class="no">P2P encryption (BIP-324), TLS</td><td class="no">4, 8 or 16 keystream blocks per vector</td></tr>
+        <tr><td class="m">SSE4.1, AVX2, AVX-512</td><td>Poly1305</td><td class="no">P2P encryption (BIP-324), TLS</td><td class="no">2, 4 or 8 blocks per vector</td></tr>
+        <tr><td class="m">SSE4.1, AVX2, AVX-512</td><td>SipHash</td><td class="no">compact block short ids</td><td class="no">2, 4 or 8 transactions per vector</td></tr>
+        <tr><td class="m">SSE4.1, AVX2, AVX-512</td><td>AES (bitsliced)</td><td class="no">TLS AES-GCM without AES-NI</td><td class="no">8, 16 or 32 counter blocks per vector</td></tr>
+        <tr><td class="m">SHA-NI</td><td>SHA-256, SHA-1</td><td class="no">block and transaction hashing, merkle roots</td><td class="no">native, with two-message interleaved double hash</td></tr>
+        <tr><td class="m">SHA512</td><td>SHA-512</td><td class="no">SHA-512 hashing</td><td class="no">native</td></tr>
+        <tr><td class="m">AES-NI, PCLMULQDQ</td><td>AES-GCM</td><td class="no">TLS</td><td class="no">native, 4 counter blocks interleaved, carry-less GHASH</td></tr>
+        <tr><td class="m">VAES, VPCLMULQDQ</td><td>AES-GCM</td><td class="no">TLS</td><td class="no">8 or 16 counter blocks per vector</td></tr>
+        <tr><td class="m">AVX-IFMA, AVX-512 IFMA</td><td>secp256k1</td><td class="no">batch ECDSA and Schnorr verification, silent payment indexing and scanning</td><td class="no">4 or 8 field multiplies per vector</td></tr>
+        <tr><td class="m">CUDA</td><td>secp256k1</td><td class="no">batch ECDSA and Schnorr verification, silent payment indexing and scanning</td><td class="no">one signature or output per GPU thread</td></tr>
+      </tbody>
+    </table></div>
+    <h3 class="subhead">ARM (ARM64)</h3>
+    <div class="scroller"><table style="min-width:820px">
+      <thead><tr><th style="width:200px">Acceleration</th><th style="width:150px">Algorithm</th><th style="width:250px">Applied to</th><th>Method</th></tr></thead>
+      <tbody>
+        <tr><td class="m">NEON</td><td>SHA-256</td><td class="no">block and transaction hashing, merkle roots</td><td class="no">4 messages per vector</td></tr>
+        <tr><td class="m">NEON</td><td>SHA-512</td><td class="no">SHA-512 hashing</td><td class="no">2 messages per vector</td></tr>
+        <tr><td class="m">NEON</td><td>ChaCha20</td><td class="no">P2P encryption (BIP-324), TLS</td><td class="no">4 keystream blocks per vector</td></tr>
+        <tr><td class="m">NEON</td><td>Poly1305</td><td class="no">P2P encryption (BIP-324), TLS</td><td class="no">2 blocks per vector</td></tr>
+        <tr><td class="m">NEON</td><td>SipHash</td><td class="no">compact block short ids</td><td class="no">2 transactions per vector</td></tr>
+        <tr><td class="m">NEON</td><td>AES (bitsliced)</td><td class="no">TLS AES-GCM without AES</td><td class="no">8 counter blocks per vector</td></tr>
+        <tr><td class="m">SHA2</td><td>SHA-256, SHA-1</td><td class="no">block and transaction hashing, merkle roots</td><td class="no">native</td></tr>
+        <tr><td class="m">SHA3</td><td>SHA-512</td><td class="no">SHA-512 hashing</td><td class="no">native</td></tr>
+        <tr><td class="m">AES, PMULL</td><td>AES-GCM</td><td class="no">TLS</td><td class="no">native, carry-less GHASH</td></tr>
+        <tr><td class="m">CUDA</td><td>secp256k1</td><td class="no">batch ECDSA and Schnorr verification, silent payment indexing and scanning</td><td class="no">one signature or output per GPU thread</td></tr>
+      </tbody>
+    </table></div>
+    <p class="lede">All are supported on all operating systems and compilers, except CUDA on macOS. CPU intrinsics are selected at build time. CUDA is selected at runtime when an NVIDIA driver is present, otherwise batches run on the CPU.</p>
   </section>
 
   <div class="lightbox" id="lightbox" hidden><img alt=""></div>
