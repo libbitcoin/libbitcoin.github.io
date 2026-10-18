@@ -255,10 +255,6 @@
         <h3>Chain object rate: comparative (log scale)</h3>
         <img src="performance/server-electrum.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
-      <figure class="shot" data-full="performance/server-history-absent.png" tabindex="0">
-        <h3>Absent address probe rate: comparative (log scale)</h3>
-        <img src="performance/server-history-absent.png" alt="Absent address probe rate: comparative (log scale)" loading="lazy">
-      </figure>
       <figure class="shot" data-full="performance/server-history-absent-lf.png" tabindex="0">
         <h3>Absent address probe rate by address index load factor (log scale)</h3>
         <img src="performance/server-history-absent-lf.png" alt="Absent address probe rate by address index load factor (log scale)" loading="lazy">
@@ -340,9 +336,9 @@
     <p class="lede">
       Each method is called with 300 unique requests, drawn from random blocks over the whole
       chain: a block, a transaction and an output script from each. Addresses are grouped by
-      history size, and the largest class adds 27 addresses of 100k to 2.2M entries. The absent
-      address probe uses 300 script hashes that own no output, the query a wallet makes most often
-      when it scans past its last used address.
+      history size, and the largest class adds 27 addresses of 100k to 2.2M entries. The 0 entries
+      class uses 300 script hashes that own no output, the query a wallet makes most often when it
+      scans past its last used address, and is plotted in calls per second.
     </p>
     <p class="lede">
       Each server starts once and runs until idle. Each of three repetitions, on its own requests,
