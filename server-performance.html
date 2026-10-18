@@ -255,6 +255,14 @@
         <h3>Chain object rate: comparative (log scale)</h3>
         <img src="performance/server-electrum.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
+      <figure class="shot" data-full="performance/server-history.png" tabindex="0">
+        <h3>Address history entry rate by history size: comparative (log scale)</h3>
+        <img src="performance/server-history.png" alt="Address history entry rate by history size: comparative (log scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-history-absent-lf.png" tabindex="0">
+        <h3>Absent address probe rate by address index load factor (log scale)</h3>
+        <img src="performance/server-history-absent-lf.png" alt="Absent address probe rate by address index load factor (log scale)" loading="lazy">
+      </figure>
     </div>
   </section>
 
@@ -328,7 +336,9 @@
     <p class="lede">
       Each method is called with 300 unique requests, drawn from random blocks over the whole
       chain: a block, a transaction and an output script from each. Addresses are grouped by
-      history size, and the largest class adds 27 addresses of 100k to 2.2M entries.
+      history size, and the largest class adds 27 addresses of 100k to 2.2M entries. The absent
+      address probe uses 300 script hashes that own no output, the query a wallet makes most often
+      when it scans past its last used address.
     </p>
     <p class="lede">
       Each server starts once and runs until idle. Each of three repetitions, on its own requests,
@@ -341,6 +351,12 @@
       history rates are entries returned per second of call time. Bitcoin Core and Fulcrum hold all
       headers in memory, so they have no cold header query, and their warm header bars are
       hatched.
+    </p>
+    <p class="lede">
+      The address index load factor is the mean number of index rows per hash bucket. An absent
+      address probe walks its bucket and reads every row in it, so its cold cost scales with the
+      load factor, while a warm probe costs the same at any load factor. The load factor comparison
+      uses stores built at load factors 5, 2.5 and 1, with head sizes of 3.0, 6.0 and 15 GB.
     </p>
     <p class="lede after">
       A silent payments scan subscribes one scan key to a range of blocks ending at 950,000, and is
