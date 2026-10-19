@@ -248,6 +248,7 @@
   </header>
 
   <nav class="menu">
+    <a href="#efficiency">Efficiency</a>
     <a href="#native-rest-interface">Native REST Interface</a>
     <a href="#electrum-interface">Electrum Interface</a>
     <a href="#sparrow-interface">Sparrow Interface</a>
@@ -259,6 +260,24 @@
     <a href="#esplora-interface">Esplora Interface</a>
     <a href="#methodology">Methodology</a>
   </nav>
+
+  <section>
+    <h2 id="efficiency">Efficiency</h2>
+    <div class="gallery">
+      <figure class="shot" data-full="performance/server-efficiency.png" tabindex="0">
+        <h3>Index efficiency: multiple of other product (log scale)</h3>
+        <img src="performance/server-efficiency.png" alt="Index efficiency: multiple of other product (log scale)" loading="lazy">
+      </figure>
+    </div>
+    <p class="lede after">
+      Index efficiency is Libbitcoin's query rate relative to the other server, divided by the size
+      of its index relative to the other's, both at block 950,000 (index sizes are on the
+      <a href="node-performance.html#store-size">node performance</a> page). Each value is a
+      multiple: 2.5&times; means Libbitcoin delivers 2.5 times the query rate per byte of index, and
+      below 1&times; it delivers less. Address history rates are entries per second, silent payments
+      rates are blocks scanned per second, and other rates are calls per second.
+    </p>
+  </section>
 
   <section>
     <h2 id="native-rest-interface">Native REST Interface</h2>
@@ -277,6 +296,12 @@
         <img src="performance/server-history.png" alt="Address history rate: comparative (log scale)" loading="lazy">
       </figure>
     </div>
+    <p class="lede after">
+      Addresses are grouped by history size, and the largest class adds 27 addresses of 100k to
+      2.2M entries. The 0 entries class uses 300 script hashes that own no output, the query a
+      wallet makes most often when it scans past its last used address, and is plotted in calls per
+      second. Address history rates are entries returned per second of call time.
+    </p>
   </section>
 
   <section>
@@ -291,6 +316,20 @@
         <img src="performance/server-sp-cpu.png" alt="Silent payments scan rate, CPU: comparative (log scale)" loading="lazy">
       </figure>
     </div>
+    <p class="lede after">
+      A silent payments scan subscribes one scan key to a range of blocks ending at 950,000, and is
+      timed from the subscription to the notification of completion. Each of three repetitions
+      purges the standby list, scans cold with a new key, then scans warm with the same key. Rates
+      are blocks of the range per second, and each range is labeled with its approximate span of
+      time. GPU scans use each server's default GPU backend. CPU scans use Frigate's CPU backend,
+      UltrafastSecp256k1 field arithmetic on BMI2/ADX, which has no SIMD path, and Libbitcoin's
+      AVX-512 IFMA scan. A scan the server ended without completing, other than by timeout, is
+      marked as a server failure.
+      Libbitcoin's other CPU paths are shown warm, in order of rate above the Libbitcoin AVX-512
+      IFMA warm bar.
+      AVX-512F builds the IFMA 52 bit multiply-add from 32 bit multiplies, and AVX-IFMA is measured
+      as AVX-512 IFMA restricted to its 256 bit registers.
+    </p>
   </section>
 
   <section>
@@ -348,36 +387,18 @@
     </p>
     <p class="lede">
       Each method is called with 300 unique requests, drawn from random blocks over the whole
-      chain: a block, a transaction and an output script from each. Addresses are grouped by
-      history size, and the largest class adds 27 addresses of 100k to 2.2M entries. The 0 entries
-      class uses 300 script hashes that own no output, the query a wallet makes most often when it
-      scans past its last used address, and is plotted in calls per second.
+      chain: a block, a transaction and an output script from each.
     </p>
     <p class="lede">
       Each server starts once and runs until idle. Each of three repetitions, on its own requests,
       empties working sets and purges the standby list, sends 5 s of untimed pings, then makes a
       cold pass in shuffled order and a warm pass on the same requests in another order.
     </p>
-    <p class="lede">
-      A call is timed from request to the last response byte, received into a preallocated
-      buffer, with parsing after timing. Rates are calls per second (1000 / mean ms), and address
-      history rates are entries returned per second of call time. Bitcoin Core and Fulcrum hold all
-      headers in memory, so they have no cold header query, and their warm header bars are
-      hatched.
-    </p>
     <p class="lede after">
-      A silent payments scan subscribes one scan key to a range of blocks ending at 950,000, and is
-      timed from the subscription to the notification of completion. Each of three repetitions
-      purges the standby list, scans cold with a new key, then scans warm with the same key. Rates
-      are blocks of the range per second, and each range is labeled with its approximate span of
-      time. GPU scans use each server's default GPU backend. CPU scans use Frigate's CPU backend,
-      UltrafastSecp256k1 field arithmetic on BMI2/ADX, which has no SIMD path, and Libbitcoin's
-      AVX-512 IFMA scan. A scan the server ended without completing, other than by timeout, is
-      marked as a server failure.
-      Libbitcoin's other CPU paths are shown warm, in order of rate above the Libbitcoin AVX-512
-      IFMA warm bar.
-      AVX-512F builds the IFMA 52 bit multiply-add from 32 bit multiplies, and AVX-IFMA is measured
-      as AVX-512 IFMA restricted to its 256 bit registers.
+      A call is timed from request to the last response byte, received into a preallocated
+      buffer, with parsing after timing. Rates are calls per second (1000 / mean ms). Bitcoin Core
+      and Fulcrum hold all headers in memory, so they have no cold header query, and their warm
+      header bars are hatched.
     </p>
   </section>
 
