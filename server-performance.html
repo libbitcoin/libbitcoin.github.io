@@ -76,6 +76,10 @@
   h1 { color: var(--heading); font-family: var(--mono); font-size: clamp(28px, 4.4vw, 44px); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
   .lede { max-width: 66ch; color: var(--ink-2); font-size: 16px; }
   .lede strong { color: var(--ink); font-weight: 600; }
+  .menu { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 28px; padding: 10px 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .menu a { color: var(--ink-2); text-decoration: none; }
+  .menu a:hover, .menu a:focus { color: var(--heading); }
+  h2[id] { scroll-margin-top: 16px; }
   .lede.after { margin: 14px 0 40px; }
 
   .tag { display: inline-block; padding: 2px 7px; border-radius: 2px; font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; white-space: nowrap; border: 1px solid currentColor; }
@@ -243,31 +247,40 @@
     </p>
   </header>
 
+  <nav class="menu">
+    <a href="#native-rest-interface">Native REST Interface</a>
+    <a href="#electrum-interface">Electrum Interface</a>
+    <a href="#sparrow-interface">Sparrow Interface</a>
+    <a href="#bitcoin-p2p-interface">Bitcoin P2P Interface</a>
+    <a href="#bitcoind-json-rpc-interface">Bitcoind JSON-RPC Interface</a>
+    <a href="#bitcoind-rest-interface">Bitcoind REST Interface</a>
+    <a href="#bitcoind-zmq-interface">Bitcoind ZMQ Interface</a>
+    <a href="#btcd-interface">BTCD Interface</a>
+    <a href="#esplora-interface">Esplora Interface</a>
+    <a href="#methodology">Methodology</a>
+  </nav>
+
   <section>
-    <h2>Native REST Interface</h2>
+    <h2 id="native-rest-interface">Native REST Interface</h2>
     <p class="lede after">Measurements pending.</p>
   </section>
 
   <section>
-    <h2>Electrum Interface</h2>
+    <h2 id="electrum-interface">Electrum Interface</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-electrum.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
         <img src="performance/server-electrum.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
-      <figure class="shot" data-full="performance/server-history-absent-lf.png" tabindex="0">
-        <h3>Absent address probe rate by address index load factor (log scale)</h3>
-        <img src="performance/server-history-absent-lf.png" alt="Absent address probe rate by address index load factor (log scale)" loading="lazy">
-      </figure>
       <figure class="shot" data-full="performance/server-history.png" tabindex="0">
-        <h3>Address history entry rate by history size: comparative (log scale)</h3>
-        <img src="performance/server-history.png" alt="Address history entry rate by history size: comparative (log scale)" loading="lazy">
+        <h3>Address history rate: comparative (log scale)</h3>
+        <img src="performance/server-history.png" alt="Address history rate: comparative (log scale)" loading="lazy">
       </figure>
     </div>
   </section>
 
   <section>
-    <h2>Sparrow Interface</h2>
+    <h2 id="sparrow-interface">Sparrow Interface</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-sp-gpu.png" tabindex="0">
         <h3>Silent payments scan rate, GPU: comparative (log scale)</h3>
@@ -281,12 +294,12 @@
   </section>
 
   <section>
-    <h2>Bitcoin P2P Interface</h2>
+    <h2 id="bitcoin-p2p-interface">Bitcoin P2P Interface</h2>
     <p class="lede after">Measurements pending.</p>
   </section>
 
   <section>
-    <h2>Bitcoind JSON-RPC Interface</h2>
+    <h2 id="bitcoind-json-rpc-interface">Bitcoind JSON-RPC Interface</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-bitcoind.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -296,7 +309,7 @@
   </section>
 
   <section>
-    <h2>Bitcoind REST Interface</h2>
+    <h2 id="bitcoind-rest-interface">Bitcoind REST Interface</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-rest.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -306,22 +319,22 @@
   </section>
 
   <section>
-    <h2>Bitcoind ZMQ Interface</h2>
+    <h2 id="bitcoind-zmq-interface">Bitcoind ZMQ Interface</h2>
     <p class="lede after">Measurements pending.</p>
   </section>
 
   <section>
-    <h2>BTCD Interface</h2>
+    <h2 id="btcd-interface">BTCD Interface</h2>
     <p class="lede after">Measurements pending.</p>
   </section>
 
   <section>
-    <h2>Esplora Interface</h2>
+    <h2 id="esplora-interface">Esplora Interface</h2>
     <p class="lede after">Measurements pending.</p>
   </section>
 
   <section>
-    <h2>Methodology</h2>
+    <h2 id="methodology">Methodology</h2>
     <p class="lede">
       All servers run on one machine, shelly (Threadripper PRO 9985WX, 512 GB, Windows 11), one
       stack at a time, each with a store at block 950,000 on its own volume. The client is on the
@@ -351,12 +364,6 @@
       history rates are entries returned per second of call time. Bitcoin Core and Fulcrum hold all
       headers in memory, so they have no cold header query, and their warm header bars are
       hatched.
-    </p>
-    <p class="lede">
-      The address index load factor is the mean number of index rows per hash bucket. An absent
-      address probe walks its bucket and reads every row in it, so its cold cost scales with the
-      load factor, while a warm probe costs the same at any load factor. The load factor comparison
-      uses stores built at load factors 5, 2.5 and 1, with head sizes of 3.0, 6.0 and 15 GB.
     </p>
     <p class="lede after">
       A silent payments scan subscribes one scan key to a range of blocks ending at 950,000, and is
