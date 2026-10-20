@@ -1,445 +1,280 @@
-# 10 — Transaction protocols (in/out 106)
+# 10 — Transaction protocols (in/out ladder)
 
 > Companion to [`06-sessions-and-protocols`](06-sessions-and-protocols),
-> [`08-block-out-protocols`](08-block-out-protocols), and
-> [`09-filter-out-70015`](09-filter-out-70015).
+> [`08-block-out-protocols`](08-block-out-protocols) and
+> [`11-chaser-transaction`](11-chaser-transaction).
 >
-> The transaction protocols implement BIP35-era loose-tx relay. There
-> are two versioned classes:
+> The transaction protocols relay unconfirmed transactions between the
+> pool (`chaser_transaction`) and peers. Each direction is a ladder of
+> levels, each inheriting the one below:
 >
-> - **`protocol_transaction_in_106`** — receive `inv(tx)` from peer,
->   request and ingest. **Currently stubbed**: the handler exists but
->   takes no action. Tx ingestion via this protocol is not implemented
->   in this repo.
-> - **`protocol_transaction_out_106`** — emit `inv(tx)` on bus
->   `chase::transaction`; serve `get_data(tx)` requests.
+> | Direction | 106 | 60002 (BIP35) | 70001 (BIP37) | 70013 (BIP133) | 70016 (BIP339) |
+> | --------- | --- | ------------- | ------------- | -------------- | -------------- |
+> | in        | `inv` → `getdata` → `tx` → `submit` | — | `not_found` accepted | fee / suspension violations drop the peer | wtxid identity |
+> | out       | `chase::transaction` → `inv`; `getdata` → `tx` | `mempool` | `not_found` reported | `feefilter` both ways; filtered announcements | wtxid identity |
 >
-> Both are pre-BIP339; the inline TODOs note that wtxidrelay handling
-> is future work. There is no `transaction_*_70012` family — BIP130
-> does not apply to transactions, only headers.
+> Relay is gated on `network.enable_relay`; currency is signalled to
+> peers by the fee filter rather than by attaching late (doc 06 §2.4).
 
 | File                                                    | Lines | Role                                                              |
 | ------------------------------------------------------- | ----- | ----------------------------------------------------------------- |
-| `src/protocols/protocol_transaction_in_106.cpp`         |  76   | Stub: subscribes to `inv`, ignores                                 |
-| `src/protocols/protocol_transaction_out_106.cpp`        | 194   | Outbound announce + serve                                          |
+| `src/protocols/protocol_transaction_in_106.cpp`         | 221   | Request announced txs, submit received txs to the pool             |
+| `src/protocols/protocol_transaction_in_70001.cpp`       |  84   | Accept `not_found` for requested txs                               |
+| `src/protocols/protocol_transaction_in_70013.cpp`       |  61   | Drop peers that send against our fee filter or suspension          |
+| `src/protocols/protocol_transaction_in_70016.cpp`       |  63   | Identify by wtxid                                                  |
+| `src/protocols/protocol_transaction_out_106.cpp`        | 238   | Announce pooled txs, serve `get_data`                              |
+| `src/protocols/protocol_transaction_out_60002.cpp`      | 123   | Serve `mempool`                                                    |
+| `src/protocols/protocol_transaction_out_70001.cpp`      |  74   | `not_found` accumulation                                           |
+| `src/protocols/protocol_transaction_out_70013.cpp`      | 154   | Fee filter                                                         |
+| `src/protocols/protocol_transaction_out_70016.cpp`      |  63   | Identify by wtxid                                                  |
 
 ---
 
-## 1. Why these are small
+## 1. Attachment
 
-A full Bitcoin node has a *mempool* — an in-memory store of unconfirmed
-transactions used for mining templates and relay. In this codebase, the
-mempool is represented by `chaser_transaction` and `chaser_template`,
-both of which are currently **mostly inactive**:
+From `session_peer.ipp:158-189`:
 
-- `chaser_transaction` issues a single `chase::transaction(...)` event
-  at startup (`chaser_transaction.cpp:85`, the only live emit; another
-  emit at `:105` is commented out) and otherwise has no body beyond
-  the `chase::stop` handler.
-- `chaser_template` consumes `chase::transaction` but currently issues
-  no `chase::template_` events.
+```
+if (relay) {
+    witness_tx = network.enable_witness_tx && peer.wants_witness_tx() && peer bip339
+    tx in:  70016 if witness_tx else 70013 if bip133 else 70001 if bip37 else 106
+    if (peer_version.relay)
+        tx out: 70016 if witness_tx else 70013 if bip133 else 70001 if bip37 else 60002 if bip35 else 106
+}
+```
 
-Consequently the transaction relay path is **wired but largely
-dormant**. The protocols are present for the case where a future
-mempool/template implementation drives them.
+> **Invariant (TxAttach-1).** The in protocol is attached whenever
+> relay is enabled; the out protocol additionally requires that the
+> peer asked for relay in its version message. Our own relay request is
+> made only when the confirmed chain is current
+> (`session_peer::relay()`, doc 06 §1.2).
 
-> **Invariant (TxProto-State-1).** As of this repo state, the
-> outbound protocol will emit at most one `inv(tx)` announcement at
-> startup (driven by the single `chase::transaction` emit from
-> `chaser_transaction`). Operational tx relay requires upstream
-> changes.
-
-> **Invariant (TxProto-State-2).** The inbound protocol is a stub;
-> `inv(tx)` from peers is observed but no `getdata` is sent. Tx
-> ingestion does not currently produce store mutations.
+> **Invariant (TxAttach-2).** Exactly one level per direction; the
+> ladders are strict `if/else if`.
 
 ---
 
-## 2. `protocol_transaction_in_106` — stub
+## 2. The in ladder
 
-### 2.1 Full implementation
+### 2.1 `protocol_transaction_in_106`
 
-```cpp
-// :38-47
-void start() {
-    SUBSCRIBE_CHANNEL(inventory, handle_receive_inventory, _1, _2);
-    protocol_peer::start();
-}
+State: `requested_` (an unordered set of announced-and-requested hashes,
+`protocol_transaction_in_106.hpp:88`) and `tx_type_` (`witness_tx` iff
+`node.require_witness`, `:39-40`).
 
-// :55-69
-bool handle_receive_inventory(ec, message) {
-    if (stopped(ec)) return false;
-    // TODO: get and handle tx as required.
-    ////const auto tx_count = message->count(type_id::transaction);
-    ////set_announced(hash);
-    return true;
-}
+```mermaid
+sequenceDiagram
+    autonumber
+    participant PEER as peer
+    participant TIN as protocol_transaction_in_106
+    participant TX as chaser_transaction
+
+    PEER->>TIN: inv(tx hashes)
+    alt not current
+        Note over TIN: ignore (relay implied by attachment, not a violation)
+    else requested_.size() > max_inventory
+        TIN->>PEER: stop(excessive_backlog)
+    else
+        TIN->>TIN: set_announced(each hash)
+        TIN->>PEER: getdata(hashes not archived), requested_ ∪= hashes
+    end
+    PEER->>TIN: tx
+    alt not in requested_
+        TIN->>PEER: stop(protocol_violation)
+    else
+        TIN->>TX: submit({tx}, test=false)
+        TX-->>TIN: handle_submit(ec) → POST do_handle_submit
+        alt ec is a tolerated code
+            Note over TIN: ignore
+        else ec
+            TIN->>PEER: stop(ec)
+        end
+    end
 ```
 
-That's all of it. The commented-out lines (`:66-67`) show the intended
-shape: count tx-typed items in the inventory and record each as
-"announced from this peer" via `set_announced(hash)` so that the
-*out* protocol won't echo it back. None of this is currently active.
+Source: `handle_receive_inventory` `:82-117`, `create_get_data`
+`:120-141`, `handle_receive_transaction` `:155-176`,
+`do_handle_submit` `:186-215`.
 
-### 2.2 TODO breadcrumbs
+> **Invariant (TxIn-Request-1).** Only announced txs are requested and
+> only requested txs are accepted; an unrequested `tx` is a protocol
+> violation. The backlog of outstanding requests is bounded by
+> `max_inventory` (measured between messages, so it may exceed the bound
+> by one message).
 
-Inline comments (`:51-53, :65`):
+> **Invariant (TxIn-Tolerance-1).** These submit results are *not*
+> misbehaviour at 106 and are ignored: `pooling_disabled`,
+> `insufficient_fee`, `duplicate_transaction`, `double_spend`,
+> `absolute_time_locked`, `relative_time_locked`,
+> `missing_previous_output` (`:203-210`). A conflict with an unconfirmed
+> tx, an orphan, a lock evaluated against the presumed next block, and a
+> rate the peer could not know are all legitimate from the peer's view.
+> Everything else (consensus failure, faults) drops the peer.
 
-> *"TODO: bip339: After a node has received a wtxidrelay message
-> from a peer, the node SHOULD use a MSG_WTX getdata message to
-> request any announced transactions."*
+### 2.2 `protocol_transaction_in_70001`
 
-> *"TODO: get and handle tx as required."*
+Adds `not_found` handling (`:39-78`): each tx item must be in
+`requested_`, else protocol violation.
 
-This protocol will need:
+### 2.3 `protocol_transaction_in_70013`
 
-1. A subscription to peer `wtxidrelay` to decide between MSG_TX and
-   MSG_WTX `getdata`.
-2. A handler that calls `get_data` for unknown tx hashes.
-3. A `tx` message handler that validates and stores the tx.
-4. A `chase::transaction(link)` emission point (the only one currently
-   in the codebase is `chaser_transaction`, but the natural source
-   would be this protocol — see §6).
+Overrides `do_handle_submit` (`:39-55`): because the peer was sent our
+fee rate when current and the maximum while not, a tx below the rate
+(`insufficient_fee`) or any tx while pooling is disabled
+(`pooling_disabled`) was sent against instruction and drops the peer.
 
-> **Invariant (TxIn-Stub-1).** No bus events are emitted, no store
-> mutations are performed, no further messages are sent in response
-> to `inv`. The protocol exists solely to subscribe and (in future)
-> implement.
+### 2.4 `protocol_transaction_in_70016`
+
+Overrides identity (`:37-57`): announcements and requests use
+`type_id::wtxid`, the request record is keyed by the witness hash, and
+"archived" is tested with `to_witness_tx`.
 
 ---
 
-## 3. `protocol_transaction_out_106` — announce + serve
+## 3. The out ladder
 
-### 3.1 Subscriptions
-
-```cpp
-// :39-50
-void start() {
-    subscribe_events(BIND(handle_event, _1, _2, _3));      // bus
-    SUBSCRIBE_CHANNEL(get_data, handle_receive_get_data, _1, _2);
-    protocol_peer::start();
-}
-
-// :52-58
-void stopping(ec) {
-    unsubscribe_events();
-    protocol_peer::stopping(ec);
-}
-```
-
-One bus subscription, one channel subscription. Symmetric to
-`protocol_block_out_106` ([`08 §2.1`](08-block-out-protocols#21-subscriptions))
-but for tx not block.
-
-### 3.2 Bus event handler — `chase::transaction → do_announce`
+### 3.1 `protocol_transaction_out_106`
 
 ```cpp
-// :63-86
-bool handle_event(ec, event_, value) {
-    if (stopped()) return false;
-    switch (event_) {
-        case chase::transaction: {
-            POST(do_announce, std::get<transaction_t>(value));
-            break;
-        }
-        default: break;
-    }
-    return true;
-}
-
-// :93-117
-bool do_announce(transaction_t link) {
-    const auto hash = query.get_tx_key(link);
-    if (was_announced(hash))                 // anti-echo
-        return true;
-    if (hash == null_hash) return true;      // store inconsistency; logged only
-    SEND(inventory{ { { type_id::transaction, hash } } }, handle_send, _1);
-    return true;
-}
+// :39-60 start: subscribe_chase; SUBSCRIBE_CHANNEL(get_data); stopping → unsubscribe_chase
+// :85-106 handle_chase: chase::transaction → POST(do_announce, link)
+// :111-139 do_announce → announce(hash): skip if was_announced or null; NOTIFY(inv{ type, hash })
+// :144-153 handle_receive_get_data → send_transaction(success, 0, message, gate())
+// :159-212 send_transaction: loop over tx items, witness gate, get_transaction, unservable → stop(not_found) at 106
 ```
+
+The send loop has the same shape as block-out (doc 08 §2.5): drain
+unservable items (106 stops the channel; 70001 accumulates), report,
+send one tx, continue from the completion.
 
 > **Invariant (TxOut-Announce-1).** Same anti-echo discipline as
-> `protocol_block_out_106` and `protocol_header_out_70012`: a peer
-> that announced a tx to us does not receive an echo. Implementation
-> identical except for the `type_id::transaction` selector.
+> block-out and header-out: a peer that announced a tx to us does not
+> receive an echo.
 
-> **Invariant (TxOut-Announce-2).** `chase::transaction(link)` is
-> emitted only by `chaser_transaction` (verified in
-> [`01-event-bus §2.6`](01-event-bus#26-confirm-chain-and-mining)).
-> Currently fires at most once (at startup), so the announce path is
-> driven by upstream rather than by tx relay traffic.
+> **Invariant (TxOut-Witness-1).** A node that does not provide witness
+> drops a peer requesting a witness tx (`witness_tx` or `wtxid` items,
+> `:180-187`).
 
-### 3.3 Inbound `get_data` — streamed tx send
+### 3.2 `protocol_transaction_out_60002` — `mempool`
 
-The pattern mirrors `protocol_filter_out_70015` (one-shot subscription
-during streaming, resubscribe on completion) but threads through the
-peer's `get_data.items` list rather than an ancestry list.
+When `network.enable_memory_pool`, subscribes to `mempool` (`:39-50`).
+`handle_receive_memory_pool` (`:63-76`) snapshots the pool record count
+and streams `inv` messages of up to `max_inventory` confirmable pooled
+txs each (`get_confirmable_txs` by pool cursor, `:81-117`), skipping
+filtered txs; txs pooled after the snapshot are announced by the
+`transaction` event.
 
-```cpp
-// :122-133
-bool handle_receive_get_data(ec, message) {
-    if (stopped(ec)) return false;
-    send_transaction(error::success, zero, message);    // start at index 0
-    return false;                                       // ← one-shot
-}
-```
+### 3.3 `protocol_transaction_out_70001` — `not_found`
 
-```cpp
-// :142-188 (simplified)
-void send_transaction(ec, size_t index, get_data::cptr message) {
-    if (stopped(ec)) return;
+As for block-out 70001: unservable items are accumulated when
+`enable_not_found_` and reported with one `not_found` whose completion
+resumes the send loop (`:40-68`).
 
-    // Skip over non-tx inventory items
-    for (; index < message->items.size(); ++index)
-        if (message->items.at(index).is_transaction_type())
-            break;
+### 3.4 `protocol_transaction_out_70013` — fee filter
 
-    // BUGBUG: registration race.
-    if (index >= message->items.size()) {
-        SUBSCRIBE_CHANNEL(get_data, handle_receive_get_data, _1, _2);   // resubscribe
-        return;
-    }
+- Sends `feefilter{ minimum_fee_rate() }` at start and whenever
+  `chase::block` or `chase::stale` changes the answer (`:42-52`,
+  `:58-69`, `:71-93`): the configured rate while current, `max_money`
+  while not (`protocol::minimum_fee_rate`, doc 06 §3). This is how
+  currency is signalled to peers.
+- Records the peer's `feefilter` on the channel (`set_minimum_fee`,
+  `:98-108`).
+- `do_announce` skips txs whose rate is below the peer's filter
+  (`is_filtered`, `:113-148`); a missing fee record is a store integrity
+  fault.
 
-    const auto& item = message->items.at(index);
-    const auto witness = item.is_witness_type();
-    if (!node_witness_ && witness) {
-        stop(network::error::protocol_violation);
-        return;
-    }
+> **Invariant (TxOut-Fee-1).** A peer is never sent an announcement
+> below the rate it advertised, and is told `max_money` whenever the
+> node is not current, so the node receives no relay while catching up.
 
-    const auto ptr = query.get_transaction(query.to_tx(item.hash), witness);
-    if (!ptr) {
-        stop(system::error::not_found);
-        return;
-    }
+### 3.5 `protocol_transaction_out_70016`
 
-    SEND(transaction{ ptr }, send_transaction, _1, add1(index), message);
-}
-```
-
-> **Invariant (TxOut-Stream-1).** One outstanding `tx` send per
-> channel; the recursive `send_transaction` callback chains them.
-> Same shape as block-out and filter-out streaming.
-
-> **Invariant (TxOut-Stream-2).** Resubscription to `get_data`
-> happens only after the entire request's tx items have been served
-> (or skipped). Until then, the channel is unsubscribed from
-> `get_data`. A second incoming `get_data` arriving in that window
-> currently has no handler registered, which the libbitcoin-network
-> channel **ignores**. (Behaviour may be tightened in future to drop
-> peers in that case; do not rely on either policy.)
-
-> **Note: previously-flagged off-by-one at `:187`.** Earlier
-> revisions of this protocol used `sub1(index)` here, which produced
-> an off-by-one (re-sending the same tx). Fixed in libbitcoin-node
-> PR #1007 (commit 940ccea) to use `add1(index)`. Keep this in mind
-> when reading older checkouts.
-
-### 3.4 Witness gating
-
-```cpp
-// :164-170
-if (!node_witness_ && witness)
-    stop(network::error::protocol_violation);
-```
-
-Same logic as `protocol_block_out_106` (`08 §2.6`): a node that
-doesn't advertise witness service drops any peer that requests
-witness data.
-
-### 3.5 BIP339 TODOs
-
-Multiple inline TODOs at `:51-53, :90-91, :137-140` reference
-**BIP339 (`wtxidrelay`)**: after exchanging `wtxidrelay`, the
-inv/getdata semantics for transactions switch to `MSG_WTX` (using
-witness txids). This is not yet implemented; the protocol currently
-uses MSG_TX universally.
+Identity by wtxid (`:39-57`): announcements carry `type_id::wtxid` with
+the witness hash, and `wtxid` get_data items resolve through
+`to_witness_tx`.
 
 ---
 
-## 4. Attachment
+## 4. Bus integration
 
-From `session_peer.ipp:156-160`:
+| Protocol                          | Subscribes to                        | Emits |
+| --------------------------------- | ------------------------------------ | ----- |
+| `protocol_transaction_in_*`       | none                                 | none  |
+| `protocol_transaction_out_106/60002/70001/70016` | `chase::transaction`  | none  |
+| `protocol_transaction_out_70013`  | `chase::transaction`, `chase::block`, `chase::stale` | none |
 
-```cpp
-if (txs_in_out) {
-    if (peer->peer_version()->relay)
-        channel->attach<protocol_transaction_out_106>(self)->start();
-}
-```
-
-where `txs_in_out = relay && peer.is_negotiated(bip37) && (!delay || is_current(true))`.
-
-Two important consequences:
-
-> **Invariant (TxAttach-1).** Only the OUT protocol is attached
-> here. `protocol_transaction_in_106` is **never attached** in this
-> repo's current attach tree. This explains why its stubbed status is
-> not yet a problem — it cannot receive anything because it isn't
-> wired in.
-
-> **Invariant (TxAttach-2).** Tx out attaches only when (a) relay is
-> enabled, (b) peer has negotiated BIP37 (mempool filtering), and (c)
-> the peer's version message claimed `relay = true`. So tx
-> announcement traffic is opt-in on both sides.
+The in protocols reach the pool through the `submit` RPC
+(`protocol → session → full_node → chaser_transaction`); the pool's
+`chase::transaction` is what drives announcements to every other peer.
 
 ---
 
-## 5. Bus integration
-
-| Protocol                          | Subscribes to        | Emits           |
-| --------------------------------- | -------------------- | --------------- |
-| `protocol_transaction_in_106`     | none                 | none            |
-| `protocol_transaction_out_106`    | `chase::transaction` | none            |
-
-The out protocol never *emits* bus events. It is a pure consumer of
-`chase::transaction`. Compare with `protocol_block_in_31800` which
-both consumes (`chase::download`, etc.) and emits (`chase::checked`,
-`chase::unchecked`, `chase::starved`) — block-in is much more
-deeply integrated.
-
----
-
-## 6. Where `chase::transaction` comes from
-
-Currently only `chaser_transaction.cpp:85`:
-
-```cpp
-notify(error::success, chase::transaction, transaction_t{});
-```
-
-This is called from the constructor path with a *zero* `transaction_t`
-value. The commented-out emit at `:105` would be the operational
-emission point — once mempool ingestion exists, each accepted tx
-would emit `chase::transaction(link)`.
-
-> **Invariant (TxEvent-1).** Until `chaser_transaction` is fleshed
-> out, the out protocol's bus subscription receives effectively no
-> traffic. The protocol is *correctly idle*, not broken — it would
-> activate the moment the chaser starts emitting.
-
-The natural extension path:
-
-1. Implement `protocol_transaction_in_106::handle_receive_inventory`
-   to `getdata` for unknown tx hashes.
-2. Add a `tx` message handler that runs consensus + policy checks and
-   calls a store mutation (analogous to `set_code` for blocks).
-3. Emit `chase::transaction(link)` from that handler — or from a
-   chaser that consumes a per-channel "received tx" message.
-4. Add `chaser_transaction` body that drives mempool eviction,
-   miner-template trigger, etc.
-
----
-
-## 7. State machine view (out_106)
+## 5. State machine view (out)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> SUBSCRIBED: start (subscribe bus + get_data)
-    SUBSCRIBED --> SUBSCRIBED: chase:transaction → do_announce → SEND inv
-    SUBSCRIBED --> STREAMING: get_data → unsubscribe from get_data send_transaction(0, msg)
-    STREAMING --> STREAMING: SEND tx; send_transaction(add1(i), msg)
-    STREAMING --> SUBSCRIBED: index ≥ size → resubscribe to get_data
-    STREAMING --> DROPPED: witness mismatch / not_found / send error
-    SUBSCRIBED --> [*]: stop / chase:stop
+    [*] --> SUBSCRIBED: start (subscribe bus + get_data, feefilter at 70013)
+    SUBSCRIBED --> SUBSCRIBED: chase∷transaction → do_announce → SEND inv (unless echo or filtered)
+    SUBSCRIBED --> SUBSCRIBED: chase∷block / stale → resend feefilter if changed (70013)
+    SUBSCRIBED --> STREAMING: get_data → send_transaction(0, msg) under gate
+    STREAMING --> STREAMING: SEND tx or not_found, send_transaction(next, msg)
+    STREAMING --> SUBSCRIBED: items exhausted
+    STREAMING --> DROPPED: witness mismatch / not_found at 106 / send error
+    SUBSCRIBED --> [*]: stop / chase∷stop
     STREAMING --> [*]: stop
     DROPPED --> [*]
 ```
 
-State space (per channel): `{SUBSCRIBED, STREAMING}` — same as
-filter-out.
+---
+
+## 6. Error / outcome inventory
+
+| Site                                              | Code                                  | Trigger                                                     |
+| ------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------- |
+| `in_106.cpp:100-106`                              | `error::excessive_backlog`            | more than `max_inventory` requested txs outstanding         |
+| `in_106.cpp:164-170`, `in_70001.cpp:68-74`        | `protocol_violation`                  | unrequested `tx` or `not_found`                             |
+| `in_106.cpp:203-214`                              | submit code                           | consensus failure or fault from the pool                    |
+| `in_70013.cpp:47-52`                              | `insufficient_fee`, `pooling_disabled`| tx sent against the advertised fee filter / suspension      |
+| `out_106.cpp:180-187`                             | `protocol_violation`                  | witness requested but `provide_witness` false               |
+| `out_106.cpp:215-225`                             | `system::error::not_found`            | tx requested but missing from store (106 only)              |
+| `out_60002.cpp:96-101`                            | store code                            | `get_confirmable_txs` failed                                |
+| `out_70013.cpp:131-135`                           | `database::error::integrity` (fault)  | fee record missing for an announced tx                      |
 
 ---
 
-## 8. Error / outcome inventory
-
-| Site                                          | Code                                  | Trigger                                       |
-| --------------------------------------------- | ------------------------------------- | --------------------------------------------- |
-| `:167-169`                                    | `protocol_violation`                  | witness requested but `node_witness_` false   |
-| `:183`                                        | `system::error::not_found`            | tx requested but missing from store           |
-
-No node-faults. No store mutations originate here (the out protocol is
-strictly read+send).
-
----
-
-## 9. Spec view
-
-### 9.1 As processes
+## 7. Spec view
 
 ```
-protocol_transaction_in_106 : Process    (stub)
-  state: ∅
-  inputs: peer inv(tx)
-  outputs: none (ignored)
+tx_in : Process
+  state: requested : Set Hash
+  inputs:  peer inv(tx) → request unknown; peer tx → submit; peer not_found (70001+)
+  outputs: peer getdata, submit(tx) RPC, drop_channel
 
-protocol_transaction_out_106 : Process
-  state: streaming : Bool
-  inputs:
-    bus chase::transaction(link) → emit inv(tx) [filtered by was_announced]
-    peer get_data(items) → enter streaming
-    send_transaction continuation
-  outputs:
-    peer inv(tx) | tx messages
-    drop_channel
-  store reads: get_tx_key, to_tx, get_transaction
+tx_out : Process
+  state: sent_fee ∈ ℕ (70013)
+  inputs:  bus chase::transaction(link) → inv (filtered by was_announced, fee filter)
+           bus chase::block / stale → feefilter (70013)
+           peer get_data → stream tx | not_found
+           peer mempool → stream inv (60002)
+           peer feefilter → minimum_fee (70013)
+  outputs: peer inv | tx | not_found | feefilter
 ```
 
-### 9.2 Safety properties
-
-1. **Anti-echo** (TxOut-Announce-1).
-2. **Single in-flight stream** (TxOut-Stream-1).
-3. **Witness consistency**: never serves witness tx if not advertising
-   witness service.
-4. **Stub no-op** (TxIn-Stub-1, TxProto-State-2): the in protocol
-   produces no observable effects.
-
-### 9.3 Liveness
-
-Bounded entirely by upstream. Until `chase::transaction` fires
-frequently, the out protocol is idle.
-
-### 9.4 Historical note
-
-The `sub1(index)` continuation at `:187` was an off-by-one bug,
-fixed in PR #1007 (commit 940ccea) to `add1(index)`. The spec
-should treat the streamed-tx loop as a simple forward iteration.
-
----
-
-## 10. Implementation notes
-
-- The in protocol is currently a no-op; it stays that way until the mempool
-  design is settled.
-- The out protocol is a near-clone of block-out: one announce path, one
-  streaming serve path — the same actor template applies.
-- The continuation passes `(index + 1)` forward through `add1`; the loop is
-  a straightforward forward iteration over `message->items`.
-
----
-
-## 11. Notes for the formal model
-
-- The in protocol contributes no transitions; it can be modelled as
-  identity.
-- The out protocol's streaming state machine is identical in shape
-  to filter-out and block-out — three serialised request types
-  collapse to one "drain queue then resubscribe" pattern in the
-  abstract.
-- The dormancy of `chase::transaction` is a *deployment* fact, not a
-  model property. A spec should still encode the protocol's intended
-  behaviour given an active source.
+Safety: request discipline (TxIn-Request-1); anti-echo
+(TxOut-Announce-1); fee filter honoured both ways (TxOut-Fee-1); witness
+consistency (TxOut-Witness-1). Liveness: bounded entirely by the pool and
+the peer.
 
 ---
 
 ## Cross-references
 
-- [`01-event-bus`](01-event-bus) §2.6 (`chase::transaction` —
-  emitter / consumer table)
+- [`01-event-bus`](01-event-bus) §2.6 (`chase::transaction`, `block`,
+  `stale` — emitter / consumer table)
 - [`06-sessions-and-protocols`](06-sessions-and-protocols) §2.3
-  — `txs_in_out` attach predicate
+  — attach predicates; §3 — `minimum_fee_rate`
 - [`08-block-out-protocols`](08-block-out-protocols) §2.5
-  (streaming send loop — same pattern, working version)
-- [`09-filter-out-70015`](09-filter-out-70015) §6 (streaming +
-  resubscribe pattern — same pattern, working version)
-- BIPs 35, 37, 144, 339 (external)
+  (streaming send loop — same pattern)
+- [`11-chaser-transaction`](11-chaser-transaction) (the pool that
+  `submit` reaches and that emits `chase::transaction`)
+- BIPs 35, 37, 133, 144, 339 (external)

@@ -1,0 +1,3 @@
+exclude:
+  - architecture/md
+  - tools

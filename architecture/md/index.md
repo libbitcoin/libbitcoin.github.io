@@ -1,13 +1,14 @@
 # libbitcoin-node — Architecture documentation
 
-This directory contains a top-down, source-anchored description of
-libbitcoin-node — the architecture documentation for the project. It is
+This is a top-down, source-anchored description of libbitcoin-node. It is
 also written to support a **formal-verification effort**, which needs
 state machines, invariants, pre/post-conditions, and a clear bus-vs.-store
 ownership model.
 
-Every behavioural claim is anchored with `file:line` references into
-the C++ source so it can be re-verified or re-derived if source drifts.
+Every behavioural claim is anchored with `file:line` references into the
+C++ source so it can be re-verified or re-derived if source drifts. The
+citations in this revision were verified against libbitcoin-node master at
+commit `a5173475` (2026-10-20), with `chaser_check` renamed to `chaser_download` (node branch `download`, `ea1e1264`).
 
 ---
 
@@ -17,17 +18,17 @@ the C++ source so it can be re-verified or re-derived if source drifts.
 | -- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 00 | [`00-overview`](00-overview)                                        | Top-down map: layer stack, object graph, threading model, lifecycle         |
 | 01 | [`01-event-bus`](01-event-bus)                                      | Every `chase` event with verified issuer/handler sites; methodology         |
-| 02 | [`02-chaser-organize`](02-chaser-organize)                          | Templated header+block organize state machine; 15 `organizeN` fault sites   |
-| 03 | [`03-chaser-check`](03-chaser-check)                                | Block-download orchestration; race_all purge barrier; σ slow-peer detector |
-| 04 | [`04-chaser-validate`](04-chaser-validate)                          | Consensus validation; own threadpool + backlog; 8 `validateN` fault sites   |
-| 05 | [`05-chaser-confirm`](05-chaser-confirm)                            | UTXO double-spend check + confirmed-chain writer; 12 `confirmN` fault sites |
+| 02 | [`02-chaser-header`](02-chaser-header)                              | Header organize state machine, tree pruning, disorganize; 15 `organizeN` fault sites |
+| 03 | [`03-chaser-download`](03-chaser-download)                                | Block-download orchestration; race_all purge barrier; σ slow-peer detector; download window |
+| 04 | [`04-chaser-validate`](04-chaser-validate)                          | Consensus validation; own threadpool; batched signature and silent-payment verification; 12 `validateN` fault sites |
+| 05 | [`05-chaser-confirm`](05-chaser-confirm)                            | Order-based consensus check + confirmed-chain writer; stale timer; 12 `confirmN` fault sites |
 | 06 | [`06-sessions-and-protocols`](06-sessions-and-protocols)            | Sessions, the protocol attach tree, `protocol_block_in_31800`                |
-| 07 | [`07-header-protocols`](07-header-protocols)                        | Header in/out at 31800 + 70012; anti-echo discipline                         |
-| 08 | [`08-block-out-protocols`](08-block-out-protocols)                  | Block out at 106 + 70012 supersede gate; streaming send loop                 |
-| 09 | [`09-filter-out-70015`](09-filter-out-70015)                        | BIP157/158 client filters; three request types; one-shot stream trick         |
-| 10 | [`10-tx-protocols`](10-tx-protocols)                                | Tx in (stub) + tx out at 106; flags a suspect `sub1`/`add1` line             |
-| 11 | [`11-protocol-block-in-106`](11-protocol-block-in-106)              | Legacy blocks-first sync (used when peer doesn't negotiate `headers_protocol`) |
-| 12 | [`12-periphery-chasers`](12-periphery-chasers)                      | `chaser_snapshot`, `chaser_storage`, `chaser_template`, `chaser_transaction`  |
+| 07 | [`07-header-protocols`](07-header-protocols)                        | Header in/out at 31800, 70012 and 70014 (compact blocks); prove-then-archive sync |
+| 08 | [`08-block-out-protocols`](08-block-out-protocols)                  | Block out at 106, 70001, 70012 and 70014; streaming send loop; `not_found` |
+| 09 | [`09-filter-out-70015`](09-filter-out-70015)                        | BIP157/158 client filters; three request types                              |
+| 10 | [`10-tx-protocols`](10-tx-protocols)                                | Tx in/out ladder at 106, 60002, 70001, 70013 and 70016                      |
+| 11 | [`11-chaser-transaction`](11-chaser-transaction)                    | The transaction pool: package submission, compact block fill, scan starts; 9 `transactionN` fault sites |
+| 12 | [`12-periphery-chasers`](12-periphery-chasers)                      | `chaser_snapshot`, `chaser_storage`, `chaser_template`, `chaser_estimate`    |
 
 ---
 
@@ -35,14 +36,14 @@ the C++ source so it can be re-verified or re-derived if source drifts.
 
 ### For a new contributor
 Read in order: **00 → 01 → 02 → 03 → 04 → 05** for the consensus
-pipeline, then **06 → 07/08/11** for the corresponding peer protocols.
-Skim 09, 10, 12 as needed.
+pipeline, then **06 → 07/08** for the corresponding peer protocols, then
+**10 → 11** for the transaction pool. Skim 09 and 12 as needed.
 
 ### For a formal-verification reader
 **01** is foundational — the `chase` events are the inter-process
 interface. Then **02 §3, §5, §7** (organize state machine, disorganize
-state machine, error-code → proof-obligation list), **04 §4, §6**
-(validate consensus + error inventory), **05 §4–§8** (confirm
+state machine, error-code → proof-obligation list), **04 §4–§7**
+(validate consensus, batching, error inventory), **05 §4–§8** (confirm
 algorithm, rollback atomicity, error inventory). The numbered
 invariants throughout (`Validate-Backlog-1`, `Confirm-Rollback-1`,
 etc.) are the recommended target set for a TLA+/Alloy spec.
@@ -50,8 +51,8 @@ etc.) are the recommended target set for a TLA+/Alloy spec.
 ### For a peer-protocol implementer
 **00 §7** for the network-layer overview, then **06** for the
 attach tree, then read whichever versioned family you need
-(**07** for headers, **08+11** for blocks, **09** for filters,
-**10** for tx).
+(**07** for headers and compact blocks, **08** for blocks, **09** for
+filters, **10** for tx).
 
 ---
 
@@ -75,16 +76,17 @@ families:
 | `Lifecycle-*`   | 00                               | start/run/close ordering                            |
 | `Store-*`       | 00                               | Suspend/resume around store maintenance             |
 | `Bus-*`         | 01                               | Subscription/unsubscription semantics               |
-| `Organize-*`    | 02                               | Template state machine                              |
-| `Check-*`       | 03                               | Download orchestration                              |
-| `Validate-*`    | 04                               | Consensus validation                                |
-| `Confirm-*`     | 05                               | Confirmation + UTXO                                 |
-| `Session-*`, `Attach-*`, `Protocol-*`, `Observer-*`, `Performer-*`, `BlockIn-*`, `HeaderIn-*`, `HeaderOut-*`, `HeaderBus-*`, `Anti-Echo-*`, `BlockOut-*`, `Filter-*`, `TxProto-*`, `TxAttach-*`, `TxOut-*`, `TxIn-*`, `TxEvent-*`, `BlockIn106-*` | 06–11 | Network layer |
-| `Snapshot-*`, `Storage-*`, `Periphery-*`, `TxChaser-*` | 12 | Periphery chasers |
+| `Organize-*`    | 02                               | Header organize state machine                       |
+| `Download-*`       | 03                               | Download orchestration                              |
+| `Validate-*`    | 04                               | Consensus validation and batching                   |
+| `Confirm-*`     | 05                               | Confirmation + order-based consensus                |
+| `Session-*`, `Attach-*`, `Protocol-*`, `Observer-*`, `Performer-*`, `BlockIn-*`, `HeaderIn-*`, `HeaderOut-*`, `Compact-*`, `Anti-Echo-*`, `BlockOut-*`, `Filter-*`, `TxIn-*`, `TxOut-*` | 06–10 | Network layer |
+| `Pool-*`        | 11                               | Transaction pool                                    |
+| `Snapshot-*`, `Storage-*`, `Estimate-*`, `Periphery-*` | 12 | Periphery chasers |
 
 ### Mermaid diagrams
 All diagrams use Mermaid (sequence, flowchart, stateDiagram-v2,
-classDiagram). They render natively on GitHub.
+classDiagram).
 
 ### "Spec view" / "Implementation notes" / "Notes for the formal model"
 Most subsystem docs have these three closing sections. They are the
@@ -103,31 +105,22 @@ distilled-for-export view of each subsystem.
    *sequencing* of those calls, not their content. The consensus
    surface is delegated to libbitcoin-system documentation.
 3. **Store consistency** is treated as an oracle. Every numbered
-   `organizeN`/`validateN`/`confirmN` fault is documented as a proof
-   obligation against store-consistency invariants supplied by
+   `organizeN`/`validateN`/`confirmN`/`transactionN` fault is documented
+   as a proof obligation against store-consistency invariants supplied by
    libbitcoin-database. A full proof would require importing those.
 4. **Discrepancies with `chase.hpp` comments**: the inline event-bus
-   doc in `chase.hpp` has several stale entries (issuer
-   misattributions, dormant events). All are flagged in
+   doc in `chase.hpp` has a few stale entries (incomplete handler lists,
+   dormant events). All are flagged in
    [`01-event-bus`](01-event-bus) with `⚠` and discussed in
    §2 of that doc.
-5. **Stub subsystems**: `chaser_template`, `chaser_transaction`, and
-   `protocol_transaction_in_106` are stubs. The docs describe their
-   wiring and intended design but note clearly where current
+5. **Stub subsystems**: `chaser_template` is a stub. The doc describes
+   its wiring and intended design but notes clearly that current
    behaviour is "no-op".
-6. **Reviewer-confirmed corrections**: a first pass of reviewer
-   feedback (evoskuil) corrected several claims; the affected docs
-   are 02 (milestone semantics, NDEBUG polarity, tree_ DoS), 03
-   (`is_current(false)` is candidate-chain), 04 (consensus is split
-   across multiple stages, not concentrated here), 05 (NDEBUG
-   polarity, expanded `block_confirmable` description), 06
-   (session-template diagram, "recent" vs "current"), 08
-   (`superseded_` atomic rationale), 09 (no-handler messages are
-   ignored, not protocol violations), 10 (the previously-flagged
-   `sub1`/`add1` at `protocol_transaction_out_106.cpp:187` was an
-   off-by-one bug, fixed in PR #1007), 11 (order-discipline is the
-   same as headers-first; BIP130 typo), and 12 (chaser_storage
-   timer runs on the network threadpool via the chaser's strand).
+6. **Database-side batching.** The signature and silent-payment batch
+   tables, their verification kernels (CPU or GPU) and the pooled-block
+   validation query live in libbitcoin-database and libbitcoin-system.
+   Doc 04 describes the node's bank/drain protocol around them, not the
+   kernels.
 
 ---
 
@@ -139,73 +132,77 @@ libbitcoin-node
 │   ├── full_node.cpp ........................ 00
 │   ├── configuration.cpp / settings.cpp ..... (mentioned in 00, not detailed)
 │   ├── error.cpp ............................ 00 §9
-│   ├── block_arena.cpp / block_memory.cpp ... 00 §8 (overview only)
+│   ├── estimator.cpp ........................ 12 §4 (interface only)
 │   │
 │   ├── chasers/
 │   │   ├── chaser.cpp ....................... 00 §3 (base; per-doc as needed)
-│   │   ├── chaser_block.cpp ................. 02 §4
-│   │   ├── chaser_header.cpp ................ 02 §4, §6.2
-│   │   ├── chaser_check.cpp ................. 03
+│   │   ├── chaser_header.cpp ................ 02
+│   │   ├── chaser_download.cpp ................. 03
 │   │   ├── chaser_validate.cpp .............. 04
+│   │   ├── chaser_validate_parallel.cpp ..... 04 §4
+│   │   ├── chaser_validate_batch.cpp ........ 04 §5
+│   │   ├── chaser_validate_capture.cpp ...... 04 §5
 │   │   ├── chaser_confirm.cpp ............... 05
-│   │   ├── chaser_snapshot.cpp .............. 12 §1
-│   │   ├── chaser_storage.cpp ............... 12 §2
+│   │   ├── chaser_transaction.cpp ........... 11
 │   │   ├── chaser_template.cpp .............. 12 §3
-│   │   └── chaser_transaction.cpp ........... 12 §4
+│   │   ├── chaser_estimate.cpp .............. 12 §4
+│   │   ├── chaser_snapshot.cpp .............. 12 §1
+│   │   └── chaser_storage.cpp ............... 12 §2
 │   │
 │   ├── sessions/
 │   │   ├── session.cpp ...................... 06 §1
 │   │   ├── session_inbound.cpp .............. 06 §1.3
-│   │   ├── session_outbound.cpp ............. 06 §1 (typedef)
+│   │   ├── session_outbound.cpp ............. 06 §1.4
 │   │   └── session_manual.cpp ............... 06 §1 (typedef)
+│   │
+│   ├── channels/
+│   │   └── channel_peer.cpp ................. 07 §8 (announcement cache)
 │   │
 │   └── protocols/
 │       ├── protocol.cpp ..................... 06 §3
-│       ├── protocol_peer.cpp ................ 06 (referenced); 07 §8 anti-echo
+│       ├── protocol_peer.cpp ................ 06 §3; 07 §8 anti-echo
 │       ├── protocol_observer.cpp ............ 06 §3.2
 │       ├── protocol_performer.cpp ........... 06 §4
 │       │
-│       ├── protocol_block_in_106.cpp ........ 11
 │       ├── protocol_block_in_31800.cpp ...... 06 §5
 │       ├── protocol_block_out_106.cpp ....... 08 §2
-│       ├── protocol_block_out_70012.cpp ..... 08 §3
+│       ├── protocol_block_out_70001.cpp ..... 08 §3
+│       ├── protocol_block_out_70012.cpp ..... 08 §4
+│       ├── protocol_block_out_70014.cpp ..... 08 §5
 │       │
 │       ├── protocol_header_in_31800.cpp ..... 07 §2
 │       ├── protocol_header_in_70012.cpp ..... 07 §3
-│       ├── protocol_header_out_31800.cpp .... 07 §4
-│       ├── protocol_header_out_70012.cpp .... 07 §5
+│       ├── protocol_header_in_70014.cpp ..... 07 §4
+│       ├── protocol_header_out_31800.cpp .... 07 §5
+│       ├── protocol_header_out_70012.cpp .... 07 §6
+│       ├── protocol_header_out_70014.cpp .... 07 §7
 │       │
 │       ├── protocol_filter_out_70015.cpp .... 09
 │       ├── protocol_transaction_in_106.cpp .. 10 §2
-│       └── protocol_transaction_out_106.cpp . 10 §3
+│       ├── protocol_transaction_in_70001.cpp  10 §2
+│       ├── protocol_transaction_in_70013.cpp  10 §2
+│       ├── protocol_transaction_in_70016.cpp  10 §2
+│       ├── protocol_transaction_out_106.cpp . 10 §3
+│       ├── protocol_transaction_out_60002.cpp 10 §3
+│       ├── protocol_transaction_out_70001.cpp 10 §3
+│       ├── protocol_transaction_out_70013.cpp 10 §3
+│       └── protocol_transaction_out_70016.cpp 10 §3
 │
 └── include/bitcoin/node/
     ├── full_node.hpp ........................ 00
     ├── chase.hpp ............................ 00 §4; 01 (verified against source)
     ├── events.hpp ........................... 00 §4 (metrics enum)
     ├── error.hpp ............................ 00 §9
-    └── impl/chasers/chaser_organize.ipp ..... 02
+    ├── settings.hpp ......................... 00 §10
+    ├── estimator.hpp ........................ 12 §4
+    └── impl/sessions/session_peer.ipp ....... 06 §2
 ```
 
 Files **not** detailed (treated as "use as documented"):
-- `configuration.cpp` / `settings.cpp` — straightforward configuration
+- `configuration.cpp` / `settings.cpp` / `parser.cpp` — configuration
 - `messages/` headers — wire types from libbitcoin-network
-- `channels/` headers — channel base from libbitcoin-network with a
-  small node-specific subclass
-
----
-
-## Next steps (suggested follow-on docs, not yet written)
-
-- **`docs/spec/`** — TLA+ or Alloy skeletons encoding the numbered
-  invariants. The recommended starting set: `Validate-Backlog-1`,
-  `Validate-Ordering-1`, `Confirm-Rollback-1`, `Confirm-Order-1`,
-  `Organize-Disorg-1`, `Bus-1..2`. These are the smallest set whose
-  proofs would cover the consensus-critical safety claims.
-- **A change log** — when source changes, the affected `file:line`
-  citations should be updated. A `docs/architecture/CHANGES`
-  recording which docs were re-verified at which git SHA would
-  help keep the corpus honest over time.
+- `block_arena.hpp` / `block_memory.hpp` — arena allocator (not currently
+  wired into channel construction; see 00 §8)
 
 ---
 
@@ -217,8 +214,10 @@ Files **not** detailed (treated as "use as documented"):
 2. For per-chaser docs, the relevant invariants reference specific
    `file:line`s — re-grep those when their files change.
 3. The error inventories in each chaser doc (`organizeN`,
-   `validateN`, `confirmN`) are exhaustive at the time of writing
-   — any new `error::<chaser>N` entry should add a row.
+   `validateN`, `confirmN`, `transactionN`, `batchN`, `estimates_*`) are
+   exhaustive at the time of writing — any new `error::<chaser>N` entry
+   should add a row.
 4. The attach tree in
-   [`06 §2.3`](06-sessions-and-protocols#23-attach_protocolschannel----line-session_peeripp57-161)
+   [`06 §2.3`](06-sessions-and-protocols#23-attach_protocolschannel--session_peeripp71-190)
    should be re-checked whenever `session_peer.ipp` is modified.
+5. Update the verification commit at the top of this page.
