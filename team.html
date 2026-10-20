@@ -66,6 +66,7 @@
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
   }
+  html { scrollbar-gutter: stable; }
   body { background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 96px; }
   .logo { width: 132px; height: auto; display: block; }
@@ -85,8 +86,8 @@
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
   .menu a.here { color: var(--heading); }
-  .menu.site { margin-bottom: 0; border-bottom: 0; }
-  .menu.site + .menu { margin-top: 0; }
+  .mast .menu.site { margin: 0; }
+  .mast + .menu { border-top: 0; }
   .video { position: relative; display: block; margin: 28px 0 40px; aspect-ratio: 16 / 9; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; }
   .video img, .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
   .video .play { position: absolute; left: 50%; top: 50%; width: 76px; height: 54px; margin: -27px 0 0 -38px; border-radius: 14px; background: rgba(39,40,34,.82); border: 2px solid var(--accent); transition: background .15s; }
@@ -179,20 +180,19 @@
 </svg>
     <div class="eyebrow">Bitcoin full node and query server</div>
     <h1>Team</h1>
+    <nav class="menu site">
+      <a href="index.html">Home</a>
+      <a href="interfaces.html">Server interfaces</a>
+      <a href="interface-performance.html">Interface performance</a>
+      <a href="node-performance.html">Node performance</a>
+      <a href="architecture/index.html">Node architecture</a>
+      <a href="team.html" class="here">Team</a>
+    </nav>
     <p class="lede">
       <strong>Libbitcoin Time 2026</strong>: the development history of the libbitcoin
       repositories.
     </p>
   </header>
-
-  <nav class="menu site">
-    <a href="index.html">Home</a>
-    <a href="interfaces.html">Server interfaces</a>
-    <a href="interface-performance.html">Interface performance</a>
-    <a href="node-performance.html">Node performance</a>
-    <a href="architecture/index.html">Node architecture</a>
-    <a href="team.html" class="here">Team</a>
-  </nav>
 
   <a class="video" id="video" href="https://www.youtube.com/watch?v=Cb7hKsnd9ko" aria-label="Play Libbitcoin Time 2026">
     <img src="team/cover.jpg" alt="Libbitcoin Time 2026" width="1280" height="720">

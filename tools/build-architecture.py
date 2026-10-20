@@ -48,6 +48,7 @@ STYLE = """
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
   }
+  html { scrollbar-gutter: stable; }
   body { background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 96px; }
   .logo { width: 132px; height: auto; display: block; }
@@ -62,8 +63,8 @@ STYLE = """
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
   .menu a.here { color: var(--heading); }
-  .menu.site { margin-bottom: 0; border-bottom: 0; }
-  .menu.site + .menu { margin-top: 0; }
+  .mast .menu.site { margin: 0; }
+  .mast + .menu { border-top: 0; }
   .foot { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 48px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; display: flex; flex-direction: column; gap: 10px; }
   .pager { display: flex; justify-content: space-between; gap: 18px; margin: 40px 0 0; font-family: var(--mono); font-size: 12.5px; }
 
@@ -271,20 +272,20 @@ def render(name, md, guard, logo, mermaid_src):
     </a>
     <div class="eyebrow">Bitcoin full node and query server</div>
     <h1>%(h1)s</h1>
+    <nav class="menu site">
+      <a href="../index.html">Home</a>
+      <a href="../interfaces.html">Server interfaces</a>
+      <a href="../interface-performance.html">Interface performance</a>
+      <a href="../node-performance.html">Node performance</a>
+      <a href="index.html" class="here">Node architecture</a>
+      <a href="../team.html">Team</a>
+    </nav>
     <p class="lede">
       Source-anchored architecture documentation for <strong>libbitcoin-node</strong>:
       the chasers, the event bus, sessions and peer protocols.
     </p>
   </header>
 
-  <nav class="menu site">
-    <a href="../index.html">Home</a>
-    <a href="../interfaces.html">Server interfaces</a>
-    <a href="../interface-performance.html">Interface performance</a>
-    <a href="../node-performance.html">Node performance</a>
-    <a href="index.html" class="here">Node architecture</a>
-    <a href="../team.html">Team</a>
-  </nav>
   <nav class="menu">
 %(menu)s
   </nav>
