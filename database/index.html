@@ -88,6 +88,10 @@
   .doc h2 { color: var(--heading); font-family: var(--mono); font-size: 20px; font-weight: 600; letter-spacing: -.015em; margin: 44px 0 12px; scroll-margin-top: 16px; }
   .doc h3 { color: var(--heading); font-family: var(--mono); font-size: 15.5px; font-weight: 600; margin: 30px 0 10px; scroll-margin-top: 16px; }
   .doc h4 { color: var(--ink); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 22px 0 8px; scroll-margin-top: 16px; }
+  .doc .anchor { margin-left: .45em; color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity .15s; }
+  .doc h2:hover .anchor, .doc h3:hover .anchor, .doc h4:hover .anchor, .doc h5:hover .anchor, .doc h6:hover .anchor, .doc .anchor:focus { opacity: 1; }
+  .doc .anchor:hover { color: var(--accent); }
+  @media (hover: none) { .doc .anchor { opacity: .6; } }
   .doc p { margin: 0 0 14px; }
   .doc ul, .doc ol { margin: 0 0 14px; padding-left: 26px; }
   .doc li { margin: 3px 0; }
@@ -113,7 +117,8 @@
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
   .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: zoom-out; }
+  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
+  .lightbox.panning { cursor: grabbing; user-select: none; }
   .lightbox[hidden] { display: none; }
   .lightbox svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
   .mermaid:not([data-processed]) { font-family: var(--mono); font-size: 12px; text-align: left; white-space: pre; color: var(--ink-3); }
@@ -229,11 +234,11 @@
 
   <nav class="menu">
     <a href="index.html" class="here">Architecture</a>
-    <a href="00-overview.html">Overview</a>
-    <a href="01-primitives.html">Primitives</a>
-    <a href="02-tables.html">Tables</a>
-    <a href="03-storage.html">Storage</a>
-    <a href="04-queries.html">Queries</a>
+    <a href="overview.html">Overview</a>
+    <a href="primitives.html">Primitives</a>
+    <a href="tables.html">Tables</a>
+    <a href="storage.html">Storage</a>
+    <a href="queries.html">Queries</a>
   </nav>
 
   <article class="doc">
@@ -250,7 +255,7 @@ C++ source. The citations were verified against libbitcoin-database master
 at commit <code>d29fa3df</code> (2026-10-20). Paths are relative to
 <code>include/bitcoin/database/</code> unless they begin with <code>src/</code>.</p>
 <hr />
-<h2 id="the-documents">The documents</h2>
+<h2 id="the-documents">The documents<a class="anchor" href="#the-documents" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -262,53 +267,53 @@ at commit <code>d29fa3df</code> (2026-10-20). Paths are relative to
 <tbody>
 <tr>
 <td>00</td>
-<td><a href="00-overview.html"><code>00-overview</code></a></td>
+<td><a href="overview.html"><code>00-overview</code></a></td>
 <td>Layers, the relational model, navigation versus search, file layout</td>
 </tr>
 <tr>
 <td>01</td>
-<td><a href="01-primitives.html"><code>01-primitives</code></a></td>
+<td><a href="primitives.html"><code>01-primitives</code></a></td>
 <td>Links, keys, heads, bodies and maps, with figures of each head type</td>
 </tr>
 <tr>
 <td>02</td>
-<td><a href="02-tables.html"><code>02-tables</code></a></td>
+<td><a href="tables.html"><code>02-tables</code></a></td>
 <td>Every store table: map type, link, row, fields, and relations</td>
 </tr>
 <tr>
 <td>03</td>
-<td><a href="03-storage.html"><code>03-storage</code></a></td>
+<td><a href="storage.html"><code>03-storage</code></a></td>
 <td>Memory maps, growth and remap, disk full, snapshot and restore, locking</td>
 </tr>
 <tr>
 <td>04</td>
-<td><a href="04-queries.html"><code>04-queries</code></a></td>
+<td><a href="queries.html"><code>04-queries</code></a></td>
 <td>Query families, archival commit order, block state, confirmation, pool</td>
 </tr>
 </tbody>
 </table></div>
 <hr />
-<h2 id="recommended-reading-orders">Recommended reading orders</h2>
-<h3 id="for-a-new-contributor">For a new contributor</h3>
+<h2 id="recommended-reading-orders">Recommended reading orders<a class="anchor" href="#recommended-reading-orders" aria-label="Link to this section">#</a></h2>
+<h3 id="for-a-new-contributor">For a new contributor<a class="anchor" href="#for-a-new-contributor" aria-label="Link to this section">#</a></h3>
 <p><strong>00 → 01 → 02</strong>, then <strong>04 §2–§3</strong> for how a block is written and
 confirmed. Read <strong>03</strong> when working on store lifecycle or performance.</p>
-<h3 id="for-a-formal-verification-reader">For a formal-verification reader</h3>
+<h3 id="for-a-formal-verification-reader">For a formal-verification reader<a class="anchor" href="#for-a-formal-verification-reader" aria-label="Link to this section">#</a></h3>
 <p><strong>01 §5</strong> and <strong>03 §5</strong> give the publication model: every write becomes
 visible through a single atomic cell or size store, and recovery is a head
 snapshot over append-only bodies. <strong>04 §2</strong> is the archival commit order
 that the node's <code>organizeN</code>/<code>validateN</code>/<code>confirmN</code> faults rely on. The
 numbered invariants are listed below.</p>
-<h3 id="for-a-node-reader">For a node reader</h3>
+<h3 id="for-a-node-reader">For a node reader<a class="anchor" href="#for-a-node-reader" aria-label="Link to this section">#</a></h3>
 <p>The <a href="../architecture/index.html">node architecture</a> treats the store as an
 oracle. <strong>04</strong> is the interface it calls, and <strong>03 §4–§6</strong> are the
 suspend, disk-full and snapshot behaviours that <code>chaser_storage</code> and
 <code>chaser_snapshot</code> drive.</p>
 <hr />
-<h2 id="conventions-used-throughout">Conventions used throughout</h2>
-<h3 id="fileline-citations">File:line citations</h3>
+<h2 id="conventions-used-throughout">Conventions used throughout<a class="anchor" href="#conventions-used-throughout" aria-label="Link to this section">#</a></h2>
+<h3 id="fileline-citations">File:line citations<a class="anchor" href="#fileline-citations" aria-label="Link to this section">#</a></h3>
 <p>Every non-trivial claim has a <code>path:N</code> citation. Re-grep from the repo root
 after source changes and update the commit above.</p>
-<h3 id="numbered-invariants">Numbered invariants</h3>
+<h3 id="numbered-invariants">Numbered invariants<a class="anchor" href="#numbered-invariants" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -365,11 +370,11 @@ after source changes and update the commit above.</p>
 </tr>
 </tbody>
 </table></div>
-<h3 id="figures">Figures</h3>
-<p>The head-type figures in <a href="01-primitives.html"><code>01-primitives</code></a> are generated by
+<h3 id="figures">Figures<a class="anchor" href="#figures" aria-label="Link to this section">#</a></h3>
+<p>The head-type figures in <a href="primitives.html"><code>01-primitives</code></a> are generated by
 <code>tools/plot-database.py</code>. Click a figure to view it at full size.</p>
 <hr />
-<h2 id="honest-caveats">Honest caveats</h2>
+<h2 id="honest-caveats">Honest caveats<a class="anchor" href="#honest-caveats" aria-label="Link to this section">#</a></h2>
 <ol>
 <li>
 <p><strong>No build verification.</strong> Citations are textual and were re-grepped
@@ -383,13 +388,13 @@ after source changes and update the commit above.</p>
 </li>
 <li>
 <p><strong>Consensus rules</strong> (script, BIP30/34/68 checks) live in
-   libbitcoin-system. <a href="04-queries.html"><code>04-queries</code></a> describes the store
+   libbitcoin-system. <a href="queries.html"><code>04-queries</code></a> describes the store
    reads behind them, not the rules.</p>
 </li>
 </ol>
   </article>
 
-  <nav class="pager"><span></span><a href="00-overview.html">Overview &rarr;</a></nav>
+  <nav class="pager"><span></span><a href="overview.html">Overview &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 
@@ -419,14 +424,31 @@ after source changes and update the commit above.</p>
       box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
     }
   });
-  box.addEventListener('click', close);
+  var drag = null, dragged = false;
+  box.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
+    dragged = false;
+  });
+  box.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
+    box.scrollLeft = drag.left - dx;
+    box.scrollTop = drag.top - dy;
+  });
+  function release() { drag = null; box.classList.remove('panning'); }
+  box.addEventListener('pointerup', release);
+  box.addEventListener('pointercancel', release);
+  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>
 mermaid.initialize({
-  startOnLoad: true,
+  startOnLoad: false,
   theme: 'dark',
   securityLevel: 'loose',
   htmlLabels: false,
@@ -463,6 +485,15 @@ mermaid.initialize({
     clusterBorder: '#6a7282',
     titleColor: '#ffa022'
   }
+});
+if (location.hash) history.scrollRestoration = 'manual';
+window.addEventListener('load', function () {
+  function settle() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var target = id && document.getElementById(id);
+    if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
+  }
+  mermaid.run().then(settle, settle);
 });
 </script>
 </body>

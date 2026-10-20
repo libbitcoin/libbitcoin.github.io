@@ -88,6 +88,10 @@
   .doc h2 { color: var(--heading); font-family: var(--mono); font-size: 20px; font-weight: 600; letter-spacing: -.015em; margin: 44px 0 12px; scroll-margin-top: 16px; }
   .doc h3 { color: var(--heading); font-family: var(--mono); font-size: 15.5px; font-weight: 600; margin: 30px 0 10px; scroll-margin-top: 16px; }
   .doc h4 { color: var(--ink); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 22px 0 8px; scroll-margin-top: 16px; }
+  .doc .anchor { margin-left: .45em; color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity .15s; }
+  .doc h2:hover .anchor, .doc h3:hover .anchor, .doc h4:hover .anchor, .doc h5:hover .anchor, .doc h6:hover .anchor, .doc .anchor:focus { opacity: 1; }
+  .doc .anchor:hover { color: var(--accent); }
+  @media (hover: none) { .doc .anchor { opacity: .6; } }
   .doc p { margin: 0 0 14px; }
   .doc ul, .doc ol { margin: 0 0 14px; padding-left: 26px; }
   .doc li { margin: 3px 0; }
@@ -113,7 +117,8 @@
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
   .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: zoom-out; }
+  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
+  .lightbox.panning { cursor: grabbing; user-select: none; }
   .lightbox[hidden] { display: none; }
   .lightbox svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
   .mermaid:not([data-processed]) { font-family: var(--mono); font-size: 12px; text-align: left; white-space: pre; color: var(--ink-3); }
@@ -229,19 +234,19 @@
 
   <nav class="menu">
     <a href="index.html" class="here">Architecture</a>
-    <a href="00-overview.html">Overview</a>
-    <a href="01-event-bus.html">Event bus</a>
-    <a href="02-chaser-header.html">Chaser header</a>
-    <a href="03-chaser-download.html">Chaser download</a>
-    <a href="04-chaser-validate.html">Chaser validate</a>
-    <a href="05-chaser-confirm.html">Chaser confirm</a>
-    <a href="06-sessions-and-protocols.html">Sessions and protocols</a>
-    <a href="07-header-protocols.html">Header protocols</a>
-    <a href="08-block-out-protocols.html">Block out protocols</a>
-    <a href="09-filter-out-70015.html">Filter out 70015</a>
-    <a href="10-tx-protocols.html">Tx protocols</a>
-    <a href="11-chaser-transaction.html">Chaser transaction</a>
-    <a href="12-periphery-chasers.html">Periphery chasers</a>
+    <a href="overview.html">Overview</a>
+    <a href="event-bus.html">Event bus</a>
+    <a href="header-chaser.html">Header chaser</a>
+    <a href="download-chaser.html">Download chaser</a>
+    <a href="validation-chaser.html">Validation chaser</a>
+    <a href="confirmation-chaser.html">Confirmation chaser</a>
+    <a href="sessions-and-protocols.html">Sessions and protocols</a>
+    <a href="header-protocols.html">Header protocols</a>
+    <a href="block-out-protocols.html">Block out protocols</a>
+    <a href="filter-out-protocol.html">Filter out protocol</a>
+    <a href="transaction-protocols.html">Transaction protocols</a>
+    <a href="transaction-chaser.html">Transaction chaser</a>
+    <a href="periphery-chasers.html">Periphery chasers</a>
   </nav>
 
   <article class="doc">
@@ -259,7 +264,7 @@ C++ source so it can be re-verified or re-derived if source drifts. The
 citations in this revision were verified against libbitcoin-node master at
 commit <code>a5173475</code> (2026-10-20), with <code>chaser_check</code> renamed to <code>chaser_download</code> (node branch <code>download</code>, <code>ea1e1264</code>).</p>
 <hr />
-<h2 id="the-13-documents">The 13 documents</h2>
+<h2 id="the-13-documents">The 13 documents<a class="anchor" href="#the-13-documents" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -271,78 +276,78 @@ commit <code>a5173475</code> (2026-10-20), with <code>chaser_check</code> rename
 <tbody>
 <tr>
 <td>00</td>
-<td><a href="00-overview.html"><code>00-overview</code></a></td>
+<td><a href="overview.html"><code>00-overview</code></a></td>
 <td>Top-down map: layer stack, object graph, threading model, lifecycle</td>
 </tr>
 <tr>
 <td>01</td>
-<td><a href="01-event-bus.html"><code>01-event-bus</code></a></td>
+<td><a href="event-bus.html"><code>01-event-bus</code></a></td>
 <td>Every <code>chase</code> event with verified issuer/handler sites; methodology</td>
 </tr>
 <tr>
 <td>02</td>
-<td><a href="02-chaser-header.html"><code>02-chaser-header</code></a></td>
+<td><a href="header-chaser.html"><code>02-chaser-header</code></a></td>
 <td>Header organize state machine, tree pruning, disorganize; 15 <code>organizeN</code> fault sites</td>
 </tr>
 <tr>
 <td>03</td>
-<td><a href="03-chaser-download.html"><code>03-chaser-download</code></a></td>
+<td><a href="download-chaser.html"><code>03-chaser-download</code></a></td>
 <td>Block-download orchestration; race_all purge barrier; σ slow-peer detector; download window</td>
 </tr>
 <tr>
 <td>04</td>
-<td><a href="04-chaser-validate.html"><code>04-chaser-validate</code></a></td>
+<td><a href="validation-chaser.html"><code>04-chaser-validate</code></a></td>
 <td>Consensus validation; own threadpool; batched signature and silent-payment verification; 12 <code>validateN</code> fault sites</td>
 </tr>
 <tr>
 <td>05</td>
-<td><a href="05-chaser-confirm.html"><code>05-chaser-confirm</code></a></td>
+<td><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a></td>
 <td>Order-based consensus check + confirmed-chain writer; stale timer; 12 <code>confirmN</code> fault sites</td>
 </tr>
 <tr>
 <td>06</td>
-<td><a href="06-sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a></td>
+<td><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a></td>
 <td>Sessions, the protocol attach tree, <code>protocol_block_in_31800</code></td>
 </tr>
 <tr>
 <td>07</td>
-<td><a href="07-header-protocols.html"><code>07-header-protocols</code></a></td>
+<td><a href="header-protocols.html"><code>07-header-protocols</code></a></td>
 <td>Header in/out at 31800, 70012 and 70014 (compact blocks); prove-then-archive sync</td>
 </tr>
 <tr>
 <td>08</td>
-<td><a href="08-block-out-protocols.html"><code>08-block-out-protocols</code></a></td>
+<td><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a></td>
 <td>Block out at 106, 70001, 70012 and 70014; streaming send loop; <code>not_found</code></td>
 </tr>
 <tr>
 <td>09</td>
-<td><a href="09-filter-out-70015.html"><code>09-filter-out-70015</code></a></td>
+<td><a href="filter-out-protocol.html"><code>09-filter-out-protocol</code></a></td>
 <td>BIP157/158 client filters; three request types</td>
 </tr>
 <tr>
 <td>10</td>
-<td><a href="10-tx-protocols.html"><code>10-tx-protocols</code></a></td>
+<td><a href="transaction-protocols.html"><code>10-tx-protocols</code></a></td>
 <td>Tx in/out ladder at 106, 60002, 70001, 70013 and 70016</td>
 </tr>
 <tr>
 <td>11</td>
-<td><a href="11-chaser-transaction.html"><code>11-chaser-transaction</code></a></td>
+<td><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a></td>
 <td>The transaction pool: package submission, compact block fill, scan starts; 9 <code>transactionN</code> fault sites</td>
 </tr>
 <tr>
 <td>12</td>
-<td><a href="12-periphery-chasers.html"><code>12-periphery-chasers</code></a></td>
+<td><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a></td>
 <td><code>chaser_snapshot</code>, <code>chaser_storage</code>, <code>chaser_template</code>, <code>chaser_estimate</code></td>
 </tr>
 </tbody>
 </table></div>
 <hr />
-<h2 id="recommended-reading-orders">Recommended reading orders</h2>
-<h3 id="for-a-new-contributor">For a new contributor</h3>
+<h2 id="recommended-reading-orders">Recommended reading orders<a class="anchor" href="#recommended-reading-orders" aria-label="Link to this section">#</a></h2>
+<h3 id="for-a-new-contributor">For a new contributor<a class="anchor" href="#for-a-new-contributor" aria-label="Link to this section">#</a></h3>
 <p>Read in order: <strong>00 → 01 → 02 → 03 → 04 → 05</strong> for the consensus
 pipeline, then <strong>06 → 07/08</strong> for the corresponding peer protocols, then
 <strong>10 → 11</strong> for the transaction pool. Skim 09 and 12 as needed.</p>
-<h3 id="for-a-formal-verification-reader">For a formal-verification reader</h3>
+<h3 id="for-a-formal-verification-reader">For a formal-verification reader<a class="anchor" href="#for-a-formal-verification-reader" aria-label="Link to this section">#</a></h3>
 <p><strong>01</strong> is foundational — the <code>chase</code> events are the inter-process
 interface. Then <strong>02 §3, §5, §7</strong> (organize state machine, disorganize
 state machine, error-code → proof-obligation list), <strong>04 §4–§7</strong>
@@ -350,19 +355,19 @@ state machine, error-code → proof-obligation list), <strong>04 §4–§7</stro
 algorithm, rollback atomicity, error inventory). The numbered
 invariants throughout (<code>Validate-Backlog-1</code>, <code>Confirm-Rollback-1</code>,
 etc.) are the recommended target set for a TLA+/Alloy spec.</p>
-<h3 id="for-a-peer-protocol-implementer">For a peer-protocol implementer</h3>
+<h3 id="for-a-peer-protocol-implementer">For a peer-protocol implementer<a class="anchor" href="#for-a-peer-protocol-implementer" aria-label="Link to this section">#</a></h3>
 <p><strong>00 §7</strong> for the network-layer overview, then <strong>06</strong> for the
 attach tree, then read whichever versioned family you need
 (<strong>07</strong> for headers and compact blocks, <strong>08</strong> for blocks, <strong>09</strong> for
 filters, <strong>10</strong> for tx).</p>
 <hr />
-<h2 id="conventions-used-throughout">Conventions used throughout</h2>
-<h3 id="fileline-citations">File:line citations</h3>
+<h2 id="conventions-used-throughout">Conventions used throughout<a class="anchor" href="#conventions-used-throughout" aria-label="Link to this section">#</a></h2>
+<h3 id="fileline-citations">File:line citations<a class="anchor" href="#fileline-citations" aria-label="Link to this section">#</a></h3>
 <p>Every non-trivial behavioural claim has a <code>path/to/file.cpp:N</code> (or
 <code>.hpp</code>, <code>.ipp</code>) citation. If you change source, run
 <code>grep -rn 'pattern' src include</code> from the repo root to find new
 locations and update the citation.</p>
-<h3 id="numbered-invariants">Numbered invariants</h3>
+<h3 id="numbered-invariants">Numbered invariants<a class="anchor" href="#numbered-invariants" aria-label="Link to this section">#</a></h3>
 <p>Each doc names its invariants in the form <code>Topic-N</code> (e.g.
 <code>Validate-Bypass-1</code>, <code>Confirm-Rollback-1</code>). The intent is that a
 formal-spec encoding can cite them stably. Major invariant
@@ -433,14 +438,14 @@ families:</p>
 </tr>
 </tbody>
 </table></div>
-<h3 id="mermaid-diagrams">Mermaid diagrams</h3>
+<h3 id="mermaid-diagrams">Mermaid diagrams<a class="anchor" href="#mermaid-diagrams" aria-label="Link to this section">#</a></h3>
 <p>All diagrams use Mermaid (sequence, flowchart, stateDiagram-v2,
 classDiagram).</p>
-<h3 id="spec-view--implementation-notes--notes-for-the-formal-model">"Spec view" / "Implementation notes" / "Notes for the formal model"</h3>
+<h3 id="spec-view--implementation-notes--notes-for-the-formal-model">"Spec view" / "Implementation notes" / "Notes for the formal model"<a class="anchor" href="#spec-view--implementation-notes--notes-for-the-formal-model" aria-label="Link to this section">#</a></h3>
 <p>Most subsystem docs have these three closing sections. They are the
 distilled-for-export view of each subsystem.</p>
 <hr />
-<h2 id="honest-caveats">Honest caveats</h2>
+<h2 id="honest-caveats">Honest caveats<a class="anchor" href="#honest-caveats" aria-label="Link to this section">#</a></h2>
 <ol>
 <li>
 <p><strong>No build verification.</strong> Citations are textual. They were
@@ -464,7 +469,7 @@ distilled-for-export view of each subsystem.</p>
 <p><strong>Discrepancies with <code>chase.hpp</code> comments</strong>: the inline event-bus
    doc in <code>chase.hpp</code> has a few stale entries (incomplete handler lists,
    dormant events). All are flagged in
-   <a href="01-event-bus.html"><code>01-event-bus</code></a> with <code>⚠</code> and discussed in
+   <a href="event-bus.html"><code>01-event-bus</code></a> with <code>⚠</code> and discussed in
    §2 of that doc.</p>
 </li>
 <li>
@@ -481,7 +486,7 @@ distilled-for-export view of each subsystem.</p>
 </li>
 </ol>
 <hr />
-<h2 id="coverage-map">Coverage map</h2>
+<h2 id="coverage-map">Coverage map<a class="anchor" href="#coverage-map" aria-label="Link to this section">#</a></h2>
 <pre><code>libbitcoin-node
 ├── src/
 │   ├── full_node.cpp ........................ 00
@@ -560,11 +565,11 @@ distilled-for-export view of each subsystem.</p>
   wired into channel construction; see 00 §8)</li>
 </ul>
 <hr />
-<h2 id="how-to-update-these-docs-after-source-changes">How to update these docs after source changes</h2>
+<h2 id="how-to-update-these-docs-after-source-changes">How to update these docs after source changes<a class="anchor" href="#how-to-update-these-docs-after-source-changes" aria-label="Link to this section">#</a></h2>
 <ol>
 <li>
 <p>Run the verification greps from
-   <a href="01-event-bus.html#4-methodology"><code>01-event-bus §4</code></a> to detect
+   <a href="event-bus.html#4-methodology"><code>01-event-bus §4</code></a> to detect
    bus-graph drift.</p>
 </li>
 <li>
@@ -579,7 +584,7 @@ distilled-for-export view of each subsystem.</p>
 </li>
 <li>
 <p>The attach tree in
-   <a href="06-sessions-and-protocols.html#23-attach_protocolschannel--session_peeripp71-190"><code>06 §2.3</code></a>
+   <a href="sessions-and-protocols.html#23-attach_protocolschannel--session_peeripp71-190"><code>06 §2.3</code></a>
    should be re-checked whenever <code>session_peer.ipp</code> is modified.</p>
 </li>
 <li>
@@ -588,7 +593,7 @@ distilled-for-export view of each subsystem.</p>
 </ol>
   </article>
 
-  <nav class="pager"><span></span><a href="00-overview.html">Overview &rarr;</a></nav>
+  <nav class="pager"><span></span><a href="overview.html">Overview &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 
@@ -619,14 +624,31 @@ distilled-for-export view of each subsystem.</p>
       box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
     }
   });
-  box.addEventListener('click', close);
+  var drag = null, dragged = false;
+  box.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
+    dragged = false;
+  });
+  box.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
+    box.scrollLeft = drag.left - dx;
+    box.scrollTop = drag.top - dy;
+  });
+  function release() { drag = null; box.classList.remove('panning'); }
+  box.addEventListener('pointerup', release);
+  box.addEventListener('pointercancel', release);
+  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>
 mermaid.initialize({
-  startOnLoad: true,
+  startOnLoad: false,
   theme: 'dark',
   securityLevel: 'loose',
   htmlLabels: false,
@@ -663,6 +685,15 @@ mermaid.initialize({
     clusterBorder: '#6a7282',
     titleColor: '#ffa022'
   }
+});
+if (location.hash) history.scrollRestoration = 'manual';
+window.addEventListener('load', function () {
+  function settle() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var target = id && document.getElementById(id);
+    if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
+  }
+  mermaid.run().then(settle, settle);
 });
 </script>
 </body>

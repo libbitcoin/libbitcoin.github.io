@@ -22,19 +22,19 @@ commit `a5173475` (2026-10-20), with `chaser_check` renamed to `chaser_download`
 
 | #  | File                                                                      | Topic                                                                       |
 | -- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| 00 | [`00-overview`](00-overview)                                        | Top-down map: layer stack, object graph, threading model, lifecycle         |
-| 01 | [`01-event-bus`](01-event-bus)                                      | Every `chase` event with verified issuer/handler sites; methodology         |
-| 02 | [`02-chaser-header`](02-chaser-header)                              | Header organize state machine, tree pruning, disorganize; 15 `organizeN` fault sites |
-| 03 | [`03-chaser-download`](03-chaser-download)                                | Block-download orchestration; race_all purge barrier; σ slow-peer detector; download window |
-| 04 | [`04-chaser-validate`](04-chaser-validate)                          | Consensus validation; own threadpool; batched signature and silent-payment verification; 12 `validateN` fault sites |
-| 05 | [`05-chaser-confirm`](05-chaser-confirm)                            | Order-based consensus check + confirmed-chain writer; stale timer; 12 `confirmN` fault sites |
-| 06 | [`06-sessions-and-protocols`](06-sessions-and-protocols)            | Sessions, the protocol attach tree, `protocol_block_in_31800`                |
-| 07 | [`07-header-protocols`](07-header-protocols)                        | Header in/out at 31800, 70012 and 70014 (compact blocks); prove-then-archive sync |
-| 08 | [`08-block-out-protocols`](08-block-out-protocols)                  | Block out at 106, 70001, 70012 and 70014; streaming send loop; `not_found` |
-| 09 | [`09-filter-out-70015`](09-filter-out-70015)                        | BIP157/158 client filters; three request types                              |
-| 10 | [`10-tx-protocols`](10-tx-protocols)                                | Tx in/out ladder at 106, 60002, 70001, 70013 and 70016                      |
-| 11 | [`11-chaser-transaction`](11-chaser-transaction)                    | The transaction pool: package submission, compact block fill, scan starts; 9 `transactionN` fault sites |
-| 12 | [`12-periphery-chasers`](12-periphery-chasers)                      | `chaser_snapshot`, `chaser_storage`, `chaser_template`, `chaser_estimate`    |
+| 00 | [`00-overview`](overview)                                        | Top-down map: layer stack, object graph, threading model, lifecycle         |
+| 01 | [`01-event-bus`](event-bus)                                      | Every `chase` event with verified issuer/handler sites; methodology         |
+| 02 | [`02-chaser-header`](header-chaser)                              | Header organize state machine, tree pruning, disorganize; 15 `organizeN` fault sites |
+| 03 | [`03-chaser-download`](download-chaser)                                | Block-download orchestration; race_all purge barrier; σ slow-peer detector; download window |
+| 04 | [`04-chaser-validate`](validation-chaser)                          | Consensus validation; own threadpool; batched signature and silent-payment verification; 12 `validateN` fault sites |
+| 05 | [`05-chaser-confirm`](confirmation-chaser)                            | Order-based consensus check + confirmed-chain writer; stale timer; 12 `confirmN` fault sites |
+| 06 | [`06-sessions-and-protocols`](sessions-and-protocols)            | Sessions, the protocol attach tree, `protocol_block_in_31800`                |
+| 07 | [`07-header-protocols`](header-protocols)                        | Header in/out at 31800, 70012 and 70014 (compact blocks); prove-then-archive sync |
+| 08 | [`08-block-out-protocols`](block-out-protocols)                  | Block out at 106, 70001, 70012 and 70014; streaming send loop; `not_found` |
+| 09 | [`09-filter-out-protocol`](filter-out-protocol)                        | BIP157/158 client filters; three request types                              |
+| 10 | [`10-tx-protocols`](transaction-protocols)                                | Tx in/out ladder at 106, 60002, 70001, 70013 and 70016                      |
+| 11 | [`11-chaser-transaction`](transaction-chaser)                    | The transaction pool: package submission, compact block fill, scan starts; 9 `transactionN` fault sites |
+| 12 | [`12-periphery-chasers`](periphery-chasers)                      | `chaser_snapshot`, `chaser_storage`, `chaser_template`, `chaser_estimate`    |
 
 ---
 
@@ -117,7 +117,7 @@ distilled-for-export view of each subsystem.
 4. **Discrepancies with `chase.hpp` comments**: the inline event-bus
    doc in `chase.hpp` has a few stale entries (incomplete handler lists,
    dormant events). All are flagged in
-   [`01-event-bus`](01-event-bus) with `⚠` and discussed in
+   [`01-event-bus`](event-bus) with `⚠` and discussed in
    §2 of that doc.
 5. **Stub subsystems**: `chaser_template` is a stub. The doc describes
    its wiring and intended design but notes clearly that current
@@ -215,7 +215,7 @@ Files **not** detailed (treated as "use as documented"):
 ## How to update these docs after source changes
 
 1. Run the verification greps from
-   [`01-event-bus §4`](01-event-bus#4-methodology) to detect
+   [`01-event-bus §4`](event-bus#4-methodology) to detect
    bus-graph drift.
 2. For per-chaser docs, the relevant invariants reference specific
    `file:line`s — re-grep those when their files change.
@@ -224,6 +224,6 @@ Files **not** detailed (treated as "use as documented"):
    exhaustive at the time of writing — any new `error::<chaser>N` entry
    should add a row.
 4. The attach tree in
-   [`06 §2.3`](06-sessions-and-protocols#23-attach_protocolschannel--session_peeripp71-190)
+   [`06 §2.3`](sessions-and-protocols#23-attach_protocolschannel--session_peeripp71-190)
    should be re-checked whenever `session_peer.ipp` is modified.
 5. Update the verification commit at the top of this page.

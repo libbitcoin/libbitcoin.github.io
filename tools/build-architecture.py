@@ -36,19 +36,19 @@ SECTIONS = {
         "foot": 'Adapted from the libbitcoin-node wiki architecture pages by <a href="https://github.com/rsantacroce">rsantacroce</a>.',
         "pages": [
             ("index", "Architecture"),
-            ("00-overview", "Overview"),
-            ("01-event-bus", "Event bus"),
-            ("02-chaser-header", "Chaser header"),
-            ("03-chaser-download", "Chaser download"),
-            ("04-chaser-validate", "Chaser validate"),
-            ("05-chaser-confirm", "Chaser confirm"),
-            ("06-sessions-and-protocols", "Sessions and protocols"),
-            ("07-header-protocols", "Header protocols"),
-            ("08-block-out-protocols", "Block out protocols"),
-            ("09-filter-out-70015", "Filter out 70015"),
-            ("10-tx-protocols", "Tx protocols"),
-            ("11-chaser-transaction", "Chaser transaction"),
-            ("12-periphery-chasers", "Periphery chasers"),
+            ("overview", "Overview"),
+            ("event-bus", "Event bus"),
+            ("header-chaser", "Header chaser"),
+            ("download-chaser", "Download chaser"),
+            ("validation-chaser", "Validation chaser"),
+            ("confirmation-chaser", "Confirmation chaser"),
+            ("sessions-and-protocols", "Sessions and protocols"),
+            ("header-protocols", "Header protocols"),
+            ("block-out-protocols", "Block out protocols"),
+            ("filter-out-protocol", "Filter out protocol"),
+            ("transaction-protocols", "Transaction protocols"),
+            ("transaction-chaser", "Transaction chaser"),
+            ("periphery-chasers", "Periphery chasers"),
         ],
     },
     "database": {
@@ -59,11 +59,11 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Architecture"),
-            ("00-overview", "Overview"),
-            ("01-primitives", "Primitives"),
-            ("02-tables", "Tables"),
-            ("03-storage", "Storage"),
-            ("04-queries", "Queries"),
+            ("overview", "Overview"),
+            ("primitives", "Primitives"),
+            ("tables", "Tables"),
+            ("storage", "Storage"),
+            ("queries", "Queries"),
         ],
     },
 }
@@ -103,6 +103,10 @@ STYLE = """
   .doc h2 { color: var(--heading); font-family: var(--mono); font-size: 20px; font-weight: 600; letter-spacing: -.015em; margin: 44px 0 12px; scroll-margin-top: 16px; }
   .doc h3 { color: var(--heading); font-family: var(--mono); font-size: 15.5px; font-weight: 600; margin: 30px 0 10px; scroll-margin-top: 16px; }
   .doc h4 { color: var(--ink); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 22px 0 8px; scroll-margin-top: 16px; }
+  .doc .anchor { margin-left: .45em; color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity .15s; }
+  .doc h2:hover .anchor, .doc h3:hover .anchor, .doc h4:hover .anchor, .doc h5:hover .anchor, .doc h6:hover .anchor, .doc .anchor:focus { opacity: 1; }
+  .doc .anchor:hover { color: var(--accent); }
+  @media (hover: none) { .doc .anchor { opacity: .6; } }
   .doc p { margin: 0 0 14px; }
   .doc ul, .doc ol { margin: 0 0 14px; padding-left: 26px; }
   .doc li { margin: 3px 0; }
@@ -128,7 +132,8 @@ STYLE = """
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
   .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: zoom-out; }
+  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
+  .lightbox.panning { cursor: grabbing; user-select: none; }
   .lightbox[hidden] { display: none; }
   .lightbox svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
   .mermaid:not([data-processed]) { font-family: var(--mono); font-size: 12px; text-align: left; white-space: pre; color: var(--ink-3); }
@@ -207,7 +212,8 @@ def add_heading_ids(body):
         seen[slug] = n + 1
         if n:
             slug = "%s-%d" % (slug, n)
-        return '<h%s id="%s"%s>%s</h%s>' % (level, slug, attrs, text, level)
+        return '<h%s id="%s"%s>%s<a class="anchor" href="#%s" aria-label="Link to this section">#</a></h%s>' % (
+            level, slug, attrs, text, slug, level)
 
     return re.sub(r"<h([2-6])([^>]*)>(.*?)</h\1>", ident, body, flags=re.S)
 
@@ -362,14 +368,31 @@ def render(key, name, md, guard, logo, mermaid_src):
       box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
     }
   });
-  box.addEventListener('click', close);
+  var drag = null, dragged = false;
+  box.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
+    dragged = false;
+  });
+  box.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
+    box.scrollLeft = drag.left - dx;
+    box.scrollTop = drag.top - dy;
+  });
+  function release() { drag = null; box.classList.remove('panning'); }
+  box.addEventListener('pointerup', release);
+  box.addEventListener('pointercancel', release);
+  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
 </script>
 <script src="%(mermaid)s"></script>
 <script>
 mermaid.initialize({
-  startOnLoad: true,
+  startOnLoad: false,
   theme: 'dark',
   securityLevel: 'loose',
   htmlLabels: false,
@@ -407,6 +430,15 @@ mermaid.initialize({
     titleColor: '#ffa022'
   }
 });
+if (location.hash) history.scrollRestoration = 'manual';
+window.addEventListener('load', function () {
+  function settle() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var target = id && document.getElementById(id);
+    if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
+  }
+  mermaid.run().then(settle, settle);
+});
 </script>
 </body>
 </html>
@@ -415,7 +447,7 @@ mermaid.initialize({
            mermaid=mermaid_src, key=key, site=site_menu(key), lede=section["lede"], foot=foot)
 
 
-def check_links(pages):
+def check_links(key, pages):
     ids = {name: set(re.findall(r' id="([^"]+)"', body)) for name, body in pages.items()}
     bad = []
     for name, body in pages.items():
@@ -426,6 +458,8 @@ def check_links(pages):
                     bad.append((name, href))
                 continue
             target, _, anchor = href.partition("#")
+            if not target.endswith(".html") and os.path.isfile(os.path.join(ROOT, key, target)):
+                continue
             target = target[:-5] if target.endswith(".html") else target
             if target not in ids:
                 bad.append((name, href))
@@ -449,7 +483,7 @@ def main():
             pages[name] = render(key, name, md, guard, logo, mermaid_src)
             write(os.path.join(ROOT, key, name + ".html"), pages[name])
             print("wrote", key + "/" + name + ".html")
-        for name, href in check_links(pages):
+        for name, href in check_links(key, pages):
             print("BROKEN LINK in %s/%s: %s" % (key, name, href))
 
 
