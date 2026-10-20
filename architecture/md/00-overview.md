@@ -170,6 +170,41 @@ chasers therefore execute concurrently with each other, bounded only by
 the shared threadpool size. `chaser_validate` additionally fans block
 validation out over its own pool (doc 04).
 
+### 3.4 Lock-free
+
+The node, with the network and system layers beneath it and the server
+above it, is lock-free: at every point some thread completes its step,
+whatever the scheduling of the others, because no thread ever waits on
+another.
+
+- **Strands order work, they do not block threads.** Posting to a busy
+  strand queues the handler and returns. The posting thread continues with
+  other work; a strand serializes handlers, not threads.
+- **Cross-thread state is atomic.** State shared outside a strand is
+  `std::atomic`: latches and counters such as `chaser_validate`'s
+  `validate_backlog_` and bank flags (doc 04), `chaser_snapshot::pruned_`
+  (doc 12), `protocol_block_out_70012::superseded_` (doc 08), and the
+  network's suspend flags and channel counts (`network/net.hpp:381-388`).
+- **Results cross strands by posting.** A broadcast that gathers a result
+  from many channels (diagnostics) has each channel post its row to the
+  collector's strand, and the collector reads them after the round
+  completes (network `broadcast/diagnostics.hpp`, server
+  `protocol_bitcoind::to_collector`, branch `lockfree`).
+- **System code waits on no other thread.** A parallel algorithm
+  (`std::for_each` under `execution::par`) fans a loop out over the pool
+  and joins it, which is the caller's own work. Batch signature capture
+  registers each thread's rows once, on first use, as a static initializer
+  does (`chain/signatures.cpp`). GPU verification queues
+  callers for the device (`crypto/secp256k1/cuda/turns.hpp`), which is
+  arbitration of hardware, not of shared state.
+
+> **Invariant (Concurrency-4).** No node, network, server or system code
+> waits on another thread for shared state. State is owned by one strand,
+> handed between strands by `post`, or held in an atomic.
+
+Store locking ([database 03 §8](../database/03-storage.html#8-locking)) is internal to
+the database and hidden from the network stack.
+
 ---
 
 ## 4. The event bus
