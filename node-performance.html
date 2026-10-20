@@ -141,6 +141,9 @@
   .menu { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 28px; padding: 10px 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
+  .menu a.here { color: var(--heading); }
+  .menu.site { margin-bottom: 0; border-bottom: 0; }
+  .menu.site + .menu { margin-top: 0; }
   h2[id] { scroll-margin-top: 16px; }
   .lede.after { margin: 14px 0 40px; }
   table.fit th, table.fit td { white-space: normal; overflow-wrap: anywhere; }
@@ -248,11 +251,16 @@
       Performance measurements of <strong>libbitcoin-server</strong> across machines and
       configurations, some with Bitcoin Core, libsecp256k1, or UltrafastSecp256k1 comparisons.
     </p>
-    <p class="lede">
-      See also <a href="server-performance.html">server performance</a>.
-    </p>
   </header>
 
+  <nav class="menu site">
+    <a href="index.html">Home</a>
+    <a href="interfaces.html">Server interfaces</a>
+    <a href="interface-performance.html">Interface performance</a>
+    <a href="node-performance.html" class="here">Node performance</a>
+    <a href="architecture/index.html">Node architecture</a>
+    <a href="team.html">Team</a>
+  </nav>
   <nav class="menu">
     <a href="#milestone">Milestone</a>
     <a href="#full-validation">Full validation</a>
@@ -290,6 +298,10 @@
       <figure class="shot" data-full="performance/minram-milestone-bs.png" tabindex="0">
         <h3>Minimum RAM: all OS pruned milestone</h3>
         <img src="performance/minram-milestone-bs.png" alt="Minimum RAM: all OS pruned milestone" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/minram-milestone-unpruned-bs.png" tabindex="0">
+        <h3>Minimum RAM: all OS unpruned milestone</h3>
+        <img src="performance/minram-milestone-unpruned-bs.png" alt="Minimum RAM: all OS unpruned milestone" loading="lazy">
       </figure>
     </div>
 
