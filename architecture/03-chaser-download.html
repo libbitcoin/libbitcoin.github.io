@@ -111,6 +111,8 @@
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
+  .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
+  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: zoom-out; }
   .lightbox[hidden] { display: none; }
   .lightbox svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
@@ -215,7 +217,8 @@
       <a href="../interfaces.html">Server interfaces</a>
       <a href="../interface-performance.html">Interface performance</a>
       <a href="../node-performance.html">Node performance</a>
-      <a href="index.html" class="here">Node architecture</a>
+      <a href="../architecture/index.html" class="here">Node architecture</a>
+      <a href="../database/index.html">Database architecture</a>
       <a href="../team.html">Team</a>
     </nav>
     <p class="lede">
@@ -946,6 +949,12 @@ flowchart LR
   document.addEventListener('click', function (e) {
     var svg = e.target.closest('.mermaid svg');
     if (svg) open(svg);
+    var img = e.target.closest('.doc img');
+    if (img) {
+      var copy = img.cloneNode(true);
+      copy.style.width = img.naturalWidth + 'px';
+      box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
+    }
   });
   box.addEventListener('click', close);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });

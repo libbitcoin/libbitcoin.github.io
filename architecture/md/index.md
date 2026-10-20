@@ -5,6 +5,12 @@ also written to support a **formal-verification effort**, which needs
 state machines, invariants, pre/post-conditions, and a clear bus-vs.-store
 ownership model.
 
+The architectural concepts (parallel block download, sequential chasers
+following concurrent download and validation, validation bypass by
+checkpoints and milestones, append-only store writes with small copyable
+indexes, and quiescence for snapshot, remap and shutdown) are from the
+2021 design document for the version 4 node.
+
 Every behavioural claim is anchored with `file:line` references into the
 C++ source so it can be re-verified or re-derived if source drifts. The
 citations in this revision were verified against libbitcoin-node master at

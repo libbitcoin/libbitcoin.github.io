@@ -14,28 +14,59 @@ import sys
 import markdown
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "architecture", "md")
-OUT = os.path.join(ROOT, "architecture")
 CHROME = os.path.join(ROOT, "node-performance.html")
 MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 
-PAGES = [
-    ("index", "Architecture"),
-    ("00-overview", "Overview"),
-    ("01-event-bus", "Event bus"),
-    ("02-chaser-header", "Chaser header"),
-    ("03-chaser-download", "Chaser download"),
-    ("04-chaser-validate", "Chaser validate"),
-    ("05-chaser-confirm", "Chaser confirm"),
-    ("06-sessions-and-protocols", "Sessions and protocols"),
-    ("07-header-protocols", "Header protocols"),
-    ("08-block-out-protocols", "Block out protocols"),
-    ("09-filter-out-70015", "Filter out 70015"),
-    ("10-tx-protocols", "Tx protocols"),
-    ("11-chaser-transaction", "Chaser transaction"),
-    ("12-periphery-chasers", "Periphery chasers"),
+SITE_MENU = [
+    ("index.html", "Home"),
+    ("interfaces.html", "Server interfaces"),
+    ("interface-performance.html", "Interface performance"),
+    ("node-performance.html", "Node performance"),
+    ("architecture/index.html", "Node architecture"),
+    ("database/index.html", "Database architecture"),
+    ("team.html", "Team"),
 ]
-SLUGS = {name for name, _ in PAGES}
+
+SECTIONS = {
+    "architecture": {
+        "title": "Libbitcoin Node Architecture",
+        "h1": "Node Architecture",
+        "description": "Source-anchored architecture documentation for libbitcoin-node: chasers, the event bus, sessions and peer protocols.",
+        "lede": "Source-anchored architecture documentation for <strong>libbitcoin-node</strong>:\n      the chasers, the event bus, sessions and peer protocols.",
+        "foot": 'Adapted from the libbitcoin-node wiki architecture pages by <a href="https://github.com/rsantacroce">rsantacroce</a>.',
+        "pages": [
+            ("index", "Architecture"),
+            ("00-overview", "Overview"),
+            ("01-event-bus", "Event bus"),
+            ("02-chaser-header", "Chaser header"),
+            ("03-chaser-download", "Chaser download"),
+            ("04-chaser-validate", "Chaser validate"),
+            ("05-chaser-confirm", "Chaser confirm"),
+            ("06-sessions-and-protocols", "Sessions and protocols"),
+            ("07-header-protocols", "Header protocols"),
+            ("08-block-out-protocols", "Block out protocols"),
+            ("09-filter-out-70015", "Filter out 70015"),
+            ("10-tx-protocols", "Tx protocols"),
+            ("11-chaser-transaction", "Chaser transaction"),
+            ("12-periphery-chasers", "Periphery chasers"),
+        ],
+    },
+    "database": {
+        "title": "Libbitcoin Database Architecture",
+        "h1": "Database Architecture",
+        "description": "Source-anchored architecture documentation for libbitcoin-database: heads, bodies, maps, tables, the memory-mapped store and queries.",
+        "lede": "Source-anchored architecture documentation for <strong>libbitcoin-database</strong>:\n      heads, bodies, maps, tables, the memory-mapped store and queries.",
+        "foot": "",
+        "pages": [
+            ("index", "Architecture"),
+            ("00-overview", "Overview"),
+            ("01-primitives", "Primitives"),
+            ("02-tables", "Tables"),
+            ("03-storage", "Storage"),
+            ("04-queries", "Queries"),
+        ],
+    },
+}
 
 STYLE = """
   :root {
@@ -95,6 +126,8 @@ STYLE = """
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
+  .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
+  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: zoom-out; }
   .lightbox[hidden] { display: none; }
   .lightbox svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
@@ -151,13 +184,13 @@ def restore_mermaid(body, blocks):
     return re.sub(r"<p>MERMAIDBLOCK(\d+)</p>", put, body)
 
 
-def fix_links(body):
+def fix_links(body, slugs):
     def fix(m):
         target = m.group(1)
         name, _, anchor = target.partition("#")
         if name == "Architecture":
             name = "index"
-        if name not in SLUGS:
+        if name not in slugs:
             return m.group(0)
         return 'href="%s.html%s"' % (name, "#" + anchor if anchor else "")
 
@@ -207,34 +240,45 @@ def lede(title):
     return title.replace("`", "")
 
 
-def menu(current):
+def site_menu(here):
     items = []
-    for name, label in PAGES:
+    for href, label in SITE_MENU:
+        cls = ' class="here"' if href == here + "/index.html" else ""
+        items.append('      <a href="../%s"%s>%s</a>' % (href, cls, html.escape(label)))
+    return "\n".join(items)
+
+
+def menu(pages, current):
+    items = []
+    for name, label in pages:
         cls = ' class="here"' if name == current else ""
         items.append('    <a href="%s.html"%s>%s</a>' % (name, cls, html.escape(label)))
     return "\n".join(items)
 
 
-def pager(current):
-    names = [n for n, _ in PAGES]
+def pager(pages, current):
+    names = [n for n, _ in pages]
     i = names.index(current)
-    prev = '<a href="%s.html">&larr; %s</a>' % PAGES[i - 1] if i > 0 else "<span></span>"
-    nxt = '<a href="%s.html">%s &rarr;</a>' % PAGES[i + 1] if i + 1 < len(PAGES) else "<span></span>"
+    prev = '<a href="%s.html">&larr; %s</a>' % pages[i - 1] if i > 0 else "<span></span>"
+    nxt = '<a href="%s.html">%s &rarr;</a>' % pages[i + 1] if i + 1 < len(pages) else "<span></span>"
     return '<nav class="pager">%s%s</nav>' % (prev, nxt)
 
 
-def render(name, md, guard, logo, mermaid_src):
+def render(key, name, md, guard, logo, mermaid_src):
+    section = SECTIONS[key]
+    pages = section["pages"]
     title, body_md = split_title(md)
     body_md, blocks = extract_mermaid(loosen_lists(body_md))
     converter = markdown.Markdown(extensions=["tables", "fenced_code"])
     body = converter.convert(body_md)
     body = restore_mermaid(body, blocks)
-    body = fix_links(body)
+    body = fix_links(body, {n for n, _ in pages})
     body = add_heading_ids(body)
     body = wrap_tables(body)
-    page_title = "Libbitcoin Node Architecture" if name == "index" else "Libbitcoin Node Architecture: " + lede(title)
-    description = "Source-anchored architecture documentation for libbitcoin-node: chasers, the event bus, sessions and peer protocols."
-    h1 = html.escape(lede(title)) if name != "index" else "Node Architecture"
+    page_title = section["title"] if name == "index" else section["title"] + ": " + lede(title)
+    description = section["description"]
+    h1 = html.escape(lede(title)) if name != "index" else section["h1"]
+    foot = '<span>%s</span>\n    ' % section["foot"] if section["foot"] else ""
     return """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -243,11 +287,11 @@ def render(name, md, guard, logo, mermaid_src):
 <title>%(page_title)s</title>
 <meta name="description" content="%(description)s">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-<link rel="canonical" href="https://libbitcoin.info/architecture/%(name)s.html">
+<link rel="canonical" href="https://libbitcoin.info/%(key)s/%(name)s.html">
 %(guard)s
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
-<meta property="og:url" content="https://libbitcoin.info/architecture/%(name)s.html">
+<meta property="og:url" content="https://libbitcoin.info/%(key)s/%(name)s.html">
 <meta property="og:title" content="%(page_title)s">
 <meta property="og:description" content="%(description)s">
 <meta property="og:image" content="https://libbitcoin.info/card.png">
@@ -273,16 +317,10 @@ def render(name, md, guard, logo, mermaid_src):
     <div class="eyebrow">Bitcoin full node and query server</div>
     <h1>%(h1)s</h1>
     <nav class="menu site">
-      <a href="../index.html">Home</a>
-      <a href="../interfaces.html">Server interfaces</a>
-      <a href="../interface-performance.html">Interface performance</a>
-      <a href="../node-performance.html">Node performance</a>
-      <a href="index.html" class="here">Node architecture</a>
-      <a href="../team.html">Team</a>
+%(site)s
     </nav>
     <p class="lede">
-      Source-anchored architecture documentation for <strong>libbitcoin-node</strong>:
-      the chasers, the event bus, sessions and peer protocols.
+      %(lede)s
     </p>
   </header>
 
@@ -299,8 +337,7 @@ def render(name, md, guard, logo, mermaid_src):
   <div class="lightbox" id="lightbox" hidden></div>
 
   <p class="foot">
-    <span>Adapted from the libbitcoin-node wiki architecture pages by <a href="https://github.com/rsantacroce">rsantacroce</a>.</span>
-    <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
+    %(foot)s<span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
 </div>
 <script>
@@ -318,6 +355,12 @@ def render(name, md, guard, logo, mermaid_src):
   document.addEventListener('click', function (e) {
     var svg = e.target.closest('.mermaid svg');
     if (svg) open(svg);
+    var img = e.target.closest('.doc img');
+    if (img) {
+      var copy = img.cloneNode(true);
+      copy.style.width = img.naturalWidth + 'px';
+      box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
+    }
   });
   box.addEventListener('click', close);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
@@ -368,7 +411,8 @@ mermaid.initialize({
 </body>
 </html>
 """ % dict(page_title=page_title, description=description, name=name, guard=guard, logo=logo,
-           style=STYLE, h1=h1, menu=menu(name), body=body, pager=pager(name), mermaid=mermaid_src)
+           style=STYLE, h1=h1, menu=menu(pages, name), body=body, pager=pager(pages, name),
+           mermaid=mermaid_src, key=key, site=site_menu(key), lede=section["lede"], foot=foot)
 
 
 def check_links(pages):
@@ -395,14 +439,18 @@ def main():
     if "--mermaid" in sys.argv:
         mermaid_src = sys.argv[sys.argv.index("--mermaid") + 1]
     guard, logo = chrome()
-    pages = {}
-    for name, _ in PAGES:
-        md = read(os.path.join(SRC, name + ".md"))
-        pages[name] = render(name, md, guard, logo, mermaid_src)
-        write(os.path.join(OUT, name + ".html"), pages[name])
-        print("wrote", name + ".html")
-    for name, href in check_links(pages):
-        print("BROKEN LINK in %s: %s" % (name, href))
+    for key, section in SECTIONS.items():
+        src = os.path.join(ROOT, key, "md")
+        if not os.path.isdir(src):
+            continue
+        pages = {}
+        for name, _ in section["pages"]:
+            md = read(os.path.join(src, name + ".md"))
+            pages[name] = render(key, name, md, guard, logo, mermaid_src)
+            write(os.path.join(ROOT, key, name + ".html"), pages[name])
+            print("wrote", key + "/" + name + ".html")
+        for name, href in check_links(pages):
+            print("BROKEN LINK in %s/%s: %s" % (key, name, href))
 
 
 if __name__ == "__main__":
