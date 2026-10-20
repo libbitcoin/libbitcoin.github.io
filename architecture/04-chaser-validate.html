@@ -1068,8 +1068,10 @@ this chaser only sequences and persists their outcomes.</p>
 </li>
 <li>
 <p>The bank/turnstile protocol is lock-free: two atomics per batch
-  (<code>bank_</code>, <code>draining_</code>) and two writer counters. A model can use a
-  ticket lock or epoch counter.</p>
+  (<code>bank_</code>, <code>draining_</code>) and two writer counters. The draining worker
+  yields only until in-flight commits to its bank complete; arriving
+  commits go to the other bank and losing claimants return, so every
+  other thread continues. A model can use an epoch counter.</p>
 </li>
 <li>
 <p>The store interface used by validate is wide; see the coupling diagram.</p>

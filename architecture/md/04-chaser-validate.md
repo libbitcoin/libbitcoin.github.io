@@ -659,8 +659,10 @@ this chaser only sequences and persists their outcomes.
   disabled is the reference behaviour, and a store decline on commit
   falls back to exactly that.
 - The bank/turnstile protocol is lock-free: two atomics per batch
-  (`bank_`, `draining_`) and two writer counters. A model can use a
-  ticket lock or epoch counter.
+  (`bank_`, `draining_`) and two writer counters. The draining worker
+  yields only until in-flight commits to its bank complete; arriving
+  commits go to the other bank and losing claimants return, so every
+  other thread continues. A model can use an epoch counter.
 - The store interface used by validate is wide; see the coupling diagram.
 
 ---
