@@ -7,8 +7,8 @@ its recovery model, and the query layer that the node uses.
 
 The relational concepts (natural, foreign and search keys, navigation versus
 search, append-only bodies published by heads, recoverability, and
-reliability) are from the 2021 design
-document for the version 4 store.
+reliability) are from the 2021 [design
+document](libbitcoin-v4-relational-database.pdf) for the version 4 store.
 
 Every behavioural claim is anchored with `file:line` references into the
 C++ source. The citations were verified against libbitcoin-database master
