@@ -440,9 +440,11 @@
       chain: a block, a transaction and an output script from each.
     </p>
     <p class="lede">
-      Each server starts once and runs until idle. Each of three repetitions, on its own requests,
-      empties working sets and purges the standby list, sends 5 s of untimed pings, then makes a
-      cold pass in shuffled order and a warm pass on the same requests in another order.
+      Each of three repetitions, on its own requests, stops the servers, empties working sets,
+      flushes modified pages and purges the standby list, restarts the servers and waits until
+      idle, sends 5 s of untimed pings, then makes a cold pass in shuffled order and a warm pass on
+      the same requests in another order. Every cold pass therefore starts with nothing resident,
+      including each server's own caches.
     </p>
     <p class="lede after">
       A call is timed from request to the last response byte, received into a preallocated
