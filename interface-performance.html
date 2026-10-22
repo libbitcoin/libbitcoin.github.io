@@ -249,7 +249,6 @@
       <a href="node-performance.html">Node performance</a>
       <a href="architecture/index.html">Node architecture</a>
       <a href="database/index.html">Database architecture</a>
-      <a href="slack/index.html">Slack</a>
       <a href="team.html">Team</a>
     </nav>
     <p class="lede">
@@ -295,44 +294,50 @@
     <h2 id="throughput">Throughput</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-throughput-p2ps-linear.png" tabindex="0">
-        <h3>Encrypted P2P (BIP324) block throughput by concurrent connections (linear scale)</h3>
-        <img src="performance/server-throughput-p2ps-linear.png" alt="Encrypted P2P (BIP324) block throughput by concurrent connections (linear scale)" loading="lazy">
-      </figure>
-      <figure class="shot" data-full="performance/server-throughput-p2ps.png" tabindex="0">
-        <h3>Encrypted P2P (BIP324) throughput by concurrent connections (log scale)</h3>
-        <img src="performance/server-throughput-p2ps.png" alt="Encrypted P2P (BIP324) throughput by concurrent connections (log scale)" loading="lazy">
+        <h3>P2P/S block throughput (linear scale)</h3>
+        <img src="performance/server-throughput-p2ps-linear.png" alt="P2P/S block throughput (linear scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-throughput-p2p.png" tabindex="0">
-        <h3>P2P throughput by concurrent connections (log scale)</h3>
-        <img src="performance/server-throughput-p2p.png" alt="P2P throughput by concurrent connections (log scale)" loading="lazy">
+        <h3>P2P/S block/tx throughput (log scale)</h3>
+        <img src="performance/server-throughput-p2p.png" alt="P2P/S block/tx throughput (log scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-throughput-rpc.png" tabindex="0">
-        <h3>RPC throughput by concurrent connections (log scale)</h3>
-        <img src="performance/server-throughput-rpc.png" alt="RPC throughput by concurrent connections (log scale)" loading="lazy">
+        <h3>Bitcoind JSON-RPC block/tx throughput (log scale)</h3>
+        <img src="performance/server-throughput-rpc.png" alt="Bitcoind JSON-RPC block/tx throughput (log scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-throughput-rest.png" tabindex="0">
-        <h3>REST throughput by concurrent connections (log scale)</h3>
-        <img src="performance/server-throughput-rest.png" alt="REST throughput by concurrent connections (log scale)" loading="lazy">
+        <h3>Bitcoind REST block/tx throughput (log scale)</h3>
+        <img src="performance/server-throughput-rest.png" alt="Bitcoind REST block/tx throughput (log scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-throughput-rest-hex.png" tabindex="0">
-        <h3>REST hex throughput by concurrent connections (log scale)</h3>
-        <img src="performance/server-throughput-rest-hex.png" alt="REST hex throughput by concurrent connections (log scale)" loading="lazy">
+        <h3>Bitcoind REST hex block/tx throughput (log scale)</h3>
+        <img src="performance/server-throughput-rest-hex.png" alt="Bitcoind REST hex block/tx throughput (log scale)" loading="lazy">
       </figure>
     </div>
     <p class="lede after">
       The other charts measure one connection at a time. Throughput is what a server delivers under
       many: each connection count requests its own set of blocks or transactions back to back for
-      20 seconds, repeating the set if it runs out, from 16 client processes, after a server restart
-      and cache purge, with both servers configured to accept the full connection count. The dashed
-      lines mark the block rate that 1, 10, 100 and 1,000 peer connections at 1 Gbps can carry, so a block curve
-      above a line means the network, not the server, would be the limit. Bitcoin Core serves only
+      20 seconds, repeating the set if it runs out, from 16 client processes, with both servers
+      configured to accept the full connection count. Each set is requested twice in succession and
+      the second, warm pass is shown. Block series purge the cache and restart the server before
+      every connection count; transaction series do so once per series. On the linear block chart,
+      the dashed line marks the block rate that 10 Gbps of network can carry, so a
+      block curve above the line means the network, not the server, would be the limit. Bitcoin Core serves only
       unconfirmed transactions over P2P, so P2P transactions are shown for Libbitcoin alone. Bitcoin
-      Core serves P2P blocks from a single thread and levels off at about
-      860 blocks per second from two connections, with latency growing in proportion to the load;
-      Libbitcoin serves them concurrently and reaches about 5,600 per second by 64 connections.
-      Over encrypted (BIP324) P2P, Libbitcoin reaches about 4,100 blocks per second and Bitcoin Core
-      about 520, while Libbitcoin transactions are faster than unencrypted, since BIP324 drops the
-      per-message double SHA-256 checksum and Libbitcoin's ChaCha20 is hardware accelerated.
+      Core serves P2P blocks from a single thread and levels off at about 1,100 blocks per second
+      from two connections, with latency growing in proportion to the load; Libbitcoin serves them
+      concurrently and reaches about 5,900 per second by 64 connections. Over encrypted (BIP324)
+      P2P, Libbitcoin reaches about 4,600 blocks per second and Bitcoin Core about 630, while
+      Libbitcoin transactions are faster than unencrypted, since BIP324 drops the per-message
+      double SHA-256 checksum and Libbitcoin's ChaCha20 is hardware accelerated.
+    </p>
+    <p class="lede after">
+      Bitcoin Core does not serve HTTPS or websockets, so HTTPS series (dashed) in the RPC and REST
+      charts, and the websocket and native charts, show Libbitcoin alone. HTTPS uses 256 listening
+      ports, one per connection. The HTTPS and secure websocket curves level off where the test
+      client's TLS saturates its processes; Libbitcoin uses under six cores at those rates, and the
+      rate rises with more client processes. Plain HTTP transactions level off near 140,000 per
+      second.
     </p>
   </section>
 
@@ -368,7 +373,8 @@
       </figure>
     </div>
     <p class="lede after">
-      Addresses are grouped by history size, and the largest class adds 27 addresses of 100k to
+      The Electrum interface is compared with <strong>Fulcrum 2.1.3</strong>, which indexes from Bitcoin
+      Core at default settings. Addresses are grouped by history size, and the largest class adds 27 addresses of 100k to
       2.2M entries. The 0 entries class uses 300 script hashes that own no output, the query a
       wallet makes most often when it scans past its last used address, and is plotted in calls per
       second. Address history rates are entries returned per second of call time.
@@ -388,7 +394,8 @@
       </figure>
     </div>
     <p class="lede after">
-      A silent payments scan subscribes one scan key to a range of blocks ending at 950,000, and is
+      The Sparrow interface is compared with <strong>Frigate 1.6.1</strong>, which indexes silent payments
+      from Bitcoin Core. A silent payments scan subscribes one scan key to a range of blocks ending at 950,000, and is
       timed from the subscription to the notification of completion. Each of three repetitions
       purges the standby list, scans cold with a new key, then scans warm with the same key. Rates
       are blocks of the range per second, and each range is labeled with its approximate span of
@@ -426,6 +433,9 @@
         <img src="performance/server-bitcoind.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
     </div>
+    <p class="lede after">
+      The bitcoind JSON-RPC interface is compared with <strong>Bitcoin Core 32.0</strong>.
+    </p>
   </section>
 
   <section>
@@ -436,22 +446,25 @@
         <img src="performance/server-rest.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
     </div>
+    <p class="lede after">
+      The bitcoind REST interface is compared with <strong>Bitcoin Core 32.0</strong>.
+    </p>
   </section>
 
   <section>
     <h2 id="bitcoind-zmq-interface">Bitcoind ZMQ Interface</h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-zmq.png" tabindex="0">
-        <h3>Rawtx notification rate: comparative (log scale)</h3>
-        <img src="performance/server-zmq.png" alt="Rawtx notification rate: comparative (log scale)" loading="lazy">
+        <h3>Chain object rate: comparative (log scale)</h3>
+        <img src="performance/server-zmq.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
     </div>
     <p class="lede after">
       Each server is at block 950,000 with an empty pool. The 28,142 transactions of blocks
       950,001 to 950,009 are offered in block order by one P2P peer (inventory, then the
       transaction when requested), and each is timed from its send to the arrival of its rawtx
-      notification on a ZMQ subscription. Latency is over the 24,517 transactions both servers
-      accepted. Libbitcoin accepted 1,421 more transactions, as Bitcoin Core's clustered mempool
+      notification on a ZMQ subscription. Rates are 1000 / mean latency over the 24,517
+      transactions both servers accepted. Libbitcoin accepted 1,421 more transactions, as Bitcoin Core's clustered mempool
       imposes a hardwired capacity limit for performance reasons. Both rejected 2,204 transactions
       that were not yet valid at block 950,000: 1,522 are time-locked to a later block, 55 have
       unsatisfied relative lock times (BIP68), and 627 spend outputs of those.
@@ -471,32 +484,18 @@
   <section>
     <h2 id="methodology">Methodology</h2>
     <p class="lede">
-      All servers run on one machine, shelly (Threadripper PRO 9985WX, 512 GB, Windows 11), one
-      stack at a time, each with a store at block 950,000 on its own volume. The client is on the
-      same machine, over loopback, making sequential calls on one connection.
+      Servers run one at a time on shelly (Threadripper PRO 9985WX, 512 GB, Windows 11), each with a
+      store at block 950,000, called over loopback from the same machine.
       <strong>Libbitcoin 4.0</strong> serves from its own store (address index load factor 5).
       <strong>Bitcoin Core 32.0</strong> has txindex, txospenderindex and the basic block filter
-      index, with networking disabled. <strong>Fulcrum 2.1.3</strong> indexes from that Bitcoin Core, at
-      default settings. <strong>Frigate 1.6.1</strong> indexes silent
-      payments from that Bitcoin Core. The Electrum interface is compared with Fulcrum, the Sparrow
-      interface with Frigate, and the bitcoind JSON-RPC and REST interfaces with Bitcoin Core.
-    </p>
-    <p class="lede">
-      Each method is called with 300 unique requests, drawn from random blocks over the whole
-      chain: a block, a transaction and an output script from each.
-    </p>
-    <p class="lede">
-      Each of three repetitions, on its own requests, stops the servers, empties working sets,
-      flushes modified pages and purges the standby list, restarts the servers and waits until
-      idle, sends 5 s of untimed pings, then makes a cold pass in shuffled order and a warm pass on
-      the same requests in another order. Every cold pass therefore starts with nothing resident,
-      including each server's own caches.
+      index.
     </p>
     <p class="lede after">
-      A call is timed from request to the last response byte, received into a preallocated
-      buffer, with parsing after timing. Rates are calls per second (1000 / mean ms). Bitcoin Core
-      and Fulcrum hold all headers in memory, so they have no cold header query, and their warm
-      header bars are hatched.
+      Unless noted, each method is called 300 times, one call at a time on one connection, with
+      requests drawn from random blocks across the chain. Each of three repetitions purges all
+      caches and restarts the servers, then makes a cold pass and a warm pass on the same requests.
+      Calls are timed to the last response byte, and rates are calls per second (1000 / mean ms).
+      Bitcoin Core and Fulcrum hold all headers in memory, so their warm header bars are hatched.
     </p>
   </section>
 

@@ -24,7 +24,6 @@ SITE_MENU = [
     ("node-performance.html", "Node performance"),
     ("architecture/index.html", "Node architecture"),
     ("database/index.html", "Database architecture"),
-    ("slack/index.html", "Slack"),
     ("team.html", "Team"),
 ]
 
