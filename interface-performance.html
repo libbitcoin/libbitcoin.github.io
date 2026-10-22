@@ -260,6 +260,7 @@
 
   <nav class="menu">
     <a href="#efficiency">Efficiency</a>
+    <a href="#throughput">Throughput</a>
     <a href="#native-rest-interface">Native REST Interface</a>
     <a href="#electrum-interface">Electrum Interface</a>
     <a href="#sparrow-interface">Sparrow Interface</a>
@@ -287,6 +288,51 @@
       multiple: 2.5&times; means Libbitcoin delivers 2.5 times the query rate per byte of index, and
       below 1&times; it delivers less. Address history rates are entries per second, silent payments
       rates are blocks scanned per second, and other rates are calls per second.
+    </p>
+  </section>
+
+  <section>
+    <h2 id="throughput">Throughput</h2>
+    <div class="gallery">
+      <figure class="shot" data-full="performance/server-throughput-p2ps-linear.png" tabindex="0">
+        <h3>Encrypted P2P (BIP324) block throughput by concurrent connections (linear scale)</h3>
+        <img src="performance/server-throughput-p2ps-linear.png" alt="Encrypted P2P (BIP324) block throughput by concurrent connections (linear scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-throughput-p2ps.png" tabindex="0">
+        <h3>Encrypted P2P (BIP324) throughput by concurrent connections (log scale)</h3>
+        <img src="performance/server-throughput-p2ps.png" alt="Encrypted P2P (BIP324) throughput by concurrent connections (log scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-throughput-p2p.png" tabindex="0">
+        <h3>P2P throughput by concurrent connections (log scale)</h3>
+        <img src="performance/server-throughput-p2p.png" alt="P2P throughput by concurrent connections (log scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-throughput-rpc.png" tabindex="0">
+        <h3>RPC throughput by concurrent connections (log scale)</h3>
+        <img src="performance/server-throughput-rpc.png" alt="RPC throughput by concurrent connections (log scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-throughput-rest.png" tabindex="0">
+        <h3>REST throughput by concurrent connections (log scale)</h3>
+        <img src="performance/server-throughput-rest.png" alt="REST throughput by concurrent connections (log scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-throughput-rest-hex.png" tabindex="0">
+        <h3>REST hex throughput by concurrent connections (log scale)</h3>
+        <img src="performance/server-throughput-rest-hex.png" alt="REST hex throughput by concurrent connections (log scale)" loading="lazy">
+      </figure>
+    </div>
+    <p class="lede after">
+      The other charts measure one connection at a time. Throughput is what a server delivers under
+      many: each connection count requests its own set of blocks or transactions back to back for
+      20 seconds, repeating the set if it runs out, from 16 client processes, after a server restart
+      and cache purge, with both servers configured to accept the full connection count. The dashed
+      lines mark the block rate that 1, 10, 100 and 1,000 peer connections at 1 Gbps can carry, so a block curve
+      above a line means the network, not the server, would be the limit. Bitcoin Core serves only
+      unconfirmed transactions over P2P, so P2P transactions are shown for Libbitcoin alone. Bitcoin
+      Core serves P2P blocks from a single thread and levels off at about
+      860 blocks per second from two connections, with latency growing in proportion to the load;
+      Libbitcoin serves them concurrently and reaches about 5,600 per second by 64 connections.
+      Over encrypted (BIP324) P2P, Libbitcoin reaches about 4,100 blocks per second and Bitcoin Core
+      about 520, while Libbitcoin transactions are faster than unencrypted, since BIP324 drops the
+      per-message double SHA-256 checksum and Libbitcoin's ChaCha20 is hardware accelerated.
     </p>
   </section>
 
