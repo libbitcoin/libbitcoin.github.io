@@ -140,10 +140,10 @@ safe = 0.0.0.0:48943
 - `[bitcoin]` replaces the chain parameters. Soft forks are active from
   block 1, and the milestone at 150,000 bypasses script validation below
   it.
-- `[forks]` enables the testnet4 rules: `time_warp_patch` and
-  `block_storm_patch`, with minimum difficulty blocks allowed
-  (`difficult = false`).
-- `[peer] identifier` is the testnet4 network magic, and `[outbound]`
+- `[forks]` enables the testnet4 rules: `forks.time_warp_patch` and
+  `forks.block_storm_patch`, with minimum difficulty blocks allowed
+  (`forks.difficult = false`).
+- `peer.identifier` is the testnet4 network magic, and `[outbound]`
   replaces the mainnet seeds.
 - `[wallet]` sets the testnet address and key prefixes.
 - `[table.*]` sizes the store for the chain at 150,000 blocks.

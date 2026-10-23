@@ -1,0 +1,61 @@
+# Building bs
+
+`bs` is built from libbitcoin-server and the four libraries it depends on:
+libbitcoin-system, libbitcoin-database, libbitcoin-network and
+libbitcoin-node. An install script builds and installs all five in
+order, along with Boost where needed.
+
+## 1. Choosing a build
+
+| Platform | Build system | Script | Page |
+| -------- | ------------ | ------ | ---- |
+| Linux | Autotools or CMake | `install-gnu.sh`, `install-cmake.sh`, `install-presets.sh` | [Linux](linux) |
+| macOS | Autotools or CMake | `install-gnu.sh`, `install-cmake.sh` | [macOS](macos) |
+| Windows | Visual Studio | `build-msvc.cmd` | [Windows](windows) |
+
+The three build systems produce the same `bs`. CMake and autotools are
+equivalent on Linux and macOS. CMake presets select a configuration by
+name.
+
+## 2. What every build needs
+
+- A C++20 compiler. The versions tested in CI are listed in
+  [Build systems and toolchains](toolchains).
+- Boost 1.86.0 or later. The Linux and macOS scripts download and build
+  it with `--build-boost`. Visual Studio restores it as a NuGet package.
+- Git, to fetch the libbitcoin sources.
+
+Nothing else is required. secp256k1 and TLS are part of libbitcoin, and
+GPU support needs no SDK at build time (see [Build options](options)).
+
+## 3. Quick start
+
+On Linux or macOS, a static release build installed under
+`~/libbitcoin`:
+
+```
+$ git clone https://github.com/libbitcoin/libbitcoin-server
+$ cd libbitcoin-server
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+```
+
+The result is `~/libbitcoin/bin/bs`. On Windows, see [Windows](windows).
+
+## 4. Hardware options
+
+By default `bs` is built for the baseline instruction set of its
+architecture (AVX2 for Windows x64). Options such as `--enable-avx2` or `--enable-shani` make it
+faster on CPUs that have those instructions, and unable to run on CPUs
+that do not. Run `bs --hardware` on the target machine to see what it
+supports, and see [Build options](options).
+
+## 5. Pages
+
+- [Linux](linux), [macOS](macos) and [Windows](windows): prerequisites
+  and steps for each platform.
+- [Build options](options): the install script options and the build
+  options shared by all three build systems.
+- [Build systems and toolchains](toolchains): autotools, CMake and
+  Visual Studio, and the compilers and Boost versions tested in CI.
+- [libbitcoin-build](libbitcoin-build): the generator behind the build
+  files, for maintainers.

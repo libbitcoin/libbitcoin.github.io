@@ -141,8 +141,8 @@ safe = 0.0.0.0:28943
 - `[bitcoin]` sets the regtest genesis block and difficulty limit, all
   soft forks active from genesis, and a 150 block subsidy interval.
   There are no checkpoints beyond genesis and no minimum work.
-- `[forks] retarget = false` disables difficulty retargeting.
-- `[peer] identifier` is the regtest network magic.
+- `forks.retarget = false` disables difficulty retargeting.
+- `peer.identifier` is the regtest network magic.
 - `bs` does not mine, so blocks come from a peer. `[outbound]` disables
   seeding and outbound connections, and `[manual]` connects to a local
   node that generates blocks, here on port 18445 since `bs` listens on

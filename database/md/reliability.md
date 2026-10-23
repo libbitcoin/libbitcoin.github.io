@@ -52,6 +52,90 @@ to libbitcoin. No software can do without them.
 Everything that follows holds under these two assumptions, and only
 under them.
 
+### 2.1 Fail-stop hardware is working hardware
+
+"Working hardware" has a precise meaning here: every fault below the
+software either does not occur or surfaces as a detectable stop, an error
+return or a halt, and never as wrong data returned as good. With correct
+software above it, that leaves no path by which an error can enter the
+store unannounced. Each failure is either absent (software, by
+assumption) or announced (hardware, by assumption).
+
+The assumption covers the whole substrate the software touches, not only
+the drive. A fail-stop drive beneath memory without ECC still admits
+silent error, because data can change after the drive has delivered it
+correctly. ECC memory, interface CRCs and drive-internal ECC each buy
+fail-stop behavior for their own segment.
+
+### 2.2 What no layer can add
+
+The fail-stop property cannot be conferred from above.
+
+- **Drive firmware** sits inside the failure domain it would certify.
+  Firmware defects are themselves a main source of fail-partial
+  behavior: lost writes acknowledged as complete, misdirected writes,
+  stale reads.
+- **Software checks** (page checksums, scrubbing, re-validation) execute
+  on the processor and memory they would be checking. They shrink the
+  surface for undetected error, but what remains is exactly what
+  fail-stop excludes, wrong data accepted as good. A checksum also
+  blesses whatever the code computed, so it cannot see the software's own
+  errors either.
+
+So software checks are probabilistic mitigation, not a guarantee. A store
+that assumes fail-stop hardware and does not checksum is not omitting a
+protection. It declines a permanent cost for a check that cannot deliver
+the property it suggests.
+
+### 2.3 Masking
+
+A component that is always correct and never stops would be stronger than
+fail-stop. No single device can guarantee it.
+
+- **Masking is finite.** Every masking mechanism is redundancy within a
+  bound: an error-correcting code corrects up to its distance, a mirror
+  survives one loss. Past the bound, a code used for correction can
+  miscorrect, decoding to the wrong value and returning it as good. The
+  same redundancy buys either more masking or more detection, and pushing
+  a device toward never stopping moves its failures toward fail-partial.
+- **No physical object is unconditionally available.** Power loss or
+  destruction stops any device. Fail-stop survives even that, since
+  destruction is a stop, which makes it the strongest model a single
+  device can hold.
+
+Continued correct service through faults requires redundancy across
+independent failure domains, and its guarantee is conditional on a fault
+budget.
+
+### 2.4 RAID
+
+RAID is that redundancy across drives, and it assumes fail-stop members.
+A member that stops is an erasure at a known location, so the array
+reconstructs it from the others and keeps serving. A code that corrects
+*n* erasures corrects only *n*/2 errors at unknown locations, so the
+announcement is worth twice the redundancy.
+
+Normal reads do not check parity, so a fail-partial member's wrong data
+passes through. A parity update computed from it writes the error into
+the parity, and a later rebuild restores it with confidence. RAID masks
+the stops of fail-stop members and does nothing for silent faults.
+
+### 2.5 Running bs on the hardware
+
+`bs` requires fail-stop hardware and nothing more:
+
+- An announced hardware error stops `bs`, either as a storage fault
+  (§5) or by ending the process. Either way `flush.lock` remains and the
+  store is condemned (§3).
+- ECC memory is the part of the substrate most often missing. Without
+  it, the assumption of §2 does not hold for memory.
+- RAID beneath the store, or a mirrored volume, masks a drive that stops,
+  so `bs` keeps running through it. It adds availability, not
+  correctness. The store's guarantee is the same with or without it.
+- Checksumming filesystems and scrubbing reduce the chance of silent
+  hardware error. They are worth having on doubtful hardware, but they
+  do not change the guarantee either.
+
 ---
 
 ## 3. The guarantee: fail-stop by construction
@@ -213,7 +297,9 @@ domains, and redundancy is only sound over members that fail by
 stopping, since it must know which member failed.
 
 Bitcoin already provides that redundancy: thousands of independent
-nodes, any one of which can stop while the rest serve. For a node, the
+nodes, any one of which can stop while the rest serve. The network is
+the array and nodes are its members, and like RAID (§2.4) its contract
+holds only over members that stop rather than lie. For a node, the
 correct design is therefore exactly fail-stop and recoverable. Masking
 faults inside the node would duplicate, conditionally and less well,
 what the network provides as a whole.

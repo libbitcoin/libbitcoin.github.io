@@ -226,6 +226,7 @@
       <a href="../index.html">Home</a>
       <a href="../interfaces.html">Server interfaces</a>
       <a href="../configuration/index.html" class="here">Configuration</a>
+      <a href="../building/index.html">Building</a>
       <a href="../interface-performance.html">Interface performance</a>
       <a href="../node-performance.html">Node performance</a>
       <a href="../architecture/index.html">Node architecture</a>
@@ -380,12 +381,12 @@ safe = 0.0.0.0:18943
 <li><code>[bitcoin]</code> replaces the chain parameters: genesis block, soft fork
   activations, checkpoint, milestone and minimum work. The milestone at
   5,100,000 bypasses script validation below it.</li>
-<li><code>[forks] difficult = false</code> allows testnet's minimum difficulty blocks.</li>
-<li><code>[peer] identifier</code> is the testnet3 network magic, and <code>[outbound]</code>
+<li><code>forks.difficult = false</code> allows testnet's minimum difficulty blocks.</li>
+<li><code>peer.identifier</code> is the testnet3 network magic, and <code>[outbound]</code>
   replaces the mainnet seeds.</li>
 <li><code>[wallet]</code> sets the testnet address and key prefixes.</li>
 <li><code>[table.*]</code> sizes the store for the chain at 5.1 million blocks.
-  <code>maximum_concurrency</code> raises the download window, since testnet blocks
+  <code>node.maximum_concurrency</code> raises the download window, since testnet blocks
   are small.</li>
 <li>The service sections move each service to the testnet3 ports of the
   port plan, 18043–18980 (<a href="index.html#6-ports">§6</a>). A service

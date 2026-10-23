@@ -226,6 +226,7 @@
       <a href="../index.html">Home</a>
       <a href="../interfaces.html">Server interfaces</a>
       <a href="../configuration/index.html" class="here">Configuration</a>
+      <a href="../building/index.html">Building</a>
       <a href="../interface-performance.html">Interface performance</a>
       <a href="../node-performance.html">Node performance</a>
       <a href="../architecture/index.html">Node architecture</a>
@@ -380,8 +381,8 @@ safe = 0.0.0.0:28943
 <li><code>[bitcoin]</code> sets the regtest genesis block and difficulty limit, all
   soft forks active from genesis, and a 150 block subsidy interval.
   There are no checkpoints beyond genesis and no minimum work.</li>
-<li><code>[forks] retarget = false</code> disables difficulty retargeting.</li>
-<li><code>[peer] identifier</code> is the regtest network magic.</li>
+<li><code>forks.retarget = false</code> disables difficulty retargeting.</li>
+<li><code>peer.identifier</code> is the regtest network magic.</li>
 <li><code>bs</code> does not mine, so blocks come from a peer. <code>[outbound]</code> disables
   seeding and outbound connections, and <code>[manual]</code> connects to a local
   node that generates blocks, here on port 18445 since <code>bs</code> listens on

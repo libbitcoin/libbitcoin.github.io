@@ -226,6 +226,7 @@
       <a href="../index.html">Home</a>
       <a href="../interfaces.html">Server interfaces</a>
       <a href="../configuration/index.html" class="here">Configuration</a>
+      <a href="../building/index.html">Building</a>
       <a href="../interface-performance.html">Interface performance</a>
       <a href="../node-performance.html">Node performance</a>
       <a href="../architecture/index.html">Node architecture</a>
@@ -380,10 +381,10 @@ safe = 0.0.0.0:48943
 <li><code>[bitcoin]</code> replaces the chain parameters. Soft forks are active from
   block 1, and the milestone at 150,000 bypasses script validation below
   it.</li>
-<li><code>[forks]</code> enables the testnet4 rules: <code>time_warp_patch</code> and
-  <code>block_storm_patch</code>, with minimum difficulty blocks allowed
-  (<code>difficult = false</code>).</li>
-<li><code>[peer] identifier</code> is the testnet4 network magic, and <code>[outbound]</code>
+<li><code>[forks]</code> enables the testnet4 rules: <code>forks.time_warp_patch</code> and
+  <code>forks.block_storm_patch</code>, with minimum difficulty blocks allowed
+  (<code>forks.difficult = false</code>).</li>
+<li><code>peer.identifier</code> is the testnet4 network magic, and <code>[outbound]</code>
   replaces the mainnet seeds.</li>
 <li><code>[wallet]</code> sets the testnet address and key prefixes.</li>
 <li><code>[table.*]</code> sizes the store for the chain at 150,000 blocks.</li>

@@ -2,4 +2,5 @@ exclude:
   - architecture/md
   - database/md
   - configuration/md
+  - building/md
   - tools

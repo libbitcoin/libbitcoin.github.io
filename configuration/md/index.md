@@ -162,7 +162,7 @@ Paths take the platform's form, for example `/data/bitcoin` or
 not to the configuration file.
 
 Integer values may use commas as thousands separators, for example
-`maximum_height = 900,000`.
+`node.maximum_height = 900,000`.
 
 Section map:
 
@@ -221,7 +221,7 @@ milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950
 ```
 
 Pruning reduces download and store size under a milestone sync. With
-`limited_blocks`, blocks under the milestone are downloaded and stored
+`node.limited_blocks`, blocks under the milestone are downloaded and stored
 without their input scripts and witnesses, and the node serves only
 blocks above the milestone to peers.
 
@@ -295,12 +295,12 @@ silent_start_height = 709632
 ### 5.10 Privacy networks
 
 Tor in both directions: outbound through its SOCKS5 proxy
-(`[outbound] socks`), and inbound through a Tor hidden service
+(`outbound.socks`), and inbound through a Tor hidden service
 (`HiddenServiceDir` and `HiddenServicePort` in `torrc`) pointing at the
 node's listening port. I2P in both directions: outbound through the
 SOCKS5 proxy pointed at an I2P router's SOCKS port, and inbound through a
-SAM bridge (`[inbound] sam`, `key_path`). Address gossip (`[peer] gossip_tor`, `gossip_i2p`), and
-opportunistic encryption (`[node] provide_privacy`).
+SAM bridge (`inbound.sam`, `inbound.key_path`). Address gossip (`peer.gossip_tor`, `peer.gossip_i2p`), and
+opportunistic encryption (`node.provide_privacy`).
 
 ### 5.11 Fixed peers
 
@@ -348,7 +348,7 @@ conflict.
 | Esplora REST | `[esplora]` | 8980 | 8943 |
 
 P2P has no separate secure port. BIP324 encryption is negotiated on the
-same port, and offered when `[node] provide_privacy` is set. ZMQ's secure
+same port, and offered when `node.provide_privacy` is set. ZMQ's secure
 port uses CurveZMQ.
 
 On the test chains the service ports move by a fixed offset, and the P2P
@@ -431,12 +431,12 @@ credential = user:password
 
 ## 8. Performance settings
 
-- `[node] threads`, `thread_priority`, `memory_priority`.
-- `[node] use_gpu`, `batch_verify`, `batch_silent`, `cpu_batch_verify`,
-  `cpu_batch_silent`. Check GPU and CPU support with `bs -w`.
-- `[node] maximum_concurrency` (download window).
-- `[database] turbo`.
-- `[outbound] connections` during sync, `current_connections` after.
+- `node.threads`, `node.thread_priority`, `node.memory_priority`.
+- `node.use_gpu`, `node.batch_verify`, `node.batch_silent`, `node.cpu_batch_verify`,
+  `node.cpu_batch_silent`. Check GPU and CPU support with `bs -w`.
+- `node.maximum_concurrency` (download window).
+- `database.turbo`.
+- `outbound.connections` during sync, `outbound.current_connections` after.
 
 ---
 

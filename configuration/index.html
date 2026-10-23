@@ -226,6 +226,7 @@
       <a href="../index.html">Home</a>
       <a href="../interfaces.html">Server interfaces</a>
       <a href="../configuration/index.html" class="here">Configuration</a>
+      <a href="../building/index.html">Building</a>
       <a href="../interface-performance.html">Interface performance</a>
       <a href="../node-performance.html">Node performance</a>
       <a href="../architecture/index.html">Node architecture</a>
@@ -518,7 +519,7 @@ reliability as the main processor.</p>
 <code>D:\bitcoin</code>. A relative path is relative to the working directory,
 not to the configuration file.</p>
 <p>Integer values may use commas as thousands separators, for example
-<code>maximum_height = 900,000</code>.</p>
+<code>node.maximum_height = 900,000</code>.</p>
 <p>Section map:</p>
 <div class="scroller"><table>
 <thead>
@@ -583,7 +584,7 @@ validated. The default milestone is block 950,000.</p>
 milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
 </code></pre>
 <p>Pruning reduces download and store size under a milestone sync. With
-<code>limited_blocks</code>, blocks under the milestone are downloaded and stored
+<code>node.limited_blocks</code>, blocks under the milestone are downloaded and stored
 without their input scripts and witnesses, and the node serves only
 blocks above the milestone to peers.</p>
 <pre><code class="language-ini"><span class="section">[node]</span>
@@ -632,12 +633,12 @@ silent_start_height = 709632
 </code></pre>
 <h3 id="510-privacy-networks">5.10 Privacy networks<a class="anchor" href="#510-privacy-networks" aria-label="Link to this section">#</a></h3>
 <p>Tor in both directions: outbound through its SOCKS5 proxy
-(<code>[outbound] socks</code>), and inbound through a Tor hidden service
+(<code>outbound.socks</code>), and inbound through a Tor hidden service
 (<code>HiddenServiceDir</code> and <code>HiddenServicePort</code> in <code>torrc</code>) pointing at the
 node's listening port. I2P in both directions: outbound through the
 SOCKS5 proxy pointed at an I2P router's SOCKS port, and inbound through a
-SAM bridge (<code>[inbound] sam</code>, <code>key_path</code>). Address gossip (<code>[peer] gossip_tor</code>, <code>gossip_i2p</code>), and
-opportunistic encryption (<code>[node] provide_privacy</code>).</p>
+SAM bridge (<code>inbound.sam</code>, <code>inbound.key_path</code>). Address gossip (<code>peer.gossip_tor</code>, <code>peer.gossip_i2p</code>), and
+opportunistic encryption (<code>node.provide_privacy</code>).</p>
 <h3 id="511-fixed-peers">5.11 Fixed peers<a class="anchor" href="#511-fixed-peers" aria-label="Link to this section">#</a></h3>
 <pre><code class="language-ini"><span class="section">[manual]</span>
 peer = 192.168.0.10:8333
@@ -728,7 +729,7 @@ conflict.</p>
 </tbody>
 </table></div>
 <p>P2P has no separate secure port. BIP324 encryption is negotiated on the
-same port, and offered when <code>[node] provide_privacy</code> is set. ZMQ's secure
+same port, and offered when <code>node.provide_privacy</code> is set. ZMQ's secure
 port uses CurveZMQ.</p>
 <p>On the test chains the service ports move by a fixed offset, and the P2P
 port follows its network's convention:</p>
@@ -832,12 +833,12 @@ credential = user:password
 <hr />
 <h2 id="8-performance-settings">8. Performance settings<a class="anchor" href="#8-performance-settings" aria-label="Link to this section">#</a></h2>
 <ul>
-<li><code>[node] threads</code>, <code>thread_priority</code>, <code>memory_priority</code>.</li>
-<li><code>[node] use_gpu</code>, <code>batch_verify</code>, <code>batch_silent</code>, <code>cpu_batch_verify</code>,
-  <code>cpu_batch_silent</code>. Check GPU and CPU support with <code>bs -w</code>.</li>
-<li><code>[node] maximum_concurrency</code> (download window).</li>
-<li><code>[database] turbo</code>.</li>
-<li><code>[outbound] connections</code> during sync, <code>current_connections</code> after.</li>
+<li><code>node.threads</code>, <code>node.thread_priority</code>, <code>node.memory_priority</code>.</li>
+<li><code>node.use_gpu</code>, <code>node.batch_verify</code>, <code>node.batch_silent</code>, <code>node.cpu_batch_verify</code>,
+  <code>node.cpu_batch_silent</code>. Check GPU and CPU support with <code>bs -w</code>.</li>
+<li><code>node.maximum_concurrency</code> (download window).</li>
+<li><code>database.turbo</code>.</li>
+<li><code>outbound.connections</code> during sync, <code>outbound.current_connections</code> after.</li>
 </ul>
 <hr />
 <h2 id="9-store-table-sizing-table">9. Store table sizing (<code>[table.*]</code>)<a class="anchor" href="#9-store-table-sizing-table" aria-label="Link to this section">#</a></h2>
