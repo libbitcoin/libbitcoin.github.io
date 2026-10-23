@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Libbitcoin Database Architecture: 01 — Primitives (heads, bodies, maps)</title>
+<title>Libbitcoin Database Architecture: 02 — Primitives (heads, bodies, maps)</title>
 <meta name="description" content="Source-anchored architecture documentation for libbitcoin-database: heads, bodies, maps, tables, the memory-mapped store and queries.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/database/primitives.html">
@@ -40,7 +40,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/database/primitives.html">
-<meta property="og:title" content="Libbitcoin Database Architecture: 01 — Primitives (heads, bodies, maps)">
+<meta property="og:title" content="Libbitcoin Database Architecture: 02 — Primitives (heads, bodies, maps)">
 <meta property="og:description" content="Source-anchored architecture documentation for libbitcoin-database: heads, bodies, maps, tables, the memory-mapped store and queries.">
 <meta property="og:image" content="https://libbitcoin.info/card.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card.png">
@@ -49,7 +49,7 @@
 <meta property="og:image:height" content="1260">
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Libbitcoin Database Architecture: 01 — Primitives (heads, bodies, maps)">
+<meta name="twitter:title" content="Libbitcoin Database Architecture: 02 — Primitives (heads, bodies, maps)">
 <meta name="twitter:description" content="Source-anchored architecture documentation for libbitcoin-database: heads, bodies, maps, tables, the memory-mapped store and queries.">
 <meta name="twitter:image" content="https://libbitcoin.info/card.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -216,7 +221,7 @@
 </svg>
     </a>
     <div class="eyebrow">Bitcoin full node and query server</div>
-    <h1>01 — Primitives (heads, bodies, maps)</h1>
+    <h1>02 — Primitives (heads, bodies, maps)</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <a href="../interfaces.html">Server interfaces</a>
@@ -236,6 +241,7 @@
   <nav class="menu">
     <a href="index.html">Architecture</a>
     <a href="overview.html">Overview</a>
+    <a href="reliability.html">Reliability</a>
     <a href="primitives.html" class="here">Primitives</a>
     <a href="tables.html">Tables</a>
     <a href="storage.html">Storage</a>
@@ -244,7 +250,7 @@
 
   <article class="doc">
 <blockquote>
-<p>Companion to <a href="overview.html"><code>00-overview</code></a> and <a href="tables.html"><code>02-tables</code></a>.</p>
+<p>Companion to <a href="overview.html"><code>00-overview</code></a> and <a href="tables.html"><code>03-tables</code></a>.</p>
 <p>Every table in the store is an instance of a small set of templates in
 <code>include/bitcoin/database/primitives/</code>. A table is a <strong>head</strong> and a
 <strong>body</strong>, each backed by its own storage (file). The head is the small,
@@ -389,23 +395,17 @@ bits are a <strong>bucket filter</strong>: a small bloom filter over the keys pu
 the bucket (<code>hashhead.hpp:43-48</code>).</p>
 <p><img alt="Hash head cell" src="figures/hash-cell.png" /></p>
 <ul>
-<li>
-<p><strong>Push</strong> computes the new cell (new link, filter OR the key's k bits) and
+<li><strong>Push</strong> computes the new cell (new link, filter OR the key's k bits) and
   installs it with a compare-exchange loop, so the filter can never lag the
   conflict stack. The element's <code>next</code> is written from the observed top and
   fenced before the exchange publishes it (<code>impl/primitives/hashhead.ipp</code>, <code>set_cell</code>, <code>next_cell</code>).
   A word-aligned cell is a lock-free atomic; an unaligned cell is guarded
-  by a mutex.</p>
-</li>
-<li>
-<p><strong>Search</strong> first tests the key's k bits against the cell. If any is clear
-  the key is not in the bucket and no body memory is touched (<code>screened</code>).</p>
-</li>
-<li>
-<p><strong>k</strong> is derived from the expected element count and bucket count
+  by a mutex.</li>
+<li><strong>Search</strong> first tests the key's k bits against the cell. If any is clear
+  the key is not in the bucket and no body memory is touched (<code>screened</code>).</li>
+<li><strong>k</strong> is derived from the expected element count and bucket count
   (<code>optimal_k</code>), and the envelope's stored value overrides it at open, so a
-  store keeps the k it was built with.</p>
-</li>
+  store keeps the k it was built with.</li>
 </ul>
 <p>Only three tables have spare cell bits, and so a working filter:</p>
 <p><img alt="Hash head cells of the store" src="figures/hash-cells.png" /></p>
@@ -445,17 +445,13 @@ per size and one file per record, all addressed by the same link. A body of
 one record, <code>body&lt;Link, Key, Size&gt;</code>, is the special case <code>bodys</code> of one
 size, and is what most tables use.</p>
 <ul>
-<li>
-<p><strong>Records</strong>: position = link × record size, in each record's own file
+<li><strong>Records</strong>: position = link × record size, in each record's own file
   (<code>memory/mmaps.hpp</code>). Allocation is unified across the record files under
-  one lock.</p>
-</li>
-<li>
-<p><strong>Slab</strong> (one record of <code>Size == max_size_t</code>): position = link. Elements
+  one lock.</li>
+<li><strong>Slab</strong> (one record of <code>Size == max_size_t</code>): position = link. Elements
   carry no length prefix; each element's own serialization (typically a
   varint count) determines its extent, so an empty element is not
-  storable.</p>
-</li>
+  storable.</li>
 </ul>
 <p>Allocation reserves space and advances the logical size before the element
 is written; the element becomes reachable only when something publishes its
@@ -474,26 +470,18 @@ reclaims the prevout, pool, spends, wtxid and batch bodies
 through <code>next</code>, newest first.</p>
 <p><img alt="Hash map" src="figures/hashmap.png" /></p>
 <ul>
-<li>
-<p><strong>Two-phase commit.</strong> <code>allocate</code> and <code>set</code> write a complete element with
+<li><strong>Two-phase commit.</strong> <code>allocate</code> and <code>set</code> write a complete element with
   its <code>next</code> unset, and <code>commit</code> pushes it onto the bucket. Until the
   commit the element is unreachable by search, so a reader can never see a
-  partly written element (<code>set</code>, <code>commit</code>, <code>put</code> = all three).</p>
-</li>
-<li>
-<p><strong>Search.</strong> <code>first</code> / <code>find</code> screen the cell, then walk the stack
-  comparing stored keys (<code>impl/primitives/hashmap.ipp:519-538</code>).</p>
-</li>
-<li>
-<p><strong>Duplicates.</strong> Keys are not unique. <code>it(key)</code> returns an <code>iterator</code> that
+  partly written element (<code>set</code>, <code>commit</code>, <code>put</code> = all three).</li>
+<li><strong>Search.</strong> <code>first</code> / <code>find</code> screen the cell, then walk the stack
+  comparing stored keys (<code>impl/primitives/hashmap.ipp:519-538</code>).</li>
+<li><strong>Duplicates.</strong> Keys are not unique. <code>it(key)</code> returns an <code>iterator</code> that
   walks the whole conflict stack, skipping keys that do not match
-  (<code>primitives/iterator.hpp</code>). This is the multimap of the 2021 design.</p>
-</li>
-<li>
-<p><strong>Get by link.</strong> <code>get(link)</code> bypasses the head entirely, so a hashmap is
+  (<code>primitives/iterator.hpp</code>). This is the multimap of the 2021 design.</li>
+<li><strong>Get by link.</strong> <code>get(link)</code> bypasses the head entirely, so a hashmap is
   a key-link bimap: search by key yields the link, and the link is a
-  foreign key that other tables store.</p>
-</li>
+  foreign key that other tables store.</li>
 </ul>
 <p>Slab hashmaps (variable elements, byte-offset links) are supported by the
 template; the store uses record hashmaps throughout and keeps variable data
@@ -583,31 +571,25 @@ file, which keeps hot data dense in memory.</p>
 <hr />
 <h2 id="5-notes-for-the-formal-model">5. Notes for the formal model<a class="anchor" href="#5-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>Each map is a pair (head, body) of byte arrays plus a logical size. All
+<li>Each map is a pair (head, body) of byte arrays plus a logical size. All
   publication is either a single atomic cell store (head) or a size store
   (headmap, body count), so the reachable state is always a prefix-closed
-  subset of the written state.</p>
-</li>
-<li>
-<p>The hash head is a set of per-bucket stacks with a monotone filter per
-  stack. Search is <code>filter ⊇ keys(stack)</code> then a linear walk.</p>
-</li>
-<li>
-<p>The array head and headmap are total functions from a dense domain to
-  links, mutable pointwise; the bodies they reference are append-only.</p>
-</li>
+  subset of the written state.</li>
+<li>The hash head is a set of per-bucket stacks with a monotone filter per
+  stack. Search is <code>filter ⊇ keys(stack)</code> then a linear walk.</li>
+<li>The array head and headmap are total functions from a dense domain to
+  links, mutable pointwise; the bodies they reference are append-only.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li><a href="tables.html"><code>02-tables</code></a> — every store table, with its map type and sizes</li>
-<li><a href="storage.html"><code>03-storage</code></a> — the storage under heads and bodies, remap,
+<li><a href="tables.html"><code>03-tables</code></a> — every store table, with its map type and sizes</li>
+<li><a href="storage.html"><code>04-storage</code></a> — the storage under heads and bodies, remap,
   disk full and snapshot</li>
 </ul>
   </article>
 
-  <nav class="pager"><a href="overview.html">&larr; Overview</a><a href="tables.html">Tables &rarr;</a></nav>
+  <nav class="pager"><a href="reliability.html">&larr; Reliability</a><a href="tables.html">Tables &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 

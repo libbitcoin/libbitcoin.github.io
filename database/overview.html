@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -236,6 +241,7 @@
   <nav class="menu">
     <a href="index.html">Architecture</a>
     <a href="overview.html" class="here">Overview</a>
+    <a href="reliability.html">Reliability</a>
     <a href="primitives.html">Primitives</a>
     <a href="tables.html">Tables</a>
     <a href="storage.html">Storage</a>
@@ -244,8 +250,8 @@
 
   <article class="doc">
 <blockquote>
-<p>Companion to <a href="primitives.html"><code>01-primitives</code></a>, <a href="tables.html"><code>02-tables</code></a>,
-<a href="storage.html"><code>03-storage</code></a> and <a href="queries.html"><code>04-queries</code></a>.</p>
+<p>Companion to <a href="primitives.html"><code>02-primitives</code></a>, <a href="tables.html"><code>03-tables</code></a>,
+<a href="storage.html"><code>04-storage</code></a> and <a href="queries.html"><code>05-queries</code></a>.</p>
 </blockquote>
 <hr />
 <h2 id="1-layers">1. Layers<a class="anchor" href="#1-layers" aria-label="Link to this section">#</a></h2>
@@ -301,21 +307,17 @@ flowchart TB
 <p>The store is strictly relational, but every relation is resolved by one of
 two physical operations chosen when the table is designed:</p>
 <ul>
-<li>
-<p><strong>Navigation.</strong> A row holds the <strong>link</strong> of a row in another table. A
+<li><strong>Navigation.</strong> A row holds the <strong>link</strong> of a row in another table. A
   link is that row's position (record ordinal or byte offset), so following
   it is a multiply and an add: no hash, no search, no lock beyond the remap
   lock. Links are the store's foreign keys (FK). Tables do not store their
-  own primary keys; a row's PK is its position.</p>
-</li>
-<li>
-<p><strong>Search.</strong> A hash head maps a key to the newest row with that key, and
+  own primary keys; a row's PK is its position.</li>
+<li><strong>Search.</strong> A hash head maps a key to the newest row with that key, and
   rows in a bucket chain to older rows. Search is how a natural key (NK)
-  from outside the store becomes a link.</p>
-</li>
+  from outside the store becomes a link.</li>
 </ul>
 <p>The 2021 design names the key kinds used throughout:</p>
-<div class="scroller"><table>
+<div class="scroller"><table class="keys">
 <thead>
 <tr>
 <th>Key</th>
@@ -367,31 +369,27 @@ height index once confirmed. Optional entries are output script hash
 <p>Two associations cannot be written when their parent is written, because
 the store is append-only and blocks and transactions arrive out of order:</p>
 <ul>
-<li>
-<p><strong>Header → transactions.</strong> Headers are archived first (headers-first
+<li><strong>Header → transactions.</strong> Headers are archived first (headers-first
   sync), and a block's transactions arrive later. The association is a
   single <code>txs</code> row written once the header and all its transactions are
   archived. In 2021 this was a search; it is now an array map indexed
   directly by the header link, so it is navigation
-  (<code>tables/archives/txs.hpp:36-46</code>).</p>
-</li>
-<li>
-<p><strong>Output → spending input.</strong> An output can be archived before or after
+  (<code>tables/archives/txs.hpp:36-46</code>).</li>
+<li><strong>Output → spending input.</strong> An output can be archived before or after
   any input that spends it. The <code>ins</code> hash map is keyed by the spent point
   (NP), so spenders of an output are found by search on that point
-  (<code>tables/archives/ins.hpp</code>).</p>
-</li>
+  (<code>tables/archives/ins.hpp</code>).</li>
 </ul>
 <h3 id="22-publication">2.2 Publication<a class="anchor" href="#22-publication" aria-label="Link to this section">#</a></h3>
 <p>Bodies are append-only. A row is allocated, written, and only then made
 reachable: by a head push (search), an array or headmap cell (index), or a
 foreign key written into a row that is itself published later. A reader
 therefore never reaches a partly written row, without any read lock on the
-row (<a href="primitives.html"><code>01 §4.1</code></a>, <a href="queries.html"><code>04 §2</code></a>).</p>
+row (<a href="primitives.html"><code>02 §4.1</code></a>, <a href="queries.html"><code>05 §2</code></a>).</p>
 <p>This one property gives both concurrency (readers and the single writer
 of each row do not coordinate) and recovery: a consistent state is a copy
 of the heads, since every body row beyond what the heads publish is
-unreachable (<a href="storage.html"><code>03 §6</code></a>).</p>
+unreachable (<a href="storage.html"><code>04 §6</code></a>).</p>
 <hr />
 <h2 id="3-table-categories">3. Table categories<a class="anchor" href="#3-table-categories" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
@@ -425,7 +423,7 @@ unreachable (<a href="storage.html"><code>03 §6</code></a>).</p>
 </tr>
 </tbody>
 </table></div>
-<p>Details per table are in <a href="tables.html"><code>02-tables</code></a>.</p>
+<p>Details per table are in <a href="tables.html"><code>03-tables</code></a>.</p>
 <hr />
 <h2 id="4-files">4. Files<a class="anchor" href="#4-files" aria-label="Link to this section">#</a></h2>
 <p>Each table has a head file and, unless it is a headmap, one body file per
@@ -446,7 +444,7 @@ record (<code>store.hpp:346-359</code>, <code>tables/names.hpp</code>).</p>
 └── ...
 </code></pre>
 <p>Heads are a few percent of the store. Bodies are the bulk and are never
-copied (<a href="storage.html"><code>03 §6</code></a>).</p>
+copied (<a href="storage.html"><code>04 §6</code></a>).</p>
 <hr />
 <h2 id="5-optimizations-since-the-2021-design">5. Optimizations since the 2021 design<a class="anchor" href="#5-optimizations-since-the-2021-design" aria-label="Link to this section">#</a></h2>
 <p>The implementation originally followed the design closely. Each difference
@@ -501,7 +499,7 @@ below is an optimization made as the store evolved.</p>
 </ul>
   </article>
 
-  <nav class="pager"><a href="index.html">&larr; Architecture</a><a href="primitives.html">Primitives &rarr;</a></nav>
+  <nav class="pager"><a href="index.html">&larr; Architecture</a><a href="reliability.html">Reliability &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 

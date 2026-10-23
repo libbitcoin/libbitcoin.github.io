@@ -202,7 +202,7 @@ another.
 > waits on another thread for shared state. State is owned by one strand,
 > handed between strands by `post`, or held in an atomic.
 
-Store locking ([database 03 §8](../database/storage.html#8-locking)) is internal to
+Store locking ([database 04 §8](../database/storage.html#8-locking)) is internal to
 the database and hidden from the network stack.
 
 ---

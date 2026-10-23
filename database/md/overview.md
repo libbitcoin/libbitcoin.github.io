@@ -1,7 +1,7 @@
 # 00 — Overview
 
-> Companion to [`01-primitives`](primitives), [`02-tables`](tables),
-> [`03-storage`](storage) and [`04-queries`](queries).
+> Companion to [`02-primitives`](primitives), [`03-tables`](tables),
+> [`04-storage`](storage) and [`05-queries`](queries).
 
 ---
 
@@ -82,12 +82,12 @@ Bodies are append-only. A row is allocated, written, and only then made
 reachable: by a head push (search), an array or headmap cell (index), or a
 foreign key written into a row that is itself published later. A reader
 therefore never reaches a partly written row, without any read lock on the
-row ([`01 §4.1`](primitives), [`04 §2`](queries)).
+row ([`02 §4.1`](primitives), [`05 §2`](queries)).
 
 This one property gives both concurrency (readers and the single writer
 of each row do not coordinate) and recovery: a consistent state is a copy
 of the heads, since every body row beyond what the heads publish is
-unreachable ([`03 §6`](storage)).
+unreachable ([`04 §6`](storage)).
 
 ---
 
@@ -100,7 +100,7 @@ unreachable ([`03 §6`](storage)).
 | cache     | prevout, pool, spends, ecdsa, schnorr, silent, prevalid, presilent, envelope | Derived or transient data; prunable, truncated per batch, or rewritten in place. |
 | optional  | filter_bk, filter_tx; address search in outs | Enabled by configuration at creation. |
 
-Details per table are in [`02-tables`](tables).
+Details per table are in [`03-tables`](tables).
 
 ---
 
@@ -127,7 +127,7 @@ record (`store.hpp:346-359`, `tables/names.hpp`).
 ```
 
 Heads are a few percent of the store. Bodies are the bulk and are never
-copied ([`03 §6`](storage)).
+copied ([`04 §6`](storage)).
 
 ---
 

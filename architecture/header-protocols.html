@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -639,15 +644,11 @@ cases (doc 08 §4).</p>
 Each channel maintains a bounded deque of recently-announced hashes
 (<code>node.announcement_cache</code> entries; zero disables).</p>
 <ul>
-<li>
-<p><code>set_announced(hash)</code>: called by header-in (headers after
+<li><code>set_announced(hash)</code>: called by header-in (headers after
   subscription, compact blocks) and tx-in (every announced tx) when
-  receiving an announcement.</p>
-</li>
-<li>
-<p><code>was_announced(hash)</code>: called by header-out, block-out and tx-out
-  before sending an announcement.</p>
-</li>
+  receiving an announcement.</li>
+<li><code>was_announced(hash)</code>: called by header-out, block-out and tx-out
+  before sending an announcement.</li>
 </ul>
 <p>This is <strong>not</strong> global state; it's per-channel — exactly what's needed
 to break the local A↔B echo.</p>
@@ -768,84 +769,54 @@ header_out : Process
 <ol>
 <li><strong>No archival without proof</strong> (HeaderIn-Prove-1, HeaderIn-Prove-2).</li>
 <li><strong>No echo within a channel</strong> (Anti-Echo-1).</li>
-<li>
-<p><strong>Sync convergence</strong>: assuming a peer's header chain extends ours
+<li><strong>Sync convergence</strong>: assuming a peer's header chain extends ours
    and is proven, each <code>get_headers</code> reply strictly extends the
    candidate chain (or is empty). Convergence after 2⌈Δ/2000⌉
-   round-trips where Δ is the gap (one pass to prove, one to archive).</p>
-</li>
-<li>
-<p><strong>Compact identity before submission</strong> (Compact-Fill-3).</p>
-</li>
+   round-trips where Δ is the gap (one pass to prove, one to archive).</li>
+<li><strong>Compact identity before submission</strong> (Compact-Fill-3).</li>
 </ol>
 <h3 id="113-liveness">11.3 Liveness<a class="anchor" href="#113-liveness" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p>Each channel makes progress as long as the peer responds to
-  <code>get_headers</code>.</p>
-</li>
-<li>
-<p>After <code>complete()</code>, the channel quiesces until the peer sends a
-  <code>headers</code>, <code>cmpctblock</code> (70014) or <code>inv</code> (31800) message.</p>
-</li>
+<li>Each channel makes progress as long as the peer responds to
+  <code>get_headers</code>.</li>
+<li>After <code>complete()</code>, the channel quiesces until the peer sends a
+  <code>headers</code>, <code>cmpctblock</code> (70014) or <code>inv</code> (31800) message.</li>
 </ul>
 <hr />
 <h2 id="12-implementation-notes">12. Implementation notes<a class="anchor" href="#12-implementation-notes" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>The sync is two passes over the branch; the second is the one that
-  writes. The sample vector is the only memory held across them.</p>
-</li>
-<li>
-<p>BIP130 and BIP152 are strict extensions over 31800; mirror that with a
-  class hierarchy or trait composition.</p>
-</li>
-<li>
-<p><code>set_announced</code>/<code>was_announced</code> is a per-channel bounded FIFO.</p>
-</li>
+<li>The sync is two passes over the branch; the second is the one that
+  writes. The sample vector is the only memory held across them.</li>
+<li>BIP130 and BIP152 are strict extensions over 31800; mirror that with a
+  class hierarchy or trait composition.</li>
+<li><code>set_announced</code>/<code>was_announced</code> is a per-channel bounded FIFO.</li>
 </ul>
 <hr />
 <h2 id="13-notes-for-the-formal-model">13. Notes for the formal model<a class="anchor" href="#13-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>The in protocol is stateful in the sync bookkeeping (§11.1); the
+<li>The in protocol is stateful in the sync bookkeeping (§11.1); the
   proof points (checkpoint, current-and-minimum-work) are the
-  obligations that tie it to <code>chaser_header</code>.</p>
-</li>
-<li>
-<p>The compact fill is a per-channel single-slot state machine whose
+  obligations that tie it to <code>chaser_header</code>.</li>
+<li>The compact fill is a per-channel single-slot state machine whose
   correctness obligations are identity-before-submit and short-id
-  verification; the pool side is in doc 11.</p>
-</li>
-<li>
-<p>The end-to-end "candidate chain converges to peer's tip" property
+  verification; the pool side is in doc 11.</li>
+<li>The end-to-end "candidate chain converges to peer's tip" property
   requires reasoning across multiple channels — out of scope of a
   per-protocol spec but provable given <code>chaser_header</code>'s safety
-  properties.</p>
-</li>
+  properties.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><a href="header-chaser.html"><code>02-chaser-header</code></a> — the consumer of headers
-  organized by these protocols; <code>get_minimum_work</code>; <code>organize_compact</code></p>
-</li>
-<li>
-<p><a href="download-chaser.html"><code>03-chaser-download</code></a> §7 — compact deferral</p>
-</li>
+<li><a href="header-chaser.html"><code>02-chaser-header</code></a> — the consumer of headers
+  organized by these protocols; <code>get_minimum_work</code>; <code>organize_compact</code></li>
+<li><a href="download-chaser.html"><code>03-chaser-download</code></a> §7 — compact deferral</li>
 <li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §7 — emits <code>chase::block</code></li>
-<li>
-<p><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2 —
-  attach tree; §3 — <code>node::protocol_peer</code> base and <code>make_compact_block</code></p>
-</li>
-<li>
-<p><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> (block serving and
-  the supersede gate)</p>
-</li>
-<li>
-<p><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> §3 (<code>submit_compact</code>)</p>
-</li>
+<li><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2 —
+  attach tree; §3 — <code>node::protocol_peer</code> base and <code>make_compact_block</code></li>
+<li><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> (block serving and
+  the supersede gate)</li>
+<li><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> §3 (<code>submit_compact</code>)</li>
 </ul>
   </article>
 

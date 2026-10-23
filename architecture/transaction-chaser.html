@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -420,25 +425,15 @@ flowchart TD
 so a parent is archived before its child is resolved.</p>
 <p>Package validation (<code>validate(index, txs, stored)</code>, <code>:518-557</code>):</p>
 <ol>
-<li>
-<p>empty package → <code>empty_package</code>; all already stored →
-   <code>duplicate_transaction</code>;</p>
-</li>
-<li>
-<p><code>block::is_forward_reference</code> → <code>forward_reference</code>;
-   <code>block::is_internal_double_spend</code> → <code>block_internal_double_spend</code>;</p>
-</li>
-<li>
-<p><code>block::populate(txs, pool_)</code> fills intra-package prevouts;</p>
-</li>
-<li>
-<p>each unstored tx is validated (below), accumulating fee and virtual
-   size; <code>index</code> reports the failing tx;</p>
-</li>
-<li>
-<p>the package rate (satoshis per virtual kilobyte) must reach
-   <code>node.minimum_fee_rate</code> → <code>insufficient_fee</code>.</p>
-</li>
+<li>empty package → <code>empty_package</code>; all already stored →
+   <code>duplicate_transaction</code>;</li>
+<li><code>block::is_forward_reference</code> → <code>forward_reference</code>;
+   <code>block::is_internal_double_spend</code> → <code>block_internal_double_spend</code>;</li>
+<li><code>block::populate(txs, pool_)</code> fills intra-package prevouts;</li>
+<li>each unstored tx is validated (below), accumulating fee and virtual
+   size; <code>index</code> reports the failing tx;</li>
+<li>the package rate (satoshis per virtual kilobyte) must reach
+   <code>node.minimum_fee_rate</code> → <code>insufficient_fee</code>.</li>
 </ol>
 <p>Per-tx validation (<code>validate(tx)</code>, <code>:559-579</code>):</p>
 <pre><code>tx.check(); tx.check(pool_)                        // tx consensus
@@ -463,28 +458,20 @@ resolves (<code>:306-310</code>).</p>
 txs of an identified compact block and the full link vector with
 terminal entries at their positions:</p>
 <ol>
-<li>
-<p><code>duplicate_block</code> if the block is already associated (another channel
+<li><code>duplicate_block</code> if the block is already associated (another channel
    filled it); <code>transaction3</code> fault if the context is missing;
-   <code>transaction5</code> if the terminal count does not match the tx count.</p>
-</li>
-<li>
-<p>Each terminal position is filled in block order by <code>fill</code> (<code>:435-487</code>):
+   <code>transaction5</code> if the terminal count does not match the tx count.</li>
+<li>Each terminal position is filled in block order by <code>fill</code> (<code>:435-487</code>):
    an already stored tx (matched by witness, <code>to_stored</code>) is reused and,
    if pooling and not yet pooled or confirmed, validated under the block
    context and pooled; an unstored tx is validated under the block
    context, archived (<code>set_code</code>), pooled unless coinbase, and silent
    indexed when at or above <code>silent_start_height</code> under taproot. Each
-   newly pooled tx emits <code>chase::transaction</code>.</p>
-</li>
-<li>
-<p>The coinbase, when missing, is filled last (validation indexes only
-   txs linked above it).</p>
-</li>
-<li>
-<p><code>query.set_code(link, filled, strong)</code> associates the block with
-   <code>strong = is_under_checkpoint(height)</code>; then <code>chase::checked</code>.</p>
-</li>
+   newly pooled tx emits <code>chase::transaction</code>.</li>
+<li>The coinbase, when missing, is filled last (validation indexes only
+   txs linked above it).</li>
+<li><code>query.set_code(link, filled, strong)</code> associates the block with
+   <code>strong = is_under_checkpoint(height)</code>; then <code>chase::checked</code>.</li>
 </ol>
 <p>A tx that fails validation makes the identified block unconfirmable:
 <code>unconfirmable</code> (<code>:490-500</code>) sets the block unconfirmable (<code>transaction4</code>
@@ -636,33 +623,23 @@ after the chain becomes current; scan maps complete or fault.</p>
 <hr />
 <h2 id="9-notes-for-the-formal-model">9. Notes for the formal model<a class="anchor" href="#9-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>Strand-confined except for the scan map, which only writes scan
-  starts and reports back by post.</p>
-</li>
-<li>
-<p>The pool is a store projection ("pooled under context C"); model it
+<li>Strand-confined except for the scan map, which only writes scan
+  starts and reports back by post.</li>
+<li>The pool is a store projection ("pooled under context C"); model it
   as a set of (tx, context, arrival) rows with the latch as a one-way
-  flag.</p>
-</li>
-<li>
-<p>The compact fill is the only place where a block is archived by a
+  flag.</li>
+<li>The compact fill is the only place where a block is archived by a
   path other than the download protocol; its <code>checked</code> obligation is the
-  same as doc 06 §8.3-1.</p>
-</li>
+  same as doc 06 §8.3-1.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="event-bus.html"><code>01-event-bus</code></a> §2.3, §2.6</li>
 <li><a href="validation-chaser.html"><code>04-chaser-validate</code></a> §4.2 (pooled block path)</li>
-<li>
-<p><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §8 (organized/reorganized
-  ordering)</p>
-</li>
-<li>
-<p><a href="header-protocols.html"><code>07-header-protocols</code></a> §4 (compact fill)</p>
-</li>
+<li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §8 (organized/reorganized
+  ordering)</li>
+<li><a href="header-protocols.html"><code>07-header-protocols</code></a> §4 (compact fill)</li>
 <li><a href="transaction-protocols.html"><code>10-tx-protocols</code></a> (submitters and announcers)</li>
 <li><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §3, §4 (<code>chaser_template</code>,
   <code>chaser_estimate</code> consume <code>transaction</code>)</li>

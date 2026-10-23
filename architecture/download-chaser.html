@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -326,14 +331,10 @@ below are associated (downloaded) on the candidate chain.</p>
 <em>round</em> is complete when <code>advanced_ == requested_</code>. This is correct
 because:</p>
 <ul>
-<li>
-<p>Every block hash that is requested will eventually be validated or the
-  peer will fail (and the hash is returned to the pool).</p>
-</li>
-<li>
-<p>Once <code>requested_</code> round-trips have completed, the request window can
-  slide forward without leaving gaps below.</p>
-</li>
+<li>Every block hash that is requested will eventually be validated or the
+  peer will fail (and the hash is returned to the pool).</li>
+<li>Once <code>requested_</code> round-trips have completed, the request window can
+  slide forward without leaving gaps below.</li>
 </ul>
 <p>It does <strong>not</strong> track an in-order height; out-of-order validation is
 permitted as long as the count balances.</p>
@@ -347,16 +348,12 @@ short-circuits if either falls behind (<code>chaser_download.cpp:503-509</code>)
 <code>handle_purged</code>. Semantics:</p>
 <ul>
 <li>A <code>race_all</code> invokes its completer <strong>once all copies are dropped</strong>.</li>
-<li>
-<p><code>chaser_download</code> holds one copy in <code>job_</code>. Every peer protocol that
+<li><code>chaser_download</code> holds one copy in <code>job_</code>. Every peer protocol that
   calls <code>get_hashes</code> receives a copy via the <code>map_handler</code>
-  (<code>chaser_download.cpp:455</code>: <code>handler(success, get_map(), job_)</code>).</p>
-</li>
-<li>
-<p>When <code>chaser_download</code> drops its copy via <code>stop_tracking()</code>
+  (<code>chaser_download.cpp:455</code>: <code>handler(success, get_map(), job_)</code>).</li>
+<li>When <code>chaser_download</code> drops its copy via <code>stop_tracking()</code>
   (<code>:193-201</code>), the completer fires only after every peer has also
-  dropped its copy — i.e., released its current download work.</p>
-</li>
+  dropped its copy — i.e., released its current download work.</li>
 </ul>
 <p>So <code>job_</code> is effectively a <em>purge barrier</em>: "wait until every
 in-flight download has either completed or surrendered, then resume".</p>
@@ -629,13 +626,9 @@ otherwise:              record speed = double(speed)
 <p>(<code>chaser_download.cpp:278-343</code>; <code>minimum_for_standard_deviation = 4</code>,
 <code>chaser_download.hpp:83</code>)</p>
 <ul>
-<li>
-<p><code>exhausted_channel</code>: peer announces "I have nothing else useful for
-  you". Peer pauses its timer; the record is released.</p>
-</li>
-<li>
-<p><code>stalled_channel</code>: peer reports zero progress. Peer drops itself.</p>
-</li>
+<li><code>exhausted_channel</code>: peer announces "I have nothing else useful for
+  you". Peer pauses its timer; the record is released.</li>
+<li><code>stalled_channel</code>: peer reports zero progress. Peer drops itself.</li>
 <li><code>slow_channel</code>: peer is statistically below the herd. Returned only
   when ≥ 4 samples and the gap exceeds <code>allowed_deviation × σ</code>.</li>
 </ul>
@@ -643,22 +636,14 @@ otherwise:              record speed = double(speed)
 <p><code>protocol_block_in_31800</code> emits <code>chase::starved(self)</code> when it receives an
 empty map. <code>do_starved</code> (<code>:224-253</code>):</p>
 <ol>
-<li>
-<p>Removes <code>self</code> from <code>speeds_</code> (so it can't be picked as its own
-   victim).</p>
-</li>
-<li>
-<p>Picks the slowest remaining channel by <code>speeds_</code> min.</p>
-</li>
-<li>
-<p>If found: erases it and <code>notify_one(slow, chase::split, self)</code> — direct
+<li>Removes <code>self</code> from <code>speeds_</code> (so it can't be picked as its own
+   victim).</li>
+<li>Picks the slowest remaining channel by <code>speeds_</code> min.</li>
+<li>If found: erases it and <code>notify_one(slow, chase::split, self)</code> — direct
    that single channel to split its work and stop, leaving the starved
-   channel something to claim.</p>
-</li>
-<li>
-<p>If <code>speeds_</code> is empty: broadcast <code>chase::stall(self)</code> to all
-   download-capable channels.</p>
-</li>
+   channel something to claim.</li>
+<li>If <code>speeds_</code> is empty: broadcast <code>chase::stall(self)</code> to all
+   download-capable channels.</li>
 </ol>
 <p>The receiver of <code>split</code>/<code>stall</code> is <code>protocol_block_in_31800</code>; see
 <a href="sessions-and-protocols.html#53-bus-event-handling"><code>06 §5.3</code></a>.</p>
@@ -667,49 +652,33 @@ empty map. <code>do_starved</code> (<code>:224-253</code>):</p>
 <p><code>set_unassociated</code> (<code>chaser_download.cpp:496-571</code>) is the heart of work
 generation. It:</p>
 <ol>
-<li>
-<p>Early-exits if purging, if not all previously-requested work has cleared
+<li>Early-exits if purging, if not all previously-requested work has cleared
    (<code>position &lt; requested</code>), or if validation has not caught up
-   (<code>advanced &lt; requested</code>) (<code>:500-509</code>).</p>
-</li>
-<li>
-<p>Latches <code>inventory_</code> on first nonzero (<code>:512-514</code> →
-   <code>get_inventory_size</code>).</p>
-</li>
-<li>
-<p>Computes a <code>stop</code> height: <code>min(position + maximum_concurrency,
+   (<code>advanced &lt; requested</code>) (<code>:500-509</code>).</li>
+<li>Latches <code>inventory_</code> on first nonzero (<code>:512-514</code> →
+   <code>get_inventory_size</code>).</li>
+<li>Computes a <code>stop</code> height: <code>min(position + maximum_concurrency,
    maximum_height)</code>, <strong>clamped to the bypass height</strong> while the position
    is under it (<code>:524-527</code>). Bypassed blocks may archive unprobed, so the
    window must not extend above the bypass height until all blocks at or
-   below it are associated.</p>
-</li>
-<li>
-<p>When current and <code>compact_timeout</code> is nonzero, if the top candidate is
+   below it are associated.</li>
+<li>When current and <code>compact_timeout</code> is nonzero, if the top candidate is
    a compact-announced header that is not yet associated, clamps <code>stop</code>
    to one below it and starts the compact timer (once per link)
    (<code>:530-547</code>). This gives the compact fill a chance before the block is
    downloaded in full; when the timer fires, <code>expired_</code> records the link
-   and <code>do_headers</code> re-runs the generator without the clamp (<code>:573-582</code>).</p>
-</li>
-<li>
-<p>Loops <code>query.get_unassociated_above(requested_, inventory_, stop)</code>,
+   and <code>do_headers</code> re-runs the generator without the clamp (<code>:573-582</code>).</li>
+<li>Loops <code>query.get_unassociated_above(requested_, inventory_, stop)</code>,
    chunking each result into a <code>map_ptr</code> and pushing onto <code>maps_</code>, until
    <code>set_map</code> returns false (empty map, end of unassociated headers
-   below <code>stop</code>) (<code>:549-560</code>).</p>
-</li>
-<li>
-<p>Returns total count added.</p>
-</li>
+   below <code>stop</code>) (<code>:549-560</code>).</li>
+<li>Returns total count added.</li>
 </ol>
 <p><code>get_inventory_size</code> (<code>:584-593</code>):</p>
 <ul>
-<li>
-<p>Returns 0 if no connections OR if <code>is_current_chain(false)</code> is false —
-  i.e. the <strong>candidate</strong> (header) chain isn't current.</p>
-</li>
-<li>
-<p>Otherwise: <code>ceilinged_divide(unassociated_count_above(fork, step), connections)</code>.</p>
-</li>
+<li>Returns 0 if no connections OR if <code>is_current_chain(false)</code> is false —
+  i.e. the <strong>candidate</strong> (header) chain isn't current.</li>
+<li>Otherwise: <code>ceilinged_divide(unassociated_count_above(fork, step), connections)</code>.</li>
 </ul>
 <p>The candidate-current gate is <em>not</em> "wait until caught up" — issuing
 zero work until the node is caught up would just stall. Instead it
@@ -794,140 +763,88 @@ flowchart LR
 <ul>
 <li><strong>inputs</strong>:</li>
 <li>bus messages (<code>chase::*</code> listed in §4)</li>
-<li>
-<p>request RPCs: <code>update</code>, <code>get_hashes</code>, <code>put_hashes</code> (each carries a
-    <code>result_handler</code> continuation)</p>
-</li>
-<li>
-<p>the compact timer tick</p>
-</li>
+<li>request RPCs: <code>update</code>, <code>get_hashes</code>, <code>put_hashes</code> (each carries a
+    <code>result_handler</code> continuation)</li>
+<li>the compact timer tick</li>
 <li><strong>outputs</strong>:</li>
-<li>
-<p>bus messages (<code>chase::download</code>, <code>chase::windowed</code>, <code>chase::purge</code>,
-    <code>chase::split</code>, <code>chase::stall</code>)</p>
-</li>
-<li>
-<p>returned codes to request RPCs</p>
-</li>
+<li>bus messages (<code>chase::download</code>, <code>chase::windowed</code>, <code>chase::purge</code>,
+    <code>chase::split</code>, <code>chase::stall</code>)</li>
+<li>returned codes to request RPCs</li>
 <li><strong>state</strong>:</li>
 <li><code>position</code>, <code>requested</code>, <code>advanced</code> ∈ ℕ</li>
 <li><code>inventory</code> ∈ ℕ (latched after first nonzero)</li>
 <li><code>purging</code> ∈ {true, false}  -- abstracts <code>job_</code></li>
 <li><code>deferred</code>, <code>expired</code> ∈ Link ∪ {⊥}</li>
-<li>
-<p><code>maps</code> : Queue of <code>map</code>  -- each <code>map</code> is a non-empty set of
-    <code>(height, hash)</code> pairs</p>
-</li>
-<li>
-<p><code>speeds</code> : finite map from channel-id to ℝ⁺</p>
-</li>
+<li><code>maps</code> : Queue of <code>map</code>  -- each <code>map</code> is a non-empty set of
+    <code>(height, hash)</code> pairs</li>
+<li><code>speeds</code> : finite map from channel-id to ℝ⁺</li>
 </ul>
 <h3 id="102-safety-properties-to-prove">10.2 Safety properties to prove<a class="anchor" href="#102-safety-properties-to-prove" aria-label="Link to this section">#</a></h3>
 <ol>
-<li>
-<p><strong>No-overshoot</strong>: <code>position ≤ requested</code> and <code>advanced ≤ requested</code>
-   are loop invariants.</p>
-</li>
-<li>
-<p><strong>Purge soundness</strong>: while <code>purging</code>, <code>maps = ∅</code> and no <code>download</code>
-   is emitted.</p>
-</li>
-<li>
-<p><strong>Bypass clamp</strong> (Download-Bypass-1): no requested height above the
-   bypass height while the position is under it.</p>
-</li>
-<li>
-<p><strong>Eventual progress</strong>: assuming peers honour <code>get_hashes</code>/<code>put_hashes</code>
+<li><strong>No-overshoot</strong>: <code>position ≤ requested</code> and <code>advanced ≤ requested</code>
+   are loop invariants.</li>
+<li><strong>Purge soundness</strong>: while <code>purging</code>, <code>maps = ∅</code> and no <code>download</code>
+   is emitted.</li>
+<li><strong>Bypass clamp</strong> (Download-Bypass-1): no requested height above the
+   bypass height while the position is under it.</li>
+<li><strong>Eventual progress</strong>: assuming peers honour <code>get_hashes</code>/<code>put_hashes</code>
    contracts, the position increases monotonically when not purging.
-   <em>Liveness</em>; requires fairness on peer scheduling.</p>
-</li>
-<li>
-<p><strong>Split correctness</strong>: <code>chase::split(self)</code> is sent only to
-   <code>notify_one(slow)</code> where <code>slow ≠ self</code> (<code>:228-247</code>).</p>
-</li>
-<li>
-<p><strong>Purge barrier completeness</strong>: every <code>chase::purge</code> is eventually
+   <em>Liveness</em>; requires fairness on peer scheduling.</li>
+<li><strong>Split correctness</strong>: <code>chase::split(self)</code> is sent only to
+   <code>notify_one(slow)</code> where <code>slow ≠ self</code> (<code>:228-247</code>).</li>
+<li><strong>Purge barrier completeness</strong>: every <code>chase::purge</code> is eventually
    followed by a <code>chase::download</code> (or by <code>stop</code>). This depends on the
-   <code>race_all</code> semantics and peer compliance.</p>
-</li>
+   <code>race_all</code> semantics and peer compliance.</li>
 </ol>
 <h3 id="103-liveness-assumptions">10.3 Liveness assumptions<a class="anchor" href="#103-liveness-assumptions" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p>Peers eventually release <code>job_</code> copies after <code>chase::purge</code> — the
-  protocols layer guarantees this on stop (doc 06 §5.2).</p>
-</li>
-<li>
-<p><code>query.get_unassociated_above</code> terminates and is monotone in
-  <code>requested_</code>.</p>
-</li>
-<li>
-<p>The compact deferral is bounded by <code>compact_timeout</code> per top.</p>
-</li>
+<li>Peers eventually release <code>job_</code> copies after <code>chase::purge</code> — the
+  protocols layer guarantees this on stop (doc 06 §5.2).</li>
+<li><code>query.get_unassociated_above</code> terminates and is monotone in
+  <code>requested_</code>.</li>
+<li>The compact deferral is bounded by <code>compact_timeout</code> per top.</li>
 </ul>
 <hr />
 <h2 id="11-implementation-notes">11. Implementation notes<a class="anchor" href="#11-implementation-notes" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>The three state machines (§3) are independent in their state space but
+<li>The three state machines (§3) are independent in their state space but
   interleaved in time — one actor per chaser with a single message-pump is
-  sufficient.</p>
-</li>
-<li>
-<p>The <code>race_all</code> token (<code>job_</code>) is a non-trivial primitive. It is
+  sufficient.</li>
+<li>The <code>race_all</code> token (<code>job_</code>) is a non-trivial primitive. It is
   effectively a <code>(condition-variable, ref-count)</code> pair: each peer
   increments on <code>get_hashes</code> and decrements when done; the chaser waits on
-  count → 0.</p>
-</li>
-<li>
-<p><code>set_unassociated</code> is naturally a generator/iterator (lazy sequence of
-  maps).</p>
-</li>
+  count → 0.</li>
+<li><code>set_unassociated</code> is naturally a generator/iterator (lazy sequence of
+  maps).</li>
 </ul>
 <hr />
 <h2 id="12-notes-for-the-formal-model">12. Notes for the formal model<a class="anchor" href="#12-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>All <code>do_*</code> methods run on the strand. Race-freedom on internal state
-  is by construction.</p>
-</li>
-<li>
-<p>The only externally-visible interaction beyond the bus is the peer
+<li>All <code>do_*</code> methods run on the strand. Race-freedom on internal state
+  is by construction.</li>
+<li>The only externally-visible interaction beyond the bus is the peer
   speed/inventory protocol (§6, §7). Model the peer as a process that
   responds to <code>slow_channel</code>/<code>exhausted_channel</code>/<code>stalled_channel</code>
-  return values by dropping or pausing its connection.</p>
-</li>
-<li>
-<p>A model of <code>race_all</code> requires a counted semaphore or refcount; this
+  return values by dropping or pausing its connection.</li>
+<li>A model of <code>race_all</code> requires a counted semaphore or refcount; this
   is the only place in <code>chaser_download</code> that needs more than
-  single-threaded reasoning.</p>
-</li>
+  single-threaded reasoning.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="overview.html"><code>00-overview</code></a> §5 (chaser pipeline overview)</li>
-<li>
-<p><a href="event-bus.html"><code>01-event-bus</code></a> §2.1 (work-shuffling events) and
-  §2.2 (candidate-chain events)</p>
-</li>
-<li>
-<p><a href="header-chaser.html"><code>02-chaser-header</code></a> §3.2 (organize emits
-  <code>headers</code>/<code>bump</code>/<code>regressed</code>/<code>disorganized</code> consumed here)</p>
-</li>
-<li>
-<p><a href="validation-chaser.html"><code>04-chaser-validate</code></a> (issuer of <code>valid</code>; consumer
-  of <code>windowed</code>)</p>
-</li>
-<li>
-<p><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §5
+<li><a href="event-bus.html"><code>01-event-bus</code></a> §2.1 (work-shuffling events) and
+  §2.2 (candidate-chain events)</li>
+<li><a href="header-chaser.html"><code>02-chaser-header</code></a> §3.2 (organize emits
+  <code>headers</code>/<code>bump</code>/<code>regressed</code>/<code>disorganized</code> consumed here)</li>
+<li><a href="validation-chaser.html"><code>04-chaser-validate</code></a> (issuer of <code>valid</code>; consumer
+  of <code>windowed</code>)</li>
+<li><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §5
   (<code>protocol_block_in_31800</code> — peer-side counterpart; consumer of
-  <code>download</code>/<code>purge</code>/<code>split</code>/<code>stall</code>/<code>report</code>)</p>
-</li>
-<li>
-<p><a href="header-protocols.html"><code>07-header-protocols</code></a> §4 (compact block fill
-  that the deferral timer waits for)</p>
-</li>
+  <code>download</code>/<code>purge</code>/<code>split</code>/<code>stall</code>/<code>report</code>)</li>
+<li><a href="header-protocols.html"><code>07-header-protocols</code></a> §4 (compact block fill
+  that the deferral timer waits for)</li>
 </ul>
   </article>
 

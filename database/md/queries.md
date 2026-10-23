@@ -1,6 +1,6 @@
-# 04 — Queries
+# 05 — Queries
 
-> Companion to [`02-tables`](tables) and [`03-storage`](storage).
+> Companion to [`03-tables`](tables) and [`04-storage`](storage).
 >
 > `query<store>` (`query.hpp`, `impl/query/`) is the whole interface the
 > node uses. Apart from the two chain reorganization mutexes, its state
@@ -212,6 +212,6 @@ side of this protocol is in
 
 ## Cross-references
 
-- [`02-tables`](tables) — the tables these queries write
+- [`03-tables`](tables) — the tables these queries write
 - [Node architecture](../architecture/index.html) — the chasers that call
   them

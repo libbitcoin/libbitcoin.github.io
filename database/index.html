@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -236,6 +241,7 @@
   <nav class="menu">
     <a href="index.html" class="here">Architecture</a>
     <a href="overview.html">Overview</a>
+    <a href="reliability.html">Reliability</a>
     <a href="primitives.html">Primitives</a>
     <a href="tables.html">Tables</a>
     <a href="storage.html">Storage</a>
@@ -273,22 +279,27 @@ at commit <code>d29fa3df</code> (2026-10-20). Paths are relative to
 </tr>
 <tr>
 <td>01</td>
-<td><a href="primitives.html"><code>01-primitives</code></a></td>
-<td>Links, keys, heads, bodies and maps, with figures of each head type</td>
+<td><a href="reliability.html"><code>01-reliability</code></a></td>
+<td>Fail-stop and recoverable: assumptions, the clean-close guarantee, recovery, and why repair is impossible</td>
 </tr>
 <tr>
 <td>02</td>
-<td><a href="tables.html"><code>02-tables</code></a></td>
-<td>Every store table: map type, link, row, fields, and relations</td>
+<td><a href="primitives.html"><code>02-primitives</code></a></td>
+<td>Links, keys, heads, bodies and maps, with figures of each head type</td>
 </tr>
 <tr>
 <td>03</td>
-<td><a href="storage.html"><code>03-storage</code></a></td>
-<td>Memory maps, growth and remap, disk full, snapshot and restore, locking</td>
+<td><a href="tables.html"><code>03-tables</code></a></td>
+<td>Every store table: map type, link, row, fields, and relations</td>
 </tr>
 <tr>
 <td>04</td>
-<td><a href="queries.html"><code>04-queries</code></a></td>
+<td><a href="storage.html"><code>04-storage</code></a></td>
+<td>Memory maps, growth and remap, disk full, snapshot and restore, locking</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="queries.html"><code>05-queries</code></a></td>
 <td>Query families, archival commit order, block state, confirmation, pool</td>
 </tr>
 </tbody>
@@ -296,17 +307,17 @@ at commit <code>d29fa3df</code> (2026-10-20). Paths are relative to
 <hr />
 <h2 id="recommended-reading-orders">Recommended reading orders<a class="anchor" href="#recommended-reading-orders" aria-label="Link to this section">#</a></h2>
 <h3 id="for-a-new-contributor">For a new contributor<a class="anchor" href="#for-a-new-contributor" aria-label="Link to this section">#</a></h3>
-<p><strong>00 → 01 → 02</strong>, then <strong>04 §2–§3</strong> for how a block is written and
-confirmed. Read <strong>03</strong> when working on store lifecycle or performance.</p>
+<p><strong>00 → 01 → 02 → 03</strong>, then <strong>05 §2–§3</strong> for how a block is written and
+confirmed. Read <strong>04</strong> when working on store lifecycle or performance.</p>
 <h3 id="for-a-formal-verification-reader">For a formal-verification reader<a class="anchor" href="#for-a-formal-verification-reader" aria-label="Link to this section">#</a></h3>
-<p><strong>01 §5</strong> and <strong>03 §5</strong> give the publication model: every write becomes
+<p><strong>01</strong> states the reliability model. <strong>02 §5</strong> and <strong>04 §5</strong> give the publication model: every write becomes
 visible through a single atomic cell or size store, and recovery is a head
-snapshot over append-only bodies. <strong>04 §2</strong> is the archival commit order
+snapshot over append-only bodies. <strong>05 §2</strong> is the archival commit order
 that the node's <code>organizeN</code>/<code>validateN</code>/<code>confirmN</code> faults rely on. The
 numbered invariants are listed below.</p>
 <h3 id="for-a-node-reader">For a node reader<a class="anchor" href="#for-a-node-reader" aria-label="Link to this section">#</a></h3>
 <p>The <a href="../architecture/index.html">node architecture</a> treats the store as an
-oracle. <strong>04</strong> is the interface it calls, and <strong>03 §4–§6</strong> are the
+oracle. <strong>05</strong> is the interface it calls, and <strong>04 §4–§6</strong> are the
 suspend, disk-full and snapshot behaviours that <code>chaser_storage</code> and
 <code>chaser_snapshot</code> drive.</p>
 <hr />
@@ -325,73 +336,72 @@ after source changes and update the commit above.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>Link-*</code></td>
+<td><code>Reliability-*</code></td>
 <td>01</td>
+<td>Clean close, condemnation and recovery</td>
+</tr>
+<tr>
+<td><code>Link-*</code></td>
+<td>02</td>
 <td>Link domain and terminal</td>
 </tr>
 <tr>
 <td><code>Head-*</code></td>
-<td>01</td>
+<td>02</td>
 <td>Head cell and filter semantics</td>
 </tr>
 <tr>
 <td><code>Body-*</code></td>
-<td>01</td>
+<td>02</td>
 <td>Append-only bodies</td>
 </tr>
 <tr>
 <td><code>Map-*</code></td>
-<td>01</td>
+<td>02</td>
 <td>Searchability and publication</td>
 </tr>
 <tr>
 <td><code>Table-*</code></td>
-<td>02</td>
+<td>03</td>
 <td>Table relations</td>
 </tr>
 <tr>
 <td><code>Storage-*</code></td>
-<td>03</td>
-<td>Counter chain, remap, disk full</td>
+<td>04</td>
+<td>Counter chain, remap, disk full, deadlock</td>
 </tr>
 <tr>
 <td><code>Snapshot-*</code></td>
-<td>03</td>
+<td>04</td>
 <td>Head copy and restore</td>
 </tr>
 <tr>
 <td><code>Archive-*</code></td>
-<td>04</td>
+<td>05</td>
 <td>Archival commit order</td>
 </tr>
 <tr>
 <td><code>Confirm-*</code></td>
-<td>04</td>
+<td>05</td>
 <td>Strong and height indexes</td>
 </tr>
 </tbody>
 </table></div>
 <h3 id="figures">Figures<a class="anchor" href="#figures" aria-label="Link to this section">#</a></h3>
-<p>The head-type figures in <a href="primitives.html"><code>01-primitives</code></a> are generated by
+<p>The head-type figures in <a href="primitives.html"><code>02-primitives</code></a> are generated by
 <code>tools/plot-database.py</code>. Click a figure to view it at full size.</p>
 <hr />
 <h2 id="honest-caveats">Honest caveats<a class="anchor" href="#honest-caveats" aria-label="Link to this section">#</a></h2>
 <ol>
-<li>
-<p><strong>No build verification.</strong> Citations are textual and were re-grepped
-   during writing; nothing was built or executed for this documentation.</p>
-</li>
-<li>
-<p><strong>Comments in <code>store.hpp</code>.</strong> Several member comments there name an
+<li><strong>No build verification.</strong> Citations are textual and were re-grepped
+   during writing; nothing was built or executed for this documentation.</li>
+<li><strong>Comments in <code>store.hpp</code>.</strong> Several member comments there name an
    older primitive (for example input and txs as "slab hashmap", strong
    and state as "record hashmap"). These pages follow the type
-   declarations in <code>tables/</code>.</p>
-</li>
-<li>
-<p><strong>Consensus rules</strong> (script, BIP30/34/68 checks) live in
-   libbitcoin-system. <a href="queries.html"><code>04-queries</code></a> describes the store
-   reads behind them, not the rules.</p>
-</li>
+   declarations in <code>tables/</code>.</li>
+<li><strong>Consensus rules</strong> (script, BIP30/34/68 checks) live in
+   libbitcoin-system. <a href="queries.html"><code>05-queries</code></a> describes the store
+   reads behind them, not the rules.</li>
 </ol>
   </article>
 

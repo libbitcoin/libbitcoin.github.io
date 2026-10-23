@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -448,43 +453,31 @@ distilled-for-export view of each subsystem.</p>
 <hr />
 <h2 id="honest-caveats">Honest caveats<a class="anchor" href="#honest-caveats" aria-label="Link to this section">#</a></h2>
 <ol>
-<li>
-<p><strong>No build verification.</strong> Citations are textual. They were
+<li><strong>No build verification.</strong> Citations are textual. They were
    re-grepped during writing but the code has not been built or
    executed during this documentation effort. A version drift
-   between source and docs is possible.</p>
-</li>
-<li>
-<p><strong><code>block.accept</code> / <code>block.connect</code> semantics</strong> live in
+   between source and docs is possible.</li>
+<li><strong><code>block.accept</code> / <code>block.connect</code> semantics</strong> live in
    libbitcoin-system, not this repo. Docs 02/04/05 describe the
    <em>sequencing</em> of those calls, not their content. The consensus
-   surface is delegated to libbitcoin-system documentation.</p>
-</li>
-<li>
-<p><strong>Store consistency</strong> is treated as an oracle. Every numbered
+   surface is delegated to libbitcoin-system documentation.</li>
+<li><strong>Store consistency</strong> is treated as an oracle. Every numbered
    <code>organizeN</code>/<code>validateN</code>/<code>confirmN</code>/<code>transactionN</code> fault is documented
    as a proof obligation against store-consistency invariants supplied by
-   libbitcoin-database. A full proof would require importing those.</p>
-</li>
-<li>
-<p><strong>Discrepancies with <code>chase.hpp</code> comments</strong>: the inline event-bus
+   libbitcoin-database. A full proof would require importing those.</li>
+<li><strong>Discrepancies with <code>chase.hpp</code> comments</strong>: the inline event-bus
    doc in <code>chase.hpp</code> has a few stale entries (incomplete handler lists,
    dormant events). All are flagged in
    <a href="event-bus.html"><code>01-event-bus</code></a> with <code>⚠</code> and discussed in
-   §2 of that doc.</p>
-</li>
-<li>
-<p><strong>Stub subsystems</strong>: <code>chaser_template</code> is a stub. The doc describes
+   §2 of that doc.</li>
+<li><strong>Stub subsystems</strong>: <code>chaser_template</code> is a stub. The doc describes
    its wiring and intended design but notes clearly that current
-   behaviour is "no-op".</p>
-</li>
-<li>
-<p><strong>Database-side batching.</strong> The signature and silent-payment batch
+   behaviour is "no-op".</li>
+<li><strong>Database-side batching.</strong> The signature and silent-payment batch
    tables, their verification kernels (CPU or GPU) and the pooled-block
    validation query live in libbitcoin-database and libbitcoin-system.
    Doc 04 describes the node's bank/drain protocol around them, not the
-   kernels.</p>
-</li>
+   kernels.</li>
 </ol>
 <hr />
 <h2 id="coverage-map">Coverage map<a class="anchor" href="#coverage-map" aria-label="Link to this section">#</a></h2>
@@ -568,29 +561,19 @@ distilled-for-export view of each subsystem.</p>
 <hr />
 <h2 id="how-to-update-these-docs-after-source-changes">How to update these docs after source changes<a class="anchor" href="#how-to-update-these-docs-after-source-changes" aria-label="Link to this section">#</a></h2>
 <ol>
-<li>
-<p>Run the verification greps from
+<li>Run the verification greps from
    <a href="event-bus.html#4-methodology"><code>01-event-bus §4</code></a> to detect
-   bus-graph drift.</p>
-</li>
-<li>
-<p>For per-chaser docs, the relevant invariants reference specific
-   <code>file:line</code>s — re-grep those when their files change.</p>
-</li>
-<li>
-<p>The error inventories in each chaser doc (<code>organizeN</code>,
+   bus-graph drift.</li>
+<li>For per-chaser docs, the relevant invariants reference specific
+   <code>file:line</code>s — re-grep those when their files change.</li>
+<li>The error inventories in each chaser doc (<code>organizeN</code>,
    <code>validateN</code>, <code>confirmN</code>, <code>transactionN</code>, <code>batchN</code>, <code>estimates_*</code>) are
    exhaustive at the time of writing — any new <code>error::&lt;chaser&gt;N</code> entry
-   should add a row.</p>
-</li>
-<li>
-<p>The attach tree in
+   should add a row.</li>
+<li>The attach tree in
    <a href="sessions-and-protocols.html#23-attach_protocolschannel--session_peeripp71-190"><code>06 §2.3</code></a>
-   should be re-checked whenever <code>session_peer.ipp</code> is modified.</p>
-</li>
-<li>
-<p>Update the verification commit at the top of this page.</p>
-</li>
+   should be re-checked whenever <code>session_peer.ipp</code> is modified.</li>
+<li>Update the verification commit at the top of this page.</li>
 </ol>
   </article>
 

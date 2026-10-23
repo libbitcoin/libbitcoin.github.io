@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -330,21 +335,15 @@ network pool, and subscribe to the bus in <code>start()</code>.</p>
 <h3 id="11-role">1.1 Role<a class="anchor" href="#11-role" aria-label="Link to this section">#</a></h3>
 <p>Three triggers:</p>
 <ul>
-<li>
-<p><strong>Startup prune</strong>: in <code>start()</code>, before the network starts, when the
+<li><strong>Startup prune</strong>: in <code>start()</code>, before the network starts, when the
   confirmed top is above genesis and the store is coalesced, prune the
-  prevout cache and emit <code>chases::pruned{ top }</code> (<code>chaser_snapshot.cpp:68-92</code>).</p>
-</li>
-<li>
-<p><strong>One-shot prune on announce</strong>: when the confirmed chain first
+  prevout cache and emit <code>chases::pruned{ top }</code> (<code>chaser_snapshot.cpp:68-92</code>).</li>
+<li><strong>One-shot prune on announce</strong>: when the confirmed chain first
   announces a current block (<code>chase::block</code>), prune once if coalesced;
-  latched by <code>pruned_</code> (<code>:141-148</code>, <code>:166-202</code>).</p>
-</li>
-<li>
-<p><strong>Explicit snapshot</strong>: on <code>chase::snap(height)</code>, take a full store
+  latched by <code>pruned_</code> (<code>:141-148</code>, <code>:166-202</code>).</li>
+<li><strong>Explicit snapshot</strong>: on <code>chase::snap(height)</code>, take a full store
   snapshot. <em>No issuer of <code>chase::snap</code> exists in this repo</em> — dormant
-  (doc 01 §2.1).</p>
-</li>
+  (doc 01 §2.1).</li>
 </ul>
 <h3 id="12-state">1.2 State<a class="anchor" href="#12-state" aria-label="Link to this section">#</a></h3>
 <pre><code class="language-cpp">// chaser_snapshot.hpp:43
@@ -648,45 +647,29 @@ chaser_estimate : Process
 <hr />
 <h2 id="7-notes-for-the-formal-model">7. Notes for the formal model<a class="anchor" href="#7-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>These four chasers contribute little to the global proof obligation
+<li>These four chasers contribute little to the global proof obligation
   set; the one obligation that touches the pipeline is
-  Storage-Unfull-1 (ordering of <code>unfull</code> before <code>resume</code>).</p>
-</li>
-<li>
-<p><code>chaser_snapshot</code>'s <code>pruned_</code> latch is a standard monotone Boolean;
-  Snapshot-Prune-1 orders the latch and <code>pruned</code> before the resumption.</p>
-</li>
-<li>
-<p><code>chaser_storage</code>'s polling loop is a classic "wait until precondition
+  Storage-Unfull-1 (ordering of <code>unfull</code> before <code>resume</code>).</li>
+<li><code>chaser_snapshot</code>'s <code>pruned_</code> latch is a standard monotone Boolean;
+  Snapshot-Prune-1 orders the latch and <code>pruned</code> before the resumption.</li>
+<li><code>chaser_storage</code>'s polling loop is a classic "wait until precondition
   holds" pattern; formally a liveness property "if <code>chase::space</code> is
   emitted and disk eventually has capacity, the system eventually
-  resumes".</p>
-</li>
-<li>
-<p><code>chaser_estimate</code> is a pure function of the event stream once
+  resumes".</li>
+<li><code>chaser_estimate</code> is a pure function of the event stream once
   initialized; Estimate-Consistency-1 (push/pop inverse) is the property
-  worth stating.</p>
-</li>
+  worth stating.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><a href="overview.html"><code>00-overview</code></a> §6.2 (the suspend/resume/fault
-  cycle that <code>chaser_storage</code> and <code>chaser_snapshot</code> participate in)</p>
-</li>
-<li>
-<p><a href="event-bus.html"><code>01-event-bus</code></a> §2 (rows for <code>block</code>, <code>snap</code>, <code>space</code>,
-  <code>unfull</code>, <code>pruned</code>, <code>transaction</code>, <code>template_</code>)</p>
-</li>
-<li>
-<p><a href="validation-chaser.html"><code>04-chaser-validate</code></a> §6.2 (recovery from
-  <code>unfull</code>)</p>
-</li>
-<li>
-<p><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §7 (emits <code>chase::block</code>)</p>
-</li>
+<li><a href="overview.html"><code>00-overview</code></a> §6.2 (the suspend/resume/fault
+  cycle that <code>chaser_storage</code> and <code>chaser_snapshot</code> participate in)</li>
+<li><a href="event-bus.html"><code>01-event-bus</code></a> §2 (rows for <code>block</code>, <code>snap</code>, <code>space</code>,
+  <code>unfull</code>, <code>pruned</code>, <code>transaction</code>, <code>template_</code>)</li>
+<li><a href="validation-chaser.html"><code>04-chaser-validate</code></a> §6.2 (recovery from
+  <code>unfull</code>)</li>
+<li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §7 (emits <code>chase::block</code>)</li>
 <li><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> (emits
   <code>chase::transaction</code>)</li>
 </ul>

@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -324,35 +329,25 @@ classDiagram
 </div>
 <p>Key facts:</p>
 <ul>
-<li>
-<p><code>full_node</code> is a <code>network::net</code> subclass
+<li><code>full_node</code> is a <code>network::net</code> subclass
   (<code>include/bitcoin/node/full_node.hpp:32-33</code>). Networking (peer discovery,
   channels, message framing) is inherited unchanged from
   libbitcoin-network. The node only <em>adds</em> chasers and <em>overrides</em> session
-  attachment to use node-specific sessions.</p>
-</li>
-<li>
-<p><code>full_node</code> owns the <strong>nine chasers as direct members</strong>
+  attachment to use node-specific sessions.</li>
+<li><code>full_node</code> owns the <strong>nine chasers as direct members</strong>
   (<code>include/bitcoin/node/full_node.hpp:210-218</code>). They are constructed in
   order at <code>full_node</code> construction (<code>src/full_node.cpp:44-52</code>) and live
-  exactly as long as the node.</p>
-</li>
-<li>
-<p>All chasers share a single <code>event_subscriber_</code>
-  (<code>include/bitcoin/node/full_node.hpp:219</code>) — this is the central event bus.</p>
-</li>
-<li>
-<p>The store is <strong>not owned</strong> by <code>full_node</code>; only a reference to a <code>query</code> is
-  held (<code>src/full_node.cpp:43</code>). Lifetime is the embedder's responsibility.</p>
-</li>
-<li>
-<p><code>full_node</code> is a pure forwarder for the chaser entry points: organize
+  exactly as long as the node.</li>
+<li>All chasers share a single <code>event_subscriber_</code>
+  (<code>include/bitcoin/node/full_node.hpp:219</code>) — this is the central event bus.</li>
+<li>The store is <strong>not owned</strong> by <code>full_node</code>; only a reference to a <code>query</code> is
+  held (<code>src/full_node.cpp:43</code>). Lifetime is the embedder's responsibility.</li>
+<li><code>full_node</code> is a pure forwarder for the chaser entry points: organize
   variants and <code>prioritize</code>/<code>get_minimum_work</code> go to <code>chaser_header_</code>
   (<code>src/full_node.cpp:161-188</code>), <code>submit</code>/<code>submit_compact</code> to
   <code>chaser_transaction_</code> (<code>:190-201</code>), <code>get_hashes</code>/<code>put_hashes</code> and
   <code>performance</code> to <code>chaser_download_</code> (<code>:203-212</code>, <code>:486-490</code>), and <code>estimate</code>
-  to <code>chaser_estimate_</code> (<code>:480-484</code>).</p>
-</li>
+  to <code>chaser_estimate_</code> (<code>:480-484</code>).</li>
 </ul>
 <hr />
 <h2 id="3-concurrency-model">3. Concurrency model<a class="anchor" href="#3-concurrency-model" aria-label="Link to this section">#</a></h2>
@@ -449,41 +444,33 @@ above it, is lock-free: at every point some thread completes its step,
 whatever the scheduling of the others, because no thread ever waits on
 another.</p>
 <ul>
-<li>
-<p><strong>Strands order work, they do not block threads.</strong> Posting to a busy
+<li><strong>Strands order work, they do not block threads.</strong> Posting to a busy
   strand queues the handler and returns. The posting thread continues with
-  other work; a strand serializes handlers, not threads.</p>
-</li>
-<li>
-<p><strong>Cross-thread state is atomic.</strong> State shared outside a strand is
+  other work; a strand serializes handlers, not threads.</li>
+<li><strong>Cross-thread state is atomic.</strong> State shared outside a strand is
   <code>std::atomic</code>: latches and counters such as <code>chaser_validate</code>'s
   <code>validate_backlog_</code> and bank flags (doc 04), <code>chaser_snapshot::pruned_</code>
   (doc 12), <code>protocol_block_out_70012::superseded_</code> (doc 08), and the
-  network's suspend flags and channel counts (<code>network/net.hpp:381-388</code>).</p>
-</li>
-<li>
-<p><strong>Results cross strands by posting.</strong> A broadcast that gathers a result
+  network's suspend flags and channel counts (<code>network/net.hpp:381-388</code>).</li>
+<li><strong>Results cross strands by posting.</strong> A broadcast that gathers a result
   from many channels (diagnostics) has each channel post its row to the
   collector's strand, and the collector reads them after the round
   completes (network <code>broadcast/diagnostics.hpp</code>, server
-  <code>protocol_bitcoind::to_collector</code>, branch <code>lockfree</code>).</p>
-</li>
-<li>
-<p><strong>System code waits on no other thread.</strong> A parallel algorithm
+  <code>protocol_bitcoind::to_collector</code>, branch <code>lockfree</code>).</li>
+<li><strong>System code waits on no other thread.</strong> A parallel algorithm
   (<code>std::for_each</code> under <code>execution::par</code>) fans a loop out over the pool
   and joins it, which is the caller's own work. Batch signature capture
   registers each thread's rows once, on first use, as a static initializer
   does (<code>chain/signatures.cpp</code>). GPU verification queues
   callers for the device (<code>crypto/secp256k1/cuda/turns.hpp</code>), which is
-  arbitration of hardware, not of shared state.</p>
-</li>
+  arbitration of hardware, not of shared state.</li>
 </ul>
 <blockquote>
 <p><strong>Invariant (Concurrency-4).</strong> No node, network, server or system code
 waits on another thread for shared state. State is owned by one strand,
 handed between strands by <code>post</code>, or held in an atomic.</p>
 </blockquote>
-<p>Store locking (<a href="../database/storage.html#8-locking">database 03 §8</a>) is internal to
+<p>Store locking (<a href="../database/storage.html#8-locking">database 04 §8</a>) is internal to
 the database and hidden from the network stack.</p>
 <hr />
 <h2 id="4-the-event-bus">4. The event bus<a class="anchor" href="#4-the-event-bus" aria-label="Link to this section">#</a></h2>
@@ -1015,30 +1002,18 @@ immutable values; the allocator is below the spec layer.</p>
 defined in <code>include/bitcoin/node/error.hpp</code>. Categories:</p>
 <ul>
 <li><strong>store</strong>: <code>store_uninitialized</code>, <code>store_reload</code>, <code>store_prune</code>, <code>store_snapshot</code></li>
-<li>
-<p><strong>network</strong>: <code>slow_channel</code>, <code>stalled_channel</code>, <code>exhausted_channel</code>,
-  <code>sacrificed_channel</code>, <code>suspended_channel</code>, <code>suspended_service</code></p>
-</li>
-<li>
-<p><strong>blockchain</strong>: <code>orphan_block</code>, <code>orphan_header</code>, <code>duplicate_block</code>,
-  <code>duplicate_header</code>, <code>unexpected_header</code></p>
-</li>
-<li>
-<p><strong>transaction pool</strong>: <code>pooling_disabled</code>, <code>insufficient_fee</code>,
-  <code>empty_package</code>, <code>duplicate_transaction</code>, <code>excessive_backlog</code></p>
-</li>
-<li>
-<p><strong>fee estimation</strong>: <code>estimate_disabled</code>, <code>estimate_premature</code>, <code>estimate_false</code></p>
-</li>
-<li>
-<p><strong>faults (terminal)</strong>: <code>protocol1-2</code>, <code>header1</code>, <code>organize1-15</code>,
+<li><strong>network</strong>: <code>slow_channel</code>, <code>stalled_channel</code>, <code>exhausted_channel</code>,
+  <code>sacrificed_channel</code>, <code>suspended_channel</code>, <code>suspended_service</code></li>
+<li><strong>blockchain</strong>: <code>orphan_block</code>, <code>orphan_header</code>, <code>duplicate_block</code>,
+  <code>duplicate_header</code>, <code>unexpected_header</code></li>
+<li><strong>transaction pool</strong>: <code>pooling_disabled</code>, <code>insufficient_fee</code>,
+  <code>empty_package</code>, <code>duplicate_transaction</code>, <code>excessive_backlog</code></li>
+<li><strong>fee estimation</strong>: <code>estimate_disabled</code>, <code>estimate_premature</code>, <code>estimate_false</code></li>
+<li><strong>faults (terminal)</strong>: <code>protocol1-2</code>, <code>header1</code>, <code>organize1-15</code>,
   <code>validate1-12</code>, <code>confirm1-12</code>, <code>transaction1-9</code>, <code>estimates_initialize</code>,
-  <code>estimates_push1-2</code>, <code>estimates_pop1-2</code>, <code>estimates_pool</code>, <code>batch1-8</code></p>
-</li>
-<li>
-<p><strong>configuration</strong>: <code>silent_unwitnessed</code>, <code>silent_pruned</code>, <code>filter_pruned</code>
-  (returned by <code>configuration::initialize</code>, <code>src/configuration.cpp:38-69</code>)</p>
-</li>
+  <code>estimates_push1-2</code>, <code>estimates_pop1-2</code>, <code>estimates_pool</code>, <code>batch1-8</code></li>
+<li><strong>configuration</strong>: <code>silent_unwitnessed</code>, <code>silent_pruned</code>, <code>filter_pruned</code>
+  (returned by <code>configuration::initialize</code>, <code>src/configuration.cpp:38-69</code>)</li>
 </ul>
 <blockquote>
 <p><strong>Note for the spec.</strong> The numbered codes are <em>terminal</em> error markers
@@ -1140,52 +1115,30 @@ the architecture docs refer to:</p>
 <hr />
 <h2 id="appendix-a--glossary">Appendix A — Glossary<a class="anchor" href="#appendix-a--glossary" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><strong>Chaser</strong>: a long-running strand-confined state machine that owns one
+<li><strong>Chaser</strong>: a long-running strand-confined state machine that owns one
   responsibility in the blockchain pipeline (header organization,
-  validation, the transaction pool, etc.).</p>
-</li>
-<li>
-<p><strong>Organize</strong>: the act of attaching a header to the candidate chain.</p>
-</li>
-<li>
-<p><strong>Candidate chain</strong>: the chain of headers the node <em>prefers</em> but
-  has not yet fully confirmed.</p>
-</li>
-<li>
-<p><strong>Confirmed chain</strong>: the chain of blocks that have passed all consensus
-  checks and been committed.</p>
-</li>
-<li>
-<p><strong>Proven header</strong>: a header whose branch the header protocol has
+  validation, the transaction pool, etc.).</li>
+<li><strong>Organize</strong>: the act of attaching a header to the candidate chain.</li>
+<li><strong>Candidate chain</strong>: the chain of headers the node <em>prefers</em> but
+  has not yet fully confirmed.</li>
+<li><strong>Confirmed chain</strong>: the chain of blocks that have passed all consensus
+  checks and been committed.</li>
+<li><strong>Proven header</strong>: a header whose branch the header protocol has
   validated end to end to a checkpoint or to a current top at minimum
-  work; organized without re-validation.</p>
-</li>
-<li>
-<p><strong>Milestone / checkpoint</strong>: configured <code>(hash, height)</code> pairs. A
+  work; organized without re-validation.</li>
+<li><strong>Milestone / checkpoint</strong>: configured <code>(hash, height)</code> pairs. A
   checkpoint fixes the chain; a milestone only permits validation bypass
-  of blocks at or under it when it is on the candidate branch.</p>
-</li>
-<li>
-<p><strong>Bypass</strong>: a block under the top checkpoint or the active milestone;
-  identified and archived but not script-validated.</p>
-</li>
-<li>
-<p><strong>Strand</strong>: an asio primitive that serializes execution of posted
-  callbacks; the node uses one per chaser and one per channel.</p>
-</li>
-<li>
-<p><strong>Event bus</strong>: <code>event_subscriber_</code> on <code>full_node</code>; carries typed
-  <code>chases::*</code> payloads between chasers and protocols.</p>
-</li>
-<li>
-<p><strong>Window</strong>: the download window of <code>chaser_download</code> (<code>maximum_concurrency</code>
-  blocks above the position); <code>chase::windowed</code> marks its completion.</p>
-</li>
-<li>
-<p><strong>Bank</strong>: one of two store-side batch tables (signatures, silent
-  payments); commits fill one bank while the other drains.</p>
-</li>
+  of blocks at or under it when it is on the candidate branch.</li>
+<li><strong>Bypass</strong>: a block under the top checkpoint or the active milestone;
+  identified and archived but not script-validated.</li>
+<li><strong>Strand</strong>: an asio primitive that serializes execution of posted
+  callbacks; the node uses one per chaser and one per channel.</li>
+<li><strong>Event bus</strong>: <code>event_subscriber_</code> on <code>full_node</code>; carries typed
+  <code>chases::*</code> payloads between chasers and protocols.</li>
+<li><strong>Window</strong>: the download window of <code>chaser_download</code> (<code>maximum_concurrency</code>
+  blocks above the position); <code>chase::windowed</code> marks its completion.</li>
+<li><strong>Bank</strong>: one of two store-side batch tables (signatures, silent
+  payments); commits fill one bank while the other drains.</li>
 </ul>
   </article>
 

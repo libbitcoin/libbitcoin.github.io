@@ -1,6 +1,6 @@
-# 01 — Primitives (heads, bodies, maps)
+# 02 — Primitives (heads, bodies, maps)
 
-> Companion to [`00-overview`](overview) and [`02-tables`](tables).
+> Companion to [`00-overview`](overview) and [`03-tables`](tables).
 >
 > Every table in the store is an instance of a small set of templates in
 > `include/bitcoin/database/primitives/`. A table is a **head** and a
@@ -270,6 +270,6 @@ file, which keeps hot data dense in memory.
 
 ## Cross-references
 
-- [`02-tables`](tables) — every store table, with its map type and sizes
-- [`03-storage`](storage) — the storage under heads and bodies, remap,
+- [`03-tables`](tables) — every store table, with its map type and sizes
+- [`04-storage`](storage) — the storage under heads and bodies, remap,
   disk full and snapshot

@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -914,16 +919,12 @@ flowchart LR
 </ol>
 <h3 id="113-liveness">11.3 Liveness<a class="anchor" href="#113-liveness" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p>Provided validate keeps emitting <code>chase::valid</code>, every block on the
+<li>Provided validate keeps emitting <code>chase::valid</code>, every block on the
   candidate chain with a validated state eventually receives a
-  <code>do_bumped</code> call that includes it in the fork.</p>
-</li>
-<li>
-<p>The self-bump after fork drain (<code>chaser_confirm.cpp:288-290</code>) ensures
+  <code>do_bumped</code> call that includes it in the fork.</li>
+<li>The self-bump after fork drain (<code>chaser_confirm.cpp:288-290</code>) ensures
   no stall when <code>chase::valid</code> arrived during the in-progress
-  iteration.</p>
-</li>
+  iteration.</li>
 </ul>
 <h3 id="114-what-queryblock_confirmablelink-actually-checks">11.4 What <code>query.block_confirmable(link)</code> actually checks<a class="anchor" href="#114-what-queryblock_confirmablelink-actually-checks" aria-label="Link to this section">#</a></h3>
 <p>This is a <strong>significant consensus operation</strong>, not a narrow
@@ -977,76 +978,48 @@ runs for this block (loop ordering at <code>chaser_confirm.cpp:248-286</code>).<
 <hr />
 <h2 id="12-implementation-notes">12. Implementation notes<a class="anchor" href="#12-implementation-notes" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>Confirmation is sequential — a single-threaded function, with no
-  parallelism to model.</p>
-</li>
-<li>
-<p>The reorg / rollback structure is a clean two-phase commit:
+<li>Confirmation is sequential — a single-threaded function, with no
+  parallelism to model.</li>
+<li>The reorg / rollback structure is a clean two-phase commit:
   pop-confirmed-down-to-fork-point, then push-new-tops; on per-block
-  failure, run roll-back.</p>
-</li>
-<li>
-<p>The fork is returned by <code>get_validated_fork</code> as a list of
-  <code>header_state</code> records, iterated forward.</p>
-</li>
-<li>
-<p>Three state arms (bypass, confirmable, validated) and one
-  fault arm — a simple <code>case</code>/<code>switch</code>.</p>
-</li>
+  failure, run roll-back.</li>
+<li>The fork is returned by <code>get_validated_fork</code> as a list of
+  <code>header_state</code> records, iterated forward.</li>
+<li>Three state arms (bypass, confirmable, validated) and one
+  fault arm — a simple <code>case</code>/<code>switch</code>.</li>
 </ul>
 <hr />
 <h2 id="13-notes-for-the-formal-model">13. Notes for the formal model<a class="anchor" href="#13-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>The entire chaser is <strong>strand-confined</strong> (<code>Confirm-Conc-1</code>).
-  Single-threaded reasoning suffices.</p>
-</li>
-<li>
-<p>The most subtle property is the <strong>rollback</strong>: prove that if
+<li>The entire chaser is <strong>strand-confined</strong> (<code>Confirm-Conc-1</code>).
+  Single-threaded reasoning suffices.</li>
+<li>The most subtle property is the <strong>rollback</strong>: prove that if
   <code>confirm_block</code> fails at height <code>h</code> after <code>j</code> prior successful
   pushes in this fork, then <code>roll_back(popped, fork_point, h-1)</code> is
   equivalent to undoing those <code>j</code> pushes and re-pushing the original
-  <code>popped</code>.</p>
-</li>
-<li>
-<p>The "current chain" gate on <code>chase::block</code> (<code>Confirm-Announce-1</code>) and
+  <code>popped</code>.</li>
+<li>The "current chain" gate on <code>chase::block</code> (<code>Confirm-Announce-1</code>) and
   the stale timer are purely about peer-facing currency; not safety
-  properties.</p>
-</li>
+  properties.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><a href="overview.html"><code>00-overview</code></a> §5 (pipeline overview), §9 (error
-  categories — confirmN listed)</p>
-</li>
-<li>
-<p><a href="event-bus.html"><code>01-event-bus</code></a> §2.5, §2.6 (confirm events)</p>
-</li>
-<li>
-<p><a href="header-chaser.html"><code>02-chaser-header</code></a> §5 (<code>chase::unconfirmable</code>
+<li><a href="overview.html"><code>00-overview</code></a> §5 (pipeline overview), §9 (error
+  categories — confirmN listed)</li>
+<li><a href="event-bus.html"><code>01-event-bus</code></a> §2.5, §2.6 (confirm events)</li>
+<li><a href="header-chaser.html"><code>02-chaser-header</code></a> §5 (<code>chase::unconfirmable</code>
   triggers disorganize, which is how <em>this</em> chaser's output flows back
-  upstream)</p>
-</li>
-<li>
-<p><a href="validation-chaser.html"><code>04-chaser-validate</code></a> §3 (issuer of
-  <code>chase::valid</code> consumed here)</p>
-</li>
-<li>
-<p><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> §2 (consumer of
-  <code>organized</code>/<code>reorganized</code>)</p>
-</li>
-<li>
-<p><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §1, §4
-  (<code>chaser_snapshot</code>, <code>chaser_estimate</code>, consumers of <code>chase::block</code>)</p>
-</li>
-<li>
-<p><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> and
+  upstream)</li>
+<li><a href="validation-chaser.html"><code>04-chaser-validate</code></a> §3 (issuer of
+  <code>chase::valid</code> consumed here)</li>
+<li><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> §2 (consumer of
+  <code>organized</code>/<code>reorganized</code>)</li>
+<li><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §1, §4
+  (<code>chaser_snapshot</code>, <code>chaser_estimate</code>, consumers of <code>chase::block</code>)</li>
+<li><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> and
   <a href="header-protocols.html"><code>07-header-protocols</code></a> (consumers of <code>chase::block</code>
-  for peer announcements)</p>
-</li>
+  for peer announcements)</li>
 </ul>
   </article>
 

@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -464,22 +469,16 @@ filtered txs; txs pooled after the snapshot are announced by the
 resumes the send loop (<code>:40-68</code>).</p>
 <h3 id="34-protocol_transaction_out_70013--fee-filter">3.4 <code>protocol_transaction_out_70013</code> — fee filter<a class="anchor" href="#34-protocol_transaction_out_70013--fee-filter" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p>Sends <code>feefilter{ minimum_fee_rate() }</code> at start and whenever
+<li>Sends <code>feefilter{ minimum_fee_rate() }</code> at start and whenever
   <code>chase::block</code> or <code>chase::stale</code> changes the answer (<code>:42-52</code>,
   <code>:58-69</code>, <code>:71-93</code>): the configured rate while current, <code>max_money</code>
   while not (<code>protocol::minimum_fee_rate</code>, doc 06 §3). This is how
-  currency is signalled to peers.</p>
-</li>
-<li>
-<p>Records the peer's <code>feefilter</code> on the channel (<code>set_minimum_fee</code>,
-  <code>:98-108</code>).</p>
-</li>
-<li>
-<p><code>do_announce</code> skips txs whose rate is below the peer's filter
+  currency is signalled to peers.</li>
+<li>Records the peer's <code>feefilter</code> on the channel (<code>set_minimum_fee</code>,
+  <code>:98-108</code>).</li>
+<li><code>do_announce</code> skips txs whose rate is below the peer's filter
   (<code>is_filtered</code>, <code>:113-148</code>); a missing fee record is a store integrity
-  fault.</p>
-</li>
+  fault.</li>
 </ul>
 <blockquote>
 <p><strong>Invariant (TxOut-Fee-1).</strong> A peer is never sent an announcement
@@ -612,25 +611,15 @@ the peer.</p>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><a href="event-bus.html"><code>01-event-bus</code></a> §2.6 (<code>chase::transaction</code>, <code>block</code>,
-  <code>stale</code> — emitter / consumer table)</p>
-</li>
-<li>
-<p><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2.3
-  — attach predicates; §3 — <code>minimum_fee_rate</code></p>
-</li>
-<li>
-<p><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> §2.5
-  (streaming send loop — same pattern)</p>
-</li>
-<li>
-<p><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> (the pool that
-  <code>submit</code> reaches and that emits <code>chase::transaction</code>)</p>
-</li>
-<li>
-<p>BIPs 35, 37, 133, 144, 339 (external)</p>
-</li>
+<li><a href="event-bus.html"><code>01-event-bus</code></a> §2.6 (<code>chase::transaction</code>, <code>block</code>,
+  <code>stale</code> — emitter / consumer table)</li>
+<li><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2.3
+  — attach predicates; §3 — <code>minimum_fee_rate</code></li>
+<li><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> §2.5
+  (streaming send loop — same pattern)</li>
+<li><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> (the pool that
+  <code>submit</code> reaches and that emits <code>chase::transaction</code>)</li>
+<li>BIPs 35, 37, 133, 144, 339 (external)</li>
 </ul>
   </article>
 

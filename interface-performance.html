@@ -329,7 +329,10 @@
       the second, warm pass is shown. Block series purge the cache and restart the server before
       every connection count; transaction series do so once per series. On the linear block chart,
       the dashed line marks the block rate that 10 Gbps of network can carry, so a
-      block curve above the line means the network, not the server, would be the limit. Bitcoin Core serves only
+      block curve above the line means the network, not the server, would be the limit.
+    </p>
+    <p class="lede after">
+      Bitcoin Core serves only
       unconfirmed transactions over P2P, so P2P transactions are shown for Libbitcoin alone. Bitcoin
       Core serves P2P blocks from a single thread and levels off at about 1,100 blocks per second
       from two connections, with latency growing in proportion to the load; Libbitcoin serves them
@@ -467,6 +470,10 @@
         <h3>Chain object rate: comparative (log scale)</h3>
         <img src="performance/server-zmq.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
+      <figure class="shot" data-full="performance/server-dispatch-zmq.png" tabindex="0">
+        <h3>Notification dispatch rate: comparative (log scale)</h3>
+        <img src="performance/server-dispatch-zmq.png" alt="Notification dispatch rate: comparative (log scale)" loading="lazy">
+      </figure>
     </div>
     <p class="lede after">
       Each server is at block 950,000 with an empty pool. The 28,142 transactions of blocks
@@ -477,6 +484,13 @@
       imposes a hardwired capacity limit for performance reasons. Both rejected 2,204 transactions
       that were not yet valid at block 950,000: 1,522 are time-locked to a later block, 55 have
       unsatisfied relative lock times (BIP68), and 627 spend outputs of those.
+    </p>
+    <p class="lede after">
+      Dispatch is measured with 16 to 256 subscribers on one unencrypted ZMTP endpoint, the same
+      transactions offered at 500 per second. For each notification, the span from its arrival at
+      the first subscriber to its arrival at the last is taken, and the rate is the subscribers
+      reached after the first per second of the median span. At 256 subscribers Libbitcoin delivers
+      each notification to all of them in about 2 ms, Bitcoin Core in 8 to 10 ms.
     </p>
   </section>
 

@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -379,25 +384,15 @@ session layer, there is <em>no node-specific state</em>; the mixin's only role
 is to give protocols a typed handle on the node.</p>
 <h3 id="12-per-session-overrides-in-session_peer">1.2 Per-session overrides in <code>session_peer</code><a class="anchor" href="#12-per-session-overrides-in-session_peer" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p><code>services_provided()</code> ORs the node's configured service bits
+<li><code>services_provided()</code> ORs the node's configured service bits
   (<code>provide_blocks</code>, <code>provide_witness</code>, <code>provide_filters</code>,
-  <code>provide_privacy</code>) into the network's (<code>session_peer.ipp:28-33</code>).</p>
-</li>
-<li>
-<p><code>relay()</code> requests tx relay in the version handshake <strong>only when the
-  confirmed chain is current</strong> (<code>:35-39</code>).</p>
-</li>
-<li>
-<p><code>create_channel</code> constructs a <code>node::channel_peer</code> (<code>:41-52</code>).</p>
-</li>
-<li>
-<p><code>attach_handshake</code> sets the channel's start height from the confirmed
-  top before the version exchange (<code>:54-68</code>).</p>
-</li>
-<li>
-<p><code>attach_protocols</code> is the attach tree (§2.3).</p>
-</li>
+  <code>provide_privacy</code>) into the network's (<code>session_peer.ipp:28-33</code>).</li>
+<li><code>relay()</code> requests tx relay in the version handshake <strong>only when the
+  confirmed chain is current</strong> (<code>:35-39</code>).</li>
+<li><code>create_channel</code> constructs a <code>node::channel_peer</code> (<code>:41-52</code>).</li>
+<li><code>attach_handshake</code> sets the channel's start height from the confirmed
+  top before the version exchange (<code>:54-68</code>).</li>
+<li><code>attach_protocols</code> is the attach tree (§2.3).</li>
 </ul>
 <h3 id="13-inbound-enabled-gate">1.3 Inbound <code>enabled()</code> gate<a class="anchor" href="#13-inbound-enabled-gate" aria-label="Link to this section">#</a></h3>
 <pre><code class="language-cpp">// src/sessions/session_inbound.cpp:26-29
@@ -601,22 +596,16 @@ the coinbase prefilled and short ids over wtxids, <code>:98-134</code>).</p>
 <h3 id="33-protocol_observer--channel-suspend-listener">3.3 <code>protocol_observer</code> — channel-suspend listener<a class="anchor" href="#33-protocol_observer--channel-suspend-listener" aria-label="Link to this section">#</a></h3>
 <p>Every channel has one. Its jobs (<code>src/protocols/protocol_observer.cpp</code>):</p>
 <ol>
-<li>
-<p><strong>Translate <code>chase::suspend</code> to channel stop.</strong> When the bus
+<li><strong>Translate <code>chase::suspend</code> to channel stop.</strong> When the bus
    broadcasts <code>suspend</code>, every observer calls <code>stop(ec)</code> with the event's
    code (<code>:69-94</code>). Result: a <code>suspend</code> event tears down every peer
-   connection.</p>
-</li>
-<li>
-<p><strong>Hygiene: drop peers that send unrequested tx inventories</strong> when
-   relay is disallowed (<code>:100-119</code>).</p>
-</li>
-<li>
-<p><strong>Diagnostics</strong>: answers <code>network::diagnostics</code> broadcasts with a
+   connection.</li>
+<li><strong>Hygiene: drop peers that send unrequested tx inventories</strong> when
+   relay is disallowed (<code>:100-119</code>).</li>
+<li><strong>Diagnostics</strong>: answers <code>network::diagnostics</code> broadcasts with a
    per-channel row (peer version, services, fee, bytes by message, ping
    times, <code>:129-189</code>) and <code>network::terminator</code> broadcasts by stopping
-   the targeted channel (<code>:192-210</code>).</p>
-</li>
+   the targeted channel (<code>:192-210</code>).</li>
 </ol>
 <blockquote>
 <p><strong>Invariant (Observer-Suspend-1).</strong> A single <code>chase::suspend</code>
@@ -646,23 +635,15 @@ stateDiagram-v2
 </div>
 <p>Key code paths:</p>
 <ul>
-<li>
-<p><code>start_performance()</code> (<code>:35-46</code>): start clock, reset byte counter, arm
-  the timer (period <code>node.sample_period_seconds</code>).</p>
-</li>
-<li>
-<p><code>handle_performance_timer(ec)</code> (<code>:48-76</code>): on tick, if idle ⇒
+<li><code>start_performance()</code> (<code>:35-46</code>): start clock, reset byte counter, arm
+  the timer (period <code>node.sample_period_seconds</code>).</li>
+<li><code>handle_performance_timer(ec)</code> (<code>:48-76</code>): on tick, if idle ⇒
   <code>pause_performance</code> (sends <code>max_uint64</code>); else compute rate in bytes/s
-  and <code>send_performance</code>.</p>
-</li>
-<li>
-<p><code>send_performance(rate)</code> (<code>:90-113</code>): if <code>deviation_</code> is enabled, send
+  and <code>send_performance</code>.</li>
+<li><code>send_performance(rate)</code> (<code>:90-113</code>): if <code>deviation_</code> is enabled, send
   via the <code>performance(rate, handler)</code> RPC → chaser_download → maybe
-  <code>slow_channel</code>; else only stalled/exhausted detection locally.</p>
-</li>
-<li>
-<p><code>do_handle_performance(ec)</code> (<code>:123-152</code>):</p>
-</li>
+  <code>slow_channel</code>; else only stalled/exhausted detection locally.</li>
+<li><code>do_handle_performance(ec)</code> (<code>:123-152</code>):</li>
 </ul>
 <div class="scroller"><table>
 <thead>
@@ -993,124 +974,80 @@ tree</strong> (§2.3). A spec can model:</p>
 fixed for that channel's lifetime.</p>
 <h3 id="82-protocol_block_in_31800-as-a-process">8.2 <code>protocol_block_in_31800</code> as a process<a class="anchor" href="#82-protocol_block_in_31800-as-a-process" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p><strong>State</strong>: <code>map ∈ MaybeQueue (HashPair)</code>, <code>job ∈ MaybeJobBarrier</code>,
-  <code>bytes ∈ ℕ</code>.</p>
-</li>
-<li>
-<p><strong>Inputs</strong> (channel strand): peer <code>block</code> messages; bus events listed
-  in §5.3; performance timer ticks.</p>
-</li>
-<li>
-<p><strong>Inputs</strong> (chaser strand, via RPC results): <code>handle_get_hashes(ec,
-  map, job)</code>, <code>handle_put_hashes(ec, count)</code>.</p>
-</li>
-<li>
-<p><strong>Outputs</strong>: peer <code>getdata</code> messages; bus events <code>chase::checked</code>,
+<li><strong>State</strong>: <code>map ∈ MaybeQueue (HashPair)</code>, <code>job ∈ MaybeJobBarrier</code>,
+  <code>bytes ∈ ℕ</code>.</li>
+<li><strong>Inputs</strong> (channel strand): peer <code>block</code> messages; bus events listed
+  in §5.3; performance timer ticks.</li>
+<li><strong>Inputs</strong> (chaser strand, via RPC results): <code>handle_get_hashes(ec,
+  map, job)</code>, <code>handle_put_hashes(ec, count)</code>.</li>
+<li><strong>Outputs</strong>: peer <code>getdata</code> messages; bus events <code>chase::checked</code>,
   <code>chase::unchecked</code>, <code>chase::starved</code>; store mutations <code>set_code</code>,
-  <code>set_block_unconfirmable</code>.</p>
-</li>
+  <code>set_block_unconfirmable</code>.</li>
 </ul>
 <h3 id="83-safety-properties">8.3 Safety properties<a class="anchor" href="#83-safety-properties" aria-label="Link to this section">#</a></h3>
 <ol>
-<li>
-<p><strong>Store-precedes-bus</strong> (BlockIn-Store-1): <code>chase::checked(h)</code> ⇒
-   the block is durably stored at the link <code>to_candidate(h)</code>.</p>
-</li>
-<li>
-<p><strong>No silent invalidation</strong>: every <code>chase::unchecked(link)</code> is
+<li><strong>Store-precedes-bus</strong> (BlockIn-Store-1): <code>chase::checked(h)</code> ⇒
+   the block is durably stored at the link <code>to_candidate(h)</code>.</li>
+<li><strong>No silent invalidation</strong>: every <code>chase::unchecked(link)</code> is
    preceded by a successful <code>set_block_unconfirmable(link)</code>. Failure
-   path goes to fault, not silent drop (BlockIn-Check-2).</p>
-</li>
-<li>
-<p><strong>Map ownership</strong>: at any time, a given map entry is in exactly
+   path goes to fault, not silent drop (BlockIn-Check-2).</li>
+<li><strong>Map ownership</strong>: at any time, a given map entry is in exactly
    one place: in <code>chaser_download.maps_</code>, in some channel's <code>map_</code>, or
-   in flight as a returned <code>restore</code> to the chaser.</p>
-</li>
-<li>
-<p><strong>Job barrier completeness</strong>: while any channel holds <code>job_</code>, the
-   chaser's <code>race_all</code> is not complete.</p>
-</li>
+   in flight as a returned <code>restore</code> to the chaser.</li>
+<li><strong>Job barrier completeness</strong>: while any channel holds <code>job_</code>, the
+   chaser's <code>race_all</code> is not complete.</li>
 </ol>
 <h3 id="84-liveness">8.4 Liveness<a class="anchor" href="#84-liveness" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p>Each channel either keeps progressing (<code>chase::checked</code> per block) or
+<li>Each channel either keeps progressing (<code>chase::checked</code> per block) or
   emits <code>chase::starved</code> when its map drains, prompting the chaser to
-  rebalance.</p>
-</li>
-<li>
-<p>A persistently slow channel is dropped via <code>slow_channel</code>; a
-  persistently stuck channel via <code>stalled_channel</code>.</p>
-</li>
+  rebalance.</li>
+<li>A persistently slow channel is dropped via <code>slow_channel</code>; a
+  persistently stuck channel via <code>stalled_channel</code>.</li>
 </ul>
 <hr />
 <h2 id="9-implementation-notes">9. Implementation notes<a class="anchor" href="#9-implementation-notes" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><strong>Sessions</strong>: the three session subclasses differ only in that
+<li><strong>Sessions</strong>: the three session subclasses differ only in that
   <code>enabled</code> is customised for inbound and the connection count for
-  outbound; the attach tree (§2.3) is the only behavioural component.</p>
-</li>
-<li>
-<p><strong><code>node::protocol</code> sibling pattern</strong>: a workaround for C++ multiple
+  outbound; the attach tree (§2.3) is the only behavioural component.</li>
+<li><strong><code>node::protocol</code> sibling pattern</strong>: a workaround for C++ multiple
   inheritance — without that constraint a wire protocol can simply hold
-  a reference to the node.</p>
-</li>
-<li>
-<p><strong><code>protocol_block_in_31800</code></strong>: an actor with one mailbox for peer
+  a reference to the node.</li>
+<li><strong><code>protocol_block_in_31800</code></strong>: an actor with one mailbox for peer
   messages and one for chaser events. The interleaving on the channel
-  strand makes it inherently single-threaded per channel.</p>
-</li>
-<li>
-<p><strong><code>protocol_performer</code></strong>: a recurring scheduled task that snapshots
-  <code>bytes_</code> and computes a rate.</p>
-</li>
+  strand makes it inherently single-threaded per channel.</li>
+<li><strong><code>protocol_performer</code></strong>: a recurring scheduled task that snapshots
+  <code>bytes_</code> and computes a rate.</li>
 </ul>
 <hr />
 <h2 id="10-notes-for-the-formal-model">10. Notes for the formal model<a class="anchor" href="#10-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>The session layer adds no shared state — it is a static dispatch
+<li>The session layer adds no shared state — it is a static dispatch
   from configuration + handshake state to a finite protocol set, plus
-  one integer (the outbound target) driven by currency.</p>
-</li>
-<li>
-<p><code>protocol_block_in_31800</code> is strand-confined; its only off-strand
+  one integer (the outbound target) driven by currency.</li>
+<li><code>protocol_block_in_31800</code> is strand-confined; its only off-strand
   interactions are <code>get_hashes</code>/<code>put_hashes</code>/<code>performance</code> RPCs which
   post to the chaser strand. The full system can be modelled as one
   chaser strand + N independent channel strands communicating only by
-  the bus and these three RPCs.</p>
-</li>
-<li>
-<p>The <strong>map-ownership</strong> property (§8.3-3) is the non-trivial
+  the bus and these three RPCs.</li>
+<li>The <strong>map-ownership</strong> property (§8.3-3) is the non-trivial
   correctness obligation here; an exchange protocol proof can be
-  modelled with a token-passing semantics.</p>
-</li>
+  modelled with a token-passing semantics.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="overview.html"><code>00-overview</code></a> §7 (network layer at a glance)</li>
-<li>
-<p><a href="event-bus.html"><code>01-event-bus</code></a> §2.1 (work-shuffling events
-  emitted/consumed here), §2.3 (<code>checked</code>/<code>unchecked</code>)</p>
-</li>
-<li>
-<p><a href="download-chaser.html"><code>03-chaser-download</code></a> §6 (the chaser side of
-  performance and starved/split/stall), §9 (coupling diagram)</p>
-</li>
-<li>
-<p><a href="header-protocols.html"><code>07-header-protocols</code></a> (header sync and compact
-  blocks)</p>
-</li>
-<li>
-<p><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> (block-serving
-  counterpart)</p>
-</li>
-<li>
-<p><a href="filter-out-protocol.html"><code>09-filter-out-protocol</code></a> (BIP158 filter serving)</p>
-</li>
+<li><a href="event-bus.html"><code>01-event-bus</code></a> §2.1 (work-shuffling events
+  emitted/consumed here), §2.3 (<code>checked</code>/<code>unchecked</code>)</li>
+<li><a href="download-chaser.html"><code>03-chaser-download</code></a> §6 (the chaser side of
+  performance and starved/split/stall), §9 (coupling diagram)</li>
+<li><a href="header-protocols.html"><code>07-header-protocols</code></a> (header sync and compact
+  blocks)</li>
+<li><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> (block-serving
+  counterpart)</li>
+<li><a href="filter-out-protocol.html"><code>09-filter-out-protocol</code></a> (BIP158 filter serving)</li>
 <li><a href="transaction-protocols.html"><code>10-tx-protocols</code></a> (transaction ladder)</li>
 </ul>
   </article>

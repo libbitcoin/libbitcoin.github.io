@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -288,21 +293,15 @@ full node for these filters, scan them locally to find blocks
 relevant to their wallet, then fetch only those blocks. BIP157 is the
 P2P protocol for serving them:</p>
 <ul>
-<li>
-<p><strong>Filter checkpoint</strong> (<code>getcfcheckpt</code>): every 1000 blocks (the
+<li><strong>Filter checkpoint</strong> (<code>getcfcheckpt</code>): every 1000 blocks (the
   <code>client_filter_checkpoint_interval</code>), the <em>filter header</em> (a hash
-  chain over filter bodies). Used by clients to anchor trust quickly.</p>
-</li>
-<li>
-<p><strong>Filter headers</strong> (<code>getcfheaders</code>): a range of filter hashes from
+  chain over filter bodies). Used by clients to anchor trust quickly.</li>
+<li><strong>Filter headers</strong> (<code>getcfheaders</code>): a range of filter hashes from
   <code>start_height</code> to <code>stop_hash</code> inclusive, plus the filter header at
   <code>start_height - 1</code>. Up to <code>max_client_filter_headers</code> (2000) per
-  request.</p>
-</li>
-<li>
-<p><strong>Filters</strong> (<code>getcfilters</code>): the actual filter bodies for a range,
-  up to <code>max_client_filters</code> (1000) per request.</p>
-</li>
+  request.</li>
+<li><strong>Filters</strong> (<code>getcfilters</code>): the actual filter bodies for a range,
+  up to <code>max_client_filters</code> (1000) per request.</li>
 </ul>
 <p>Only one filter type is recognised: <code>client_filter::type_id::neutrino</code>
 (BIP158). Anything else is a protocol violation.</p>
@@ -598,21 +597,13 @@ O(count) for cfilters, back-pressured by the send callback chain.</p>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><a href="validation-chaser.html"><code>04-chaser-validate</code></a> §4.2 (writes
-  <code>set_filter_body</code>)</p>
-</li>
-<li>
-<p><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §6 (writes
-  <code>set_filter_head</code>)</p>
-</li>
-<li>
-<p><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2.3
-  — <code>provide_filters</code> attach predicate</p>
-</li>
-<li>
-<p>BIP157, BIP158 (external)</p>
-</li>
+<li><a href="validation-chaser.html"><code>04-chaser-validate</code></a> §4.2 (writes
+  <code>set_filter_body</code>)</li>
+<li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §6 (writes
+  <code>set_filter_head</code>)</li>
+<li><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2.3
+  — <code>provide_filters</code> attach predicate</li>
+<li>BIP157, BIP158 (external)</li>
 </ul>
   </article>
 

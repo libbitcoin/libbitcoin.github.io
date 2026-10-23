@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -336,28 +341,20 @@ chain_state::cptr state_{};         // strand-only; top candidate chain state
 header_tree tree_{};                // strand-only; unordered_map&lt;hash_cref, header::cptr&gt;
 </code></pre>
 <ul>
-<li>
-<p><strong><code>state_</code></strong> — current top of the <em>candidate</em> chain, cached as a
+<li><strong><code>state_</code></strong> — current top of the <em>candidate</em> chain, cached as a
   <code>chain_state</code> (height, hash, flags, cumulative work). Initialised in
   <code>start()</code> (<code>:76-78</code>); updated at the end of every successful strong
-  organize (<code>:389</code>); rewound by <code>do_disorganize</code> (<code>:542-543</code>).</p>
-</li>
-<li>
-<p><strong><code>tree_</code></strong> — a memory-resident map of <em>weak-branch</em> headers (headers
+  organize (<code>:389</code>); rewound by <code>do_disorganize</code> (<code>:542-543</code>).</li>
+<li><strong><code>tree_</code></strong> — a memory-resident map of <em>weak-branch</em> headers (headers
   whose branch does not beat the current candidate). Populated by
   <code>cache()</code> (<code>:659-666</code>); drained by <code>push_header(key)</code> (<code>:647-657</code>);
-  pruned by work window and by checkpoint (§6).</p>
-</li>
-<li>
-<p><strong><code>bumped_</code></strong> — latches <code>true</code> after validation has been kicked via
+  pruned by work window and by checkpoint (§6).</li>
+<li><strong><code>bumped_</code></strong> — latches <code>true</code> after validation has been kicked via
   <code>chase::bump</code> for the first current strong header; reset to <code>false</code> on
   every regression (<code>:327</code>), so each regression is followed by exactly
-  one bump.</p>
-</li>
-<li>
-<p><strong><code>active_checkpoint_</code></strong> — the highest configured checkpoint at or
-  under the candidate top; forks under it are refused (§4).</p>
-</li>
+  one bump.</li>
+<li><strong><code>active_checkpoint_</code></strong> — the highest configured checkpoint at or
+  under the candidate top; forks under it are refused (§4).</li>
 </ul>
 <blockquote>
 <p><strong>Invariant (Organize-Mem-1).</strong> All of the above are set on the strand
@@ -695,34 +692,22 @@ stateDiagram-v2
 <h3 id="51-what-disorganize-accomplishes">5.1 What disorganize accomplishes<a class="anchor" href="#51-what-disorganize-accomplishes" aria-label="Link to this section">#</a></h3>
 <p>After a successful run, post-conditions:</p>
 <ol>
-<li>
-<p><strong><code>set_block_unconfirmable</code></strong> has been called for the offending link
+<li><strong><code>set_block_unconfirmable</code></strong> has been called for the offending link
    and every candidate above it. The store now permanently marks
-   these headers as bad (<code>:489</code>).</p>
-</li>
-<li>
-<p>The <strong>candidate chain top equals the previous confirmed chain top</strong>:
+   these headers as bad (<code>:489</code>).</li>
+<li>The <strong>candidate chain top equals the previous confirmed chain top</strong>:
    every candidate above the fork point has been popped
    (<code>:487-512</code>); every confirmed block above the fork point has been
-   re-pushed as candidate (<code>:518-528</code>).</p>
-</li>
-<li>
-<p>The valid portion of the candidate branch (below the bad link) has
+   re-pushed as candidate (<code>:518-528</code>).</li>
+<li>The valid portion of the candidate branch (below the bad link) has
    been re-cached into <code>tree_</code> so that subsequent organize calls can
-   re-promote it (<code>:471-482</code>).</p>
-</li>
-<li>
-<p><code>state_</code> is reset to the new (lower) candidate top (<code>:542-543</code>).</p>
-</li>
-<li>
-<p><strong><code>chase::disorganized</code></strong> is published with payload = new fork point;
+   re-promote it (<code>:471-482</code>).</li>
+<li><code>state_</code> is reset to the new (lower) candidate top (<code>:542-543</code>).</li>
+<li><strong><code>chase::disorganized</code></strong> is published with payload = new fork point;
    downstream chasers (<code>download</code>, <code>validate</code>, <code>confirm</code>) rewind themselves
-   to this height.</p>
-</li>
-<li>
-<p><strong><code>chase::suspend</code></strong> is published; peer connections are dropped so that
-   fresh connections resync headers.</p>
-</li>
+   to this height.</li>
+<li><strong><code>chase::suspend</code></strong> is published; peer connections are dropped so that
+   fresh connections resync headers.</li>
 </ol>
 <blockquote>
 <p><strong>Invariant (Organize-Disorg-1).</strong> After <code>chase::disorganized</code> is
@@ -752,28 +737,18 @@ same link are idempotent: the second is a no-op after
 <p><code>tree_</code> is an in-memory cache of headers that have arrived but are not
 strong enough to archive. Two arrival paths:</p>
 <ol>
-<li>
-<p><strong>Weak branch</strong> (<code>:293-299</code>) — branch work doesn't beat the current
-   candidate top (or ties it without prioritization).</p>
-</li>
-<li>
-<p><strong>Disorganize</strong> (<code>:471-482</code>) — the valid portion of a rolled-back
-   branch is re-cached with its chain state.</p>
-</li>
+<li><strong>Weak branch</strong> (<code>:293-299</code>) — branch work doesn't beat the current
+   candidate top (or ties it without prioritization).</li>
+<li><strong>Disorganize</strong> (<code>:471-482</code>) — the valid portion of a rolled-back
+   branch is re-cached with its chain state.</li>
 </ol>
 <p>Exit paths:</p>
 <ul>
-<li>
-<p><strong><code>push_header(key)</code></strong> (<code>:647-657</code>) — extracts from <code>tree_</code>, archives,
-  pushes to candidate.</p>
-</li>
-<li>
-<p><strong><code>do_prioritize</code></strong> (<code>:400-427</code>) — extracts a cached branch top for
-  re-evaluation as prioritized.</p>
-</li>
-<li>
-<p><strong>Pruning</strong> (below).</p>
-</li>
+<li><strong><code>push_header(key)</code></strong> (<code>:647-657</code>) — extracts from <code>tree_</code>, archives,
+  pushes to candidate.</li>
+<li><strong><code>do_prioritize</code></strong> (<code>:400-427</code>) — extracts a cached branch top for
+  re-evaluation as prioritized.</li>
+<li><strong>Pruning</strong> (below).</li>
 </ul>
 <h3 id="62-tree-pruning-dos-bound">6.2 Tree pruning (DoS bound)<a class="anchor" href="#62-tree-pruning-dos-bound" aria-label="Link to this section">#</a></h3>
 <p>The tree is bounded by three prunes:</p>
@@ -945,25 +920,15 @@ moved to the header protocols); it remains in <code>error.hpp</code>.</p>
 <p>(For book-keeping; cross-reference with
 <a href="event-bus.html#2-verified-event-reference"><code>01-event-bus §2</code></a>.)</p>
 <ul>
-<li>
-<p><code>chase::bump</code> "issued by 'organize'": this chaser (<code>:378</code>) plus
-  <code>chaser_validate</code> on silent drain.</p>
-</li>
-<li>
-<p><code>chase::headers</code> "issued by 'header'". ✓ (<code>:384</code>).</p>
-</li>
-<li>
-<p><code>chase::regressed</code> / <code>disorganized</code> "issued by 'organize'". ✓
-  (<code>:326</code>, <code>:546</code>).</p>
-</li>
-<li>
-<p><code>chase::suspend</code> "issued by 'full_node'": incomplete, this chaser
-  <em>also</em> emits it after a disorganize (<code>:549</code>).</p>
-</li>
-<li>
-<p><code>chase::unchecked</code> / <code>unvalid</code> / <code>unconfirmable</code> "handled by
-  'organize'": ✓, with the <code>mark_unconfirmable</code> gate.</p>
-</li>
+<li><code>chase::bump</code> "issued by 'organize'": this chaser (<code>:378</code>) plus
+  <code>chaser_validate</code> on silent drain.</li>
+<li><code>chase::headers</code> "issued by 'header'". ✓ (<code>:384</code>).</li>
+<li><code>chase::regressed</code> / <code>disorganized</code> "issued by 'organize'". ✓
+  (<code>:326</code>, <code>:546</code>).</li>
+<li><code>chase::suspend</code> "issued by 'full_node'": incomplete, this chaser
+  <em>also</em> emits it after a disorganize (<code>:549</code>).</li>
+<li><code>chase::unchecked</code> / <code>unvalid</code> / <code>unconfirmable</code> "handled by
+  'organize'": ✓, with the <code>mark_unconfirmable</code> gate.</li>
 </ul>
 <hr />
 <h2 id="9-implementation-notes">9. Implementation notes<a class="anchor" href="#9-implementation-notes" aria-label="Link to this section">#</a></h2>
@@ -1020,28 +985,16 @@ moved to the header protocols); it remains in <code>error.hpp</code>.</p>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><a href="overview.html"><code>00-overview</code></a> §2 (object graph), §3 (concurrency),
-  §5 (chaser pipeline).</p>
-</li>
-<li>
-<p><a href="event-bus.html"><code>01-event-bus</code></a> §2 (every event with citations).</p>
-</li>
-<li>
-<p><a href="download-chaser.html"><code>03-chaser-download</code></a> (consumer of <code>headers</code>, producer of
-  <code>download</code>/<code>split</code>/<code>stall</code>/<code>purge</code>).</p>
-</li>
-<li>
-<p><a href="validation-chaser.html"><code>04-chaser-validate</code></a> (producer of <code>unvalid</code>).</p>
-</li>
-<li>
-<p><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> (producer of <code>unconfirmable</code>;
-  the only writer to the <em>confirmed</em> chain).</p>
-</li>
-<li>
-<p><a href="header-protocols.html"><code>07-header-protocols</code></a> §2 (how headers are proven
-  before <code>organize(header, milestone, h)</code>).</p>
-</li>
+<li><a href="overview.html"><code>00-overview</code></a> §2 (object graph), §3 (concurrency),
+  §5 (chaser pipeline).</li>
+<li><a href="event-bus.html"><code>01-event-bus</code></a> §2 (every event with citations).</li>
+<li><a href="download-chaser.html"><code>03-chaser-download</code></a> (consumer of <code>headers</code>, producer of
+  <code>download</code>/<code>split</code>/<code>stall</code>/<code>purge</code>).</li>
+<li><a href="validation-chaser.html"><code>04-chaser-validate</code></a> (producer of <code>unvalid</code>).</li>
+<li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> (producer of <code>unconfirmable</code>;
+  the only writer to the <em>confirmed</em> chain).</li>
+<li><a href="header-protocols.html"><code>07-header-protocols</code></a> §2 (how headers are proven
+  before <code>organize(header, milestone, h)</code>).</li>
 </ul>
   </article>
 

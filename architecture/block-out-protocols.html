@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -482,17 +487,13 @@ its channel handler.</p>
 <hr />
 <h2 id="5-protocol_block_out_70014--compact-serving">5. <code>protocol_block_out_70014</code> — compact serving<a class="anchor" href="#5-protocol_block_out_70014--compact-serving" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><code>handle_receive_get_data</code> (<code>:56-86</code>) runs the base loop for block
+<li><code>handle_receive_get_data</code> (<code>:56-86</code>) runs the base loop for block
   items, then answers every <code>compact</code> / <code>witness_compact</code> item that is
-  servable with a compact block from <code>make_compact_block</code> (doc 06 §3.2).</p>
-</li>
-<li>
-<p><code>handle_receive_get_compact_transactions</code> (<code>:91-134</code>) answers
+  servable with a compact block from <code>make_compact_block</code> (doc 06 §3.2).</li>
+<li><code>handle_receive_get_compact_transactions</code> (<code>:91-134</code>) answers
   <code>getblocktxn</code> with the requested txs by differentially encoded index;
   an index past the block's tx count is a protocol violation, a missing
-  tx body is a <code>protocol2</code> fault.</p>
-</li>
+  tx body is a <code>protocol2</code> fault.</li>
 </ul>
 <hr />
 <h2 id="6-end-to-end-flows">6. End-to-end flows<a class="anchor" href="#6-end-to-end-flows" aria-label="Link to this section">#</a></h2>
@@ -670,60 +671,40 @@ sequenceDiagram
 <ol>
 <li><strong>Anti-echo</strong> (BlockOut-Announce-1).</li>
 <li><strong>One in-flight send</strong> per request (BlockOut-Stream-1).</li>
-<li>
-<p><strong>Servability</strong> (BlockOut-Servable-1): only associated, unpruned
-   blocks are served.</p>
-</li>
-<li>
-<p><strong>Supersede monotone</strong> (BlockOut-Supersede-2).</p>
-</li>
+<li><strong>Servability</strong> (BlockOut-Servable-1): only associated, unpruned
+   blocks are served.</li>
+<li><strong>Supersede monotone</strong> (BlockOut-Supersede-2).</li>
 </ol>
 <h3 id="102-liveness">10.2 Liveness<a class="anchor" href="#102-liveness" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>
-<p>The send loop drains the request as long as the peer accepts data
-  and the store yields block bodies.</p>
-</li>
-<li>
-<p>Stop is non-blocking; an in-flight send completes through the
-  channel's stop machinery (libbitcoin-network).</p>
-</li>
+<li>The send loop drains the request as long as the peer accepts data
+  and the store yields block bodies.</li>
+<li>Stop is non-blocking; an in-flight send completes through the
+  channel's stop machinery (libbitcoin-network).</li>
 </ul>
 <hr />
 <h2 id="11-notes-for-the-formal-model">11. Notes for the formal model<a class="anchor" href="#11-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>The protocol is strand-confined except for the <code>superseded_</code> atomic.
-  Single-threaded reasoning suffices per channel.</p>
-</li>
-<li>
-<p>The combined "announce via compact block OR headers OR inv, never
+<li>The protocol is strand-confined except for the <code>superseded_</code> atomic.
+  Single-threaded reasoning suffices per channel.</li>
+<li>The combined "announce via compact block OR headers OR inv, never
   more than one" property needs joint reasoning across
   <code>protocol_block_out_70012</code>, <code>protocol_header_out_70012</code> and
   <code>protocol_header_out_70014</code>: they consume the same <code>chase::block</code>
   event, and the supersede flag plus the header-out fallback chain
-  ensure at most one announcement per block per channel.</p>
-</li>
-<li>
-<p>A peer's behaviour (deciding to send <code>sendheaders</code>/<code>sendcmpct</code>, when to
-  issue <code>get_data</code>, etc.) is an oracle in the model.</p>
-</li>
+  ensure at most one announcement per block per channel.</li>
+<li>A peer's behaviour (deciding to send <code>sendheaders</code>/<code>sendcmpct</code>, when to
+  issue <code>get_data</code>, etc.) is an oracle in the model.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §7 — issues <code>chase::block</code></li>
-<li>
-<p><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2.3 — attach
-  tree; §3.2 — <code>make_compact_block</code></p>
-</li>
-<li>
-<p><a href="header-protocols.html"><code>07-header-protocols</code></a> §6, §7 — the header-out
-  counterparts that take over announcement when this one is superseded</p>
-</li>
-<li>
-<p><a href="filter-out-protocol.html"><code>09-filter-out-protocol</code></a> (BIP157/158 client filters)</p>
-</li>
+<li><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a> §2.3 — attach
+  tree; §3.2 — <code>make_compact_block</code></li>
+<li><a href="header-protocols.html"><code>07-header-protocols</code></a> §6, §7 — the header-out
+  counterparts that take over announcement when this one is superseded</li>
+<li><a href="filter-out-protocol.html"><code>09-filter-out-protocol</code></a> (BIP157/158 client filters)</li>
 <li><a href="transaction-protocols.html"><code>10-tx-protocols</code></a> (transaction in/out)</li>
 </ul>
   </article>

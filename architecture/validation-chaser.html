@@ -97,9 +97,13 @@
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -112,6 +116,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -433,17 +438,13 @@ if (is_zero(validate_backlog_.load()) &amp;&amp; !stranded())
 </code></pre>
 <p>Two important details:</p>
 <ol>
-<li>
-<p>The strand loop <strong>does not block</strong> for any validation to complete; it
+<li>The strand loop <strong>does not block</strong> for any validation to complete; it
    pre-fills the backlog and exits. New iterations come from later
-   events.</p>
-</li>
-<li>
-<p>The completing worker that drains the backlog to zero <strong>calls
+   events.</li>
+<li>The completing worker that drains the backlog to zero <strong>calls
    <code>handle_chase</code> directly</strong>, <em>not</em> through the bus. This is a
    stall-prevention optimisation: re-bumps the strand without paying the
-   bus round-trip cost.</p>
-</li>
+   bus round-trip cost.</li>
 </ol>
 <blockquote>
 <p><strong>Invariant (Validate-Backlog-1).</strong> The number of concurrently running
@@ -710,23 +711,15 @@ becomes current.</p>
 <h3 id="54-draining-a-signature-bank">5.4 Draining a signature bank<a class="anchor" href="#54-draining-a-signature-bank" aria-label="Link to this section">#</a></h3>
 <p><code>do_process_batch(bank, startup)</code> (<code>:118-176</code>):</p>
 <ol>
-<li>
-<p><code>query.verify_ecdsa_signatures(cancel, use_gpu, fails, bank)</code> and
+<li><code>query.verify_ecdsa_signatures(cancel, use_gpu, fails, bank)</code> and
    <code>query.verify_schnorr_signatures(...)</code>; each returns the links of
    blocks with a failed signature; cancellation returns
-   <code>operation_canceled</code>.</p>
-</li>
-<li>
-<p><code>mark_invalids</code>: each failed block is set unconfirmable and reported
-   with <code>chase::unvalid(invalid_signature)</code> (<code>:189-214</code>).</p>
-</li>
-<li>
-<p><code>mark_valids</code>: every remaining prevalid block is set valid in
-   parallel (<code>poolstl par</code>) and reported with <code>chase::valid</code> (<code>:218-244</code>).</p>
-</li>
-<li>
-<p><code>purge_batch</code>: prevalids before signatures (<code>:178-187</code>).</p>
-</li>
+   <code>operation_canceled</code>.</li>
+<li><code>mark_invalids</code>: each failed block is set unconfirmable and reported
+   with <code>chase::unvalid(invalid_signature)</code> (<code>:189-214</code>).</li>
+<li><code>mark_valids</code>: every remaining prevalid block is set valid in
+   parallel (<code>poolstl par</code>) and reported with <code>chase::valid</code> (<code>:218-244</code>).</li>
+<li><code>purge_batch</code>: prevalids before signatures (<code>:178-187</code>).</li>
 </ol>
 <p>A silent bank drains with <code>query.compute_silents(cancel, use_gpu, bank)</code>,
 purges presilents then silents, and emits <code>chase::bump</code> because the
@@ -779,21 +772,13 @@ For each iteration:</p>
 <li>If <code>height == maximum_height_</code> latch <code>maximum_posted_</code>.</li>
 <li>If unconfirmable → return (chain top is bad; halt).</li>
 <li>Branch on the flags:</li>
-<li>
-<p>validated and scanned → complete inline with <code>success</code> (advances
-     position; happens after restart or regression)</p>
-</li>
-<li>
-<p>validated, not scanned, banks non-empty → <code>process_silent_batch(true)</code>
-     and return (its bank will scan it and bump)</p>
-</li>
-<li>
-<p>validated, not scanned, banks empty → <code>post_scan</code> (bank dropped by
-     restore)</p>
-</li>
-<li>
-<p>bypass and no index needed → complete inline with <code>success</code></p>
-</li>
+<li>validated and scanned → complete inline with <code>success</code> (advances
+     position; happens after restart or regression)</li>
+<li>validated, not scanned, banks non-empty → <code>process_silent_batch(true)</code>
+     and return (its bank will scan it and bump)</li>
+<li>validated, not scanned, banks empty → <code>post_scan</code> (bank dropped by
+     restore)</li>
+<li>bypass and no index needed → complete inline with <code>success</code></li>
 <li>otherwise → <code>post_block(link, bypass)</code></li>
 <li><code>set_position(height++)</code>.</li>
 </ol>
@@ -987,55 +972,37 @@ flowchart LR
 <p><code>chaser_validate</code> is a process with:</p>
 <ul>
 <li><strong>inputs</strong>: bus events listed in §3</li>
-<li>
-<p><strong>outputs</strong>: bus events <code>chase::valid</code>, <code>chase::unvalid</code>, <code>chase::bump</code>;
-  store mutations</p>
-</li>
-<li>
-<p><strong>state</strong>: <code>position_ ∈ ℕ</code>, <code>backlog ∈ [0, maximum_backlog_]</code>, the
+<li><strong>outputs</strong>: bus events <code>chase::valid</code>, <code>chase::unvalid</code>, <code>chase::bump</code>;
+  store mutations</li>
+<li><strong>state</strong>: <code>position_ ∈ ℕ</code>, <code>backlog ∈ [0, maximum_backlog_]</code>, the
   latches <code>disk_recovering</code>, <code>window_archived</code>, <code>maximum_posted</code>, and
-  per batch: <code>bank ∈ {A, B}</code>, <code>writers[A|B] ∈ ℕ</code>, <code>draining ∈ 𝔹</code></p>
-</li>
-<li>
-<p><strong>internal jobs</strong>: bounded number (≤ <code>maximum_backlog_</code>) of pending
-  per-block tasks, plus at most one drain per batch</p>
-</li>
+  per batch: <code>bank ∈ {A, B}</code>, <code>writers[A|B] ∈ ℕ</code>, <code>draining ∈ 𝔹</code></li>
+<li><strong>internal jobs</strong>: bounded number (≤ <code>maximum_backlog_</code>) of pending
+  per-block tasks, plus at most one drain per batch</li>
 </ul>
 <h3 id="92-properties">9.2 Properties<a class="anchor" href="#92-properties" aria-label="Link to this section">#</a></h3>
 <p><strong>Safety</strong></p>
 <ol>
-<li>
-<p><strong>No validation without download</strong> (Validate-Iter-2): for every
+<li><strong>No validation without download</strong> (Validate-Iter-2): for every
    <code>chase::valid(h)</code>, the block at link <code>to_candidate(h)</code> has previously
-   been associated.</p>
-</li>
-<li>
-<p><strong>Bypass discipline</strong> (Validate-Bypass-1): no script execution and no
+   been associated.</li>
+<li><strong>Bypass discipline</strong> (Validate-Bypass-1): no script execution and no
    prevout metadata under bypass; the store distinguishes "validated" from
-   "bypassed" by the bypass flag.</p>
-</li>
-<li>
-<p><strong>Ordering</strong> (Validate-Ordering-1): <code>set_block_valid</code> after
-   <code>set_prevouts</code> and <code>set_filter_body</code>, and after batch verification.</p>
-</li>
-<li>
-<p><strong>Exactly one outcome per block</strong> (Validate-Complete-1).</p>
-</li>
+   "bypassed" by the bypass flag.</li>
+<li><strong>Ordering</strong> (Validate-Ordering-1): <code>set_block_valid</code> after
+   <code>set_prevouts</code> and <code>set_filter_body</code>, and after batch verification.</li>
+<li><strong>Exactly one outcome per block</strong> (Validate-Complete-1).</li>
 <li><strong>Batch soundness</strong> (Validate-Batch-1): valid implies every captured
    signature verified.</li>
 </ol>
 <p><strong>Liveness</strong></p>
 <ul>
-<li>
-<p>Provided <code>chaser_download</code> keeps issuing downloads and the store responds,
+<li>Provided <code>chaser_download</code> keeps issuing downloads and the store responds,
   every height on the candidate chain eventually receives a
-  <code>complete_block</code> call.</p>
-</li>
-<li>
-<p>Backlog drain self-bump (Validate-Backlog-2) and the inline <code>windowed</code>
+  <code>complete_block</code> call.</li>
+<li>Backlog drain self-bump (Validate-Backlog-2) and the inline <code>windowed</code>
   drain (Validate-Drain-1) prevent stalls when the strand is saturated or
-  the last blocks of a window are banked.</p>
-</li>
+  the last blocks of a window are banked.</li>
 </ul>
 <h3 id="93-the-consensus-surface">9.3 The consensus surface<a class="anchor" href="#93-the-consensus-surface" aria-label="Link to this section">#</a></h3>
 <pre><code>validate : (block, ctx, bypass, current) → {valid, unvalid(reason), fault(code)}
@@ -1063,79 +1030,51 @@ this chaser only sequences and persists their outcomes.</p>
 <hr />
 <h2 id="10-implementation-notes">10. Implementation notes<a class="anchor" href="#10-implementation-notes" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>The strand/loop pattern (one strand, many workers, atomic backlog) maps
-  to a typed actor with a bounded mailbox and a worker pool.</p>
-</li>
-<li>
-<p>Batching is a performance feature; <code>validate_block</code> with capturing
+<li>The strand/loop pattern (one strand, many workers, atomic backlog) maps
+  to a typed actor with a bounded mailbox and a worker pool.</li>
+<li>Batching is a performance feature; <code>validate_block</code> with capturing
   disabled is the reference behaviour, and a store decline on commit
-  falls back to exactly that.</p>
-</li>
-<li>
-<p>The bank/turnstile protocol is lock-free: two atomics per batch
+  falls back to exactly that.</li>
+<li>The bank/turnstile protocol is lock-free: two atomics per batch
   (<code>bank_</code>, <code>draining_</code>) and two writer counters. The draining worker
   yields only until in-flight commits to its bank complete; arriving
   commits go to the other bank and losing claimants return, so every
-  other thread continues. A model can use an epoch counter.</p>
-</li>
-<li>
-<p>The store interface used by validate is wide; see the coupling diagram.</p>
-</li>
+  other thread continues. A model can use an epoch counter.</li>
+<li>The store interface used by validate is wide; see the coupling diagram.</li>
 </ul>
 <hr />
 <h2 id="11-notes-for-the-formal-model">11. Notes for the formal model<a class="anchor" href="#11-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p>Off-strand parallelism makes this the <strong>only chaser that needs more
+<li>Off-strand parallelism makes this the <strong>only chaser that needs more
   than single-threaded reasoning</strong>. The shared variables are the atomic
   <code>validate_backlog_</code>, the three latches, and the batch state; the strand
-  serialises everything else.</p>
-</li>
-<li>
-<p>A proof outline: treat each posted <code>validate_block</code> as an independent
+  serialises everything else.</li>
+<li>A proof outline: treat each posted <code>validate_block</code> as an independent
   process that does not read or write <code>position_</code> except for the final
   <code>fetch_sub</code> and the batch commit under the turnstile. Then the strand
-  and the workers commute except at those points.</p>
-</li>
-<li>
-<p>The hard part of a <em>consensus</em> proof is in libbitcoin-system and the
+  and the workers commute except at those points.</li>
+<li>The hard part of a <em>consensus</em> proof is in libbitcoin-system and the
   store kernels; this chaser only proves that their outputs are
   persisted in the right order and the right state transitions emitted,
-  including across a bank drain and across a restart.</p>
-</li>
+  including across a bank drain and across a restart.</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>
-<p><a href="event-bus.html"><code>01-event-bus</code></a> §2.3, §2.4 (<code>checked</code>, <code>windowed</code>,
-  <code>valid</code>, <code>unvalid</code>)</p>
-</li>
-<li>
-<p><a href="header-chaser.html"><code>02-chaser-header</code></a> §5 (<code>chase::unvalid</code> triggers
-  <code>do_disorganize</code>)</p>
-</li>
-<li>
-<p><a href="download-chaser.html"><code>03-chaser-download</code></a> §1.3, §5 (consumer of
-  <code>chase::valid</code>; issuer of <code>windowed</code>)</p>
-</li>
-<li>
-<p><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> (consumer of <code>chase::valid</code>;
-  the scanned/filtered gate on the validated fork)</p>
-</li>
-<li>
-<p><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> (the pool that the
-  pooled path relies on)</p>
-</li>
-<li>
-<p><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §2 (<code>chaser_storage</code>
-  issues <code>unfull</code>)</p>
-</li>
-<li>
-<p>libbitcoin-system docs (external): <code>block.accept</code> and <code>block.connect</code>
-  consensus rules; signature capture</p>
-</li>
+<li><a href="event-bus.html"><code>01-event-bus</code></a> §2.3, §2.4 (<code>checked</code>, <code>windowed</code>,
+  <code>valid</code>, <code>unvalid</code>)</li>
+<li><a href="header-chaser.html"><code>02-chaser-header</code></a> §5 (<code>chase::unvalid</code> triggers
+  <code>do_disorganize</code>)</li>
+<li><a href="download-chaser.html"><code>03-chaser-download</code></a> §1.3, §5 (consumer of
+  <code>chase::valid</code>; issuer of <code>windowed</code>)</li>
+<li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> (consumer of <code>chase::valid</code>;
+  the scanned/filtered gate on the validated fork)</li>
+<li><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> (the pool that the
+  pooled path relies on)</li>
+<li><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §2 (<code>chaser_storage</code>
+  issues <code>unfull</code>)</li>
+<li>libbitcoin-system docs (external): <code>block.accept</code> and <code>block.connect</code>
+  consensus rules; signature capture</li>
 </ul>
   </article>
 

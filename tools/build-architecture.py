@@ -61,6 +61,7 @@ SECTIONS = {
         "pages": [
             ("index", "Architecture"),
             ("overview", "Overview"),
+            ("reliability", "Reliability"),
             ("primitives", "Primitives"),
             ("tables", "Tables"),
             ("storage", "Storage"),
@@ -75,6 +76,9 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Configuration"),
+            ("testnet3", "Testnet3"),
+            ("testnet4", "Testnet4"),
+            ("regtest", "Regtest"),
         ],
     },
 }
@@ -123,9 +127,13 @@ STYLE = """
   .doc li { margin: 3px 0; }
   .doc li::marker { color: var(--ink-3); }
   .doc hr { border: 0; border-top: 1px solid var(--rule-soft); margin: 36px 0; }
-  .doc code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
+  .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
-  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+  .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre code .comment { color: var(--ink-3); }
+  .doc pre code .section { color: var(--heading); }
+  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -138,6 +146,7 @@ STYLE = """
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
@@ -229,17 +238,40 @@ def add_heading_ids(body):
     return re.sub(r"<h([2-6])([^>]*)>(.*?)</h\1>", ident, body, flags=re.S)
 
 
+def fade_comments(body):
+    def fade(m):
+        lines = m.group(2).split("\n")
+        lines = ['<span class="comment">%s</span>' % line if line.lstrip().startswith("#") else
+                 '<span class="section">%s</span>' % line if re.match(r"\s*\[[^\]]+\]\s*$", line) else line
+                 for line in lines]
+        return m.group(1) + "\n".join(lines) + m.group(3)
+
+    return re.sub(r'(<code class="language-ini">)(.*?)(</code>)', fade, body, flags=re.S)
+
+
 def wrap_tables(body):
-    return re.sub(r"<table>.*?</table>", lambda m: '<div class="scroller">%s</div>' % m.group(0), body, flags=re.S)
+    def wrap(m):
+        table = m.group(0)
+        if re.match(r"<table>\s*<thead>\s*<tr>\s*<th>Key</th>", table):
+            table = table.replace("<table>", '<table class="keys">', 1)
+        return '<div class="scroller">%s</div>' % table
+
+    return re.sub(r"<table>.*?</table>", wrap, body, flags=re.S)
 
 
 def loosen_lists(md):
-    out, fenced, prev = [], False, ""
+    out, fenced, listed, prev = [], False, False, ""
     for line in md.split("\n"):
+        item = re.match(r"\s*([-*+]|\d+\.)\s", line)
         if line.startswith("```"):
             fenced = not fenced
-        elif not fenced and re.match(r"\s*([-*+]|\d+\.)\s", line) and prev.strip() and not re.match(r"\s*([-*+]|\d+\.|>)\s", prev):
+        elif not fenced and item and prev.strip() and not listed and not re.match(r">\s", prev):
             out.append("")
+        if not fenced:
+            if item:
+                listed = True
+            elif not line.strip() or not line.startswith(" "):
+                listed = False
         out.append(line)
         prev = line
     return "\n".join(out)
@@ -292,6 +324,8 @@ def render(key, name, md, guard, logo, mermaid_src):
     body = fix_links(body, {n for n, _ in pages})
     body = add_heading_ids(body)
     body = wrap_tables(body)
+    body = body.replace("<pre><code>$ ", '<pre class="console"><code>$ ')
+    body = fade_comments(body)
     page_title = section["title"] if name == "index" else section["title"] + ": " + lede(title)
     description = section["description"]
     h1 = html.escape(lede(title)) if name != "index" else section["h1"]
