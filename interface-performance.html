@@ -487,8 +487,8 @@
       unsatisfied relative lock times (BIP68), and 627 spend outputs of those.
     </p>
     <p class="lede after">
-      Dispatch is measured with 16 to 256 subscribers on one unencrypted ZMTP endpoint, the same
-      transactions offered at 500 per second. For each notification, the span from its arrival at
+      Dispatch is measured with 16 to 256 subscribers on one ZMTP endpoint (CurveZMQ dashed, Libbitcoin
+      only), the same transactions offered at 500 per second. For each notification, the span from its arrival at
       the first subscriber to its arrival at the last is taken, and the rate is the subscribers
       reached after the first per second of the median span. At 256 subscribers Libbitcoin delivers
       each notification to all of them in about 2 ms, Bitcoin Core in 8 to 10 ms.
