@@ -84,6 +84,8 @@
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
   h2[id] { scroll-margin-top: 16px; }
+  h2 .anchor { margin-left: .45em; color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity .15s; }
+  h2:hover .anchor, h2 .anchor:focus { opacity: 1; }
   .lede.after { margin: 14px 0 40px; }
 
   .tag { display: inline-block; padding: 2px 7px; border-radius: 2px; font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; white-space: nowrap; border: 1px solid currentColor; }
@@ -245,6 +247,7 @@
     <nav class="menu site">
       <a href="index.html">Home</a>
       <a href="interfaces.html">Server interfaces</a>
+      <a href="configuration/index.html">Configuration</a>
       <a href="interface-performance.html" class="here">Interface performance</a>
       <a href="node-performance.html">Node performance</a>
       <a href="architecture/index.html">Node architecture</a>
@@ -273,7 +276,7 @@
   </nav>
 
   <section>
-    <h2 id="efficiency">Efficiency</h2>
+    <h2 id="efficiency">Efficiency<a class="anchor" href="#efficiency" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-efficiency.png" tabindex="0">
         <h3>Index efficiency: multiple of other product (log scale)</h3>
@@ -291,7 +294,7 @@
   </section>
 
   <section>
-    <h2 id="throughput">Throughput</h2>
+    <h2 id="throughput">Throughput<a class="anchor" href="#throughput" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-throughput-p2ps-linear.png" tabindex="0">
         <h3>P2P/S block throughput (linear scale)</h3>
@@ -313,6 +316,10 @@
         <h3>Bitcoind REST hex block/tx throughput (log scale)</h3>
         <img src="performance/server-throughput-rest-hex.png" alt="Bitcoind REST hex block/tx throughput (log scale)" loading="lazy">
       </figure>
+      <figure class="shot" data-full="performance/server-throughput-native.png" tabindex="0">
+        <h3>Native REST block/tx throughput (log scale)</h3>
+        <img src="performance/server-throughput-native.png" alt="Native REST block/tx throughput (log scale)" loading="lazy">
+      </figure>
     </div>
     <p class="lede after">
       The other charts measure one connection at a time. Throughput is what a server delivers under
@@ -332,9 +339,11 @@
       double SHA-256 checksum and Libbitcoin's ChaCha20 is hardware accelerated.
     </p>
     <p class="lede after">
-      Bitcoin Core does not serve HTTPS or websockets, so HTTPS series (dashed) in the RPC and REST
-      charts, and the websocket and native charts, show Libbitcoin alone. HTTPS uses 256 listening
-      ports, one per connection. The HTTPS and secure websocket curves level off where the test
+      Bitcoin Core does not serve HTTPS or websockets, so the HTTPS and websocket series (secure ones
+      dashed), and the native chart, show Libbitcoin alone. HTTPS uses 256 listening
+      ports, one per connection. TLS carries data in records of at most 16 KiB, so a 1.5 MB block
+      is sent as about a hundred separately encrypted and authenticated records; that per-record
+      work is inherent to HTTPS and secure websockets and weighs most on large responses. The HTTPS and secure websocket curves level off where the test
       client's TLS saturates its processes; Libbitcoin uses under six cores at those rates, and the
       rate rises with more client processes. Plain HTTP transactions level off near 140,000 per
       second.
@@ -342,7 +351,7 @@
   </section>
 
   <section>
-    <h2 id="native-rest-interface">Native REST Interface</h2>
+    <h2 id="native-rest-interface">Native REST Interface<a class="anchor" href="#native-rest-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-native.png" tabindex="0">
         <h3>Chain object rate (log scale)</h3>
@@ -361,7 +370,7 @@
   </section>
 
   <section>
-    <h2 id="electrum-interface">Electrum Interface</h2>
+    <h2 id="electrum-interface">Electrum Interface<a class="anchor" href="#electrum-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-electrum.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -382,7 +391,7 @@
   </section>
 
   <section>
-    <h2 id="sparrow-interface">Sparrow Interface</h2>
+    <h2 id="sparrow-interface">Sparrow Interface<a class="anchor" href="#sparrow-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-sp-gpu.png" tabindex="0">
         <h3>Silent payments scan rate, GPU: comparative (log scale)</h3>
@@ -411,7 +420,7 @@
   </section>
 
   <section>
-    <h2 id="bitcoin-p2p-interface">Bitcoin P2P Interface</h2>
+    <h2 id="bitcoin-p2p-interface">Bitcoin P2P Interface<a class="anchor" href="#bitcoin-p2p-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-p2p.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -426,7 +435,7 @@
   </section>
 
   <section>
-    <h2 id="bitcoind-json-rpc-interface">Bitcoind JSON-RPC Interface</h2>
+    <h2 id="bitcoind-json-rpc-interface">Bitcoind JSON-RPC Interface<a class="anchor" href="#bitcoind-json-rpc-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-bitcoind.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -439,7 +448,7 @@
   </section>
 
   <section>
-    <h2 id="bitcoind-rest-interface">Bitcoind REST Interface</h2>
+    <h2 id="bitcoind-rest-interface">Bitcoind REST Interface<a class="anchor" href="#bitcoind-rest-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-rest.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -452,7 +461,7 @@
   </section>
 
   <section>
-    <h2 id="bitcoind-zmq-interface">Bitcoind ZMQ Interface</h2>
+    <h2 id="bitcoind-zmq-interface">Bitcoind ZMQ Interface<a class="anchor" href="#bitcoind-zmq-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/server-zmq.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -472,17 +481,17 @@
   </section>
 
   <section>
-    <h2 id="btcd-interface">BTCD Interface</h2>
+    <h2 id="btcd-interface">BTCD Interface<a class="anchor" href="#btcd-interface" aria-label="Link to this section">#</a></h2>
     <p class="lede after">Measurements pending.</p>
   </section>
 
   <section>
-    <h2 id="esplora-interface">Esplora Interface</h2>
+    <h2 id="esplora-interface">Esplora Interface<a class="anchor" href="#esplora-interface" aria-label="Link to this section">#</a></h2>
     <p class="lede after">Measurements pending.</p>
   </section>
 
   <section>
-    <h2 id="methodology">Methodology</h2>
+    <h2 id="methodology">Methodology<a class="anchor" href="#methodology" aria-label="Link to this section">#</a></h2>
     <p class="lede">
       Servers run one at a time on shelly (Threadripper PRO 9985WX, 512 GB, Windows 11), each with a
       store at block 950,000, called over loopback from the same machine.

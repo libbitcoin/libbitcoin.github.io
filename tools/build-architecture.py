@@ -20,6 +20,7 @@ MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 SITE_MENU = [
     ("index.html", "Home"),
     ("interfaces.html", "Server interfaces"),
+    ("configuration/index.html", "Configuration"),
     ("interface-performance.html", "Interface performance"),
     ("node-performance.html", "Node performance"),
     ("architecture/index.html", "Node architecture"),
@@ -64,6 +65,16 @@ SECTIONS = {
             ("tables", "Tables"),
             ("storage", "Storage"),
             ("queries", "Queries"),
+        ],
+    },
+    "configuration": {
+        "title": "Libbitcoin Server Configuration",
+        "h1": "Configuration",
+        "description": "Configuring bs, the libbitcoin server: command line options, the running console and the configuration file.",
+        "lede": "Configuring <strong>bs</strong>, the libbitcoin server:\n      command line options, the running console and the configuration file.",
+        "foot": "",
+        "pages": [
+            ("index", "Configuration"),
         ],
     },
 }

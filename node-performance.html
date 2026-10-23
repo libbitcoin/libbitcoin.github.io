@@ -146,6 +146,8 @@
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
   h2[id] { scroll-margin-top: 16px; }
+  h2 .anchor { margin-left: .45em; color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity .15s; }
+  h2:hover .anchor, h2 .anchor:focus { opacity: 1; }
   .lede.after { margin: 14px 0 40px; }
   table.fit th, table.fit td { white-space: normal; overflow-wrap: anywhere; }
   .terms { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
@@ -251,6 +253,7 @@
     <nav class="menu site">
       <a href="index.html">Home</a>
       <a href="interfaces.html">Server interfaces</a>
+      <a href="configuration/index.html">Configuration</a>
       <a href="interface-performance.html">Interface performance</a>
       <a href="node-performance.html" class="here">Node performance</a>
       <a href="architecture/index.html">Node architecture</a>
@@ -272,14 +275,15 @@
     <a href="#batching">Batching</a>
     <a href="#scanning">Scanning</a>
     <a href="#store-size">Store size</a>
-    <a href="#installation-size">Installation size</a>
+    <a href="#size-and-scope">Size and scope</a>
+    <a href="#dependencies">Dependencies</a>
     <a href="#analysis">Analysis</a>
     <a href="#hardware-acceleration">Hardware acceleration</a>
     <a href="#constant-time-performance-considerations">Constant time performance considerations</a>
   </nav>
 
   <section>
-    <h2 id="milestone">Milestone</h2>
+    <h2 id="milestone">Milestone<a class="anchor" href="#milestone" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/shelly-milestone.png" tabindex="0">
         <h3>Threadripper PRO: comparative milestone</h3>
@@ -307,7 +311,7 @@
       </figure>
     </div>
 
-    <h2 id="full-validation">Full validation</h2>
+    <h2 id="full-validation">Full validation<a class="anchor" href="#full-validation" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/shelly-reindex.png" tabindex="0">
         <h3>Threadripper PRO: comparative validation</h3>
@@ -335,7 +339,7 @@
       </figure>
     </div>
 
-    <h2 id="mainnet-and-testnets">Mainnet and testnets</h2>
+    <h2 id="mainnet-and-testnets">Mainnet and testnets<a class="anchor" href="#mainnet-and-testnets" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/sync-mainnet-milestone.png" tabindex="0">
         <h3>Mainnet: milestone</h3>
@@ -363,7 +367,7 @@
       </figure>
     </div>
 
-    <h2 id="hashing">Hashing</h2>
+    <h2 id="hashing">Hashing<a class="anchor" href="#hashing" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/crypto-sha-neidermeyer.png" tabindex="0">
         <h3>SHA family: comparative, Ryzen 7 7735HS</h3>
@@ -379,7 +383,7 @@
       </figure>
     </div>
 
-    <h2 id="cryptography">Cryptography</h2>
+    <h2 id="cryptography">Cryptography<a class="anchor" href="#cryptography" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/crypto-secp-lanes.png" tabindex="0">
         <h3>Signature verification: scalar</h3>
@@ -395,7 +399,7 @@
       </figure>
     </div>
 
-    <h2 id="batching">Batching</h2>
+    <h2 id="batching">Batching<a class="anchor" href="#batching" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/crypto-secp-batch.png" tabindex="0">
         <h3>Signature verification: CPU and GPU batch</h3>
@@ -407,7 +411,7 @@
       </figure>
     </div>
 
-    <h2 id="scanning">Scanning</h2>
+    <h2 id="scanning">Scanning<a class="anchor" href="#scanning" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/scan-silent.png" tabindex="0">
         <h3>Silent payment scanning: CPU vs. GPU (log scale)</h3>
@@ -423,7 +427,7 @@
       </figure>
     </div>
 
-    <h2 id="store-size">Store size</h2>
+    <h2 id="store-size">Store size<a class="anchor" href="#store-size" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/store-sizes.png" tabindex="0">
         <h3>Comparative store size as a function of indexing</h3>
@@ -434,19 +438,39 @@
         <img src="performance/index-sizes.png" alt="Comparative incremental index size" loading="lazy">
       </figure>
     </div>
-    <h2 id="installation-size">Installation size</h2>
+    <h2 id="size-and-scope">Size and scope<a class="anchor" href="#size-and-scope" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/install-sizes.png" tabindex="0">
         <h3>Size required to run node, by platform</h3>
         <img src="performance/install-sizes.png" alt="Size required to run node, by platform" loading="lazy">
       </figure>
-      <figure class="shot" data-full="performance/install-makeup.png" tabindex="0">
-        <h3>Makeup of the size required to run node</h3>
-        <img src="performance/install-makeup.png" alt="Makeup of the size required to run node" loading="lazy">
+      <figure class="shot" data-full="performance/install-interfaces.png" tabindex="0">
+        <h3>Interfaces and their protocols, by node</h3>
+        <img src="performance/install-interfaces.png" alt="Interfaces and their protocols, by node" loading="lazy">
       </figure>
     </div>
 
-    <h2 id="analysis">Analysis</h2>
+    <h2 id="dependencies">Dependencies<a class="anchor" href="#dependencies" aria-label="Link to this section">#</a></h2>
+    <div class="gallery">
+      <figure class="shot" data-full="performance/install-makeup.png" tabindex="0">
+        <h3>Makeup of Bitcoin Core with Fulcrum and Frigate</h3>
+        <img src="performance/install-makeup.png" alt="Makeup of Bitcoin Core with Fulcrum and Frigate" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/install-makeup-rbitcoin.png" tabindex="0">
+        <h3>Makeup of rbitcoin</h3>
+        <img src="performance/install-makeup-rbitcoin.png" alt="Makeup of rbitcoin" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/install-makeup-btcd.png" tabindex="0">
+        <h3>Makeup of btcd</h3>
+        <img src="performance/install-makeup-btcd.png" alt="Makeup of btcd" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/install-makeup-libbitcoin.png" tabindex="0">
+        <h3>Makeup of Libbitcoin Server</h3>
+        <img src="performance/install-makeup-libbitcoin.png" alt="Makeup of Libbitcoin Server" loading="lazy">
+      </figure>
+    </div>
+
+    <h2 id="analysis">Analysis<a class="anchor" href="#analysis" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
       <figure class="shot" data-full="performance/machines-950k.png" tabindex="0">
         <h3>Eight machines to block 950,000</h3>
@@ -464,7 +488,7 @@
   </section>
 
   <section>
-    <h2 id="hardware-acceleration">Hardware acceleration</h2>
+    <h2 id="hardware-acceleration">Hardware acceleration<a class="anchor" href="#hardware-acceleration" aria-label="Link to this section">#</a></h2>
     <h3 class="subhead">Intel (x86, x64)</h3>
     <div class="scroller"><table class="fit">
       <thead><tr><th style="width:24%">Acceleration</th><th style="width:20%">Algorithm</th><th style="width:28%">Applied to</th><th>Method</th></tr></thead>
@@ -528,7 +552,7 @@ cuda ecc.... platform:0 enabled:0.</pre></figure>
   </section>
 
   <section>
-    <h2 id="constant-time-performance-considerations">Constant time performance considerations</h2>
+    <h2 id="constant-time-performance-considerations">Constant time performance considerations<a class="anchor" href="#constant-time-performance-considerations" aria-label="Link to this section">#</a></h2>
     <h3 class="subhead">Bitcoin</h3>
     <div class="scroller"><table class="fit">
       <thead><tr><th style="width:16%">Use</th><th style="width:14%">Secret</th><th style="width:20%">Operation</th><th style="width:26%">Constant time</th><th style="width:24%">Faster alternative avoided</th></tr></thead>
