@@ -472,8 +472,8 @@
         <img src="performance/server-dispatch-zmq.png" alt="Transaction notification dispatch rate: comparative (log scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-dispatch-zmq-block.png" tabindex="0">
-        <h3>Block notification dispatch rate (log scale)</h3>
-        <img src="performance/server-dispatch-zmq-block.png" alt="Block notification dispatch rate (log scale)" loading="lazy">
+        <h3>Block notification dispatch rate: comparative (log scale)</h3>
+        <img src="performance/server-dispatch-zmq-block.png" alt="Block notification dispatch rate: comparative (log scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-zmq.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -490,11 +490,15 @@
       8 to 10 ms.
     </p>
     <p class="lede after">
-      Block dispatch is measured with 256 to 6,144 rawblock subscribers on one ZMTP endpoint
-      (Libbitcoin only), while one P2P peer offers blocks 950,001 to 950,009 (1.4 to 2.4 MB) 6 seconds
-      apart. The rate is taken as for transactions. At 6,144 subscribers Libbitcoin delivers each
-      block to all of them in about 310 ms, and the rate rises from about 16,000 to 20,000 per second
-      as subscribers increase.
+      Block dispatch is measured with 256 to 6,144 rawblock subscribers on one ZMTP endpoint, while
+      one P2P peer offers nine blocks 6 seconds apart. The rate is taken as for transactions. At
+      6,144 subscribers Libbitcoin delivers each block to all of them in about 310 ms, Bitcoin Core in
+      about 360 ms. As subscribers increase, the Libbitcoin rate rises from about 16,000 to 20,000 per
+      second, and the Bitcoin Core rate stays between 15,000 and 17,500. On Windows, Defender network
+      inspection, Web Threat Defense and the Windows Firewall examine each TCP send under a shared
+      kernel lock. Libbitcoin sends to subscribers in parallel and spends about half of its delivery
+      CPU waiting on that lock. Bitcoin Core sends from a single thread, so the same inspection does
+      not contend.
     </p>
     <p class="lede after">
       The chain object rate times each of the 28,142 transactions of blocks 950,001 to 950,009,
