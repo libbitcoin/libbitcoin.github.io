@@ -81,6 +81,13 @@
   .menu a.here { color: var(--heading); }
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
+  .menu.site { align-items: center; }
+  .drop { position: relative; }
+  .drop > summary { list-style: none; cursor: pointer; color: var(--ink-2); }
+  .drop > summary::-webkit-details-marker { display: none; }
+  .drop > summary::after { content: " ▾"; }
+  .drop > summary:hover, .drop[open] > summary, .drop.here > summary { color: var(--heading); }
+  .drop > div { position: absolute; top: calc(100% + 10px); left: -14px; z-index: 20; display: flex; flex-direction: column; gap: 10px; width: max-content; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; box-shadow: var(--shadow); }
   .foot { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 48px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; display: flex; flex-direction: column; gap: 10px; }
   .pager { display: flex; justify-content: space-between; gap: 18px; margin: 40px 0 0; font-family: var(--mono); font-size: 12.5px; }
 
@@ -224,13 +231,19 @@
     <h1>Testnet4</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
-      <a href="../interfaces.html">Server interfaces</a>
-      <a href="../configuration/index.html" class="here">Configuration</a>
-      <a href="../building/index.html">Building</a>
-      <a href="../interface-performance.html">Interface performance</a>
-      <a href="../node-performance.html">Node performance</a>
-      <a href="../architecture/index.html">Node architecture</a>
-      <a href="../database/index.html">Database architecture</a>
+      <details class="drop here" name="site"><summary>Server</summary><div>
+        <a href="../interfaces.html">Interfaces</a>
+        <a href="../configuration/index.html" class="here">Configuration</a>
+        <a href="../building/index.html">Building</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Performance</summary><div>
+        <a href="../node-performance.html">Node</a>
+        <a href="../interface-performance.html">Interfaces</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Architecture</summary><div>
+        <a href="../architecture/index.html">Node</a>
+        <a href="../database/index.html">Database</a>
+      </div></details>
       <a href="../team.html">Team</a>
     </nav>
     <p class="lede">
@@ -462,6 +475,16 @@ window.addEventListener('load', function () {
     if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
   }
   mermaid.run().then(settle, settle);
+});
+</script>
+<script>
+document.addEventListener('click', function (e) {
+  document.querySelectorAll('nav.site details[open]').forEach(function (d) {
+    if (!d.contains(e.target)) d.removeAttribute('open');
+  });
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
 </script>
 </body>

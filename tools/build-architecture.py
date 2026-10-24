@@ -19,13 +19,19 @@ MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 
 SITE_MENU = [
     ("index.html", "Home"),
-    ("interfaces.html", "Server interfaces"),
-    ("configuration/index.html", "Configuration"),
-    ("building/index.html", "Building"),
-    ("interface-performance.html", "Interface performance"),
-    ("node-performance.html", "Node performance"),
-    ("architecture/index.html", "Node architecture"),
-    ("database/index.html", "Database architecture"),
+    ("Server", [
+        ("interfaces.html", "Interfaces"),
+        ("configuration/index.html", "Configuration"),
+        ("building/index.html", "Building"),
+    ]),
+    ("Performance", [
+        ("node-performance.html", "Node"),
+        ("interface-performance.html", "Interfaces"),
+    ]),
+    ("Architecture", [
+        ("architecture/index.html", "Node"),
+        ("database/index.html", "Database"),
+    ]),
     ("team.html", "Team"),
 ]
 
@@ -129,6 +135,13 @@ STYLE = """
   .menu a.here { color: var(--heading); }
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
+  .menu.site { align-items: center; }
+  .drop { position: relative; }
+  .drop > summary { list-style: none; cursor: pointer; color: var(--ink-2); }
+  .drop > summary::-webkit-details-marker { display: none; }
+  .drop > summary::after { content: " ▾"; }
+  .drop > summary:hover, .drop[open] > summary, .drop.here > summary { color: var(--heading); }
+  .drop > div { position: absolute; top: calc(100% + 10px); left: -14px; z-index: 20; display: flex; flex-direction: column; gap: 10px; width: max-content; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; box-shadow: var(--shadow); }
   .foot { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 48px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; display: flex; flex-direction: column; gap: 10px; }
   .pager { display: flex; justify-content: space-between; gap: 18px; margin: 40px 0 0; font-family: var(--mono); font-size: 12.5px; }
 
@@ -308,10 +321,19 @@ def lede(title):
 
 
 def site_menu(here):
+    current = here + "/index.html"
     items = []
-    for href, label in SITE_MENU:
-        cls = ' class="here"' if href == here + "/index.html" else ""
-        items.append('      <a href="../%s"%s>%s</a>' % (href, cls, html.escape(label)))
+    for label, target in SITE_MENU:
+        if isinstance(target, list):
+            cls = "drop here" if any(href == current for href, _ in target) else "drop"
+            items.append('      <details class="%s" name="site"><summary>%s</summary><div>' % (cls, html.escape(label)))
+            for href, name in target:
+                here_cls = ' class="here"' if href == current else ""
+                items.append('        <a href="../%s"%s>%s</a>' % (href, here_cls, html.escape(name)))
+            items.append('      </div></details>')
+        else:
+            here_cls = ' class="here"' if label == current else ""
+            items.append('      <a href="../%s"%s>%s</a>' % (label, here_cls, html.escape(target)))
     return "\n".join(items)
 
 
@@ -501,6 +523,16 @@ window.addEventListener('load', function () {
     if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
   }
   mermaid.run().then(settle, settle);
+});
+</script>
+<script>
+document.addEventListener('click', function (e) {
+  document.querySelectorAll('nav.site details[open]').forEach(function (d) {
+    if (!d.contains(e.target)) d.removeAttribute('open');
+  });
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
 </script>
 </body>
