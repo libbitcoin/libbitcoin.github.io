@@ -140,18 +140,21 @@ Commands typed into a running `bs` console (press `<enter>` after the character)
 
 Log on/off typed into a running `bs` console (press `<enter>` after the character):
 
-| Key | Level |
-| --- | ----- |
-| `a` | Application |
-| `n` | News: startup, progress and notable events |
-| `s` | Sessions: connect and accept |
-| `p` | Protocols |
-| `x` | Proxies: sockets and channels |
-| `r` | Remote peer behavior |
-| `f` | Faults |
-| `q` | Quitting: shutdown progress |
-| `o` | Objects: lifetime tracking |
-| `v` | Verbose detail |
+| Key | Digit | Level |
+| --- | ----- | ----- |
+| `a` | `.0` | Application |
+| `n` | `.1` | News: startup, progress and notable events |
+| `s` | `.2` | Sessions: connect and accept |
+| `p` | `.3` | Protocols |
+| `x` | `.4` | Proxies: sockets and channels |
+| `r` | `.5` | Remote peer behavior |
+| `f` | `.6` | Own node fault |
+| `q` | `.7` | Quitting: connections and other components stopping |
+| `o` | `.8` | Objects: lifetime tracking (debug builds only) |
+| `v` | `.9` | Verbose detail |
+
+Each log entry shows its level as a digit after the timestamp, for
+example `.6` on a fault.
 
 ---
 
@@ -193,9 +196,6 @@ database.path = bitcoin
 log.path = log
 ```
 
-Settings for the test chains are on their own pages:
-[Testnet3](testnet3), [Testnet4](testnet4) and [Regtest](regtest).
-
 ---
 
 ## 5. Common setups
@@ -211,9 +211,12 @@ maximum_height = 900,000
 
 ### 5.2 Milestone sync
 
-A milestone is a block trusted to be valid. Blocks up to it are
-synchronized without script validation, and blocks above it are fully
-validated. The default milestone is block 950,000.
+A milestone is a block you have previously validated and therefore know
+to be valid, which implies that all preceding blocks are valid. A
+milestone sync verifies the identity of the milestone block and all of
+its ancestors, and validates the blocks above it. The default milestone
+is block 950,000. The milestone and pruning are fixed when the store is
+created (§10).
 
 ```ini
 [bitcoin]
@@ -230,19 +233,188 @@ blocks above the milestone to peers.
 limited_blocks = true
 ```
 
-### 5.3 Electrum server
+### 5.3 Full validation
 
-Electrum listens on its default ports, 8380 clear and 8343 secure (§6),
-once connections are allowed. The secure port needs a certificate.
+To validate every block, set the milestone to the genesis block when
+creating the store (§10):
+
+```ini
+[bitcoin]
+milestone = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
+```
+
+### 5.4 Checkpoints
+
+Checkpoints are consensus checks, and removing them is a hard fork.
+However, to do so set a checkpoint to the genesis block:
+
+```ini
+[bitcoin]
+checkpoint = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
+```
+
+### 5.5 Admin site
+
+`bs` serves its own administrative site, which also utilizes its native
+REST interface. Here both are limited to the local machine:
+
+```ini
+[admin]
+bind = 127.0.0.1:8080
+bind = [::1]:8080
+connections = 10
+
+[native]
+bind = 127.0.0.1:8180
+bind = [::1]:8180
+connections = 10
+```
+
+To view the admin site open `http://localhost:8080` in a browser. Its pages
+are admin REST queries rendered as HTML, the default for a browser request.
+The same paths return data when JSON is requested, with `format=json` or an
+`Accept: application/json` header.
+
+To serve a custom admin site from a directory instead of the embedded site,
+set `admin.path`. A request for `/` returns `admin.default`
+(`index.html`).
+
+The admin interface is libbitcoin's own, and provides:
+
+- HTTP and websocket on each port. Over a websocket, each frame is one
+  request path, and `log_subscribe` and `event_subscribe` stream the
+  node's log and events.
+- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- Credentials (§7.3), restricted by REST method names.
+
+### 5.6 Block explorer
+
+The native REST interface serves the block explorer. Here it is limited
+to the local machine:
+
+```ini
+[native]
+bind = 127.0.0.1:8180
+bind = [::1]:8180
+connections = 10
+```
+
+To view the block explorer open `http://localhost:8180` in a browser.
+
+The explorer is the native REST interface rendered as HTML, the default for a
+browser request. The same paths return each result in any of four formats,
+chosen with `format=` or the `Accept` header:
+
+| Format | Media type | Result |
+| ------ | ---------- | ------ |
+| `html` | `text/html` | The explorer page |
+| `json` | `application/json` | JSON |
+| `text` | `text/plain` | Hex encoded bytes |
+| `data` | `application/octet-stream` | Raw bytes |
+
+For example, the genesis block header as JSON:
+
+```
+http://localhost:8180/v1/block/height/0/header?format=json
+```
+
+returns:
+
+```json
+{
+    "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+    "version": 1,
+    "previous": "0000000000000000000000000000000000000000000000000000000000000000",
+    "merkle_root": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+    "timestamp": 1231006505,
+    "bits": 486604799,
+    "nonce": 2083236893
+}
+```
+
+The full native REST map, under `http://localhost:8180`. In block paths,
+`{block}` is `hash/{block hash}` or `height/{height}`. The method name is
+the one used in credential method lists (§7.3).
+
+| Path | Method | Result |
+| ---- | ------ | ------ |
+| `/v1/configuration` | `configuration` | Server configuration |
+| `/v1/top` | `top` | Top confirmed height |
+| `/v1/top/subscribe` | `top_subscribe` | Top height notifications (websocket) |
+| `/v1/block/{block}` | `block` | Block |
+| `/v1/block/{block}/header` | `block_header` | Block header |
+| `/v1/block/{block}/header/context` | `block_header_context` | Header validation context |
+| `/v1/block/{block}/details` | `block_details` | Block details |
+| `/v1/block/{block}/txs` | `block_txs` | All transactions of the block |
+| `/v1/block/{block}/tx/{position}` | `block_tx` | Transaction at a position in the block |
+| `/v1/block/{block}/filter/{type}` | `block_filter` | Client filter |
+| `/v1/block/{block}/filter/{type}/hash` | `block_filter_hash` | Client filter hash |
+| `/v1/block/{block}/filter/{type}/header` | `block_filter_header` | Client filter header |
+| `/v1/block/subscribe` | `block_subscribe` | Block notifications (websocket) |
+| `/v1/tx/{tx hash}` | `tx` | Transaction |
+| `/v1/tx/{tx hash}/header` | `tx_header` | Header of the confirming block |
+| `/v1/tx/{tx hash}/details` | `tx_details` | Transaction details |
+| `/v1/tx/subscribe` | `tx_subscribe` | Transaction notifications (websocket) |
+| `/v1/input/{tx hash}` | `inputs` | All inputs of the transaction |
+| `/v1/input/{tx hash}/{index}` | `input` | Input |
+| `/v1/input/{tx hash}/{index}/script` | `input_script` | Input script |
+| `/v1/input/{tx hash}/{index}/witness` | `input_witness` | Input witness |
+| `/v1/output/{tx hash}` | `outputs` | All outputs of the transaction |
+| `/v1/output/{tx hash}/{index}` | `output` | Output |
+| `/v1/output/{tx hash}/{index}/script` | `output_script` | Output script |
+| `/v1/output/{tx hash}/{index}/spender` | `output_spender` | Confirmed spender of the output |
+| `/v1/output/{tx hash}/{index}/spenders` | `output_spenders` | All spenders of the output |
+| `/v1/output/{tx hash}/{index}/subscribe` | `output_subscribe` | Spend notifications (websocket) |
+| `/v1/address/{script hash}` | `address` | All history of an output script |
+| `/v1/address/{script hash}/confirmed` | `address_confirmed` | Confirmed history |
+| `/v1/address/{script hash}/unconfirmed` | `address_unconfirmed` | Unconfirmed history |
+| `/v1/address/{script hash}/balance` | `address_balance` | Confirmed balance |
+| `/v1/address/{script hash}/subscribe` | `address_subscribe` | History notifications (websocket) |
+
+Query options, besides `format`:
+
+| Option | Applies to | Purpose |
+| ------ | ---------- | ------- |
+| `witness=false` | block, transaction and input paths | Omit witness data |
+| `turbo=false` | address paths | Run the query on one thread instead of all (see `database.turbo`) |
+| `stop=true` | subscribe paths | End the subscription |
+
+To serve a custom block explorer from a directory instead of the embedded
+site, set `native.path`. A request for `/` returns `native.default`
+(`index.html`).
+
+The native interface is libbitcoin's own, and provides:
+
+- HTTP and websocket on each port. Over a websocket, each frame is one
+  request path, and the `subscribe` paths (top, block, transaction,
+  output and address) push notifications.
+- Data, text, JSON and HTML formats for each path.
+- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- Credentials (§7.3), restricted by REST method names.
+
+### 5.7 Electrum server
+
+Electrum on its assigned ports (§6), clear and secure (§7.2):
 
 ```ini
 [electrum]
+bind = 0.0.0.0:8580
+safe = 0.0.0.0:8543
 connections = 100
 cert_path = server.pem
 key_path = server.key
 ```
 
-### 5.4 bitcoind-compatible RPC
+Beyond the standard Electrum transports (TCP and TLS), `bs` provides:
+
+- HTTP and websocket on the same ports. Subscriptions need a full duplex
+  transport (TCP or websocket), so an HTTP connection's subscriptions
+  are held until it upgrades to a websocket.
+- Client certificates on its `safe` addresses (§7.2).
+- Credentials (§7.3), restricted by RPC method names. A credential
+  refuses raw TCP clients.
+
+### 5.8 Bitcoind RPC
 
 The RPC interface listens on its default port, 8280, here limited to
 the local machine.
@@ -250,26 +422,96 @@ the local machine.
 ```ini
 [bitcoind]
 bind = 127.0.0.1:8280
+bind = [::1]:8280
 connections = 10
 credential = user:password
 ```
 
-### 5.5 ZMQ notifications
+A credential may end with a list of the methods it permits (§7.3), here
+three RPC methods and the matching REST block request:
 
-ZMQ publishes on its default port, 8680, here limited to the local
+```ini
+[bitcoind]
+credential = reader:password:getblockcount,getblockhash,getblock,block
+```
+
+Beyond the standard bitcoind interfaces (JSON-RPC over HTTP, and REST),
+`bs` provides:
+
+- JSON-RPC over websocket and raw TCP on the same ports.
+- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- Credentials (§7.3) for REST as well as RPC, restricted by RPC and REST
+  method names, which are distinct. A credential refuses raw TCP clients.
+
+### 5.9 BTCD RPC
+
+The btcd RPC interface listens on its default port, 8480, here limited
+to the local machine:
+
+```ini
+[btcd]
+bind = 127.0.0.1:8480
+bind = [::1]:8480
+connections = 10
+credential = user:password
+```
+
+The BTCD interface is the Bitcoind RPC interface (§5.8) with btcd's
+methods added. Unlike btcd's own implementation, the methods it inherits
+behave exactly as they do in `[bitcoind]`.
+
+A websocket or raw TCP client may authenticate after connecting, with
+btcd's `authenticate` method. A failed `authenticate` closes the
+connection. A request for a method the credential does not permit returns
+an invalid parameters error.
+
+Beyond the standard btcd transports (HTTP and websocket, with TLS),
+`bs` provides:
+
+- JSON-RPC over raw TCP on the same ports.
+- Client certificates on its `safe` addresses (§7.2).
+- Credentials (§7.3), restricted by RPC method names. Raw TCP clients
+  authenticate with `authenticate`.
+
+### 5.10 ZMQ notifications
+
+ZMQ publishes on its default port, 8380, here limited to the local
 machine.
 
 ```ini
 [bitcoind_zmq]
-bind = 127.0.0.1:8680
+bind = 127.0.0.1:8380
+bind = [::1]:8380
 connections = 10
 ```
 
-### 5.6 Esplora REST
+Beyond the standard bitcoind notifications, `bs` provides CurveZMQ on its
+`safe` addresses (§7.2): encrypted notifications, optionally only to
+the client keys listed in `bitcoind_zmq.cert`.
 
-### 5.7 Admin and native web pages
+### 5.11 Esplora REST
 
-### 5.8 Client filters (BIP157/158)
+The Esplora REST interface, on its assigned port:
+
+```ini
+[esplora]
+bind = 0.0.0.0:8780
+connections = 100
+```
+
+To serve existing Esplora clients, bind it to the port they expect
+instead (§6). `esplora.maximum_history` limits the entries returned for
+one address.
+
+Beyond the standard Esplora REST interface, `bs` provides:
+
+- Websocket on the same ports. Each frame is one request path, and a
+  request with a body (a broadcast) follows the path with a newline and
+  the body.
+- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- Credentials (§7.3), restricted by REST method names.
+
+### 5.12 Client filters (BIP157/158)
 
 ```ini
 [node]
@@ -282,27 +524,100 @@ buckets = 950001
 buckets = 950001
 ```
 
-The filter tables are indexed by block, so their bucket counts are not
-critical. 950,001 covers the chain to block 950,000.
+Client filters are enabled when the store is created (§10). Any count
+above 0 on both tables enables the client filters index. The value
+given initializes the index to entries for that many blocks, but the index
+grows as required.
 
-### 5.9 Silent payments
+### 5.13 Disable the address index
+
+The address index is disabled when the store is created (§10):
+
+```ini
+[table.outs]
+buckets = 0
+```
+
+### 5.14 Silent payments
+
+Silent payments are indexed from `node.silent_start_height`, and never below
+taproot activation, so 0 indexes from there. The start height is fixed when
+the store is created (§10). The index is served to Sparrow
+by the `[sparrow]` service, the Electrum protocol with silent payment
+extensions:
 
 ```ini
 [node]
-silent_start_height = 709632
+silent_start_height = 0
+
+[sparrow]
+bind = 0.0.0.0:8680
+safe = 0.0.0.0:8643
+connections = 100
+cert_path = server.pem
+key_path = server.key
 ```
 
-### 5.10 Privacy networks
+The Sparrow interface is the Electrum interface with silent payment and
+block statistics methods added, and provides the same transports and
+security as `[electrum]` (§5.7).
 
-Tor in both directions: outbound through its SOCKS5 proxy
-(`outbound.socks`), and inbound through a Tor hidden service
-(`HiddenServiceDir` and `HiddenServicePort` in `torrc`) pointing at the
-node's listening port. I2P in both directions: outbound through the
-SOCKS5 proxy pointed at an I2P router's SOCKS port, and inbound through a
-SAM bridge (`inbound.sam`, `inbound.key_path`). Address gossip (`peer.gossip_tor`, `peer.gossip_i2p`), and
-opportunistic encryption (`node.provide_privacy`).
+### 5.15 Tor
 
-### 5.11 Fixed peers
+Outbound through Tor's SOCKS5 proxy, inbound through a Tor hidden service
+(`HiddenServiceDir` and `HiddenServicePort` in `torrc`) pointing at the node's
+listening port, and onion address gossip:
+
+```ini
+[outbound]
+socks = 127.0.0.1:9050
+seed = <first seed onion address>.onion:8333
+seed = <second seed onion address>.onion:8333
+
+[inbound]
+self = <hidden service onion address>.onion:8333
+
+[peer]
+gossip_tor = true
+```
+
+`inbound.self` advertises the hidden service address to peers, so they can
+connect to the node over Tor. Seeds are connected through the proxy, so the default seeds work where Tor
+can reach them. An onion-only node lists onion seeds.
+
+`outbound.socks` proxies the outbound session and its seeds. Manual peers
+([5.17](#517-fixed-peers)) use their own `manual.socks`. Each takes an optional
+`username` and `password`.
+
+### 5.16 I2P
+
+Outbound through the SOCKS5 proxy pointed at an I2P router's SOCKS port,
+inbound through the router's SAM bridge, and I2P address gossip. The
+destination key file is created if it does not exist, and the I2P address
+derived from it is advertised to peers, so `inbound.self` is not needed:
+
+```ini
+[outbound]
+socks = 127.0.0.1:4447
+seed = <first seed destination>.b32.i2p
+seed = <second seed destination>.b32.i2p
+
+[inbound]
+sam = 127.0.0.1:7656
+key_path = i2p.key
+
+[peer]
+gossip_i2p = true
+```
+
+Seeds are connected through the proxy, which reaches only I2P destinations,
+so an I2P node lists I2P seeds. I2P has no ports, so none is given.
+
+`outbound.socks` proxies the outbound session and its seeds. Manual peers
+([5.17](#517-fixed-peers)) use their own `manual.socks`. Each takes an optional
+`username` and `password`.
+
+### 5.17 Fixed peers
 
 ```ini
 [manual]
@@ -311,23 +626,150 @@ peer = 192.168.0.11:8333
 
 [outbound]
 connections = 0
+
+[inbound]
+connections = 0
 ```
 
-### 5.12 Without the address index
+Manual peers are automatically reconnected after a delay
+(`network.retry_timeout_seconds`) when they drop.
+`outbound.connections = 0` disables the outbound session, which otherwise
+connects to peers from the address pool, and `inbound.connections = 0`
+disables the inbound session, which otherwise accepts peers that connect to
+the node. The node then exchanges only with the peers listed.
+
+### 5.18 Peer services and policy
+
+What the node provides to and requires of its peers, and its transaction
+policy:
 
 ```ini
-[table.outs]
-buckets = 0
+[node]
+limited_blocks  = true      # pruned blocks
+provide_blocks  = true      # provides blocks
+require_blocks  = true      # requires blocks
+provide_witness = true      # provides witnesses (bip144)
+require_witness = true      # requires witnesses (bip144)
+provide_filters = false     # serves client filters (bip157)
+provide_privacy = true      # opportunistic encryption (bip324)
+delay_inbound = true
+fee_estimate_horizon = 0
+minimum_fee_rate = 0.000001
 ```
+
+- `node.limited_blocks` prunes blocks under the milestone (§5.2), and the
+  node then serves only blocks above it.
+- `node.provide_filters` also requires the client filter tables (§5.12).
+- `node.delay_inbound` refuses inbound peers, and client services other
+  than `[admin]` and `[native]`, until the chain is current.
+- `node.fee_estimate_horizon` is the number of recent blocks used for fee
+  estimates, at most 1,008 (one week). `0` disables fee estimation.
+- `node.minimum_fee_rate` is the lowest fee rate, in BTC per thousand
+  virtual bytes, of an unconfirmed transaction the node accepts. It is
+  also reported to clients as the relay fee.
+
+Which peer messages the node sends and accepts:
+
+```ini
+[peer]
+enable_relay = true         # in/out transaction announcements
+enable_alert = false        # send/log alert messages (no send option)
+enable_reject = false       # send/log reject messages
+enable_compact = true       # in/out compact block announcements
+enable_address = true       # in/out address messages (false disables address v1 and v2)
+enable_address_v2 = true    # in/out address v2 messages (drops down to v1 if gossip is IP only)
+enable_witness_tx = true    # in/out wtxid for tx announcements
+enable_memory_pool = true   # respond to mempool message with full pool
+enable_not_found = true     # send not_found messages (vs. dropping peer for requesting what we don't have)
+```
+
+### 5.19 Outbound bindings
+
+By default the operating system chooses the network adapter of each
+outbound connection from its routing table, and with several adapters it
+normally uses only one. Binding outbound connections to adapter addresses
+restricts them to those adapters, and spreads them across the adapters
+to combine their bandwidth:
+
+```ini
+[outbound]
+bind = 192.168.0.20
+bind = 192.168.0.21
+connections = 100
+```
+
+- Each outbound connection slot is assigned one binding in turn, so here
+  each adapter carries 50 connections. A slot always reconnects on its
+  own adapter, so the split holds for as long as the node runs.
+- Give the address without a port. The operating system assigns the
+  source port.
+- An IPv4 binding connects only to IPv4 peers, and an IPv6 binding only
+  to IPv6 peers. List one address per adapter to balance by adapter.
+- Seed connections use `outbound.bind`. Manual peers use `manual.bind`,
+  assigned in the order the peers are listed.
+- Through a SOCKS5 proxy, the binding applies to the connection to the
+  proxy.
+- The slots of an adapter that is down stay idle and retry until it
+  returns.
+
+Outbound bindings do not affect inbound connections, which are accepted
+on the `inbound.bind` addresses. Inbound defaults to `0.0.0.0:8333`, and
+accepts connections on every IPv4 adapter. To accept peers only on the same adapters, bind
+inbound to the same addresses:
+
+```ini
+[inbound]
+bind = 192.168.0.20:8333
+bind = 192.168.0.21:8333
+```
+
+Whether a bound connection actually leaves through its adapter depends on
+the operating system:
+
+- **Windows** routes a connection through the adapter that owns its
+  bound address. The bindings are sufficient.
+- **macOS** scopes the route lookup to the adapter that owns the bound
+  address. The bindings are sufficient.
+- **Linux** routes by destination and ignores the bound address, so every
+  connection leaves through the adapter of the preferred default route.
+  Each adapter needs its own routing table and a rule that selects it by
+  source address.
+
+For two Linux adapters on one subnet, `eth0` at 192.168.0.20 and `eth1`
+at 192.168.0.21, with gateway 192.168.0.1:
+
+```
+$ sudo ip route add default via 192.168.0.1 dev eth0 table 100
+$ sudo ip route add default via 192.168.0.1 dev eth1 table 200
+$ sudo ip rule add from 192.168.0.20 lookup 100
+$ sudo ip rule add from 192.168.0.21 lookup 200
+$ sudo sysctl -w net.ipv4.conf.all.arp_filter=1 net.ipv4.conf.all.arp_ignore=1 net.ipv4.conf.all.arp_announce=2
+```
+
+All five lines are required. The tables and rules send each connection
+out through its bound adapter. The last line makes each adapter answer
+only for its own address, so that replies also arrive on that adapter.
+Adapters on separate networks need only the tables and rules, each with
+its own gateway. Confirm the route of a bound address with:
+
+```
+$ ip route get 1.1.1.1 from 192.168.0.21
+```
+
+These commands do not persist across a reboot. Add the same tables and
+rules to the distribution's network configuration (netplan,
+systemd-networkd or NetworkManager).
+
+Adapters on one subnet share its gateway, so their combined bandwidth is
+also limited by the gateway's uplink.
 
 ---
 
 ## 6. Ports
 
-Every service has a default port on each chain, bound to all
-interfaces. A service is still off until its `connections` is nonzero,
-so the defaults only fix where it listens once enabled. Its secure port
-is used only once a certificate is configured.
+Every service has an assigned port on each chain, clear and secure. A
+service listens only on the addresses given by its `bind` and `safe`
+settings (§7.1), so the examples on this page give them explicitly.
 
 The P2P network uses its convention on each chain, so peers find the
 node without configuration. Each libbitcoin service uses its own block,
@@ -340,12 +782,12 @@ conflict.
 | P2P network | `[inbound]` | 8333 | 8333 |
 | Admin web | `[admin]` | 8080 | 8043 |
 | Native web and REST | `[native]` | 8180 | 8143 |
-| bitcoind RPC and REST | `[bitcoind]` | 8280 | 8243 |
-| Electrum | `[electrum]` | 8380 | 8343 |
-| ZMQ | `[bitcoind_zmq]` | 8680 | 8643 |
-| btcd RPC | `[btcd]` | 8780 | 8743 |
-| Sparrow | `[sparrow]` | 8880 | 8843 |
-| Esplora REST | `[esplora]` | 8980 | 8943 |
+| Bitcoind RPC and REST | `[bitcoind]` | 8280 | 8243 |
+| Bitcoind ZMQ | `[bitcoind_zmq]` | 8380 | 8343 |
+| BTCD RPC | `[btcd]` | 8480 | 8443 |
+| Electrum | `[electrum]` | 8580 | 8543 |
+| Sparrow | `[sparrow]` | 8680 | 8643 |
+| Esplora REST | `[esplora]` | 8780 | 8743 |
 
 P2P has no separate secure port. BIP324 encryption is negotiated on the
 same port, and offered when `node.provide_privacy` is set. ZMQ's secure
@@ -356,11 +798,11 @@ port follows its network's convention:
 
 | Chain | Service offset | Services | P2P |
 | ----- | -------------- | -------- | --- |
-| mainnet | 0 | 8043–8980 | 8333 |
-| testnet3 | +10000 | 18043–18980 | 18333 |
-| regtest | +20000 | 28043–28980 | 18444 |
-| signet | +30000 | 38043–38980 | 38333 |
-| testnet4 | +40000 | 48043–48980 | 48333 |
+| mainnet | 0 | 8043–8780 | 8333 |
+| testnet3 | +10000 | 18043–18780 | 18333 |
+| regtest | +20000 | 28043–28780 | 18444 |
+| signet | +30000 | 38043–38780 | 38333 |
+| testnet4 | +40000 | 48043–48780 | 48333 |
 
 To use a service as a drop-in replacement, bind it to the port its
 clients expect instead:
@@ -368,9 +810,11 @@ clients expect instead:
 ```ini
 [bitcoind]
 bind = 127.0.0.1:8332
+bind = [::1]:8332
 
 [btcd]
 safe = 127.0.0.1:8334
+safe = [::1]:8334
 
 [electrum]
 bind = 0.0.0.0:50001
@@ -378,6 +822,7 @@ safe = 0.0.0.0:50002
 
 [esplora]
 bind = 127.0.0.1:3000
+bind = [::1]:3000
 ```
 
 A section may list several `bind` and `safe` lines, and listens on all
@@ -386,12 +831,12 @@ on the conventional ones, over IPv4 and IPv6:
 
 ```ini
 [electrum]
-bind = 0.0.0.0:8380
-bind = [::]:8380
+bind = 0.0.0.0:8580
+bind = [::]:8580
 bind = 0.0.0.0:50001
 bind = [::]:50001
-safe = 0.0.0.0:8343
-safe = [::]:8343
+safe = 0.0.0.0:8543
+safe = [::]:8543
 safe = 0.0.0.0:50002
 safe = [::]:50002
 connections = 100
@@ -405,6 +850,7 @@ network address only:
 ```ini
 [bitcoind]
 bind = 127.0.0.1:8280
+bind = [::1]:8280
 bind = 192.168.0.10:8280
 connections = 10
 credential = user:password
@@ -414,29 +860,163 @@ credential = user:password
 
 ## 7. Settings shared by every service
 
-- One table of the settings every client service section has, with what
-  each does: `bind`, `safe` (secure), `connections` (0 = disabled),
-  `cert_path` / `key_path` / `key_pass` / `cert_auth`, `credential`,
-  `host`, `origin`, `allow_opaque_origin`, `inactivity_minutes`,
-  `expiration_minutes`, `connect_timeout_seconds`, `rate_limit`,
-  `maximum_request`, `maximum_backlog`, `minimum_buffer`,
-  `maximum_buffer`.
-- The rule: a service is off until its `connections` is nonzero. Its
-  secure port (`safe`) is used only once `cert_path` and `key_path` are set
-  (for ZMQ, `key`).
-- `node.delay_inbound`: client services (except admin and native) do not
-  accept connections until the chain is current.
+The client services (`[admin]`, `[native]`, `[bitcoind]`, `[electrum]`,
+`[btcd]`, `[sparrow]` and `[esplora]`) share these settings.
+`[bitcoind_zmq]` shares the listening settings, and secures its
+connections using CurveZMQ rather than TLS (§7.2).
+
+### 7.1 Listening
+
+A service runs only when it has somewhere to listen and is allowed
+connections:
+
+| Setting | Purpose |
+| ------- | ------- |
+| `bind` | Address and port for clear connections. Multiple allowed. |
+| `safe` | Address and port for secure connections. Multiple allowed. |
+| `connections` | Maximum concurrent connections. `0` disables the service. |
+
+An address of `0.0.0.0` (or `[::]` for IPv6) listens on all interfaces,
+and `127.0.0.1` (or `[::1]` for IPv6) on the local machine only. Client
+services other than `[admin]` and `[native]` wait until the chain is
+current before accepting connections (`node.delay_inbound`).
+
+### 7.2 Secure connections
+
+A `safe` address serves TLS, and requires a server certificate and its
+private key. Without both, the service does not listen on its `safe`
+addresses.
+
+| Setting | Purpose |
+| ------- | ------- |
+| `cert_path` | Server certificate file (PEM). |
+| `key_path` | Server private key file (PEM). |
+| `key_pass` | Password of an encrypted private key, if any. |
+| `cert_auth` | Directory of certificate authority files (PEM). When set, clients must present a certificate issued by one of them. |
+
+The same certificate and key may be used by every service. For example,
+`[admin]` over TLS only:
+
+```ini
+[admin]
+safe = 127.0.0.1:8043
+safe = [::1]:8043
+connections = 10
+cert_path = server.pem
+key_path = server.key
+```
+
+ZMQ uses CurveZMQ instead of TLS. Its `safe` addresses require the
+server's secret key (`bitcoind_zmq.key`, Z85 encoded), and each
+`bitcoind_zmq.cert` line authorizes one client public key. With no `cert`
+lines, any client may connect.
+
+### 7.3 Authentication
+
+Every client service except `[bitcoind_zmq]` has:
+
+| Setting | Purpose |
+| ------- | ------- |
+| `credential` | A `user:password` for HTTP Basic authentication ([RFC 7617](https://www.rfc-editor.org/rfc/rfc7617), [RFC 9110 §11](https://www.rfc-editor.org/rfc/rfc9110#section-11)). Multiple allowed. When any is set, every request must present one of them. Basic authentication is not encrypted, so it is exposed unless the connection is secure. |
+
+`[bitcoind]`, `[btcd]`, `[electrum]` and `[sparrow]` accept raw TCP,
+HTTP and websocket clients on the same port. Raw TCP carries no HTTP
+headers, so when a credential is set, a raw TCP connection is closed at
+its first request, except by `[btcd]`, whose clients authenticate in-band
+(§5.9). To restrict raw TCP clients, require client
+certificates (`cert_auth`) instead.
+
+A credential may end with a list of the methods it permits,
+`user:password:method,...`. A request for any other method is refused,
+with HTTP 403 or by closing a websocket. JSON-RPC interfaces use their
+RPC method names, such as `getblock` or `blockchain.headers.subscribe`.
+REST interfaces use these names, one for each kind of request path:
+
+| Section | REST method names |
+| ------- | ----------------- |
+| `[bitcoind]` | chain_information, block, block_txs, block_hash, block_headers, block_filter, block_filter_headers, block_part, block_spent_tx_outputs, deployment_info, get_utxos, mempool, mempool_information, tx |
+| `[native]` | configuration, top, top_subscribe, block, block_header, block_header_context, block_details, block_tx, block_txs, block_filter, block_filter_hash, block_filter_header, block_subscribe, tx, tx_header, tx_details, tx_subscribe, inputs, input, input_script, input_witness, outputs, output, output_script, output_spender, output_spenders, output_subscribe, address, address_confirmed, address_unconfirmed, address_balance, address_subscribe |
+| `[esplora]` | blocks, block, block_header, block_height, block_status, block_txid, block_txids, block_txs, tip_hash, tip_height, tx, tx_status, tx_merkle_proof, tx_merkleblock_proof, tx_outspend, tx_outspends, address, address_txs, address_txs_chain, address_txs_mempool, address_utxo, mempool, mempool_txids, mempool_recent, fee_estimates, broadcast, broadcast_package |
+| `[admin]` | log_subscribe, event_subscribe |
+
+### 7.4 HTTP services
+
+`[admin]`, `[native]`, `[bitcoind]`, `[btcd]` and `[esplora]` are HTTP
+services, and also have:
+
+| Setting | Purpose |
+| ------- | ------- |
+| `host` | Allowed `Host` header values ([RFC 9110 §7.2](https://www.rfc-editor.org/rfc/rfc9110#section-7.2)). Multiple allowed. |
+| `origin` | Allowed `Origin` header values for cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454)). Multiple allowed. |
+| `allow_opaque_origin` | Allow requests with an opaque origin ([RFC 6454 §7.3](https://www.rfc-editor.org/rfc/rfc6454#section-7.3)), such as from a page opened as a local file. |
+
+### 7.5 Limits
+
+Each service has the limits that apply to its protocol. They apply to
+each connection separately.
+
+#### Time
+
+| Setting | Purpose |
+| ------- | ------- |
+| `inactivity_minutes` | A connection that has received nothing for this long is closed. This is also the HTTP keep-alive period. Sending does not count as activity. `0` disables it. |
+| `expiration_minutes` | A connection is closed this long after it opened, whether or not it is active. `0` disables it. |
+| `connect_timeout_seconds` | Time allowed for a new connection to complete its transport layer handshake (TLS, or ZMTP for ZMQ) before it is dropped. Application layer handshakes, such as Electrum version negotiation, are not covered. Each connection's limit is chosen at random between half and all of this value, so that many clients do not time out together. `0` uses `network.connect_timeout_seconds`, which defaults to 5 seconds. |
+
+#### Throughput
+
+| Setting | Purpose |
+| ------- | ------- |
+| `rate_limit` | Maximum send rate of a connection, in bytes per second. The limit is continuous, not a cliff: each send is paced by its size, so a connection is slowed to the rate rather than cut off at a quota. Sends are delayed, not dropped, and throttling never disconnects a client. A client that requests faster than its responses drain is bounded by `maximum_backlog`. This protects against denial of service by bounding the rate at which one client can draw data from the server. `network.rate_limit` applies the same limit to every connection. When both are set the lower applies, and `0` leaves the other in effect (both `0` is unlimited). |
+| `maximum_backlog` | Maximum bytes of responses waiting to be sent to a connection, such as to a client that reads slower than it asks. A connection that exceeds it is closed. ZMQ instead drops the notifications that do not fit. This protects against denial of service by bounding the memory a client that does not read can hold on the server. |
+
+#### Memory
+
+| Setting | Purpose |
+| ------- | ------- |
+| `maximum_request` | Largest request accepted, in bytes, by every service: an HTTP body, a websocket message, an Electrum JSON-RPC message, a ZMQ frame, or a P2P message (`[inbound]`, `[outbound]` and `[manual]`). A larger request closes the connection. This protects against denial of service by bounding the memory a client can make the server allocate. |
+| `minimum_buffer` | Buffer memory a connection keeps for reading requests, and for writing JSON responses. A buffer expanded beyond this by a large request or response is trimmed back to this size once it is idle. |
+| `maximum_buffer` | Size of the buffer a JSON response is written through. A larger response is sent in pieces of this size, so it limits the memory per connection, not the response size. |
 
 ---
 
 ## 8. Performance settings
 
-- `node.threads`, `node.thread_priority`, `node.memory_priority`.
-- `node.use_gpu`, `node.batch_verify`, `node.batch_silent`, `node.cpu_batch_verify`,
-  `node.cpu_batch_silent`. Check GPU and CPU support with `bs -w`.
-- `node.maximum_concurrency` (download window).
-- `database.turbo`.
-- `outbound.connections` during sync, `outbound.current_connections` after.
+The defaults suit most machines. These are the settings that most affect
+sync and query speed.
+
+### 8.1 Processor
+
+| Setting | Default | Purpose |
+| ------- | ------- | ------- |
+| `network.threads` | `0` | Threads that run the network: peer and client connections. `0` uses one per hardware thread, at most 32. |
+| `node.threads` | `0` | Threads that validate blocks. `0` uses one per hardware thread, which is two per core on a processor with hyperthreading (SMT). |
+| `node.thread_priority` | `true` | Run validation threads at high priority, ahead of other programs. `false` leaves them at normal priority. |
+| `node.memory_priority` | `true` | Keep the process at normal memory priority. `false` lowers it, so the operating system reclaims its memory first. |
+| `database.turbo` | `true` | Allow a single client query to use all processors, so large queries return sooner. |
+
+### 8.2 Signature verification and silent payment indexing
+
+When a sufficient GPU is available, signatures are verified, and silent
+payment transactions indexed, in batches on the GPU, which is much faster
+than on a CPU. Run
+`bs -w` to see whether a GPU is available, and which processor features
+apply.
+
+| Setting | Default | Purpose |
+| ------- | ------- | ------- |
+| `node.use_gpu` | `true` | Use the GPU when one is available, for signature verification, silent payment indexing and silent payment scans. |
+| `node.batch_verify` | `1,000,000` | Signatures verified in each GPU batch. `0` disables GPU verification. |
+| `node.batch_silent` | `1,000,000` | Silent payment transactions indexed in each GPU batch. `0` disables GPU indexing. |
+| `database.gpu_scan_minimum` | `65,536` | Smallest silent payment scan, in transactions, sent to the GPU. Smaller scans run on the CPU, where they return sooner. |
+
+### 8.3 Network
+
+| Setting | Default | Purpose |
+| ------- | ------- | ------- |
+| `node.maximum_concurrency` | `50,000` | Blocks downloaded concurrently. Blocks arrive out of order, and this window lets download run ahead of validation. `0` is unlimited. |
+| `outbound.connections` | `100` | Outgoing peer connections while syncing. More peers may be required to saturate a high bandwidth network connection. |
+| `outbound.current_connections` | `10` | Outgoing peer connections once the chain is current, when fewer are needed. `0` keeps `outbound.connections`. |
 
 ---
 
@@ -448,1067 +1028,77 @@ changed. Each table has some of `buckets`, `expected`, `size` and
 
 The common changes are:
 
-- disabling the address index ([5.12](#512-without-the-address-index));
-- enabling client filters ([5.8](#58-client-filters-bip157158));
+- disabling the address index ([5.13](#513-disable-the-address-index));
+- enabling client filters ([5.12](#512-client-filters-bip157158));
 - sizing for a test chain, as on the [Testnet3](testnet3),
   [Testnet4](testnet4) and [Regtest](regtest) pages.
 
 `bs -k` and `bs -l` report bucket fill and collisions on an existing
 store.
 
+### 9.1 Bucket autotuning
+
+The hashmap tables (`header`, `tx`, `ins`, `outs`, `pool` and `wtxid`)
+derive their bucket count from their `expected` entry count and the
+installed memory, unless `buckets` is configured. The ratio of entries to
+buckets is the load factor. More buckets shorten searches but enlarge
+the table heads, which must generally be held in memory during initial
+sync.
+
+| Installed memory | Load factor | Address index (`outs`) |
+| ---------------- | ----------- | ---------------------- |
+| 8 GB or less | 7.5 | 50 |
+| 32 GB or more | 2.5 | 5 |
+
+Between 8 and 32 GB the load factor falls in proportion to the memory.
+So a store created on a smaller machine uses less memory for its heads,
+and one created on a larger machine searches faster. A configured
+`buckets` value replaces the derived count, and `0` disables an optional
+table.
+
 ---
 
-## 10. Reference
+## 10. Settings fixed at store creation
 
-`bs --settings` displays every setting in its section, each with a
-comment giving its description and default, followed by its configured
-value. With `--config`, a setting configured to other than its default is
-marked by a comment. The sections below are the defaults, grouped by
-area.
+Some settings are captured in the store when it is created, in its
+envelope, and govern that store from then on. The general rules are that
+hashmap bucket counts cannot be changed (would require table rewrites),
+optional indexation cannot be altered (would result in hidden gaps), and
+consensus rules cannot be modified (would result in an inconsistent
+chain).
 
-### 10.1 `[log]`
+Each time `bs` opens an existing store (or restores one), it compares the
+captured values with the configuration. Where a setting differs, the
+store's value is used for that run, and the configured value is ignored.
+The configuration file is not changed. Each overridden setting is logged
+by name:
 
-Logging: which kinds of events are logged (unless changed at the console), and where log files are written.
-
-```ini
-[log]
-# Enable application logging, defaults to 'true'.
-application = true
-# Enable local fault logging, defaults to 'true'.
-fault = true
-# The maximum byte size of each pair of rotated log files, defaults to '1000000'.
-maximum_size = 1000000
-# Enable news logging, defaults to 'true'.
-news = true
-# The log files directory, defaults to empty.
-path =
-# Enable protocol logging, defaults to 'false'.
-protocol = false
-# Enable proxy logging, defaults to 'false'.
-proxy = false
-# Enable quitting logging, defaults to 'false'.
-quitting = false
-# Enable remote fault logging, defaults to 'true'.
-remote = true
-# Enable session logging, defaults to 'true'.
-session = true
-# Path to a directory containing windows symbols (.pdb) files, defaults to empty.
-symbols =
-# Enable verbose logging, defaults to 'false'.
-verbose = false
+```
+Database envelope [milestone] overrides configuration.
 ```
 
-### 10.2 `[database]`
-
-The store: its directory and store-wide options.
-
-```ini
-[database]
-# Minimum transactions for a silent payment scan to use the GPU, defaults to '65536'.
-gpu_scan_minimum = 65536
-# The interval depth for merkle proof optimization, defaults to '11'.
-interval_depth = 11
-# Save unconfirmable block state (prevents revalidation), defaults to 'true'.
-mark_unconfirmable = true
-# The blockchain database directory, defaults to 'bitcoin'.
-path = bitcoin
-# Allow individual non-validation queries to use all CPUs, defaults to 'true'.
-turbo = true
-```
-
-### 10.3 Store tables (`[table.*]`)
-
-The sizing of each store table. These are advanced settings and are rarely changed (§9).
-
-```ini
-[table.candidate]
-# The number of buckets provisioned in the candidate table head, defaults to '950001'.
-buckets = 950001
-# The percentage expansion of the candidate table head, defaults to '1'.
-rate = 1
-
-[table.confirmed]
-# The number of buckets provisioned in the confirmed table head, defaults to '950001'.
-buckets = 950001
-# The percentage expansion of the confirmed table head, defaults to '1'.
-rate = 1
-
-[table.duplicate]
-# The minimum number of buckets in the duplicate table head, defaults to '1024'.
-buckets = 1024
-# The expected element count of the duplicate table, defaults to '0'.
-expected = 0
-# The percentage expansion of the duplicate table, defaults to '1'.
-rate = 1
-# The minimum allocation of the duplicate table body, defaults to '0'.
-size = 0
-
-[table.ecdsa]
-# The percentage expansion of each batch_ecdsa table body, defaults to '1'.
-rate = 1
-# The minimum allocation of each batch_ecdsa table body, defaults to '0'.
-size = 0
-
-[table.filter_bk]
-# The number of buckets in the filter_bk table head, defaults to '0' (0 disables).
-buckets = 0
-# The percentage expansion of the filter_bk table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the filter_bk table body, defaults to '0'.
-size = 0
-
-[table.filter_tx]
-# The number of buckets in the filter_tx table head, defaults to '0' (0 disables).
-buckets = 0
-# The percentage expansion of the filter_tx table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the filter_tx table body, defaults to '0'.
-size = 0
-
-[table.header]
-# The number of buckets in the header table head, dynamic default.
-buckets = 385181
-# The expected element count of the header table, defaults to '962953'.
-expected = 962953
-# The percentage expansion of the header table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the header table body, defaults to '124220679'.
-size = 124220679
-
-[table.input]
-# The percentage expansion of the input table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the input table body, defaults to '67269346'.
-size = 67269346
-
-[table.ins]
-# The number of buckets in the ins table head, dynamic default.
-buckets = 1345386900
-# The expected element count of the ins table, defaults to '3363467251'.
-expected = 3363467251
-# The percentage expansion of the ins table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the ins table body, defaults to '1749002971'.
-size = 1749002971
-
-[table.output]
-# The percentage expansion of the output table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the output table body, defaults to '1278023220'.
-size = 1278023220
-
-[table.outs]
-# The number of buckets in the outs table head, dynamic default (0 disables address index).
-buckets = 748385817
-# The expected element count of the outs table, defaults to '3741929086'.
-expected = 3741929086
-# The percentage expansion of the outs table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the outs table body, defaults to '336773618'.
-size = 336773618
-
-[table.pool]
-# The number of buckets in the pool table head, dynamic default (0 disables).
-buckets = 4000000
-# The expected element count of the pool table, defaults to '10000000'.
-expected = 10000000
-# The percentage expansion of the pool table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the pool table body, defaults to '0'.
-size = 0
-
-[table.presilent]
-# The percentage expansion of each batch_presilent table body, defaults to '1'.
-rate = 1
-# The minimum allocation of each batch_presilent table body, defaults to '0'.
-size = 0
-
-[table.prevalid]
-# The percentage expansion of each batch_prevalid table body, defaults to '1'.
-rate = 1
-# The minimum allocation of each batch_prevalid table body, defaults to '0'.
-size = 0
-
-[table.prevout]
-# The minimum number of buckets in the prevout table head, defaults to '0'.
-buckets = 0
-# The percentage expansion of the prevout table, defaults to '1'.
-rate = 1
-# The minimum allocation of the prevout table body, defaults to '0'.
-size = 0
-
-[table.scan]
-# The number of buckets provisioned in the scan table head, defaults to '950001'.
-buckets = 950001
-# The percentage expansion of the scan table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the scan table body, defaults to '0'.
-size = 0
-
-[table.schnorr]
-# The percentage expansion of each batch_schnorr table body, defaults to '1'.
-rate = 1
-# The minimum allocation of each batch_schnorr table body, defaults to '0'.
-size = 0
-
-[table.silent]
-# The percentage expansion of each batch_silent table body, defaults to '1'.
-rate = 1
-# The minimum allocation of each batch_silent table body, defaults to '0'.
-size = 0
-
-[table.spends]
-# The percentage expansion of the spends table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the spends table body, defaults to '0'.
-size = 0
-
-[table.state]
-# The number of buckets provisioned in the state table head, defaults to '950001'.
-buckets = 950001
-# The percentage expansion of the state table head, defaults to '1'.
-rate = 1
-
-[table.strong]
-# The number of buckets provisioned in the strong table head, defaults to '1359871695'.
-buckets = 1359871695
-# The percentage expansion of the strong table head, defaults to '1'.
-rate = 1
-
-[table.tx]
-# The number of buckets in the tx table head, dynamic default.
-buckets = 543948678
-# The expected element count of the tx table, defaults to '1359871695'.
-expected = 1359871695
-# The percentage expansion of the tx table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the tx table body, defaults to '870317885'.
-size = 870317885
-
-[table.txs]
-# The number of buckets in the txs table head, defaults to '950001'.
-buckets = 950001
-# The percentage expansion of the txs table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the txs table body, defaults to '54471017'.
-size = 54471017
-
-[table.wtxid]
-# The number of buckets in the wtxid table head, dynamic default (0 disables).
-buckets = 4000000
-# The expected element count of the wtxid table, defaults to '10000000'.
-expected = 10000000
-# The percentage expansion of the wtxid table body, defaults to '1'.
-rate = 1
-# The minimum allocation of the wtxid table body, defaults to '0'.
-size = 0
-```
-
-### 10.4 `[bitcoin]`
-
-Chain parameters: genesis block, soft fork activation, checkpoints, milestone and minimum work. The defaults are mainnet, and change only for another chain.
-
-```ini
-[bitcoin]
-# The activation time for bip16 in unix time, defaults to '1333238400'.
-bip16_activation_time = 1333238400
-# The hash:height checkpoint for bip30 deactivation, defaults to '000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8:227931'.
-bip30_deactivate_checkpoint = 000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8:227931
-# The height for bip30 reactivation, defaults to '1983702'.
-bip30_reactivate_height = 1983702
-# The number of blocks considered for bip34 style soft fork activation, defaults to '1000'.
-bip34_activation_sample = 1000
-# The number of new version blocks required for bip34 style soft fork activation, defaults to '750'.
-bip34_activation_threshold = 750
-# The number of new version blocks required for bip34 style soft fork enforcement, defaults to '950'.
-bip34_enforcement_threshold = 950
-# The block height to freeze the bip34 softfork for bip90, defaults to '227931'.
-bip34_freeze = 227931
-# The block height to freeze the bip65 softfork for bip90, defaults to '388381'.
-bip65_freeze = 388381
-# The block height to freeze the bip66 softfork for bip90, defaults to '363725'.
-bip66_freeze = 363725
-# The hash:height checkpoint for bip9 bit0 activation, defaults to '000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328'.
-bip9_bit0_active_checkpoint = 000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328
-# The hash:height checkpoint for bip9 bit1 activation, defaults to '0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824'.
-bip9_bit1_active_checkpoint = 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824
-# The hash:height checkpoint for bip9 bit2 activation, defaults to '0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632'.
-bip9_bit2_active_checkpoint = 0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632
-# The target block period, defaults to '600'.
-block_spacing_seconds = 600
-# The blockchain checkpoints, defaults to the consensus set.
-checkpoint = 00000000000000004d9b4ef50f0f9d686fd69db2e03af35a100370c64632a983:295000
-checkpoint = 0000000000000001ae8c72a0b0c301f67e3afca10e819efa9041e458e9bd7e40:279000
-checkpoint = 000000000000003887df1f29024b06fc2200b55f8af8f35453d7be294df2d214:250000
-checkpoint = 00000000000001c108384350f74090433e7fcf79a606b8e797f065b130575932:225430
-checkpoint = 00000000000001b4f4b433e81ee46494af945cf96014816a4e2370f11b23df4e:216116
-checkpoint = 000000000000048b95347e83192f69cf0366076336c639f9b7228e9ba171342e:210000
-checkpoint = 000000000000059f452a5f7340de6682a977387c17010ff6e6c3bd83ca8b1317:193000
-checkpoint = 000000000000099e61ea72015e79632f216fe6cb33d7899acb35b75c8303b763:168000
-checkpoint = 00000000000005b12ffd4cd315cd34ffd4a594f430ac814c91184a0d42d2b0fe:134444
-checkpoint = 00000000000291ce28027faea320c8d2b054b2e0fe44a773f3eefb151d6bdc97:105000
-checkpoint = 0000000000573993a3c9e41ce34471c079dcf5f52a0e824a81e7f953b8661a20:74000
-checkpoint = 000000002dd5588a74784eaa7ab0507a18ad16a236e7b1ce69f00d7ddfb5d0a6:33333
-checkpoint = 0000000069e244f73d78e8fd29ba2fd2ed618bd6fa2ee92559f542fdb26e7c1d:11111
-# The hexadecimal encoding of the genesis block, defaults to mainnet.
-genesis_block = 0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000
-# The initial block subsidy, defaults to '50'.
-initial_block_subsidy_bitcoin = 50
-# A block presumed to be valid but not required to be present, defaults to '000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000'.
-milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
-# The minimum work for any branch to be considered valid, defaults to '000000000000000000000000000000000000000052b2559353df4117b7348b64'.
-minimum_work = 000000000000000000000000000000000000000052b2559353df4117b7348b64
-# The proof of work limit, defaults to '486604799'.
-proof_of_work_limit = 486604799
-# The difficulty retargeting factor, defaults to '4'.
-retargeting_factor = 4
-# The difficulty retargeting period, defaults to '1209600'.
-retargeting_interval_seconds = 1209600
-# The subsidy halving period, defaults to '210000'.
-subsidy_interval = 210000
-# The future timestamp allowance, defaults to '7200'.
-timestamp_limit_seconds = 7200
-```
-
-### 10.5 `[forks]`
-
-The consensus rules enforced. The defaults are mainnet.
-
-```ini
-[forks]
-# Add check-sequence-verify op code, defaults to 'true' (soft fork).
-bip112 = true
-# Use median time past for locktime, defaults to 'true' (soft fork).
-bip113 = true
-# Segregated witness consensus layer, defaults to 'true' (soft fork).
-bip141 = true
-# Witness version 0 (segwit), defaults to 'true' (soft fork).
-bip143 = true
-# Prevent dummy value malleability, defaults to 'true' (soft fork).
-bip147 = true
-# Add pay-to-script-hash processing, defaults to 'true' (soft fork).
-bip16 = true
-# Disallow collision of unspent transaction hashes, defaults to 'true' (soft fork).
-bip30 = true
-# Require coinbase input includes block height, defaults to 'true' (soft fork).
-bip34 = true
-# Witness version 1 (taproot), defaults to 'true' (soft fork).
-bip341 = true
-# Validation of taproot script, defaults to 'true' (soft fork).
-bip342 = true
-# Finite monetary supply, defaults to 'true' (soft fork).
-bip42 = true
-# Add check-locktime-verify op code, defaults to 'true' (soft fork).
-bip65 = true
-# Require strict signature encoding, defaults to 'true' (soft fork).
-bip66 = true
-# Add relative locktime enforcement, defaults to 'true' (soft fork).
-bip68 = true
-# Assume bip34, bip65, and bip66 activation if enabled, defaults to 'true' (hard fork).
-bip90 = true
-# Assume block_storm_patch activation if enabled, defaults to 'false' (testnet4).
-block_storm_patch = false
-# Require difficult blocks, defaults to 'true' (use false for testnet).
-difficult = true
-# Fix target overflow for very low difficulty, defaults to 'false' (litecoin).
-ltc_retarget_overflow_patch = false
-# Use scrypt hashing for proof of work, defaults to 'false' (litecoin).
-ltc_scrypt_proof_of_work = false
-# Fix time warp bug, defaults to 'false' (litecoin).
-ltc_time_warp_patch = false
-# Retarget difficulty, defaults to 'true' (use false for regtest).
-retarget = true
-# Assume time_warp_patch activation if enabled, defaults to 'false' (testnet4).
-time_warp_patch = false
-```
-
-### 10.6 `[wallet]`
-
-Address and key prefixes, used by the client-server interfaces to encode and decode addresses and keys.
-
-```ini
-[wallet]
-# The extended private key prefix, defaults to '76066276' (use '70615956' for testnet).
-hd_private_prefix = 76066276
-# The extended public key prefix, defaults to '76067358' (use '70617039' for testnet).
-hd_public_prefix = 76067358
-# The pay-to-public-key-hash address prefix, defaults to '0' (use '111' for testnet).
-p2kh_prefix = 0
-# The pay-to-script-hash address prefix, defaults to '5' (use '196' for testnet).
-p2sh_prefix = 5
-# The silent payment address prefix, defaults to 'sp' (use 'tsp' for testnet).
-silent_prefix = sp
-# The wallet import format prefix, defaults to '128' (use '239' for testnet).
-wif_prefix = 128
-# The witness address prefix, defaults to 'bc' (use 'tb' for testnet).
-witness_prefix = bc
-```
-
-### 10.7 `[node]`
-
-The node: validation threads, batching and GPU use, the download window, fee policy, and what is served to peers.
-
-```ini
-[node]
-# Allowable underperformance standard deviation, defaults to '1.5' (0 disables).
-allowed_deviation = 1.5
-# Limit of per channel cached peer block and tx announcements, to avoid replay, defaults to '42'.
-announcement_cache = 42
-# Count of silent payment transactions to index in each batch, defaults to '1000000' (0 disables).
-batch_silent = 1000000
-# Count of signatures to verify in each batch, defaults to '1000000' (0 disables).
-batch_verify = 1000000
-# Maximum percent of a compact block not pooled to fill it, defaults to '50'.
-compact_missing_percent = 50
-# Time to await a compact block fill before downloading the block, defaults to '10' (0 disables).
-compact_timeout_seconds = 10
-# Batch silent payment indexing on the CPU when the GPU is not used, defaults to 'false'.
-cpu_batch_silent = false
-# Batch signature verification on the CPU when the GPU is not used, defaults to 'false'.
-cpu_batch_verify = false
-# Time from present that blocks are considered current, defaults to '1440' (0 disables).
-currency_window_minutes = 1440
-# Block inbound peer/client (excluding admin/native) until current, defaults to 'true'.
-delay_inbound = true
-# Fee estimation horizon, limited to 1008, defaults to '0' (0 disables).
-fee_estimate_horizon = 0
-# Limit block service to recent blocks, defaults to 'false'.
-limited_blocks = false
-# Maximum number of blocks to download concurrently, defaults to '50000' (0 disables).
-maximum_concurrency = 50000
-# Maximum block height to populate, defaults to '0' (unlimited).
-maximum_height = 0
-# Set the process to high memory priority, defaults to 'true'.
-memory_priority = true
-# Minimum fee rate increment for conflicting tx acceptance, defaults to '0.0'.
-minimum_bump_rate = 0.0
-# Minimum fee rate for non-conflicting tx acceptance, defaults to '0.000001'.
-minimum_fee_rate = 0.000001
-# Serve blocks to network connections, defaults to 'true'.
-provide_blocks = true
-# Serve client filters to network connections, defaults to 'false'.
-provide_filters = false
-# Provide opportunistic connection encryption, defaults to 'false'.
-provide_privacy = false
-# Serve witness data to network connections, defaults to 'true'.
-provide_witness = true
-# Require block service of outbound connections, defaults to 'true'.
-require_blocks = true
-# Require witness service of outbound connections, defaults to 'true'.
-require_witness = true
-# Sampling period for drop of stalled channels, defaults to '10' (0 disables).
-sample_period_seconds = 10
-# Minimum height of silent payment indexation, defaults to '4294967295'.
-silent_start_height = 4294967295
-# Set validation threads to high processing priority, defaults to 'true'.
-thread_priority = true
-# The number of threads in the validation threadpool, defaults to '0' (hardware threads).
-threads = 0
-# Use the GPU where available, defaults to 'true'.
-use_gpu = true
-```
-
-### 10.8 `[network]`
-
-Settings shared by all P2P connections: threads, connection timing, send rate, and address allow and deny lists.
-
-```ini
-[network]
-# IP address to disallow, allows all others, multiple allowed.
-#blacklist =
-# The time limit for connection establishment, defaults to '5'.
-connect_timeout_seconds = 5
-# The per channel send rate limit in bytes per second, defaults to '0' (unlimited).
-rate_limit = 0
-# The time delay for failed connection retry, defaults to '1'.
-retry_timeout_seconds = 1
-# The minimum number of threads in the network threadpool, defaults to '0' (hardware threads, at most 32).
-threads = 0
-# IP address to allow, prohibits all others, multiple allowed.
-#whitelist =
-```
-
-### 10.9 `[peer]`
-
-The P2P protocol: version range, supported messages, address gossip, and the network identifier.
-
-```ini
-[peer]
-# The lower bound for address selection divisor, defaults to '5'.
-address_lower = 5
-# The upper bound for address selection divisor, defaults to '10'.
-address_upper = 10
-# The time between ping messages, defaults to '10' (0 disables).
-channel_heartbeat_minutes = 10
-# Enable address gossip, defaults to 'true'.
-enable_address = true
-# Enable privacy network (Tor and I2P) address gossip, defaults to 'true'.
-enable_address_v2 = true
-# Enable alert messages, defaults to 'false'.
-enable_alert = false
-# Enable compact block messages, defaults to 'true'.
-enable_compact = true
-# Enable memory pool messages, defaults to 'false'.
-enable_memory_pool = false
-# Enable not found messages, defaults to 'true'.
-enable_not_found = true
-# Enable reject messages, defaults to 'false'.
-enable_reject = false
-# Enable transaction relay, defaults to 'true'.
-enable_relay = true
-# Enable witness transaction identifier relay, defaults to 'false'.
-enable_witness_tx = false
-# Gossip i2p addresses, defaults to 'false'.
-gossip_i2p = false
-# Gossip internet protocol version 4 (IPv4) addresses, defaults to 'true'.
-gossip_ipv4 = true
-# Gossip internet protocol version 6 (IPv6) addresses, defaults to 'false'.
-gossip_ipv6 = false
-# Gossip tor (onion) addresses, defaults to 'false'.
-gossip_tor = false
-# The time limit to complete the connection handshake, defaults to '15' (0 disables).
-handshake_timeout_seconds = 15
-# The magic number for message headers, defaults to '3652501241'.
-identifier = 3652501241
-# The advertised services that cause a peer to be dropped, defaults to '268435632'.
-invalid_services = 268435632
-# The maximum allowable channel clock skew, defaults to '120'.
-maximum_skew_minutes = 120
-# The peer address cache file directory, defaults to empty.
-path =
-# The maximum network protocol version, defaults to '70016'.
-protocol_maximum = 70016
-# The minimum network protocol version, defaults to '31800'.
-protocol_minimum = 31800
-# The node user agent string, defaults to '/libbitcoin:4.0.10255/'.
-user_agent = /libbitcoin:4.0.10255/
-# Validate the checksum of network messages, defaults to 'false'.
-validate_checksum = false
-```
-
-### 10.10 `[outbound]`
-
-Connections the node makes to peers: count, seeds, the address pool, and a SOCKS proxy.
-
-```ini
-[outbound]
-# IP address to bind outbound connections, multiple allowed, defaults to empty.
-#bind =
-# The number of concurrent attempts to establish one connection, defaults to '5'.
-connect_batch_size = 5
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The target number of outgoing network connections, defaults to '100'.
-connections = 100
-# The target number of outgoing connections when current, defaults to '10' (0 disables).
-current_connections = 10
-# The age limit for any connection, defaults to '60' (0 disables).
-expiration_minutes = 60
-# The maximum number of peer hosts in the pool, defaults to '10000'.
-host_pool_capacity = 10000
-# The inactivity time limit for any connection, defaults to '10' (0 disables).
-inactivity_minutes = 10
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum allowed request size, defaults to '4000000'.
-maximum_request = 4000000
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The socks5 proxy password (optional).
-password =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# A seed node for initializing the host pool, multiple allowed.
-seed = seed.bitcoin.sipa.be:8333
-seed = dnsseed.bluematt.me:8333
-seed = seed.bitcoin.jonasschnelli.ch:8333
-seed = seed.btc.petertodd.net:8333
-seed = seed.bitcoin.sprovoost.nl:8333
-seed = dnsseed.emzy.de:8333
-seed = seed.bitcoin.wiz.biz:8333
-seed = seed.mainnet.achownodes.xyz:8333
-# The time limit for obtaining seed connections and addresses, defaults to '30'.
-seeding_timeout_seconds = 30
-# The socks5 proxy endpoint (port required).
-socks = localhost
-# The socks5 proxy username (optional).
-username =
-```
-
-### 10.11 `[inbound]`
-
-Connections peers make to the node: listening addresses, count, and I2P.
-
-```ini
-[inbound]
-# IP address to bind for listening, multiple allowed, defaults to '0.0.0.0:8333' (all IPv4).
-bind = 0.0.0.0:8333
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The target number of incoming network connections, defaults to '100'.
-connections = 100
-# Allow connections from the node to itself, defaults to 'false'.
-enable_loopback = false
-# The age limit for any connection, defaults to '60' (0 disables).
-expiration_minutes = 60
-# The inactivity time limit for any connection, defaults to '10' (0 disables).
-inactivity_minutes = 10
-# The i2p destination private key file path, created if not existing.
-key_path =
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum allowed request size, defaults to '4000000'.
-maximum_request = 4000000
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The sam bridge password (optional).
-password =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# The i2p sam bridge endpoint (port required).
-sam = localhost
-# Address to advertise, multiple allowed.
-#self =
-# The sam bridge username (optional).
-username =
-```
-
-### 10.12 `[manual]`
-
-Persistent connections to specific peers.
-
-```ini
-[manual]
-# IP address to bind manual connections, multiple allowed, defaults to empty.
-#bind =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The age limit for any connection, defaults to '60' (0 disables, will attempt reconnect).
-expiration_minutes = 60
-# The inactivity time limit for any connection, defaults to '10' (0 disables, will attempt reconnect).
-inactivity_minutes = 10
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum allowed request size, defaults to '4000000'.
-maximum_request = 4000000
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The socks5 proxy password (optional).
-password =
-# A persistent peer node, multiple allowed.
-#peer =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# The socks5 proxy endpoint (port required).
-socks = localhost
-# The socks5 proxy username (optional).
-username =
-```
-
-### 10.13 `[admin]`
-
-The administrative web and websocket interface.
-
-```ini
-[admin]
-# Allow requests from opaque origin (see CORS), defaults to 'false'.
-allow_opaque_origin = false
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The certificate authority directory (*.PEM), enables client authentication.
-cert_auth =
-# The path to the server certificate file (.PEM), defaults to empty.
-cert_path =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# The path of the default source page, defaults to 'index.html'.
-default = index.html
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
-# The host name (http verification), multiple allowed, defaults to empty (disabled).
-#host =
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
-# The password to decrypt the server private key file (.PEM), optional.
-key_pass =
-# The path to the server private key file (.PEM), defaults to empty.
-key_path =
-# The maximum write backlog of a channel, defaults to '10485760'.
-maximum_backlog = 10485760
-# The maximum json response buffer size, defaults to '65536'.
-maximum_buffer = 65536
-# The maximum allowed request size, defaults to '4000000'.
-maximum_request = 4000000
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
-#origin =
-# The required root path of source files to be served, defaults to empty.
-path =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure bind, multiple allowed, defaults to empty (disabled).
-#safe =
-# The server name (http header), defaults to 'libbitcoin/4'.
-server = libbitcoin/4
-```
-
-### 10.14 `[native]`
-
-The native libbitcoin REST and websocket interface, and its web pages.
-
-```ini
-[native]
-# Allow requests from opaque origin (see CORS), defaults to 'false'.
-allow_opaque_origin = false
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The certificate authority directory (*.PEM), enables client authentication.
-cert_auth =
-# The path to the server certificate file (.PEM), defaults to empty.
-cert_path =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# The path of the default source page, defaults to 'index.html'.
-default = index.html
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
-# The host name (http verification), multiple allowed, defaults to empty (disabled).
-#host =
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
-# The password to decrypt the server private key file (.PEM), optional.
-key_pass =
-# The path to the server private key file (.PEM), defaults to empty.
-key_path =
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum json response buffer size, defaults to '65536'.
-maximum_buffer = 65536
-# The maximum allowed request size, defaults to '4000000'.
-maximum_request = 4000000
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
-#origin =
-# The required root path of source files to be served, defaults to empty.
-path =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure bind, multiple allowed, defaults to empty (disabled).
-#safe =
-# The server name (http header), defaults to 'libbitcoin/4'.
-server = libbitcoin/4
-# Enable websocket interface, defaults to 'true'.
-websocket = true
-```
-
-### 10.15 `[bitcoind]`
-
-The bitcoind-compatible JSON-RPC and REST interface.
-
-```ini
-[bitcoind]
-# Allow requests from opaque origin (see CORS), defaults to 'false'.
-allow_opaque_origin = false
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The certificate authority directory (*.PEM), enables client authentication.
-cert_auth =
-# The path to the server certificate file (.PEM), defaults to empty.
-cert_path =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
-#credential =
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
-# The host name (http verification), multiple allowed, defaults to empty (disabled).
-#host =
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
-# The password to decrypt the server private key file (.PEM), optional.
-key_pass =
-# The path to the server private key file (.PEM), defaults to empty.
-key_path =
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum json response buffer size, defaults to '65536'.
-maximum_buffer = 65536
-# The maximum allowed request size, defaults to '8004096'.
-maximum_request = 8004096
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
-#origin =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure bind, multiple allowed, defaults to empty (disabled).
-#safe =
-# The server name (http header), defaults to 'libbitcoin/4'.
-server = libbitcoin/4
-# The subversion identity (getnetworkinfo), defaults to '/libbitcoin:server/'.
-subversion = /libbitcoin:server/
-# The version identity (getnetworkinfo), defaults to '0.0'.
-version = 0.0
-```
-
-### 10.16 `[bitcoind_zmq]`
-
-bitcoind-compatible ZMQ notifications.
-
-```ini
-[bitcoind_zmq]
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The Z85 encoded public key of an authorized client, multiple allowed, defaults to empty (all).
-#cert =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# The Z85 encoded CurveZMQ server secret key, defaults to none (unencrypted).
-key =
-# The maximum write backlog of a channel, defaults to '33554432'.
-maximum_backlog = 33554432
-# The maximum allowed request size, defaults to '4000000'.
-maximum_request = 4000000
-# The maximum topic subscriptions per connection, defaults to '100'.
-maximum_subscriptions = 100
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure (CurveZMQ) bind, multiple allowed, defaults to empty (disabled).
-#safe =
-```
-
-### 10.17 `[btcd]`
-
-The btcd-compatible JSON-RPC and websocket interface.
-
-```ini
-[btcd]
-# Allow requests from opaque origin (see CORS), defaults to 'false'.
-allow_opaque_origin = false
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The certificate authority directory (*.PEM), enables client authentication.
-cert_auth =
-# The path to the server certificate file (.PEM), defaults to empty.
-cert_path =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
-#credential =
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
-# The host name (http verification), multiple allowed, defaults to empty (disabled).
-#host =
-# The idle timeout (http/ws keep-alive), defaults to '10'.
-inactivity_minutes = 10
-# The password to decrypt the server private key file (.PEM), optional.
-key_pass =
-# The path to the server private key file (.PEM), defaults to empty.
-key_path =
-# The maximum write backlog of a channel, defaults to '20971520'.
-maximum_backlog = 20971520
-# The maximum json response buffer size, defaults to '65536'.
-maximum_buffer = 65536
-# The maximum number of loadtxfilter watches, defaults to '1000000'.
-maximum_filters = 1000000
-# The maximum number of address history entries, defaults to '1000000'.
-maximum_history = 1000000
-# The maximum allowed request size, defaults to '8004096'.
-maximum_request = 8004096
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
-#origin =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure bind, multiple allowed, defaults to empty (disabled).
-#safe =
-# The server name (http header), defaults to 'libbitcoin/4'.
-server = libbitcoin/4
-```
-
-### 10.18 `[electrum]`
-
-The Electrum protocol server.
-
-```ini
-[electrum]
-# String returned by server.banner, defaults to empty.
-banner_message =
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The path to the server certificate file (.PEM), defaults to empty.
-cert_path =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# String returned by server.donation_address, defaults to empty.
-donation_address =
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
-# The path to the server private key file (.PEM), defaults to empty.
-key_path =
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum json response buffer size, defaults to '65536'.
-maximum_buffer = 65536
-# The maximum allowed headers returned per request, defaults to '20160'.
-maximum_headers = 20160
-# The maximum number of address history entries upon one subscription, defaults to '1000000'.
-maximum_history = 1000000
-# The maximum allowed request size, defaults to '8004096'.
-maximum_request = 8004096
-# The maximum allowed address subscriptions per channel, defaults to '1000000'.
-maximum_subscriptions = 1000000
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# Advertised host:port at which another server can be reached (defaults to empty).
-#more_bind =
-# Advertised secure host:port at which another server can be reached (defaults to empty).
-#more_safe =
-# The seconds between unrequested pings, defaults to '0' (disabled).
-ping_interval_seconds = 0
-# The hex characters of unrequested ping data, defaults to '0'.
-ping_size = 0
-# Maximum protocol version, defaults to '1.7'.
-protocol_maximum = 1.7
-# Minimum protocol version, defaults to '1.0'.
-protocol_minimum = 1.0
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure bind, multiple allowed, defaults to empty (disabled).
-#safe =
-# Advertised host:port at which this server can be reached (defaults to empty).
-#self_bind =
-# Advertised secure host:port at which this server can be reached (defaults to empty).
-#self_safe =
-# String returned by server.version, defaults to '/libbitcoin:4.0.10255/'.
-server_name = /libbitcoin:4.0.10255/
-```
-
-### 10.19 `[sparrow]`
-
-The Electrum protocol server with silent payment extensions, for Sparrow.
-
-```ini
-[sparrow]
-# String returned by server.banner, defaults to empty.
-banner_message =
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The path to the server certificate file (.PEM), defaults to empty.
-cert_path =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# String returned by server.donation_address, defaults to empty.
-donation_address =
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
-# The path to the server private key file (.PEM), defaults to empty.
-key_path =
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum json response buffer size, defaults to '65536'.
-maximum_buffer = 65536
-# The maximum allowed headers returned per request, defaults to '20160'.
-maximum_headers = 20160
-# The maximum number of address history entries upon one subscription, defaults to '1000000'.
-maximum_history = 1000000
-# The maximum allowed request size, defaults to '8004096'.
-maximum_request = 8004096
-# The maximum allowed address subscriptions per channel, defaults to '1000000'.
-maximum_subscriptions = 1000000
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# Advertised host:port at which another server can be reached (defaults to empty).
-#more_bind =
-# Advertised secure host:port at which another server can be reached (defaults to empty).
-#more_safe =
-# The seconds between unrequested pings, defaults to '0' (disabled).
-ping_interval_seconds = 0
-# The hex characters of unrequested ping data, defaults to '0'.
-ping_size = 0
-# Maximum protocol version, defaults to '1.7'.
-protocol_maximum = 1.7
-# Minimum protocol version, defaults to '1.0'.
-protocol_minimum = 1.0
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure bind, multiple allowed, defaults to empty (disabled).
-#safe =
-# Advertised host:port at which this server can be reached (defaults to empty).
-#self_bind =
-# Advertised secure host:port at which this server can be reached (defaults to empty).
-#self_safe =
-# String returned by server.version, defaults to '/libbitcoin:4.0.10255/'.
-server_name = /libbitcoin:4.0.10255/
-```
-
-### 10.20 `[esplora]`
-
-The Esplora-compatible REST interface.
-
-```ini
-[esplora]
-# Allow requests from opaque origin (see CORS), defaults to 'false'.
-allow_opaque_origin = false
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
-# The certificate authority directory (*.PEM), enables client authentication.
-cert_auth =
-# The path to the server certificate file (.PEM), defaults to empty.
-cert_path =
-# The time limit for connection establishment, defaults to '0' (network controls).
-connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
-# The host name (http verification), multiple allowed, defaults to empty (disabled).
-#host =
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
-# The password to decrypt the server private key file (.PEM), optional.
-key_pass =
-# The path to the server private key file (.PEM), defaults to empty.
-key_path =
-# The maximum write backlog of a channel, defaults to '1048576'.
-maximum_backlog = 1048576
-# The maximum json response buffer size, defaults to '65536'.
-maximum_buffer = 65536
-# The maximum number of address history entries, defaults to '1000000'.
-maximum_history = 1000000
-# The maximum allowed request size, defaults to '8004096'.
-maximum_request = 8004096
-# The minimum retained read buffer size, defaults to '4096'.
-minimum_buffer = 4096
-# The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
-#origin =
-# The send rate limit in bytes per second, defaults to '0' (network controls).
-rate_limit = 0
-# IP address to secure bind, multiple allowed, defaults to empty (disabled).
-#safe =
-# The server name (http header), defaults to 'libbitcoin/4'.
-server = libbitcoin/4
-```
+The captured settings are:
+
+| Section | Settings |
+| ------- | -------- |
+| `[bitcoin]` | the chain parameters, soft fork activations and the milestone |
+| `[forks]` | all |
+| `[database]` | `interval_depth` |
+| `[table.*]` | `buckets` of `header`, `tx`, `ins`, `outs`, `duplicate`, `pool` and `wtxid`, and whether client filters are enabled |
+| `[node]` | `limited_blocks` and `silent_start_height` |
+
+A different top checkpoint is logged but not replaced, and client filters
+cannot be added to a store created without them. To change any of these
+settings, create a new store. The setups that depend on
+them, from milestone sync and pruning to disabling the address index,
+take effect only on a new store.
+
+---
+
+## 11. Settings Reference
+
+Every setting, by section, with its description and default, is on the
+[Settings Reference](reference) page.
+
+Settings for the test chains are on their own pages:
+[Testnet3](testnet3), [Testnet4](testnet4) and [Regtest](regtest).

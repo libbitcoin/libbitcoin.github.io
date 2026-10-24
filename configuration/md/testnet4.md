@@ -1,6 +1,6 @@
 # Testnet4
 
-Testnet4 is the current public test network, about 150,000 blocks.
+Testnet4 is the newest public test network, about 150,000 blocks.
 
 Save the settings below as `testnet4.cfg` and start the node with it:
 
@@ -103,50 +103,17 @@ buckets = 150001
 
 [table.scan]
 buckets = 150001
-
-[admin]
-bind = 0.0.0.0:48080
-safe = 0.0.0.0:48043
-
-[native]
-bind = 0.0.0.0:48180
-safe = 0.0.0.0:48143
-
-[bitcoind]
-bind = 0.0.0.0:48280
-safe = 0.0.0.0:48243
-
-[electrum]
-bind = 0.0.0.0:48380
-safe = 0.0.0.0:48343
-
-[bitcoind_zmq]
-bind = 0.0.0.0:48680
-safe = 0.0.0.0:48643
-
-[btcd]
-bind = 0.0.0.0:48780
-safe = 0.0.0.0:48743
-
-[sparrow]
-bind = 0.0.0.0:48880
-safe = 0.0.0.0:48843
-
-[esplora]
-bind = 0.0.0.0:48980
-safe = 0.0.0.0:48943
 ```
 
-- `[bitcoin]` replaces the chain parameters. Soft forks are active from
-  block 1, and the milestone at 150,000 bypasses script validation below
-  it.
-- `[forks]` enables the testnet4 rules: `forks.time_warp_patch` and
-  `forks.block_storm_patch`, with minimum difficulty blocks allowed
-  (`forks.difficult = false`).
-- `peer.identifier` is the testnet4 network magic, and `[outbound]`
-  replaces the mainnet seeds.
-- `[wallet]` sets the testnet address and key prefixes.
+- `[bitcoin]` replaces the chain parameters, with soft forks active from
+  block 1.
+- `forks.time_warp_patch` enables the testnet4 time warp rule.
+- `forks.block_storm_patch` enables the testnet4 block storm rule.
+- `forks.difficult = false` enables testnet's minimum difficulty blocks.
+- `peer.identifier` is the testnet4 network magic.
+- `[outbound]` replaces the mainnet seeds.
+- `[wallet]` sets the testnet address and key prefixes used by the server
+  ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the store for the chain at 150,000 blocks.
-- The service sections move each service to the testnet4 ports of the
-  port plan, 48043–48980 ([§6](index#6-ports)). A service
-  is still off until its `connections` is nonzero.
+- `node.maximum_concurrency` raises the download window, since testnet
+  blocks are small.

@@ -100,10 +100,10 @@
   .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
   .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
-  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre.console { font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
   .doc pre code .comment { color: var(--ink-3); }
   .doc pre code .section { color: var(--heading); }
-  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
+  .doc pre.console code { font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -244,6 +244,7 @@
     <a href="testnet3.html">Testnet3</a>
     <a href="testnet4.html">Testnet4</a>
     <a href="regtest.html" class="here">Regtest</a>
+    <a href="reference.html">Settings Reference</a>
   </nav>
 
   <article class="doc">
@@ -344,38 +345,6 @@ buckets = 10001
 
 <span class="section">[table.scan]</span>
 buckets = 10001
-
-<span class="section">[admin]</span>
-bind = 0.0.0.0:28080
-safe = 0.0.0.0:28043
-
-<span class="section">[native]</span>
-bind = 0.0.0.0:28180
-safe = 0.0.0.0:28143
-
-<span class="section">[bitcoind]</span>
-bind = 0.0.0.0:28280
-safe = 0.0.0.0:28243
-
-<span class="section">[electrum]</span>
-bind = 0.0.0.0:28380
-safe = 0.0.0.0:28343
-
-<span class="section">[bitcoind_zmq]</span>
-bind = 0.0.0.0:28680
-safe = 0.0.0.0:28643
-
-<span class="section">[btcd]</span>
-bind = 0.0.0.0:28780
-safe = 0.0.0.0:28743
-
-<span class="section">[sparrow]</span>
-bind = 0.0.0.0:28880
-safe = 0.0.0.0:28843
-
-<span class="section">[esplora]</span>
-bind = 0.0.0.0:28980
-safe = 0.0.0.0:28943
 </code></pre>
 <ul>
 <li><code>[bitcoin]</code> sets the regtest genesis block and difficulty limit, all
@@ -383,19 +352,18 @@ safe = 0.0.0.0:28943
   There are no checkpoints beyond genesis and no minimum work.</li>
 <li><code>forks.retarget = false</code> disables difficulty retargeting.</li>
 <li><code>peer.identifier</code> is the regtest network magic.</li>
-<li><code>bs</code> does not mine, so blocks come from a peer. <code>[outbound]</code> disables
-  seeding and outbound connections, and <code>[manual]</code> connects to a local
-  node that generates blocks, here on port 18445 since <code>bs</code> listens on
-  18444.</li>
+<li><code>[wallet]</code> sets the regtest address and key prefixes used by the server
+  (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
+<li><code>bs</code> does not mine, so blocks come from a peer.</li>
+<li><code>[outbound]</code> disables seeding and outbound connections.</li>
+<li><code>[manual]</code> connects to a local node that generates blocks, here on port
+  18445 since <code>bs</code> listens on 18444.</li>
 <li><code>[table.*]</code> keeps the store small, since the mainnet defaults
   preallocate for the mainnet chain.</li>
-<li>The service sections move each service to the regtest ports of the
-  port plan, 28043–28980 (<a href="index.html#6-ports">§6</a>). A service
-  is still off until its <code>connections</code> is nonzero.</li>
 </ul>
   </article>
 
-  <nav class="pager"><a href="testnet4.html">&larr; Testnet4</a><span></span></nav>
+  <nav class="pager"><a href="testnet4.html">&larr; Testnet4</a><a href="reference.html">Settings Reference &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 

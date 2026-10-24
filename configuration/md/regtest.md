@@ -104,38 +104,6 @@ buckets = 10001
 
 [table.scan]
 buckets = 10001
-
-[admin]
-bind = 0.0.0.0:28080
-safe = 0.0.0.0:28043
-
-[native]
-bind = 0.0.0.0:28180
-safe = 0.0.0.0:28143
-
-[bitcoind]
-bind = 0.0.0.0:28280
-safe = 0.0.0.0:28243
-
-[electrum]
-bind = 0.0.0.0:28380
-safe = 0.0.0.0:28343
-
-[bitcoind_zmq]
-bind = 0.0.0.0:28680
-safe = 0.0.0.0:28643
-
-[btcd]
-bind = 0.0.0.0:28780
-safe = 0.0.0.0:28743
-
-[sparrow]
-bind = 0.0.0.0:28880
-safe = 0.0.0.0:28843
-
-[esplora]
-bind = 0.0.0.0:28980
-safe = 0.0.0.0:28943
 ```
 
 - `[bitcoin]` sets the regtest genesis block and difficulty limit, all
@@ -143,12 +111,11 @@ safe = 0.0.0.0:28943
   There are no checkpoints beyond genesis and no minimum work.
 - `forks.retarget = false` disables difficulty retargeting.
 - `peer.identifier` is the regtest network magic.
-- `bs` does not mine, so blocks come from a peer. `[outbound]` disables
-  seeding and outbound connections, and `[manual]` connects to a local
-  node that generates blocks, here on port 18445 since `bs` listens on
-  18444.
+- `[wallet]` sets the regtest address and key prefixes used by the server
+  ([Settings Reference](reference#6-wallet)).
+- `bs` does not mine, so blocks come from a peer.
+- `[outbound]` disables seeding and outbound connections.
+- `[manual]` connects to a local node that generates blocks, here on port
+  18445 since `bs` listens on 18444.
 - `[table.*]` keeps the store small, since the mainnet defaults
   preallocate for the mainnet chain.
-- The service sections move each service to the regtest ports of the
-  port plan, 28043–28980 ([§6](index#6-ports)). A service
-  is still off until its `connections` is nonzero.

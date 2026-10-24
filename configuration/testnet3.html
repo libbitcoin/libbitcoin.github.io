@@ -100,10 +100,10 @@
   .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
   .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
-  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre.console { font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
   .doc pre code .comment { color: var(--ink-3); }
   .doc pre code .section { color: var(--heading); }
-  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
+  .doc pre.console code { font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -244,10 +244,11 @@
     <a href="testnet3.html" class="here">Testnet3</a>
     <a href="testnet4.html">Testnet4</a>
     <a href="regtest.html">Regtest</a>
+    <a href="reference.html">Settings Reference</a>
   </nav>
 
   <article class="doc">
-<p>Testnet3 is the long-running public test network, about 5.1 million
+<p>Testnet3 is a long-running public test network, about 5.1 million
 blocks.</p>
 <p>Save the settings below as <code>testnet3.cfg</code> and start the node with it:</p>
 <pre class="console"><code>$ bs -c testnet3.cfg
@@ -344,53 +345,18 @@ buckets = 5100001
 
 <span class="section">[table.scan]</span>
 buckets = 5100001
-
-<span class="section">[admin]</span>
-bind = 0.0.0.0:18080
-safe = 0.0.0.0:18043
-
-<span class="section">[native]</span>
-bind = 0.0.0.0:18180
-safe = 0.0.0.0:18143
-
-<span class="section">[bitcoind]</span>
-bind = 0.0.0.0:18280
-safe = 0.0.0.0:18243
-
-<span class="section">[electrum]</span>
-bind = 0.0.0.0:18380
-safe = 0.0.0.0:18343
-
-<span class="section">[bitcoind_zmq]</span>
-bind = 0.0.0.0:18680
-safe = 0.0.0.0:18643
-
-<span class="section">[btcd]</span>
-bind = 0.0.0.0:18780
-safe = 0.0.0.0:18743
-
-<span class="section">[sparrow]</span>
-bind = 0.0.0.0:18880
-safe = 0.0.0.0:18843
-
-<span class="section">[esplora]</span>
-bind = 0.0.0.0:18980
-safe = 0.0.0.0:18943
 </code></pre>
 <ul>
 <li><code>[bitcoin]</code> replaces the chain parameters: genesis block, soft fork
-  activations, checkpoint, milestone and minimum work. The milestone at
-  5,100,000 bypasses script validation below it.</li>
-<li><code>forks.difficult = false</code> allows testnet's minimum difficulty blocks.</li>
-<li><code>peer.identifier</code> is the testnet3 network magic, and <code>[outbound]</code>
-  replaces the mainnet seeds.</li>
-<li><code>[wallet]</code> sets the testnet address and key prefixes.</li>
-<li><code>[table.*]</code> sizes the store for the chain at 5.1 million blocks.
-  <code>node.maximum_concurrency</code> raises the download window, since testnet blocks
-  are small.</li>
-<li>The service sections move each service to the testnet3 ports of the
-  port plan, 18043–18980 (<a href="index.html#6-ports">§6</a>). A service
-  is still off until its <code>connections</code> is nonzero.</li>
+  activations, checkpoint, milestone and minimum work.</li>
+<li><code>forks.difficult = false</code> enables testnet's minimum difficulty blocks.</li>
+<li><code>peer.identifier</code> is the testnet3 network magic.</li>
+<li><code>[outbound]</code> replaces the mainnet seeds.</li>
+<li><code>[wallet]</code> sets the testnet address and key prefixes used by the server
+  (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
+<li><code>[table.*]</code> sizes the store for the chain at 5.1 million blocks.</li>
+<li><code>node.maximum_concurrency</code> raises the download window, since testnet
+  blocks are small.</li>
 </ul>
   </article>
 

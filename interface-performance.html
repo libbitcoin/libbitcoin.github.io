@@ -467,31 +467,44 @@
   <section>
     <h2 id="bitcoind-zmq-interface">Bitcoind ZMQ Interface<a class="anchor" href="#bitcoind-zmq-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
+      <figure class="shot" data-full="performance/server-dispatch-zmq.png" tabindex="0">
+        <h3>Transaction notification dispatch rate: comparative (log scale)</h3>
+        <img src="performance/server-dispatch-zmq.png" alt="Transaction notification dispatch rate: comparative (log scale)" loading="lazy">
+      </figure>
+      <figure class="shot" data-full="performance/server-dispatch-zmq-block.png" tabindex="0">
+        <h3>Block notification dispatch rate (log scale)</h3>
+        <img src="performance/server-dispatch-zmq-block.png" alt="Block notification dispatch rate (log scale)" loading="lazy">
+      </figure>
       <figure class="shot" data-full="performance/server-zmq.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
         <img src="performance/server-zmq.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
       </figure>
-      <figure class="shot" data-full="performance/server-dispatch-zmq.png" tabindex="0">
-        <h3>Notification dispatch rate: comparative (log scale)</h3>
-        <img src="performance/server-dispatch-zmq.png" alt="Notification dispatch rate: comparative (log scale)" loading="lazy">
-      </figure>
-    </div>
+</div>
     <p class="lede after">
-      Each server is at block 950,000 with an empty pool. The 28,142 transactions of blocks
-      950,001 to 950,009 are offered in block order by one P2P peer (inventory, then the
-      transaction when requested), and each is timed from its send to the arrival of its rawtx
-      notification on a ZMQ subscription. Rates are 1000 / mean latency over the 24,517
-      transactions both servers accepted. Libbitcoin accepted 1,421 more transactions, as Bitcoin Core's clustered mempool
-      imposes a hardwired capacity limit for performance reasons. Both rejected 2,204 transactions
-      that were not yet valid at block 950,000: 1,522 are time-locked to a later block, 55 have
-      unsatisfied relative lock times (BIP68), and 627 spend outputs of those.
+      Each server is at block 950,000 with an empty pool. Transaction dispatch is measured with 16 to
+      256 subscribers on one ZMTP endpoint (CurveZMQ dashed, Libbitcoin only), while one P2P peer
+      offers the transactions of blocks 950,001 to 950,009 at 500 per second. For each notification,
+      the span from its arrival at the first subscriber to its arrival at the last is taken, and the
+      rate is the subscribers reached after the first per second of the median span. At 256
+      subscribers Libbitcoin delivers each notification to all of them in about 2 ms, Bitcoin Core in
+      8 to 10 ms.
     </p>
     <p class="lede after">
-      Dispatch is measured with 16 to 256 subscribers on one ZMTP endpoint (CurveZMQ dashed, Libbitcoin
-      only), the same transactions offered at 500 per second. For each notification, the span from its arrival at
-      the first subscriber to its arrival at the last is taken, and the rate is the subscribers
-      reached after the first per second of the median span. At 256 subscribers Libbitcoin delivers
-      each notification to all of them in about 2 ms, Bitcoin Core in 8 to 10 ms.
+      Block dispatch is measured with 256 to 6,144 rawblock subscribers on one ZMTP endpoint
+      (Libbitcoin only), while one P2P peer offers blocks 950,001 to 950,009 (1.4 to 2.4 MB) 6 seconds
+      apart. The rate is taken as for transactions. At 6,144 subscribers Libbitcoin delivers each
+      block to all of them in about 310 ms, and the rate rises from about 16,000 to 20,000 per second
+      as subscribers increase.
+    </p>
+    <p class="lede after">
+      The chain object rate times each of the 28,142 transactions of blocks 950,001 to 950,009,
+      offered in block order by one P2P peer (inventory, then the transaction when requested), from
+      its send to the arrival of its rawtx notification on a ZMQ subscription. Rates are 1000 / mean
+      latency over the 24,517 transactions both servers accepted. Libbitcoin accepted 1,421 more
+      transactions, as Bitcoin Core's clustered mempool imposes a hardwired capacity limit for
+      performance reasons. Both rejected 2,204 transactions that were not yet valid at block 950,000:
+      1,522 are time-locked to a later block, 55 have unsatisfied relative lock times (BIP68), and 627
+      spend outputs of those.
     </p>
   </section>
 

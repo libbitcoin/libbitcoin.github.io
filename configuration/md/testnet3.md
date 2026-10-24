@@ -1,6 +1,6 @@
 # Testnet3
 
-Testnet3 is the long-running public test network, about 5.1 million
+Testnet3 is a long-running public test network, about 5.1 million
 blocks.
 
 Save the settings below as `testnet3.cfg` and start the node with it:
@@ -103,50 +103,15 @@ buckets = 5100001
 
 [table.scan]
 buckets = 5100001
-
-[admin]
-bind = 0.0.0.0:18080
-safe = 0.0.0.0:18043
-
-[native]
-bind = 0.0.0.0:18180
-safe = 0.0.0.0:18143
-
-[bitcoind]
-bind = 0.0.0.0:18280
-safe = 0.0.0.0:18243
-
-[electrum]
-bind = 0.0.0.0:18380
-safe = 0.0.0.0:18343
-
-[bitcoind_zmq]
-bind = 0.0.0.0:18680
-safe = 0.0.0.0:18643
-
-[btcd]
-bind = 0.0.0.0:18780
-safe = 0.0.0.0:18743
-
-[sparrow]
-bind = 0.0.0.0:18880
-safe = 0.0.0.0:18843
-
-[esplora]
-bind = 0.0.0.0:18980
-safe = 0.0.0.0:18943
 ```
 
 - `[bitcoin]` replaces the chain parameters: genesis block, soft fork
-  activations, checkpoint, milestone and minimum work. The milestone at
-  5,100,000 bypasses script validation below it.
-- `forks.difficult = false` allows testnet's minimum difficulty blocks.
-- `peer.identifier` is the testnet3 network magic, and `[outbound]`
-  replaces the mainnet seeds.
-- `[wallet]` sets the testnet address and key prefixes.
+  activations, checkpoint, milestone and minimum work.
+- `forks.difficult = false` enables testnet's minimum difficulty blocks.
+- `peer.identifier` is the testnet3 network magic.
+- `[outbound]` replaces the mainnet seeds.
+- `[wallet]` sets the testnet address and key prefixes used by the server
+  ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the store for the chain at 5.1 million blocks.
-  `node.maximum_concurrency` raises the download window, since testnet blocks
-  are small.
-- The service sections move each service to the testnet3 ports of the
-  port plan, 18043–18980 ([§6](index#6-ports)). A service
-  is still off until its `connections` is nonzero.
+- `node.maximum_concurrency` raises the download window, since testnet
+  blocks are small.

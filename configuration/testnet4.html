@@ -100,10 +100,10 @@
   .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
   .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
-  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre.console { font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
   .doc pre code .comment { color: var(--ink-3); }
   .doc pre code .section { color: var(--heading); }
-  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
+  .doc pre.console code { font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -244,10 +244,11 @@
     <a href="testnet3.html">Testnet3</a>
     <a href="testnet4.html" class="here">Testnet4</a>
     <a href="regtest.html">Regtest</a>
+    <a href="reference.html">Settings Reference</a>
   </nav>
 
   <article class="doc">
-<p>Testnet4 is the current public test network, about 150,000 blocks.</p>
+<p>Testnet4 is the newest public test network, about 150,000 blocks.</p>
 <p>Save the settings below as <code>testnet4.cfg</code> and start the node with it:</p>
 <pre class="console"><code>$ bs -c testnet4.cfg
 </code></pre>
@@ -344,53 +345,20 @@ buckets = 150001
 
 <span class="section">[table.scan]</span>
 buckets = 150001
-
-<span class="section">[admin]</span>
-bind = 0.0.0.0:48080
-safe = 0.0.0.0:48043
-
-<span class="section">[native]</span>
-bind = 0.0.0.0:48180
-safe = 0.0.0.0:48143
-
-<span class="section">[bitcoind]</span>
-bind = 0.0.0.0:48280
-safe = 0.0.0.0:48243
-
-<span class="section">[electrum]</span>
-bind = 0.0.0.0:48380
-safe = 0.0.0.0:48343
-
-<span class="section">[bitcoind_zmq]</span>
-bind = 0.0.0.0:48680
-safe = 0.0.0.0:48643
-
-<span class="section">[btcd]</span>
-bind = 0.0.0.0:48780
-safe = 0.0.0.0:48743
-
-<span class="section">[sparrow]</span>
-bind = 0.0.0.0:48880
-safe = 0.0.0.0:48843
-
-<span class="section">[esplora]</span>
-bind = 0.0.0.0:48980
-safe = 0.0.0.0:48943
 </code></pre>
 <ul>
-<li><code>[bitcoin]</code> replaces the chain parameters. Soft forks are active from
-  block 1, and the milestone at 150,000 bypasses script validation below
-  it.</li>
-<li><code>[forks]</code> enables the testnet4 rules: <code>forks.time_warp_patch</code> and
-  <code>forks.block_storm_patch</code>, with minimum difficulty blocks allowed
-  (<code>forks.difficult = false</code>).</li>
-<li><code>peer.identifier</code> is the testnet4 network magic, and <code>[outbound]</code>
-  replaces the mainnet seeds.</li>
-<li><code>[wallet]</code> sets the testnet address and key prefixes.</li>
+<li><code>[bitcoin]</code> replaces the chain parameters, with soft forks active from
+  block 1.</li>
+<li><code>forks.time_warp_patch</code> enables the testnet4 time warp rule.</li>
+<li><code>forks.block_storm_patch</code> enables the testnet4 block storm rule.</li>
+<li><code>forks.difficult = false</code> enables testnet's minimum difficulty blocks.</li>
+<li><code>peer.identifier</code> is the testnet4 network magic.</li>
+<li><code>[outbound]</code> replaces the mainnet seeds.</li>
+<li><code>[wallet]</code> sets the testnet address and key prefixes used by the server
+  (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
 <li><code>[table.*]</code> sizes the store for the chain at 150,000 blocks.</li>
-<li>The service sections move each service to the testnet4 ports of the
-  port plan, 48043–48980 (<a href="index.html#6-ports">§6</a>). A service
-  is still off until its <code>connections</code> is nonzero.</li>
+<li><code>node.maximum_concurrency</code> raises the download window, since testnet
+  blocks are small.</li>
 </ul>
   </article>
 

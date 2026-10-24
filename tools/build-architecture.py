@@ -80,6 +80,7 @@ SECTIONS = {
             ("testnet3", "Testnet3"),
             ("testnet4", "Testnet4"),
             ("regtest", "Regtest"),
+            ("reference", "Settings Reference"),
         ],
     },
     "building": {
@@ -147,10 +148,10 @@ STYLE = """
   .doc code { font-family: var(--mono); font-size: 12.5px; color: #d9ad6a; background: var(--surface); border: 1px solid var(--rule); border-radius: 2px; padding: 0 4px; overflow-wrap: anywhere; }
   .doc pre { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 12px 14px; margin: 0 0 18px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink); }
   .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
-  .doc pre.console { background: #3a96dd; border-color: #2f7fbd; font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
+  .doc pre.console { font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
   .doc pre code .comment { color: var(--ink-3); }
   .doc pre code .section { color: var(--heading); }
-  .doc pre.console code { color: #f2f2f2; font-family: inherit; }
+  .doc pre.console code { font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
