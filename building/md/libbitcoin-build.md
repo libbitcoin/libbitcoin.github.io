@@ -61,7 +61,7 @@ $ ./generate4.sh
 On Windows, `generate4.cmd` does the same, and accepts repository names to
 limit the copy, for example `generate4.cmd libbitcoin-node`.
 
-GSL builds from source on Linux and macOS (it needs PCRE), and is
+GSL builds from source on Linux and macOS, and is
 available as a NuGet package on Windows.
 
 ### Source files

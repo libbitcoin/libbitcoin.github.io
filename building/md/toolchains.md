@@ -77,7 +77,7 @@ no Boost binaries.
 
 Release binaries are built with CMake on Linux and macOS and with Visual
 Studio on Windows, statically linked to libbitcoin and Boost, in
-variants for each set of hardware options:
+variants for each set of hardware options, for example:
 
 | Platform | Compiler | Variants |
 | -------- | -------- | -------- |

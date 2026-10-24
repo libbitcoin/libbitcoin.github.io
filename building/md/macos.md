@@ -36,8 +36,3 @@ enable the ARM crypto instructions, which every M-series CPU has. On
 Intel Macs, use the x86 options (see [Build options](options)).
 
 GPU acceleration is not available on macOS.
-
-## 4. Static linking
-
-macOS does not support fully static executables. A static build links
-libbitcoin and Boost statically and the system libraries dynamically.

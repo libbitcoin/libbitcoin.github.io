@@ -25,8 +25,7 @@ name.
   it with `--build-boost`. Visual Studio restores it as a NuGet package.
 - Git, to fetch the libbitcoin sources.
 
-Nothing else is required. secp256k1 and TLS are part of libbitcoin, and
-GPU support needs no SDK at build time (see [Build options](options)).
+Nothing else is required (see [Build options](options)).
 
 ## 3. Quick start
 
