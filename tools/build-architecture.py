@@ -85,6 +85,7 @@ SECTIONS = {
             ("index", "Configuration"),
             ("testnet3", "Testnet3"),
             ("testnet4", "Testnet4"),
+            ("signet", "Signet"),
             ("regtest", "Regtest"),
             ("reference", "Settings Reference"),
         ],
@@ -164,6 +165,10 @@ STYLE = """
   .doc pre.console { font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; font-size: 13px; line-height: 1.35; }
   .doc pre code .comment { color: var(--ink-3); }
   .doc pre code .section { color: var(--heading); }
+  .codebox { position: relative; }
+  .copy { position: absolute; top: 8px; right: 8px; padding: 5px; line-height: 0; color: var(--ink-3); background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; }
+  .copy:hover, .copy:focus-visible { color: var(--heading); }
+  .copy.done { color: var(--heading); border-color: var(--heading); }
   .doc pre.console code { font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
@@ -385,8 +390,8 @@ def render(key, name, md, guard, logo, mermaid_src):
 <meta property="og:url" content="https://libbitcoin.info/%(key)s/%(name)s.html">
 <meta property="og:title" content="%(page_title)s">
 <meta property="og:description" content="%(description)s">
-<meta property="og:image" content="https://libbitcoin.info/card.png">
-<meta property="og:image:secure_url" content="https://libbitcoin.info/card.png">
+<meta property="og:image" content="https://libbitcoin.info/card2.png">
+<meta property="og:image:secure_url" content="https://libbitcoin.info/card2.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="2400">
 <meta property="og:image:height" content="1260">
@@ -394,7 +399,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="%(page_title)s">
 <meta name="twitter:description" content="%(description)s">
-<meta name="twitter:image" content="https://libbitcoin.info/card.png">
+<meta name="twitter:image" content="https://libbitcoin.info/card2.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>%(style)s</style>
 </head>
@@ -533,6 +538,27 @@ document.addEventListener('click', function (e) {
 });
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
+});
+document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+  var pre = code.parentNode;
+  var box = document.createElement('div');
+  box.className = 'codebox';
+  pre.parentNode.insertBefore(box, pre);
+  box.appendChild(pre);
+  var button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'copy';
+  button.title = 'Copy';
+  button.setAttribute('aria-label', 'Copy');
+  button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+  button.addEventListener('click', function () {
+    navigator.clipboard.writeText(code.innerText).then(function () {
+      button.classList.add('done');
+      button.title = 'Copied';
+      setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);
+    });
+  });
+  box.appendChild(button);
 });
 </script>
 </body>

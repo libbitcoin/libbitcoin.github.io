@@ -1031,7 +1031,7 @@ The common changes are:
 - disabling the address index ([5.13](#513-disable-the-address-index));
 - enabling client filters ([5.12](#512-client-filters-bip157158));
 - sizing for a test chain, as on the [Testnet3](testnet3),
-  [Testnet4](testnet4) and [Regtest](regtest) pages.
+  [Testnet4](testnet4), [Signet](signet) and [Regtest](regtest) pages.
 
 `bs -k` and `bs -l` report bucket fill and collisions on an existing
 store.
@@ -1101,4 +1101,4 @@ Every setting, by section, with its description and default, is on the
 [Settings Reference](reference) page.
 
 Settings for the test chains are on their own pages:
-[Testnet3](testnet3), [Testnet4](testnet4) and [Regtest](regtest).
+[Testnet3](testnet3), [Testnet4](testnet4), [Signet](signet) and [Regtest](regtest).

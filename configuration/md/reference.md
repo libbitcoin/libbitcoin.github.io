@@ -374,7 +374,7 @@ addresses, keys and descriptors in client requests and responses:
 
 They do not affect the node or the store. The defaults are mainnet, and a
 test chain sets its own, as on the [Testnet3](testnet3),
-[Testnet4](testnet4) and [Regtest](regtest) pages.
+[Testnet4](testnet4), [Signet](signet) and [Regtest](regtest) pages.
 
 ```ini
 [wallet]
