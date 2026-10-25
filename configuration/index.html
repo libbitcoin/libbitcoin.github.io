@@ -114,6 +114,13 @@
   .copy { position: absolute; top: 8px; right: 8px; padding: 5px; line-height: 0; color: var(--ink-3); background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; }
   .copy:hover, .copy:focus-visible { color: var(--heading); }
   .copy.done { color: var(--heading); border-color: var(--heading); }
+  .hljs-keyword, .hljs-built_in, .hljs-meta { color: #d0704f; }
+  .hljs-literal, .hljs-number { color: #e39a4c; }
+  .hljs-string { color: #d9ad6a; }
+  .hljs-attr { color: var(--ink); }
+  .hljs-title, .hljs-title.function_, .hljs-params { color: #f0bd6e; }
+  .hljs-comment { color: var(--ink-3); }
+  .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
@@ -1486,7 +1493,7 @@ lines, any client may connect.</p>
 <tbody>
 <tr>
 <td><code>credential</code></td>
-<td>A <code>user:password</code> for HTTP Basic authentication (<a href="https://www.rfc-editor.org/rfc/rfc7617">RFC 7617</a>, <a href="https://www.rfc-editor.org/rfc/rfc9110#section-11">RFC 9110 §11</a>). Multiple allowed. When any is set, every request must present one of them. Basic authentication is not encrypted, so it is exposed unless the connection is secure.</td>
+<td>A <code>user:password</code> for HTTP Basic authentication (<a href="https://www.rfc-editor.org/rfc/rfc7617.txt">RFC 7617</a>, <a href="https://www.rfc-editor.org/rfc/rfc9110.txt">RFC 9110 §11</a>). Multiple allowed. When any is set, every request must present one of them. Basic authentication is not encrypted, so it is exposed unless the connection is secure.</td>
 </tr>
 </tbody>
 </table></div>
@@ -1540,15 +1547,15 @@ services, and also have:</p>
 <tbody>
 <tr>
 <td><code>host</code></td>
-<td>Allowed <code>Host</code> header values (<a href="https://www.rfc-editor.org/rfc/rfc9110#section-7.2">RFC 9110 §7.2</a>). Multiple allowed.</td>
+<td>Allowed <code>Host</code> header values (<a href="https://www.rfc-editor.org/rfc/rfc9110.txt">RFC 9110 §7.2</a>). Multiple allowed.</td>
 </tr>
 <tr>
 <td><code>origin</code></td>
-<td>Allowed <code>Origin</code> header values for cross-origin requests (<a href="https://www.rfc-editor.org/rfc/rfc6454">RFC 6454</a>). Multiple allowed.</td>
+<td>Allowed <code>Origin</code> header values for cross-origin requests (<a href="https://www.rfc-editor.org/rfc/rfc6454.txt">RFC 6454</a>). Multiple allowed.</td>
 </tr>
 <tr>
 <td><code>allow_opaque_origin</code></td>
-<td>Allow requests with an opaque origin (<a href="https://www.rfc-editor.org/rfc/rfc6454#section-7.3">RFC 6454 §7.3</a>), such as from a page opened as a local file.</td>
+<td>Allow requests with an opaque origin (<a href="https://www.rfc-editor.org/rfc/rfc6454.txt">RFC 6454 §7.3</a>), such as from a page opened as a local file.</td>
 </tr>
 </tbody>
 </table></div>
@@ -1881,6 +1888,12 @@ take effect only on a new store.</p>
   box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json').forEach(function (code) {
+  hljs.highlightElement(code);
+});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>

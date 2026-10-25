@@ -917,7 +917,7 @@ Every client service except `[bitcoind_zmq]` has:
 
 | Setting | Purpose |
 | ------- | ------- |
-| `credential` | A `user:password` for HTTP Basic authentication ([RFC 7617](https://www.rfc-editor.org/rfc/rfc7617), [RFC 9110 §11](https://www.rfc-editor.org/rfc/rfc9110#section-11)). Multiple allowed. When any is set, every request must present one of them. Basic authentication is not encrypted, so it is exposed unless the connection is secure. |
+| `credential` | A `user:password` for HTTP Basic authentication ([RFC 7617](https://www.rfc-editor.org/rfc/rfc7617.txt), [RFC 9110 §11](https://www.rfc-editor.org/rfc/rfc9110.txt)). Multiple allowed. When any is set, every request must present one of them. Basic authentication is not encrypted, so it is exposed unless the connection is secure. |
 
 `[bitcoind]`, `[btcd]`, `[electrum]` and `[sparrow]` accept raw TCP,
 HTTP and websocket clients on the same port. Raw TCP carries no HTTP
@@ -946,9 +946,9 @@ services, and also have:
 
 | Setting | Purpose |
 | ------- | ------- |
-| `host` | Allowed `Host` header values ([RFC 9110 §7.2](https://www.rfc-editor.org/rfc/rfc9110#section-7.2)). Multiple allowed. |
-| `origin` | Allowed `Origin` header values for cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454)). Multiple allowed. |
-| `allow_opaque_origin` | Allow requests with an opaque origin ([RFC 6454 §7.3](https://www.rfc-editor.org/rfc/rfc6454#section-7.3)), such as from a page opened as a local file. |
+| `host` | Allowed `Host` header values ([RFC 9110 §7.2](https://www.rfc-editor.org/rfc/rfc9110.txt)). Multiple allowed. |
+| `origin` | Allowed `Origin` header values for cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454.txt)). Multiple allowed. |
+| `allow_opaque_origin` | Allow requests with an opaque origin ([RFC 6454 §7.3](https://www.rfc-editor.org/rfc/rfc6454.txt)), such as from a page opened as a local file. |
 
 ### 7.5 Limits
 

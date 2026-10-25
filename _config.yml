@@ -3,4 +3,5 @@ exclude:
   - database/md
   - configuration/md
   - building/md
+  - interfaces/md
   - tools

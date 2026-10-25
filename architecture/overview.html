@@ -114,6 +114,13 @@
   .copy { position: absolute; top: 8px; right: 8px; padding: 5px; line-height: 0; color: var(--ink-3); background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; }
   .copy:hover, .copy:focus-visible { color: var(--heading); }
   .copy.done { color: var(--heading); border-color: var(--heading); }
+  .hljs-keyword, .hljs-built_in, .hljs-meta { color: #d0704f; }
+  .hljs-literal, .hljs-number { color: #e39a4c; }
+  .hljs-string { color: #d9ad6a; }
+  .hljs-attr { color: var(--ink); }
+  .hljs-title, .hljs-title.function_, .hljs-params { color: #f0bd6e; }
+  .hljs-comment { color: var(--ink-3); }
+  .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
@@ -1213,6 +1220,12 @@ the architecture docs refer to:</p>
   box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json').forEach(function (code) {
+  hljs.highlightElement(code);
+});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>

@@ -306,7 +306,7 @@ const services = [
   ]
 },
 {
-  id: 'native', name: 'Native REST', versioned: true,
+  id: 'native', name: 'Native REST', versioned: true, doc: 'interfaces/native.html',
   note: 'A RESTful block explorer with websocket subscriptions, navigating blocks, headers, transactions, inputs, outputs, spenders, and addresses bidirectionally in constant time. All objects are served as json, wire data or hexadecimal text, with an optional witness argument as applicable. Includes robust embedded html block explorer.',
   spec: { Transport: 'http/s, ws/s', Framing: 'REST + ws', Auth: 'tls server, mutual; http basic (scoped)', Channel: 'full duplex (subscriptions)' },
   methods: [
@@ -751,7 +751,7 @@ document.getElementById('board').innerHTML = services.map(s => {
 document.getElementById('services').innerHTML = services.map(s => {
   const n = s.methods.length;
   const rowHtml = ([m, st, note, ver, cfg, wip]) => `<tr class="${st === Y || st === P ? '' : 'dim'}">
-      <td class="m">${esc(m)}</td>
+      <td class="m">${s.doc ? `<a href="${s.doc}#${m}">${esc(m)}</a>` : esc(m)}</td>
       <td class="st">${stat(st, wip)}</td>
       ${s.versioned ? `<td class="v">${esc(ver || '')}</td>` : ''}
       ${s.configured ? `<td class="v">${esc(cfg || '')}</td>` : ''}
@@ -788,6 +788,7 @@ document.getElementById('services').innerHTML = services.map(s => {
   return `<section class="svc" id="${s.id}">
     <h3>${esc(s.name)}</h3>
     ${s.note ? `<p class="svc-note">${esc(s.note)}</p>` : ''}
+    ${s.doc ? `<p class="svc-note"><a href="${s.doc}">Documentation</a></p>` : ''}
     <dl class="spec">${spec}</dl>
     ${table}${extra}
   </section>`;
