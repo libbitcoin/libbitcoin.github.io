@@ -51,8 +51,6 @@ All are off by default.
 | `--enable-sha512` | SHA512 extensions (implies AVX2) |
 | `--enable-aesni` | AES-NI and PCLMULQDQ |
 | `--enable-vaes` | VAES and VPCLMULQDQ (implies AES-NI and AVX2) |
-| `--enable-bmi2` | BMI2 |
-| `--enable-adx` | ADX |
 
 ### ARM
 
