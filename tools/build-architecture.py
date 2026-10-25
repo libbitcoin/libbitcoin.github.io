@@ -2,7 +2,7 @@
 
 Usage: python tools/build-architecture.py [--mermaid URL]
 
-The anti-mirror script and the logo are lifted from node-performance.html so
+The anti-mirror script and the logo are lifted from computation.html so
 the pages share one copy of each. Mermaid diagrams are emitted as
 <div class="mermaid"> and rendered client-side by mermaid.min.js.
 """
@@ -14,7 +14,7 @@ import sys
 import markdown
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CHROME = os.path.join(ROOT, "node-performance.html")
+CHROME = os.path.join(ROOT, "computation.html")
 MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 
 SITE_MENU = [
@@ -25,7 +25,9 @@ SITE_MENU = [
         ("building/index.html", "Building"),
     ]),
     ("Performance", [
-        ("node-performance.html", "Node"),
+        ("sync.html", "Sync"),
+        ("footprint.html", "Footprint"),
+        ("computation.html", "Computation"),
         ("interface-performance.html", "Interfaces"),
     ]),
     ("Architecture", [
