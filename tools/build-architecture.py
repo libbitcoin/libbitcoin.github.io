@@ -21,8 +21,10 @@ SITE_MENU = [
     ("index.html", "Home"),
     ("Server", [
         ("interfaces.html", "Interfaces", [
+            ("interfaces/admin.html", "Admin Console"),
             ("interfaces/native.html", "Native REST"),
             ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
+            ("interfaces/zeromq.html", "Bitcoind ZMQ"),
             ("interfaces/esplora.html", "Esplora REST"),
         ]),
         ("configuration/index.html", "Configuration"),
@@ -120,8 +122,10 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Interfaces"),
+            ("admin", "Admin Console"),
             ("native", "Native REST"),
             ("bitcoind-rest", "Bitcoind REST"),
+            ("zeromq", "Bitcoind ZMQ"),
             ("esplora", "Esplora REST"),
         ],
     },

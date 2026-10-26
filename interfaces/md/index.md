@@ -8,8 +8,10 @@ how to call them, with examples and their responses.
 
 | Interface | Section | Default port |
 | --------- | ------- | ------------ |
+| [Admin Console](admin) | `[admin]` | 8080, secure 8043 |
 | [Native REST](native) | `[native]` | 8180, secure 8143 |
 | [Bitcoind REST](bitcoind-rest) | `[bitcoind]` | 8280, secure 8243 |
+| [Bitcoind ZMQ](zeromq) | `[bitcoind_zmq]` | 8380, secure 8343 |
 | [Esplora REST](esplora) | `[esplora]` | 8780, secure 8743 |
 
 To enable an interface, and to secure it, see

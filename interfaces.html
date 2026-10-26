@@ -240,8 +240,10 @@
       <a href="index.html">Home</a>
       <details class="drop here" name="site"><summary>Server</summary><div>
         <a href="interfaces.html" class="here">Interfaces</a>
+        <a href="interfaces/admin.html" class="sub">Admin Console</a>
         <a href="interfaces/native.html" class="sub">Native REST</a>
         <a href="interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
+        <a href="interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
         <a href="interfaces/esplora.html" class="sub">Esplora REST</a>
         <a href="configuration/index.html">Configuration</a>
         <a href="building/index.html">Building</a>
@@ -301,12 +303,12 @@ const ORDER = [Y, P, W, N, R, X];
 
 const services = [
 {
-  id: 'admin', name: 'Admin Console', versioned: true,
+  id: 'admin', name: 'Admin Console', versioned: true, doc: 'interfaces/admin.html',
   note: 'An isolated operations endpoint, with its own interface and credentials. Streams the node’s log and event telemetry live over websocket, rendered via an embedded html console. Console can be replaced with custom pages by configuration.',
   spec: { Transport: 'http/s, ws/s', Framing: 'REST + ws', Auth: 'tls server, mutual; http basic (scoped)', Channel: 'full duplex (subscriptions)' },
   methods: [
     ['log_subscribe', Y, 'filtered live log stream (10 levels)', 'v1'],
-    ['event_subscribe', Y, 'filtered live event stream (27 event types)', 'v1']
+    ['event_subscribe', Y, 'filtered live event stream (28 event types)', 'v1']
   ]
 },
 {
@@ -605,7 +607,7 @@ const services = [
   ]
 },
 {
-  id: 'zeromq', name: 'Bitcoind ZMQ',
+  id: 'zeromq', name: 'Bitcoind ZMQ', doc: 'interfaces/zeromq.html',
   note: 'Drop-in compatibility for the ZeroMQ interface.',
   spec: { Transport: 'zmtp/s', Framing: 'zeromq', Auth: 'curvecp server, mutual', Channel: 'full duplex (notifications)' },
   methods: [
