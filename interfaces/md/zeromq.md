@@ -168,6 +168,13 @@ followed by a label:
 | `C` | Block added to the confirmed chain | Block hash, `C` (33 bytes) |
 | `D` | Block removed from the confirmed chain | Block hash, `D` (33 bytes) |
 | `A` | Transaction accepted to the memory pool | Transaction hash, `A`, pool sequence (41 bytes) |
+| `R` | Transaction removed from the memory pool | Transaction hash, `R`, pool sequence (41 bytes) |
+
+bitcoind sends `R` for a transaction removed from its pool for a reason
+other than confirmation, such as eviction, expiry, replacement or a
+confirmed conflict. `bs` does not evict, expire or replace transactions,
+so the only removal `R` covers is a transaction made unconfirmable by a
+confirmed conflict, for which `R` is not yet sent.
 
 The pool sequence is 8 bytes, little-endian. It counts the `A`
 notifications of the connection, and is not bitcoind's
@@ -175,6 +182,3 @@ notifications of the connection, and is not bitcoind's
 
 In a reorganization, each removed block is published with `D` from the
 top down, then each added block with `C` from the fork up.
-
-Transactions removed from the pool are not published, so the `R` label of
-bitcoind does not appear.

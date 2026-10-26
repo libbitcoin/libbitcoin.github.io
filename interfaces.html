@@ -242,6 +242,7 @@
         <a href="interfaces.html" class="here">Interfaces</a>
         <a href="interfaces/admin.html" class="sub">Admin Console</a>
         <a href="interfaces/native.html" class="sub">Native REST</a>
+        <a href="interfaces/p2p.html" class="sub">Bitcoin P2P</a>
         <a href="interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
         <a href="interfaces/esplora.html" class="sub">Esplora REST</a>
@@ -413,26 +414,33 @@ const services = [
   ]
 },
 {
-  id: 'p2p', name: 'Bitcoin P2P', versioned: true, configured: true, label: 'Message',
+  id: 'p2p', name: 'Bitcoin P2P', versioned: true, doc: 'interfaces/p2p.html', configured: true, label: 'Message',
   note: 'Bitcoin’s wire protocol. Outbound and manual connections may run over socks5 with proxy authentication, making peers through an anonymizer. Can be configured to run as a hidden service.',
   spec: { Transport: 'p2p/s, socks5', Framing: 'bitcoin p2p', Auth: 'not applicable', Channel: 'full duplex, version handshake' },
   methods: [
     ['version', Y, '', '106+', ''],
     ['verack', Y, '', '106', ''],
     ['ping', Y, '', '106+', ''],
-    ['pong', Y, 'bip31', '60001', ''],
-    ['addr', Y, '', '31402+', 'enable_address'],
-    ['getaddr', Y, '', '209', 'enable_address'],
-    ['headers', Y, '', '31800', ''],
-    ['getheaders', Y, '', '31800', ''],
-    ['sendheaders', Y, 'bip130', '70012', ''],
     ['block', Y, '', '106+', ''],
     ['tx', Y, '', '106+', 'enable_relay'],
     ['getblocks', Y, '', '106+', ''],
     ['getdata', Y, '', '106+', ''],
     ['inv', Y, '', '106+', ''],
-    ['reject', Y, 'bip61', '70002', 'enable_reject'],
+    ['getaddr', Y, '', '209', 'enable_address'],
     ['alert', Y, '', '311', 'enable_alert'],
+    ['addr', Y, '', '31402+', 'enable_address'],
+    ['headers', Y, '', '31800', ''],
+    ['getheaders', Y, '', '31800', ''],
+    ['pong', Y, 'bip31', '60001', ''],
+    ['mempool', Y, 'bip35', '60002', 'enable_memory_pool'],
+    ['notfound', Y, 'added at same version as bip37', '70001', 'enable_not_found'],
+    ['reject', Y, 'bip61', '70002', 'enable_reject'],
+    ['sendheaders', Y, 'bip130', '70012', ''],
+    ['feefilter', Y, 'bip133', '70013', 'enable_relay'],
+    ['cmpctblock', Y, 'bip152', '70014', 'enable_compact'],
+    ['sendcmpct', Y, 'bip152', '70014', 'enable_compact'],
+    ['blocktxn', Y, 'bip152', '70014', 'enable_compact'],
+    ['getblocktxn', Y, 'bip152', '70014', 'enable_compact'],
     ['cfilter', Y, 'bip157, block filters required', '70015', 'provide_filters'],
     ['cfheaders', Y, 'bip157, block filters required', '70015', 'provide_filters'],
     ['cfcheckpt', Y, 'bip157, block filters required', '70015', 'provide_filters'],
@@ -442,13 +450,6 @@ const services = [
     ['sendaddrv2', Y, 'bip155', '70016', 'enable_address_v2'],
     ['addrv2', Y, 'bip155', '70016', 'enable_address_v2'],
     ['wtxidrelay', Y, 'bip339', '70016', 'enable_witness_tx'],
-    ['mempool', Y, 'bip35', '60002', 'enable_memory_pool'],
-    ['feefilter', Y, 'bip133', '70013', 'enable_relay'],
-    ['cmpctblock', Y, 'bip152', '70014', 'enable_compact'],
-    ['sendcmpct', Y, 'bip152', '70014', 'enable_compact'],
-    ['blocktxn', Y, 'bip152', '70014', 'enable_compact'],
-    ['getblocktxn', Y, 'bip152', '70014', 'enable_compact'],
-    ['notfound', Y, 'added at same version as bip37', '70001', 'enable_not_found'],
     ['filterload', R, 'bip37, privacy leak', '70001', ''],
     ['filteradd', R, 'bip37, privacy leak', '70001', ''],
     ['filterclear', R, 'bip37, privacy leak', '70001', ''],
