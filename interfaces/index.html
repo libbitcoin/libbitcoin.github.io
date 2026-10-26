@@ -88,6 +88,7 @@
   .drop > summary::after { content: " ▾"; }
   .drop > summary:hover, .drop[open] > summary, .drop.here > summary { color: var(--heading); }
   .drop > div { position: absolute; top: calc(100% + 10px); left: -14px; z-index: 20; display: flex; flex-direction: column; gap: 10px; width: max-content; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; box-shadow: var(--shadow); }
+  .drop > div a.sub { padding-left: 14px; }
   .foot { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 48px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; display: flex; flex-direction: column; gap: 10px; }
   .pager { display: flex; justify-content: space-between; gap: 18px; margin: 40px 0 0; font-family: var(--mono); font-size: 12.5px; }
 
@@ -244,6 +245,9 @@
       <a href="../index.html">Home</a>
       <details class="drop" name="site"><summary>Server</summary><div>
         <a href="../interfaces.html">Interfaces</a>
+        <a href="../interfaces/native.html" class="sub">Native REST</a>
+        <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
+        <a href="../interfaces/esplora.html" class="sub">Esplora REST</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
       </div></details>
@@ -269,6 +273,7 @@
     <a href="index.html" class="here">Interfaces</a>
     <a href="native.html">Native REST</a>
     <a href="bitcoind-rest.html">Bitcoind REST</a>
+    <a href="esplora.html">Esplora REST</a>
   </nav>
 
   <article class="doc">
@@ -295,6 +300,11 @@ how to call them, with examples and their responses.</p>
 <td><a href="bitcoind-rest.html">Bitcoind REST</a></td>
 <td><code>[bitcoind]</code></td>
 <td>8280, secure 8243</td>
+</tr>
+<tr>
+<td><a href="esplora.html">Esplora REST</a></td>
+<td><code>[esplora]</code></td>
+<td>8780, secure 8743</td>
 </tr>
 </tbody>
 </table></div>

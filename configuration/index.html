@@ -88,6 +88,7 @@
   .drop > summary::after { content: " ▾"; }
   .drop > summary:hover, .drop[open] > summary, .drop.here > summary { color: var(--heading); }
   .drop > div { position: absolute; top: calc(100% + 10px); left: -14px; z-index: 20; display: flex; flex-direction: column; gap: 10px; width: max-content; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; box-shadow: var(--shadow); }
+  .drop > div a.sub { padding-left: 14px; }
   .foot { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 48px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; display: flex; flex-direction: column; gap: 10px; }
   .pager { display: flex; justify-content: space-between; gap: 18px; margin: 40px 0 0; font-family: var(--mono); font-size: 12.5px; }
 
@@ -244,6 +245,9 @@
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Server</summary><div>
         <a href="../interfaces.html">Interfaces</a>
+        <a href="../interfaces/native.html" class="sub">Native REST</a>
+        <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
+        <a href="../interfaces/esplora.html" class="sub">Esplora REST</a>
         <a href="../configuration/index.html" class="here">Configuration</a>
         <a href="../building/index.html">Building</a>
       </div></details>
@@ -729,180 +733,8 @@ chosen with <code>format=</code> or the <code>Accept</code> header:</p>
     &quot;nonce&quot;: 2083236893
 }
 </code></pre>
-<p>The full native REST map, under <code>http://localhost:8180</code>. In block paths,
-<code>{block}</code> is <code>hash/{block hash}</code> or <code>height/{height}</code>. The method name is
-the one used in credential method lists (§7.3).</p>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Path</th>
-<th>Method</th>
-<th>Result</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>/v1/configuration</code></td>
-<td><code>configuration</code></td>
-<td>Server configuration</td>
-</tr>
-<tr>
-<td><code>/v1/top</code></td>
-<td><code>top</code></td>
-<td>Top confirmed height</td>
-</tr>
-<tr>
-<td><code>/v1/top/subscribe</code></td>
-<td><code>top_subscribe</code></td>
-<td>Top height notifications (websocket)</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}</code></td>
-<td><code>block</code></td>
-<td>Block</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/header</code></td>
-<td><code>block_header</code></td>
-<td>Block header</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/header/context</code></td>
-<td><code>block_header_context</code></td>
-<td>Header validation context</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/details</code></td>
-<td><code>block_details</code></td>
-<td>Block details</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/txs</code></td>
-<td><code>block_txs</code></td>
-<td>All transactions of the block</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/tx/{position}</code></td>
-<td><code>block_tx</code></td>
-<td>Transaction at a position in the block</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/filter/{type}</code></td>
-<td><code>block_filter</code></td>
-<td>Client filter</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/filter/{type}/hash</code></td>
-<td><code>block_filter_hash</code></td>
-<td>Client filter hash</td>
-</tr>
-<tr>
-<td><code>/v1/block/{block}/filter/{type}/header</code></td>
-<td><code>block_filter_header</code></td>
-<td>Client filter header</td>
-</tr>
-<tr>
-<td><code>/v1/block/subscribe</code></td>
-<td><code>block_subscribe</code></td>
-<td>Block notifications (websocket)</td>
-</tr>
-<tr>
-<td><code>/v1/tx/{tx hash}</code></td>
-<td><code>tx</code></td>
-<td>Transaction</td>
-</tr>
-<tr>
-<td><code>/v1/tx/{tx hash}/header</code></td>
-<td><code>tx_header</code></td>
-<td>Header of the confirming block</td>
-</tr>
-<tr>
-<td><code>/v1/tx/{tx hash}/details</code></td>
-<td><code>tx_details</code></td>
-<td>Transaction details</td>
-</tr>
-<tr>
-<td><code>/v1/tx/subscribe</code></td>
-<td><code>tx_subscribe</code></td>
-<td>Transaction notifications (websocket)</td>
-</tr>
-<tr>
-<td><code>/v1/input/{tx hash}</code></td>
-<td><code>inputs</code></td>
-<td>All inputs of the transaction</td>
-</tr>
-<tr>
-<td><code>/v1/input/{tx hash}/{index}</code></td>
-<td><code>input</code></td>
-<td>Input</td>
-</tr>
-<tr>
-<td><code>/v1/input/{tx hash}/{index}/script</code></td>
-<td><code>input_script</code></td>
-<td>Input script</td>
-</tr>
-<tr>
-<td><code>/v1/input/{tx hash}/{index}/witness</code></td>
-<td><code>input_witness</code></td>
-<td>Input witness</td>
-</tr>
-<tr>
-<td><code>/v1/output/{tx hash}</code></td>
-<td><code>outputs</code></td>
-<td>All outputs of the transaction</td>
-</tr>
-<tr>
-<td><code>/v1/output/{tx hash}/{index}</code></td>
-<td><code>output</code></td>
-<td>Output</td>
-</tr>
-<tr>
-<td><code>/v1/output/{tx hash}/{index}/script</code></td>
-<td><code>output_script</code></td>
-<td>Output script</td>
-</tr>
-<tr>
-<td><code>/v1/output/{tx hash}/{index}/spender</code></td>
-<td><code>output_spender</code></td>
-<td>Confirmed spender of the output</td>
-</tr>
-<tr>
-<td><code>/v1/output/{tx hash}/{index}/spenders</code></td>
-<td><code>output_spenders</code></td>
-<td>All spenders of the output</td>
-</tr>
-<tr>
-<td><code>/v1/output/{tx hash}/{index}/subscribe</code></td>
-<td><code>output_subscribe</code></td>
-<td>Spend notifications (websocket)</td>
-</tr>
-<tr>
-<td><code>/v1/address/{script hash}</code></td>
-<td><code>address</code></td>
-<td>All history of an output script</td>
-</tr>
-<tr>
-<td><code>/v1/address/{script hash}/confirmed</code></td>
-<td><code>address_confirmed</code></td>
-<td>Confirmed history</td>
-</tr>
-<tr>
-<td><code>/v1/address/{script hash}/unconfirmed</code></td>
-<td><code>address_unconfirmed</code></td>
-<td>Unconfirmed history</td>
-</tr>
-<tr>
-<td><code>/v1/address/{script hash}/balance</code></td>
-<td><code>address_balance</code></td>
-<td>Confirmed balance</td>
-</tr>
-<tr>
-<td><code>/v1/address/{script hash}/subscribe</code></td>
-<td><code>address_subscribe</code></td>
-<td>History notifications (websocket)</td>
-</tr>
-</tbody>
-</table></div>
+<p>Every path, with examples, is documented in
+<a href="../interfaces/native">Native REST</a>.</p>
 <p>Query options, besides <code>format</code>:</p>
 <div class="scroller"><table>
 <thead>

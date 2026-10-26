@@ -20,7 +20,11 @@ MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 SITE_MENU = [
     ("index.html", "Home"),
     ("Server", [
-        ("interfaces.html", "Interfaces"),
+        ("interfaces.html", "Interfaces", [
+            ("interfaces/native.html", "Native REST"),
+            ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
+            ("interfaces/esplora.html", "Esplora REST"),
+        ]),
         ("configuration/index.html", "Configuration"),
         ("building/index.html", "Building"),
     ]),
@@ -118,6 +122,7 @@ SECTIONS = {
             ("index", "Interfaces"),
             ("native", "Native REST"),
             ("bitcoind-rest", "Bitcoind REST"),
+            ("esplora", "Esplora REST"),
         ],
     },
 }
@@ -157,6 +162,7 @@ STYLE = """
   .drop > summary::after { content: " ▾"; }
   .drop > summary:hover, .drop[open] > summary, .drop.here > summary { color: var(--heading); }
   .drop > div { position: absolute; top: calc(100% + 10px); left: -14px; z-index: 20; display: flex; flex-direction: column; gap: 10px; width: max-content; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; box-shadow: var(--shadow); }
+  .drop > div a.sub { padding-left: 14px; }
   .foot { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 48px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; display: flex; flex-direction: column; gap: 10px; }
   .pager { display: flex; justify-content: space-between; gap: 18px; margin: 40px 0 0; font-family: var(--mono); font-size: 12.5px; }
 
@@ -346,15 +352,18 @@ def lede(title):
     return title.replace("`", "")
 
 
-def site_menu(here):
-    current = here + "/index.html"
+def site_menu(key, name):
+    section = key + "/index.html"
+    current = "%s/%s.html" % (key, name)
     items = []
     for label, target in SITE_MENU:
         if isinstance(target, list):
-            cls = "drop here" if any(href == current for href, _ in target) else "drop"
+            links = [l for e in target for l in [(e[0], e[1], "")] + [(c[0], c[1], "sub") for c in (e[2] if len(e) > 2 else [])]]
+            cls = "drop here" if any(href in (current, section) for href, _, _ in links) else "drop"
             items.append('      <details class="%s" name="site"><summary>%s</summary><div>' % (cls, html.escape(label)))
-            for href, name in target:
-                here_cls = ' class="here"' if href == current else ""
+            for href, name, sub in links:
+                classes = " ".join(c for c in (sub, "here" if href == current else "") if c)
+                here_cls = ' class="%s"' % classes if classes else ""
                 items.append('        <a href="../%s"%s>%s</a>' % (href, here_cls, html.escape(name)))
             items.append('      </div></details>')
         else:
@@ -592,7 +601,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
 </html>
 """ % dict(page_title=page_title, description=description, name=name, guard=guard, logo=logo,
            style=STYLE, h1=h1, menu=menu(pages, name), body=body, pager=pager(pages, name),
-           mermaid=mermaid_src, key=key, site=site_menu(key), lede=section["lede"], foot=foot)
+           mermaid=mermaid_src, key=key, site=site_menu(key, name), lede=section["lede"], foot=foot)
 
 
 def check_links(key, pages):

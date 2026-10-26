@@ -332,44 +332,8 @@ returns:
 }
 ```
 
-The full native REST map, under `http://localhost:8180`. In block paths,
-`{block}` is `hash/{block hash}` or `height/{height}`. The method name is
-the one used in credential method lists (§7.3).
-
-| Path | Method | Result |
-| ---- | ------ | ------ |
-| `/v1/configuration` | `configuration` | Server configuration |
-| `/v1/top` | `top` | Top confirmed height |
-| `/v1/top/subscribe` | `top_subscribe` | Top height notifications (websocket) |
-| `/v1/block/{block}` | `block` | Block |
-| `/v1/block/{block}/header` | `block_header` | Block header |
-| `/v1/block/{block}/header/context` | `block_header_context` | Header validation context |
-| `/v1/block/{block}/details` | `block_details` | Block details |
-| `/v1/block/{block}/txs` | `block_txs` | All transactions of the block |
-| `/v1/block/{block}/tx/{position}` | `block_tx` | Transaction at a position in the block |
-| `/v1/block/{block}/filter/{type}` | `block_filter` | Client filter |
-| `/v1/block/{block}/filter/{type}/hash` | `block_filter_hash` | Client filter hash |
-| `/v1/block/{block}/filter/{type}/header` | `block_filter_header` | Client filter header |
-| `/v1/block/subscribe` | `block_subscribe` | Block notifications (websocket) |
-| `/v1/tx/{tx hash}` | `tx` | Transaction |
-| `/v1/tx/{tx hash}/header` | `tx_header` | Header of the confirming block |
-| `/v1/tx/{tx hash}/details` | `tx_details` | Transaction details |
-| `/v1/tx/subscribe` | `tx_subscribe` | Transaction notifications (websocket) |
-| `/v1/input/{tx hash}` | `inputs` | All inputs of the transaction |
-| `/v1/input/{tx hash}/{index}` | `input` | Input |
-| `/v1/input/{tx hash}/{index}/script` | `input_script` | Input script |
-| `/v1/input/{tx hash}/{index}/witness` | `input_witness` | Input witness |
-| `/v1/output/{tx hash}` | `outputs` | All outputs of the transaction |
-| `/v1/output/{tx hash}/{index}` | `output` | Output |
-| `/v1/output/{tx hash}/{index}/script` | `output_script` | Output script |
-| `/v1/output/{tx hash}/{index}/spender` | `output_spender` | Confirmed spender of the output |
-| `/v1/output/{tx hash}/{index}/spenders` | `output_spenders` | All spenders of the output |
-| `/v1/output/{tx hash}/{index}/subscribe` | `output_subscribe` | Spend notifications (websocket) |
-| `/v1/address/{script hash}` | `address` | All history of an output script |
-| `/v1/address/{script hash}/confirmed` | `address_confirmed` | Confirmed history |
-| `/v1/address/{script hash}/unconfirmed` | `address_unconfirmed` | Unconfirmed history |
-| `/v1/address/{script hash}/balance` | `address_balance` | Confirmed balance |
-| `/v1/address/{script hash}/subscribe` | `address_subscribe` | History notifications (websocket) |
+Every path, with examples, is documented in
+[Native REST](../interfaces/native).
 
 Query options, besides `format`:
 
