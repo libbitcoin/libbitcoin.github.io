@@ -10,6 +10,7 @@ how to call them, with examples and their responses.
 | --------- | ------- | ------------ |
 | [Admin Console](admin) | `[admin]` | 8080, secure 8043 |
 | [Native REST](native) | `[native]` | 8180, secure 8143 |
+| [Electrum](electrum) | `[electrum]` | 8580, secure 8543 |
 | [Bitcoin P2P](p2p) | `[inbound]`, `[outbound]`, `[manual]` | 8333 |
 | [Bitcoind REST](bitcoind-rest) | `[bitcoind]` | 8280, secure 8243 |
 | [Bitcoind ZMQ](zeromq) | `[bitcoind_zmq]` | 8380, secure 8343 |

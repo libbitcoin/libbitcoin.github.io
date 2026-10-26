@@ -247,6 +247,7 @@
         <a href="../interfaces.html">Interfaces</a>
         <a href="../interfaces/admin.html" class="sub">Admin Console</a>
         <a href="../interfaces/native.html" class="sub">Native REST</a>
+        <a href="../interfaces/electrum.html" class="sub">Electrum</a>
         <a href="../interfaces/p2p.html" class="sub here">Bitcoin P2P</a>
         <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
@@ -276,6 +277,7 @@
     <a href="index.html">Interfaces</a>
     <a href="admin.html">Admin Console</a>
     <a href="native.html">Native REST</a>
+    <a href="electrum.html">Electrum</a>
     <a href="p2p.html" class="here">Bitcoin P2P</a>
     <a href="bitcoind-rest.html">Bitcoind REST</a>
     <a href="zeromq.html">Bitcoind ZMQ</a>
@@ -287,6 +289,76 @@
 syncs the chain and serves it. It is configured by the <code>[network]</code>,
 <code>[peer]</code>, <code>[inbound]</code>, <code>[outbound]</code> and <code>[manual]</code> sections, and listens
 on port 8333 (see <a href="../configuration/index#518-peer-services-and-policy">Configuration §5.18</a>).</p>
+<p><code>bs</code> supports every feature of the Bitcoin P2P protocol that is deployed
+and not deprecated:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>BIP</th>
+<th>Feature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki">BIP14</a></td>
+<td>User agent</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0031.mediawiki">BIP31</a></td>
+<td><code>pong</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0035.mediawiki">BIP35</a></td>
+<td><code>mempool</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0111.mediawiki">BIP111</a></td>
+<td><code>node_bloom</code> (not advertised)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0130.mediawiki">BIP130</a></td>
+<td><code>sendheaders</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0133.mediawiki">BIP133</a></td>
+<td><code>feefilter</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0144.mediawiki">BIP144</a></td>
+<td>Witness serialization and inventory</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki">BIP152</a></td>
+<td>Compact blocks</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0155.mediawiki">BIP155</a></td>
+<td><code>addrv2</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki">BIP157</a></td>
+<td>Client filter messages</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki">BIP158</a></td>
+<td>Client filters</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0159.mediawiki">BIP159</a></td>
+<td><code>node_network_limited</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0324.mediawiki">BIP324</a></td>
+<td>Encrypted transport</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bitcoin/bips/blob/master/bip-0339.mediawiki">BIP339</a></td>
+<td><code>wtxidrelay</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Of the deprecated, BIP61 (<code>reject</code>) is supported, and BIP37 (bloom
+filters) is not.</p>
 <h2 id="1-messages">1. Messages<a class="anchor" href="#1-messages" aria-label="Link to this section">#</a></h2>
 <p>The protocol version is the minimum negotiated version at which <code>bs</code> uses
 the message, and the setting is the one that enables it.</p>
@@ -632,8 +704,7 @@ not announce transactions below a peer's rate.</p>
 Ignored unless <code>peer.enable_memory_pool</code> is set.</p>
 <h2 id="8-client-filters">8. Client filters<a class="anchor" href="#8-client-filters" aria-label="Link to this section">#</a></h2>
 <p>These require <code>node.provide_filters</code> (BIP157), and are ignored without it.
-<code>bs</code> serves filters, and does not request them. Only basic filters are
-served.</p>
+Only basic filters are served.</p>
 <h3 id="getcfilters">getcfilters<a class="anchor" href="#getcfilters" aria-label="Link to this section">#</a></h3>
 <p>Requests the filters of up to 1000 blocks, answered by a <code>cfilter</code> for
 each.</p>
@@ -666,7 +737,7 @@ filtered blocks, and does not advertise <code>node_bloom</code>.</p>
 <p>Not supported, as <code>filterload</code>.</p>
   </article>
 
-  <nav class="pager"><a href="native.html">&larr; Native REST</a><a href="bitcoind-rest.html">Bitcoind REST &rarr;</a></nav>
+  <nav class="pager"><a href="electrum.html">&larr; Electrum</a><a href="bitcoind-rest.html">Bitcoind REST &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 

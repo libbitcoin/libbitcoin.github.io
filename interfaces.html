@@ -242,6 +242,7 @@
         <a href="interfaces.html" class="here">Interfaces</a>
         <a href="interfaces/admin.html" class="sub">Admin Console</a>
         <a href="interfaces/native.html" class="sub">Native REST</a>
+        <a href="interfaces/electrum.html" class="sub">Electrum</a>
         <a href="interfaces/p2p.html" class="sub">Bitcoin P2P</a>
         <a href="interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
@@ -352,14 +353,14 @@ const services = [
   ]
 },
 {
-  id: 'electrum', name: 'Electrum', versioned: true,
+  id: 'electrum', name: 'Electrum', versioned: true, doc: 'interfaces/electrum.html',
   note: 'Electrum protocol with version negotiation. An http/s + ws/s transport is supported on the same port.',
   spec: { Transport: 'tcp/s, http/s, ws/s', Framing: 'json-rpc 2.0', Auth: 'tls server, mutual', Channel: 'full duplex (subscriptions)' },
   methods: [
     ['server.version', Y, '', '1.0+'],
     ['server.banner', Y, '', '1.0+'],
     ['server.donation_address', Y, '', '1.0+'],
-    ['server.features', Y, '', '1.0+'],
+    ['server.features', Y, '', '1.1+'],
     ['server.peers.subscribe', Y, '', '1.0+'],
     ['server.ping', Y, '', '1.2+'],
     ['blockchain.numblocks.subscribe', Y, '', '1.0'],
@@ -369,9 +370,9 @@ const services = [
     ['blockchain.block.get_header', Y, '', '1.0–1.3'],
     ['blockchain.block.get_chunk', Y, '', '1.0–1.3'],
     ['blockchain.estimatefee', Y, '', '1.0+'],
-    ['blockchain.relayfee', Y, '', '1.0–1.5'],
+    ['blockchain.relayfee', Y, '', '1.0–1.4.2'],
     ['blockchain.transaction.get', Y, '', '1.0+'],
-    ['blockchain.transaction.get_merkle', Y, '', '1.4+'],
+    ['blockchain.transaction.get_merkle', Y, 'served from 1.4', '1.0+'],
     ['blockchain.transaction.id_from_pos', Y, '', '1.4+'],
     ['blockchain.utxo.get_address', Y, 'address index required', '1.0'],
     ['blockchain.outpoint.get_status', Y, 'address index required', '1.7+'],
@@ -381,21 +382,22 @@ const services = [
     ['blockchain.address.get_history', Y, 'address index required', '1.0–1.2'],
     ['blockchain.address.listunspent', Y, 'address index required', '1.0–1.2'],
     ['blockchain.address.subscribe', Y, 'address index required', '1.0–1.2'],
-    ['blockchain.scripthash.get_balance', Y, 'address index required', '1.1+'],
-    ['blockchain.scripthash.get_history', Y, 'address index required', '1.1+'],
-    ['blockchain.scripthash.listunspent', Y, 'address index required', '1.1+'],
-    ['blockchain.scripthash.subscribe', Y, 'address index required', '1.1+'],
-    ['blockchain.scripthash.unsubscribe', Y, 'address index required', '1.4.2+'],
+    ['blockchain.scripthash.get_balance', Y, 'address index required', '1.1–1.6'],
+    ['blockchain.scripthash.get_history', Y, 'address index required', '1.1–1.6'],
+    ['blockchain.scripthash.listunspent', Y, 'address index required', '1.1–1.6'],
+    ['blockchain.scripthash.subscribe', Y, 'address index required', '1.1–1.6'],
+    ['blockchain.scripthash.unsubscribe', Y, 'address index required', '1.4.2–1.6'],
     ['blockchain.scriptpubkey.get_balance', Y, 'address index required', '1.7+'],
     ['blockchain.scriptpubkey.get_history', Y, 'address index required', '1.7+'],
     ['blockchain.scriptpubkey.listunspent', Y, 'address index required', '1.7+'],
     ['blockchain.scriptpubkey.subscribe', Y, 'address index required', '1.7+'],
     ['blockchain.scriptpubkey.unsubscribe', Y, 'address index required', '1.7+'],
     ['blockchain.address.get_mempool', Y, '', '1.0–1.2'],
-    ['blockchain.scripthash.get_mempool', Y, '', '1.1+'],
+    ['blockchain.scripthash.get_mempool', Y, '', '1.1–1.6'],
     ['blockchain.scriptpubkey.get_mempool', Y, '', '1.7+'],
     ['blockchain.transaction.broadcast', P, 'no replacement until v5 tx pool', '1.0+'],
     ['blockchain.transaction.broadcast_package', P, 'no replacement until v5 tx pool', '1.6+'],
+    ['blockchain.transaction.testmempoolaccept', Y, '', '1.7+'],
     ['mempool.get_fee_histogram', Y, '', '1.2+'],
     ['mempool.get_info', P, 'configured limits only', '1.6+'],
     ['mempool.recent', Y, '', '1.7+'],
@@ -415,7 +417,7 @@ const services = [
 },
 {
   id: 'p2p', name: 'Bitcoin P2P', versioned: true, doc: 'interfaces/p2p.html', configured: true, label: 'Message',
-  note: 'Bitcoin’s wire protocol. Outbound and manual connections may run over socks5 with proxy authentication, making peers through an anonymizer. Can be configured to run as a hidden service.',
+  note: 'Bitcoin’s wire protocol. Outbound and manual connections may run over socks5 with proxy authentication, making peers through an anonymizer. Can be configured to run as a hidden service. Supports every feature of the Bitcoin P2P protocol that is deployed and not deprecated.',
   spec: { Transport: 'p2p/s, socks5', Framing: 'bitcoin p2p', Auth: 'not applicable', Channel: 'full duplex, version handshake' },
   methods: [
     ['version', Y, '', '106+', ''],

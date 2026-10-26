@@ -5,6 +5,29 @@ syncs the chain and serves it. It is configured by the `[network]`,
 `[peer]`, `[inbound]`, `[outbound]` and `[manual]` sections, and listens
 on port 8333 (see [Configuration §5.18](../configuration/index#518-peer-services-and-policy)).
 
+`bs` supports every feature of the Bitcoin P2P protocol that is deployed
+and not deprecated:
+
+| BIP | Feature |
+| --- | ------- |
+| [BIP14](https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki) | User agent |
+| [BIP31](https://github.com/bitcoin/bips/blob/master/bip-0031.mediawiki) | `pong` |
+| [BIP35](https://github.com/bitcoin/bips/blob/master/bip-0035.mediawiki) | `mempool` |
+| [BIP111](https://github.com/bitcoin/bips/blob/master/bip-0111.mediawiki) | `node_bloom` (not advertised) |
+| [BIP130](https://github.com/bitcoin/bips/blob/master/bip-0130.mediawiki) | `sendheaders` |
+| [BIP133](https://github.com/bitcoin/bips/blob/master/bip-0133.mediawiki) | `feefilter` |
+| [BIP144](https://github.com/bitcoin/bips/blob/master/bip-0144.mediawiki) | Witness serialization and inventory |
+| [BIP152](https://github.com/bitcoin/bips/blob/master/bip-0152.mediawiki) | Compact blocks |
+| [BIP155](https://github.com/bitcoin/bips/blob/master/bip-0155.mediawiki) | `addrv2` |
+| [BIP157](https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki) | Client filter messages |
+| [BIP158](https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki) | Client filters |
+| [BIP159](https://github.com/bitcoin/bips/blob/master/bip-0159.mediawiki) | `node_network_limited` |
+| [BIP324](https://github.com/bitcoin/bips/blob/master/bip-0324.mediawiki) | Encrypted transport |
+| [BIP339](https://github.com/bitcoin/bips/blob/master/bip-0339.mediawiki) | `wtxidrelay` |
+
+Of the deprecated, BIP61 (`reject`) is supported, and BIP37 (bloom
+filters) is not.
+
 ## 1. Messages
 
 The protocol version is the minimum negotiated version at which `bs` uses
@@ -266,8 +289,7 @@ Ignored unless `peer.enable_memory_pool` is set.
 ## 8. Client filters
 
 These require `node.provide_filters` (BIP157), and are ignored without it.
-`bs` serves filters, and does not request them. Only basic filters are
-served.
+Only basic filters are served.
 
 ### getcfilters
 

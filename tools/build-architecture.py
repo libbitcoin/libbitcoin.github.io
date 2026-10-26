@@ -23,6 +23,7 @@ SITE_MENU = [
         ("interfaces.html", "Interfaces", [
             ("interfaces/admin.html", "Admin Console"),
             ("interfaces/native.html", "Native REST"),
+            ("interfaces/electrum.html", "Electrum"),
             ("interfaces/p2p.html", "Bitcoin P2P"),
             ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
             ("interfaces/zeromq.html", "Bitcoind ZMQ"),
@@ -125,6 +126,7 @@ SECTIONS = {
             ("index", "Interfaces"),
             ("admin", "Admin Console"),
             ("native", "Native REST"),
+            ("electrum", "Electrum"),
             ("p2p", "Bitcoin P2P"),
             ("bitcoind-rest", "Bitcoind REST"),
             ("zeromq", "Bitcoind ZMQ"),

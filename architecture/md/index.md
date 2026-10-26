@@ -100,7 +100,7 @@ distilled-for-export view of each subsystem.
 
 ---
 
-## Honest caveats
+## Caveats
 
 1. **No build verification.** Citations are textual. They were
    re-grepped during writing but the code has not been built or
