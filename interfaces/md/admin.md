@@ -1,9 +1,16 @@
 # Admin Console
 
 The admin interface streams the node's log and events over websocket,
-served on the `[admin]` binding (default port 8080). The embedded console
-is a page of this interface, and can be replaced with a custom site
-(see [Configuration §5.5](../configuration/index#55-admin-site)).
+served on the `[admin]` binding. The embedded console is a page of this
+interface, and can be replaced with a custom site (see [Configuration
+§5.5](../configuration/index#55-admin-site)).
+
+Its protocols share one port, and their secure forms share another:
+
+| Port | Default | Protocols |
+| ---- | ------- | --------- |
+| Clear (`bind`) | 8080 | HTTP, WS |
+| Secure (`safe`) | 8043 | HTTPS, WSS |
 
 ## 1. Paths
 

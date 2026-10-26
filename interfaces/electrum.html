@@ -286,9 +286,31 @@
 
   <article class="doc">
 <p>The Electrum interface is the protocol of the Electrum wallet, served on
-the <code>[electrum]</code> binding (default port 8580). It is versioned, and <code>bs</code>
-serves every Bitcoin version, 1.0 through 1.7, choosing the version with
-each client by negotiation (§2.3).</p>
+the <code>[electrum]</code> binding. It is versioned, and <code>bs</code> serves every Bitcoin
+version, 1.0 through 1.7, choosing the version with each client by
+negotiation (§2.3).</p>
+<p>Its protocols share one port, and their secure forms share another:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Default</th>
+<th>Protocols</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clear (<code>bind</code>)</td>
+<td>8580</td>
+<td>TCP, HTTP, WS</td>
+</tr>
+<tr>
+<td>Secure (<code>safe</code>)</td>
+<td>8543</td>
+<td>TCPS, HTTPS, WSS</td>
+</tr>
+</tbody>
+</table></div>
 <p>This page documents the protocol version by version. Its source is the
 <a href="https://github.com/spesmilo/electrum-protocol">protocol specification</a>,
 checked against the Electrum client and the main servers. Methods added
@@ -772,25 +794,30 @@ the connection:</p>
 </thead>
 <tbody>
 <tr>
-<td>TCP, TLS</td>
-<td>One JSON message per line</td>
+<td>TCP/S</td>
+<td>One JSON message or batch per line</td>
 <td>Yes</td>
 </tr>
 <tr>
-<td>HTTP, HTTPS</td>
-<td><code>POST /</code>, one message or batch per request</td>
-<td>No</td>
-</tr>
-<tr>
-<td>Websocket</td>
+<td>WS/S</td>
 <td>One JSON message per frame, no batches</td>
 <td>Yes</td>
 </tr>
+<tr>
+<td>HTTP/S</td>
+<td><code>POST /</code>, one message or batch per request</td>
+<td>No</td>
+</tr>
 </tbody>
 </table></div>
-<p>TCP is the transport of Electrum clients. Over HTTP, each request is a
-new connection, so a batch that begins with <code>server.version</code> sets its
-version:</p>
+<p>TCP/S is the Electrum transport, used by Electrum clients. The
+specification also defines messages over WS/S, as one frame each without
+the line ending, which ElectrumX and Fulcrum serve. HTTP/S is a <code>bs</code>
+extension, on the model of bitcoind's JSON-RPC: each request is posted to
+<code>/</code> and answered in its response. HTTP/S carries no notifications, so a
+subscription returns only its first result.</p>
+<p>Over HTTP/S, each request is a new connection, so a batch that begins
+with <code>server.version</code> sets its version:</p>
 <pre class="console"><code>$ curl -d '[{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:0,&quot;method&quot;:&quot;server.version&quot;,&quot;params&quot;:[&quot;curl&quot;,&quot;1.7&quot;]},{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;blockchain.block.header&quot;,&quot;params&quot;:[1]}]' &quot;http://localhost:8580/&quot;
 </code></pre>
 <pre><code class="language-json">[

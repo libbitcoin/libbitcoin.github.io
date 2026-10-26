@@ -285,10 +285,32 @@
   </nav>
 
   <article class="doc">
-<p>The bitcoind REST interface is a drop-in for the REST interface of bitcoind,
-served on the <code>[bitcoind]</code> binding (default port 8280) alongside the
-bitcoind JSON-RPC interface. Unlike bitcoind, it is always enabled, and
-it is protected by the binding's credentials and certificates.</p>
+<p>The bitcoind REST interface is a drop-in for the REST interface of
+bitcoind, served on the <code>[bitcoind]</code> binding alongside the bitcoind
+JSON-RPC interface. Unlike bitcoind, it is always enabled, and it is
+protected by the binding's credentials and certificates.</p>
+<p>It is reached on the same ports as the bitcoind JSON-RPC interface:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Default</th>
+<th>Protocols</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clear (<code>bind</code>)</td>
+<td>8280</td>
+<td>HTTP</td>
+</tr>
+<tr>
+<td>Secure (<code>safe</code>)</td>
+<td>8243</td>
+<td>HTTPS</td>
+</tr>
+</tbody>
+</table></div>
 <h2 id="1-paths">1. Paths<a class="anchor" href="#1-paths" aria-label="Link to this section">#</a></h2>
 <p>Every path, and the method it calls. The extension selects the format
 (§2.2).</p>

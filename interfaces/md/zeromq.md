@@ -1,8 +1,15 @@
 # Bitcoind ZMQ
 
 The bitcoind ZMQ interface is a drop-in for the ZeroMQ notifications of
-bitcoind, published on the `[bitcoind_zmq]` binding (default port 8380).
-Any ZeroMQ `SUB` socket can subscribe.
+bitcoind, published on the `[bitcoind_zmq]` binding. Any ZeroMQ `SUB`
+socket can subscribe.
+
+Every topic is published on one port, and with CurveZMQ on another:
+
+| Port | Default | Protocols |
+| ---- | ------- | --------- |
+| Clear (`bind`) | 8380 | ZMTP |
+| Secure (`safe`) | 8343 | ZMTPS |
 
 ## 1. Topics
 

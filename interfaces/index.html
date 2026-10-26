@@ -295,47 +295,66 @@ how to call them, with examples and their responses.</p>
 <tr>
 <th>Interface</th>
 <th>Section</th>
-<th>Default port</th>
+<th>Port</th>
+<th>Secure port</th>
+<th>Protocols</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><a href="admin.html">Admin Console</a></td>
 <td><code>[admin]</code></td>
-<td>8080, secure 8043</td>
+<td>8080</td>
+<td>8043</td>
+<td>HTTP/S, WS/S</td>
 </tr>
 <tr>
 <td><a href="native.html">Native REST</a></td>
 <td><code>[native]</code></td>
-<td>8180, secure 8143</td>
+<td>8180</td>
+<td>8143</td>
+<td>HTTP/S, WS/S</td>
 </tr>
 <tr>
 <td><a href="electrum.html">Electrum</a></td>
 <td><code>[electrum]</code></td>
-<td>8580, secure 8543</td>
+<td>8580</td>
+<td>8543</td>
+<td>TCP/S, HTTP/S, WS/S</td>
 </tr>
 <tr>
 <td><a href="p2p.html">Bitcoin P2P</a></td>
-<td><code>[inbound]</code>, <code>[outbound]</code>, <code>[manual]</code></td>
+<td><code>[inbound]</code></td>
 <td>8333</td>
+<td></td>
+<td>P2P/S</td>
 </tr>
 <tr>
 <td><a href="bitcoind-rest.html">Bitcoind REST</a></td>
 <td><code>[bitcoind]</code></td>
-<td>8280, secure 8243</td>
+<td>8280</td>
+<td>8243</td>
+<td>HTTP/S</td>
 </tr>
 <tr>
 <td><a href="zeromq.html">Bitcoind ZMQ</a></td>
 <td><code>[bitcoind_zmq]</code></td>
-<td>8380, secure 8343</td>
+<td>8380</td>
+<td>8343</td>
+<td>ZMTP/S</td>
 </tr>
 <tr>
 <td><a href="esplora.html">Esplora REST</a></td>
 <td><code>[esplora]</code></td>
-<td>8780, secure 8743</td>
+<td>8780</td>
+<td>8743</td>
+<td>HTTP/S, WS/S</td>
 </tr>
 </tbody>
 </table></div>
+<p>Each interface reaches all of its protocols on one port, and their secure
+forms (TLS, or CurveZMQ for ZMTPS) on another. P2P serves P2P and P2PS
+(BIP324) on one port.</p>
 <p>To enable an interface, and to secure it, see
 <a href="../configuration/index">Configuration</a>.</p>
   </article>

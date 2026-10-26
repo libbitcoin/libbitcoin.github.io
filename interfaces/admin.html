@@ -286,9 +286,31 @@
 
   <article class="doc">
 <p>The admin interface streams the node's log and events over websocket,
-served on the <code>[admin]</code> binding (default port 8080). The embedded console
-is a page of this interface, and can be replaced with a custom site
-(see <a href="../configuration/index#55-admin-site">Configuration §5.5</a>).</p>
+served on the <code>[admin]</code> binding. The embedded console is a page of this
+interface, and can be replaced with a custom site (see <a href="../configuration/index#55-admin-site">Configuration
+§5.5</a>).</p>
+<p>Its protocols share one port, and their secure forms share another:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Port</th>
+<th>Default</th>
+<th>Protocols</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clear (<code>bind</code>)</td>
+<td>8080</td>
+<td>HTTP, WS</td>
+</tr>
+<tr>
+<td>Secure (<code>safe</code>)</td>
+<td>8043</td>
+<td>HTTPS, WSS</td>
+</tr>
+</tbody>
+</table></div>
 <h2 id="1-paths">1. Paths<a class="anchor" href="#1-paths" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>

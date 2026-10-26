@@ -1,9 +1,16 @@
 # Electrum
 
 The Electrum interface is the protocol of the Electrum wallet, served on
-the `[electrum]` binding (default port 8580). It is versioned, and `bs`
-serves every Bitcoin version, 1.0 through 1.7, choosing the version with
-each client by negotiation (§2.3).
+the `[electrum]` binding. It is versioned, and `bs` serves every Bitcoin
+version, 1.0 through 1.7, choosing the version with each client by
+negotiation (§2.3).
+
+Its protocols share one port, and their secure forms share another:
+
+| Port | Default | Protocols |
+| ---- | ------- | --------- |
+| Clear (`bind`) | 8580 | TCP, HTTP, WS |
+| Secure (`safe`) | 8543 | TCPS, HTTPS, WSS |
 
 This page documents the protocol version by version. Its source is the
 [protocol specification](https://github.com/spesmilo/electrum-protocol),
@@ -124,13 +131,19 @@ the connection:
 
 | Transport | Requests | Notifications |
 | --------- | -------- | ------------- |
-| TCP, TLS | One JSON message per line | Yes |
-| HTTP, HTTPS | `POST /`, one message or batch per request | No |
-| Websocket | One JSON message per frame, no batches | Yes |
+| TCP/S | One JSON message or batch per line | Yes |
+| WS/S | One JSON message per frame, no batches | Yes |
+| HTTP/S | `POST /`, one message or batch per request | No |
 
-TCP is the transport of Electrum clients. Over HTTP, each request is a
-new connection, so a batch that begins with `server.version` sets its
-version:
+TCP/S is the Electrum transport, used by Electrum clients. The
+specification also defines messages over WS/S, as one frame each without
+the line ending, which ElectrumX and Fulcrum serve. HTTP/S is a `bs`
+extension, on the model of bitcoind's JSON-RPC: each request is posted to
+`/` and answered in its response. HTTP/S carries no notifications, so a
+subscription returns only its first result.
+
+Over HTTP/S, each request is a new connection, so a batch that begins
+with `server.version` sets its version:
 
 ```
 $ curl -d '[{"jsonrpc":"2.0","id":0,"method":"server.version","params":["curl","1.7"]},{"jsonrpc":"2.0","id":1,"method":"blockchain.block.header","params":[1]}]' "http://localhost:8580/"

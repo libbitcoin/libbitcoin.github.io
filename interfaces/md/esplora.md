@@ -1,9 +1,16 @@
 # Esplora REST
 
 The Esplora REST interface is a drop-in for the Esplora explorer API,
-served on the `[esplora]` binding (default port 8780). Transactions are
-served as decoded JSON with resolved previous outputs and computed fees,
-and addresses by encoded address or by output script hash.
+served on the `[esplora]` binding. Transactions are served as decoded JSON
+with resolved previous outputs and computed fees, and addresses by encoded
+address or by output script hash.
+
+Its protocols share one port, and their secure forms share another:
+
+| Port | Default | Protocols |
+| ---- | ------- | --------- |
+| Clear (`bind`) | 8780 | HTTP, WS |
+| Secure (`safe`) | 8743 | HTTPS, WSS |
 
 ## 1. Paths
 
@@ -110,7 +117,8 @@ The `/hex` and `/raw` paths share the method of their object.
 
 ### 2.5 Websocket
 
-A websocket connects on the same port.
+Esplora is an HTTP/S interface. WS/S is a `bs` extension, which carries
+the same request paths as frames on the same port.
 
 - Each text frame is one request path, such as `/blocks/tip/height`.
 - A broadcast follows the path with a newline and the body.

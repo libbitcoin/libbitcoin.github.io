@@ -7,6 +7,13 @@ as hex text.
 It also serves the embedded block explorer (see
 [Configuration](../configuration/index#56-block-explorer)).
 
+Its protocols share one port, and their secure forms share another:
+
+| Port | Default | Protocols |
+| ---- | ------- | --------- |
+| Clear (`bind`) | 8180 | HTTP, WS |
+| Secure (`safe`) | 8143 | HTTPS, WSS |
+
 [REST](https://en.wikipedia.org/wiki/REST) (representational state
 transfer) is the architectural style of the web, defined by Roy
 Fielding in 2000. Its central principle is that a URL identifies a resource, so the

@@ -2,8 +2,15 @@
 
 The Bitcoin P2P interface is Bitcoin's wire protocol, on which `bs` both
 syncs the chain and serves it. It is configured by the `[network]`,
-`[peer]`, `[inbound]`, `[outbound]` and `[manual]` sections, and listens
-on port 8333 (see [Configuration §5.18](../configuration/index#518-peer-services-and-policy)).
+`[peer]`, `[inbound]`, `[outbound]` and `[manual]` sections (see
+[Configuration
+§5.18](../configuration/index#518-peer-services-and-policy)).
+
+P2P and P2PS (BIP324) are reached on the same port:
+
+| Port | Default | Protocols |
+| ---- | ------- | --------- |
+| Inbound (`inbound.bind`) | 8333 | P2P, P2PS |
 
 `bs` supports every feature of the Bitcoin P2P protocol that is deployed
 and not deprecated:
