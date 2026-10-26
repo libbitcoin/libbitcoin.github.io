@@ -9,6 +9,7 @@ how to call them, with examples and their responses.
 | Interface | Section | Default port |
 | --------- | ------- | ------------ |
 | [Native REST](native) | `[native]` | 8180, secure 8143 |
+| [Bitcoind REST](bitcoind-rest) | `[bitcoind]` | 8280, secure 8243 |
 
 To enable an interface, and to secure it, see
 [Configuration](../configuration/index).

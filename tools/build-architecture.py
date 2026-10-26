@@ -117,6 +117,7 @@ SECTIONS = {
         "pages": [
             ("index", "Interfaces"),
             ("native", "Native REST"),
+            ("bitcoind-rest", "Bitcoind REST"),
         ],
     },
 }

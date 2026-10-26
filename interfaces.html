@@ -579,7 +579,7 @@ const services = [
   ]
 },
 {
-  id: 'rest', name: 'Bitcoind REST',
+  id: 'rest', name: 'Bitcoind REST', doc: 'interfaces/bitcoind-rest.html',
   note: 'Drop-in bitcoind compatibility for the REST interface, served on JSON-RPC endpoint.',
   spec: { Transport: 'http/s', Framing: 'REST', Auth: 'tls server, mutual; http basic (scoped)', Channel: 'half duplex' },
   methods: [
@@ -751,7 +751,7 @@ document.getElementById('board').innerHTML = services.map(s => {
 document.getElementById('services').innerHTML = services.map(s => {
   const n = s.methods.length;
   const rowHtml = ([m, st, note, ver, cfg, wip]) => `<tr class="${st === Y || st === P ? '' : 'dim'}">
-      <td class="m">${s.doc ? `<a href="${s.doc}#${m}">${esc(m)}</a>` : esc(m)}</td>
+      <td class="m">${s.doc ? `<a href="${s.doc}#${m.toLowerCase().replace(/[^\w-]/g, '')}">${esc(m)}</a>` : esc(m)}</td>
       <td class="st">${stat(st, wip)}</td>
       ${s.versioned ? `<td class="v">${esc(ver || '')}</td>` : ''}
       ${s.configured ? `<td class="v">${esc(cfg || '')}</td>` : ''}
