@@ -1,7 +1,7 @@
 # Quick Start
 
 From source to a synced node serving wallets and a block explorer.
-`bs` is the libbitcoin server, and runs the same on Linux, macOS and
+Bitcoin Server (`bs`) is the libbitcoin server, and runs the same on Linux, macOS and
 Windows.
 
 ## 1. Build

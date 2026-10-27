@@ -48,6 +48,10 @@ SITE_MENU = [
         ("architecture/index.html", "Node"),
         ("database/index.html", "Database"),
     ]),
+    ("Client", [
+        ("client/commands.html", "Commands"),
+    ]),
+    ("developers/index.html", "Developers"),
     ("team.html", "Team"),
 ]
 
@@ -91,11 +95,31 @@ SECTIONS = {
             ("queries", "Queries"),
         ],
     },
+    "client": {
+        "title": "Libbitcoin Client",
+        "h1": "Client",
+        "description": "Bitcoin Explorer (bx): the libbitcoin command line client and its commands.",
+        "lede": "<strong>Bitcoin Explorer</strong> (bx): the libbitcoin command line\n      client and its commands.",
+        "foot": "",
+        "pages": [
+            ("commands", "Commands"),
+        ],
+    },
+    "developers": {
+        "title": "Libbitcoin Developers",
+        "h1": "Developers",
+        "description": "The libbitcoin C++ libraries, from Bitcoin primitives to a complete server, and their API.",
+        "lede": "The libbitcoin C++ libraries, from Bitcoin primitives\n      to a complete server, and their API.",
+        "foot": "",
+        "pages": [
+            ("index", "Developers"),
+        ],
+    },
     "download": {
         "title": "Libbitcoin Server Download",
         "h1": "Download",
-        "description": "Download bs, the libbitcoin server: selecting a build for your hardware and verifying its signature.",
-        "lede": "Download <strong>bs</strong>, the libbitcoin server: selecting a build\n      for your hardware and verifying its signature.",
+        "description": "Download Bitcoin Server (bs): selecting a build for your hardware and verifying its signature.",
+        "lede": "Download <strong>Bitcoin Server</strong> (bs): selecting a build\n      for your hardware and verifying its signature.",
         "foot": "",
         "pages": [
             ("index", "Download"),
@@ -104,8 +128,8 @@ SECTIONS = {
     "start": {
         "title": "Libbitcoin Server Quick Start",
         "h1": "Quick Start",
-        "description": "Build bs, the libbitcoin server, sync the chain, and serve wallets and a block explorer.",
-        "lede": "Build <strong>bs</strong>, the libbitcoin server, sync the chain,\n      and serve wallets and a block explorer.",
+        "description": "Build Bitcoin Server (bs), sync the chain, and serve wallets and a block explorer.",
+        "lede": "Build <strong>Bitcoin Server</strong> (bs), sync the chain,\n      and serve wallets and a block explorer.",
         "foot": "",
         "pages": [
             ("index", "Quick Start"),
@@ -114,8 +138,8 @@ SECTIONS = {
     "configuration": {
         "title": "Libbitcoin Server Configuration",
         "h1": "Configuration",
-        "description": "Configuring bs, the libbitcoin server: command line options, the running console and the configuration file.",
-        "lede": "Configuring <strong>bs</strong>, the libbitcoin server:\n      command line options, the running console and the configuration file.",
+        "description": "Configuring Bitcoin Server (bs): command line options, the running console and the configuration file.",
+        "lede": "Configuring <strong>Bitcoin Server</strong> (bs):\n      command line options, the running console and the configuration file.",
         "foot": "",
         "pages": [
             ("index", "Configuration"),
@@ -129,8 +153,8 @@ SECTIONS = {
     "building": {
         "title": "Libbitcoin Server Building",
         "h1": "Building",
-        "description": "Building bs, the libbitcoin server, on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.",
-        "lede": "Building <strong>bs</strong>, the libbitcoin server, on Linux, macOS and Windows:\n      build systems, options, toolchains and libbitcoin-build.",
+        "description": "Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.",
+        "lede": "Building <strong>Bitcoin Server</strong> (bs), on Linux, macOS and Windows:\n      build systems, options, toolchains and libbitcoin-build.",
         "foot": "",
         "pages": [
             ("index", "Building"),
@@ -145,8 +169,8 @@ SECTIONS = {
     "interfaces": {
         "title": "Libbitcoin Server Interfaces",
         "h1": "Interfaces",
-        "description": "Reference documentation for each interface served by bs, the libbitcoin server: calling patterns, examples and responses.",
-        "lede": "Reference documentation for each interface served by <strong>bs</strong>, the libbitcoin server:\n      calling patterns, examples and responses.",
+        "description": "Reference documentation for each interface served by Bitcoin Server (bs): calling patterns, examples and responses.",
+        "lede": "Reference documentation for each interface served by <strong>Bitcoin Server</strong> (bs):\n      calling patterns, examples and responses.",
         "foot": "",
         "pages": [
             ("index", "Interfaces"),

@@ -6,4 +6,6 @@ exclude:
   - interfaces/md
   - start/md
   - download/md
+  - developers/md
+  - client/md
   - tools
