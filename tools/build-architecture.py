@@ -522,7 +522,7 @@ def render(key, name, md, guard, logo, mermaid_src):
     <a href="../" aria-label="libbitcoin.info">
     %(logo)s
     </a>
-    <div class="eyebrow">Bitcoin full node and query server</div>
+    <div class="eyebrow">Full stack Bitcoin software</div>
     <h1>%(h1)s</h1>
     <nav class="menu site">
 %(site)s
