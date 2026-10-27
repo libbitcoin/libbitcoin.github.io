@@ -366,7 +366,8 @@ empty. For a block with only a coinbase:
 ```
 
 Each spent output is `{"value", "scriptPubKey"}`, where `scriptPubKey`
-also carries `desc`, and `address` where one exists.
+also carries `desc`, and `address` where one exists. Addresses and
+descriptors are encoded with the [`[wallet]`](../configuration/reference#6-wallet) prefixes.
 
 ## 5. Transactions
 

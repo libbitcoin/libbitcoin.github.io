@@ -164,6 +164,7 @@ $ curl -d '[{"jsonrpc":"2.0","id":0,"method":"server.version","params":["curl","
 | Transaction, block hash | Hex, in the usual reversed (display) order |
 | Script hash | SHA-256 of the output script, as hex in reversed order |
 | Script | Hex of the output script, without its length |
+| Address | Encoded with the [`[wallet]`](../configuration/reference#6-wallet) prefixes, so a test chain uses its own |
 | Header | Hex of the 80 byte header, as serialized |
 | Transaction | Hex of the transaction, as serialized with witness data |
 | Amount, fee | Integer satoshis |
@@ -519,7 +520,8 @@ A transaction, confirmed or unconfirmed.
 | 1.2+ | `tx_hash`, `verbose` (`false`) |
 
 **Result:** the transaction as hex, or with `verbose` as bitcoind's
-`getrawtransaction` object.
+`getrawtransaction` object, with addresses encoded by the
+[`[wallet]`](../configuration/reference#6-wallet) prefixes.
 
 ### blockchain.transaction.get_merkle
 
@@ -549,7 +551,8 @@ The hash of the transaction at a position in a block.
 The address of an output.
 
 **Versions:** 1.0, deprecated. **Parameters:** `tx_hash`, `index`.
-**Result:** the address, or `null`.
+**Result:** the base58 address, with the [`[wallet]`](../configuration/reference#6-wallet) prefixes, or `null`
+for an output without one.
 
 ### blockchain.outpoint.get_status
 
@@ -650,7 +653,9 @@ These identify an output script by its hash (§2.5). Each takes
 
 These identify an output by its address, and are replaced by the script
 hash methods. Each takes `address`. Results are as for the script hash
-methods. `bs` accepts base58 (P2PKH and P2SH) addresses.
+methods. `bs` accepts base58 addresses, P2PKH and P2SH, with the
+`wallet.p2kh_prefix` and `wallet.p2sh_prefix` of its chain (see
+[`[wallet]`](../configuration/reference#6-wallet)).
 
 ### blockchain.address.get_balance
 

@@ -661,7 +661,7 @@ The administrative web and websocket interface.
 allow_opaque_origin = false
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
-# The certificate authority directory (*.PEM), enables client authentication.
+# The trusted client certificate directory (*.PEM), enables client authentication.
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
@@ -711,7 +711,7 @@ The native libbitcoin REST and websocket interface, and its web pages.
 allow_opaque_origin = false
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
-# The certificate authority directory (*.PEM), enables client authentication.
+# The trusted client certificate directory (*.PEM), enables client authentication.
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
@@ -763,7 +763,7 @@ The bitcoind JSON-RPC and REST interface.
 allow_opaque_origin = false
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
-# The certificate authority directory (*.PEM), enables client authentication.
+# The trusted client certificate directory (*.PEM), enables client authentication.
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
@@ -845,7 +845,7 @@ The btcd JSON-RPC and websocket interface.
 allow_opaque_origin = false
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
-# The certificate authority directory (*.PEM), enables client authentication.
+# The trusted client certificate directory (*.PEM), enables client authentication.
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
@@ -1013,7 +1013,7 @@ server_name = /libbitcoin:4.0.10255/
 
 ## 20. `[esplora]`
 
-The Esplora REST interface.
+The Esplora interface.
 
 ```ini
 [esplora]
@@ -1021,7 +1021,7 @@ The Esplora REST interface.
 allow_opaque_origin = false
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
-# The certificate authority directory (*.PEM), enables client authentication.
+# The trusted client certificate directory (*.PEM), enables client authentication.
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =

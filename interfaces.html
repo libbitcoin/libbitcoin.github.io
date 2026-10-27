@@ -244,9 +244,10 @@
         <a href="interfaces/native.html" class="sub">Native REST</a>
         <a href="interfaces/electrum.html" class="sub">Electrum</a>
         <a href="interfaces/p2p.html" class="sub">Bitcoin P2P</a>
+        <a href="interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
         <a href="interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="interfaces/esplora.html" class="sub">Esplora REST</a>
+        <a href="interfaces/esplora.html" class="sub">Esplora</a>
         <a href="configuration/index.html">Configuration</a>
         <a href="building/index.html">Building</a>
       </div></details>
@@ -471,7 +472,7 @@ const services = [
   ]
 },
 {
-  id: 'bitcoind', name: 'Bitcoind JSON-RPC', grouped: true,
+  id: 'bitcoind', name: 'Bitcoind JSON-RPC', grouped: true, doc: 'interfaces/bitcoind-rpc.html', unserved: '11-methods-not-served',
   note: 'Drop-in compatibility for JSON-RPC node methods. A tcp/s transport is supported on the same port.',
   spec: { Transport: 'tcp/s, http/s, ws/s', Framing: 'json-rpc 2.0', Auth: 'tls server, mutual; http basic (scoped)', Channel: 'half duplex' },
   methods: [
@@ -512,7 +513,7 @@ const services = [
     ['invalidateblock', N, 'requires stored invalidity', 'blockchain'],
     ['reconsiderblock', N, 'requires stored invalidity', 'blockchain'],
     ['savemempool', Y, 'version 1 file in store directory', 'blockchain'],
-    ['getblockfrompeer', R, 'no valid scenario', 'blockchain'],
+    ['getblockfrompeer', R, 'dynamic pruning not supported', 'blockchain'],
     ['dumptxoutset', R, 'assumeutxo is a terrible idea', 'blockchain'],
     ['loadtxoutset', R, 'assumeutxo is a terrible idea', 'blockchain'],
     ['pruneblockchain', R, 'dynamic pruning not supported', 'blockchain'],
@@ -532,8 +533,8 @@ const services = [
     ['utxoupdatepsbt', Y, '', 'transaction tooling'],
     ['sendrawtransaction', P, 'no replacement until v5 tx pool', 'transaction tooling'],
     ['testmempoolaccept', P, 'no replacement until v5 tx pool', 'transaction tooling'],
-    ['abortprivatebroadcast', N, '', 'transaction tooling'],
-    ['getprivatebroadcastinfo', N, '', 'transaction tooling'],
+    ['abortprivatebroadcast', N, 'experimental, not supported', 'transaction tooling'],
+    ['getprivatebroadcastinfo', N, 'experimental, not supported', 'transaction tooling'],
     ['submitpackage', P, 'no replacement until v5 tx pool', 'transaction tooling'],
     ['signrawtransactionwithkey', R, 'signing is a wallet function; keys never transit the server', 'transaction tooling'],
     ['descriptorprocesspsbt', R, 'signing is a wallet function; keys never transit the server', 'transaction tooling'],
@@ -658,7 +659,7 @@ const services = [
 },
 {
   id: 'esplora', name: 'Esplora', doc: 'interfaces/esplora.html',
-  note: 'The Esplora REST interface, as defined by the Blockstream explorer API. Transactions are served as decoded json with resolved previous outputs and computed fees, and addresses are served by encoded address or output script hash. A ws/s transport is supported on the same port.',
+  note: 'The Esplora interface, as defined by the Blockstream explorer API. Transactions are served as decoded json with resolved previous outputs and computed fees, and addresses are served by encoded address or output script hash. A ws/s transport is supported on the same port.',
   spec: { Transport: 'http/s, ws/s', Framing: 'REST + ws', Auth: 'tls server, mutual; http basic (scoped)', Channel: 'half duplex' },
   methods: [
     ['tx', Y, ''],
@@ -760,7 +761,7 @@ document.getElementById('board').innerHTML = services.map(s => {
 document.getElementById('services').innerHTML = services.map(s => {
   const n = s.methods.length;
   const rowHtml = ([m, st, note, ver, cfg, wip]) => `<tr class="${st === Y || st === P ? '' : 'dim'}">
-      <td class="m">${s.doc ? `<a href="${s.doc}#${m.toLowerCase().replace(/[^\w-]/g, '')}">${esc(m)}</a>` : esc(m)}</td>
+      <td class="m">${s.doc && !m.startsWith('(') ? `<a href="${s.doc}#${s.unserved && (st === N || st === R) ? s.unserved : m.toLowerCase().replace(/[^\w-]/g, '')}">${esc(m)}</a>` : esc(m)}</td>
       <td class="st">${stat(st, wip)}</td>
       ${s.versioned ? `<td class="v">${esc(ver || '')}</td>` : ''}
       ${s.configured ? `<td class="v">${esc(cfg || '')}</td>` : ''}

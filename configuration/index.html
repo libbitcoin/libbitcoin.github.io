@@ -249,9 +249,10 @@
         <a href="../interfaces/native.html" class="sub">Native REST</a>
         <a href="../interfaces/electrum.html" class="sub">Electrum</a>
         <a href="../interfaces/p2p.html" class="sub">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="../interfaces/esplora.html" class="sub">Esplora REST</a>
+        <a href="../interfaces/esplora.html" class="sub">Esplora</a>
         <a href="../configuration/index.html" class="here">Configuration</a>
         <a href="../building/index.html">Building</a>
       </div></details>
@@ -738,7 +739,7 @@ chosen with <code>format=</code> or the <code>Accept</code> header:</p>
 }
 </code></pre>
 <p>Every path, with examples, is documented in
-<a href="../interfaces/native">Native REST</a>.</p>
+<a href="../interfaces/native.html">Native REST</a>.</p>
 <p>Query options, besides <code>format</code>:</p>
 <div class="scroller"><table>
 <thead>
@@ -853,8 +854,8 @@ connections = 10
 <p>Beyond the standard bitcoind notifications, <code>bs</code> provides CurveZMQ on its
 <code>safe</code> addresses (§7.2): encrypted notifications, optionally only to
 the client keys listed in <code>bitcoind_zmq.cert</code>.</p>
-<h3 id="511-esplora-rest">5.11 Esplora REST<a class="anchor" href="#511-esplora-rest" aria-label="Link to this section">#</a></h3>
-<p>The Esplora REST interface, on its assigned port:</p>
+<h3 id="511-esplora">5.11 Esplora<a class="anchor" href="#511-esplora" aria-label="Link to this section">#</a></h3>
+<p>The Esplora interface, on its assigned port:</p>
 <pre><code class="language-ini"><span class="section">[esplora]</span>
 bind = 0.0.0.0:8780
 connections = 100
@@ -862,7 +863,7 @@ connections = 100
 <p>To serve existing Esplora clients, bind it to the port they expect
 instead (§6). <code>esplora.maximum_history</code> limits the entries returned for
 one address.</p>
-<p>Beyond the standard Esplora REST interface, <code>bs</code> provides:</p>
+<p>Beyond the standard Esplora interface, <code>bs</code> provides:</p>
 <ul>
 <li>Websocket on the same ports. Each frame is one request path, and a
   request with a body (a broadcast) follows the path with a newline and
@@ -1142,7 +1143,7 @@ conflict.</p>
 <td>8643</td>
 </tr>
 <tr>
-<td>Esplora REST</td>
+<td>Esplora</td>
 <td><code>[esplora]</code></td>
 <td>8780</td>
 <td>8743</td>
@@ -1300,7 +1301,7 @@ addresses.</p>
 </tr>
 <tr>
 <td><code>cert_auth</code></td>
-<td>Directory of certificate authority files (PEM). When set, clients must present a certificate issued by one of them.</td>
+<td>Directory of trusted certificate files (PEM). When set, clients must present a certificate trusted by one of them, such as the client's own certificate.</td>
 </tr>
 </tbody>
 </table></div>

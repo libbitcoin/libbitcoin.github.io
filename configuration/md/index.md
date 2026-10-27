@@ -453,9 +453,9 @@ Beyond the standard bitcoind notifications, `bs` provides CurveZMQ on its
 `safe` addresses (§7.2): encrypted notifications, optionally only to
 the client keys listed in `bitcoind_zmq.cert`.
 
-### 5.11 Esplora REST
+### 5.11 Esplora
 
-The Esplora REST interface, on its assigned port:
+The Esplora interface, on its assigned port:
 
 ```ini
 [esplora]
@@ -467,7 +467,7 @@ To serve existing Esplora clients, bind it to the port they expect
 instead (§6). `esplora.maximum_history` limits the entries returned for
 one address.
 
-Beyond the standard Esplora REST interface, `bs` provides:
+Beyond the standard Esplora interface, `bs` provides:
 
 - Websocket on the same ports. Each frame is one request path, and a
   request with a body (a broadcast) follows the path with a newline and
@@ -751,7 +751,7 @@ conflict.
 | BTCD RPC | `[btcd]` | 8480 | 8443 |
 | Electrum | `[electrum]` | 8580 | 8543 |
 | Sparrow | `[sparrow]` | 8680 | 8643 |
-| Esplora REST | `[esplora]` | 8780 | 8743 |
+| Esplora | `[esplora]` | 8780 | 8743 |
 
 P2P has no separate secure port. BIP324 encryption is negotiated on the
 same port, and offered when `node.provide_privacy` is set. ZMQ's secure
@@ -856,7 +856,7 @@ addresses.
 | `cert_path` | Server certificate file (PEM). |
 | `key_path` | Server private key file (PEM). |
 | `key_pass` | Password of an encrypted private key, if any. |
-| `cert_auth` | Directory of certificate authority files (PEM). When set, clients must present a certificate issued by one of them. |
+| `cert_auth` | Directory of trusted certificate files (PEM). When set, clients must present a certificate trusted by one of them, such as the client's own certificate. |
 
 The same certificate and key may be used by every service. For example,
 `[admin]` over TLS only:

@@ -1,6 +1,6 @@
-# Esplora REST
+# Esplora
 
-The Esplora REST interface is a drop-in for the Esplora explorer API,
+The Esplora interface is a drop-in for the Esplora explorer API,
 served on the `[esplora]` binding. Transactions are served as decoded JSON
 with resolved previous outputs and computed fees, and addresses by encoded
 address or by output script hash.
@@ -76,7 +76,7 @@ a prefix, such as `/api`, needs that prefix removed.
 | ---------- | ---- |
 | Block, transaction hash | 64 hex characters, in the usual reversed (display) order |
 | Height, index, start, output index | Decimal, no leading zeros |
-| Address | An encoded address for the configured chain |
+| Address | An address, encoded with the [`[wallet]`](../configuration/reference#6-wallet) prefixes |
 | Script hash | 64 hex characters, the SHA-256 of an output script, not reversed |
 
 ### 2.2 Formats
@@ -196,7 +196,7 @@ $ curl "http://localhost:8780/tx/0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68beb
 
 Each input that spends a known output also carries that output as
 `prevout`, and each output with an address carries it as
-`scriptpubkey_address`. An unconfirmed transaction's status is
+`scriptpubkey_address`, encoded with the [`[wallet]`](../configuration/reference#6-wallet) prefixes. An unconfirmed transaction's status is
 `{"confirmed": false}`. `/hex` is the transaction in wire format, with
 witness data, as hex, and `/raw` the same bytes.
 

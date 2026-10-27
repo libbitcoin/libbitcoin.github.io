@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Libbitcoin Server Interfaces: Esplora REST</title>
+<title>Libbitcoin Server Interfaces: Esplora</title>
 <meta name="description" content="Reference documentation for each interface served by bs, the libbitcoin server: calling patterns, examples and responses.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/interfaces/esplora.html">
@@ -40,7 +40,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/interfaces/esplora.html">
-<meta property="og:title" content="Libbitcoin Server Interfaces: Esplora REST">
+<meta property="og:title" content="Libbitcoin Server Interfaces: Esplora">
 <meta property="og:description" content="Reference documentation for each interface served by bs, the libbitcoin server: calling patterns, examples and responses.">
 <meta property="og:image" content="https://libbitcoin.info/card2.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card2.png">
@@ -49,7 +49,7 @@
 <meta property="og:image:height" content="1260">
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Libbitcoin Server Interfaces: Esplora REST">
+<meta name="twitter:title" content="Libbitcoin Server Interfaces: Esplora">
 <meta name="twitter:description" content="Reference documentation for each interface served by bs, the libbitcoin server: calling patterns, examples and responses.">
 <meta name="twitter:image" content="https://libbitcoin.info/card2.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
@@ -240,7 +240,7 @@
 </svg>
     </a>
     <div class="eyebrow">Bitcoin full node and query server</div>
-    <h1>Esplora REST</h1>
+    <h1>Esplora</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Server</summary><div>
@@ -249,9 +249,10 @@
         <a href="../interfaces/native.html" class="sub">Native REST</a>
         <a href="../interfaces/electrum.html" class="sub">Electrum</a>
         <a href="../interfaces/p2p.html" class="sub">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="../interfaces/esplora.html" class="sub here">Esplora REST</a>
+        <a href="../interfaces/esplora.html" class="sub here">Esplora</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
       </div></details>
@@ -279,13 +280,14 @@
     <a href="native.html">Native REST</a>
     <a href="electrum.html">Electrum</a>
     <a href="p2p.html">Bitcoin P2P</a>
+    <a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a>
     <a href="bitcoind-rest.html">Bitcoind REST</a>
     <a href="zeromq.html">Bitcoind ZMQ</a>
-    <a href="esplora.html" class="here">Esplora REST</a>
+    <a href="esplora.html" class="here">Esplora</a>
   </nav>
 
   <article class="doc">
-<p>The Esplora REST interface is a drop-in for the Esplora explorer API,
+<p>The Esplora interface is a drop-in for the Esplora explorer API,
 served on the <code>[esplora]</code> binding. Transactions are served as decoded JSON
 with resolved previous outputs and computed fees, and addresses by encoded
 address or by output script hash.</p>
@@ -485,7 +487,7 @@ a prefix, such as <code>/api</code>, needs that prefix removed.</p>
 </tr>
 <tr>
 <td>Address</td>
-<td>An encoded address for the configured chain</td>
+<td>An address, encoded with the <a href="../configuration/reference.html#6-wallet"><code>[wallet]</code></a> prefixes</td>
 </tr>
 <tr>
 <td>Script hash</td>
@@ -569,7 +571,7 @@ a prefix, such as <code>/api</code>, needs that prefix removed.</p>
 </table></div>
 <h3 id="24-credentials">2.4 Credentials<a class="anchor" href="#24-credentials" aria-label="Link to this section">#</a></h3>
 <p>A credential's method list names Esplora endpoints by the method names in
-§1 (see <a href="../configuration/index#73-authentication">Configuration §7.3</a>).
+§1 (see <a href="../configuration/index.html#73-authentication">Configuration §7.3</a>).
 The <code>/hex</code> and <code>/raw</code> paths share the method of their object.</p>
 <h3 id="25-websocket">2.5 Websocket<a class="anchor" href="#25-websocket" aria-label="Link to this section">#</a></h3>
 <p>Esplora is an HTTP/S interface. WS/S is a <code>bs</code> extension, which carries
@@ -638,7 +640,7 @@ asyncio.run(main())
 </code></pre>
 <p>Each input that spends a known output also carries that output as
 <code>prevout</code>, and each output with an address carries it as
-<code>scriptpubkey_address</code>. An unconfirmed transaction's status is
+<code>scriptpubkey_address</code>, encoded with the <a href="../configuration/reference.html#6-wallet"><code>[wallet]</code></a> prefixes. An unconfirmed transaction's status is
 <code>{"confirmed": false}</code>. <code>/hex</code> is the transaction in wire format, with
 witness data, as hex, and <code>/raw</code> the same bytes.</p>
 <h3 id="tx_status">tx_status<a class="anchor" href="#tx_status" aria-label="Link to this section">#</a></h3>

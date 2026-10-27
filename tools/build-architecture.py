@@ -25,9 +25,10 @@ SITE_MENU = [
             ("interfaces/native.html", "Native REST"),
             ("interfaces/electrum.html", "Electrum"),
             ("interfaces/p2p.html", "Bitcoin P2P"),
+            ("interfaces/bitcoind-rpc.html", "Bitcoind JSON-RPC"),
             ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
             ("interfaces/zeromq.html", "Bitcoind ZMQ"),
-            ("interfaces/esplora.html", "Esplora REST"),
+            ("interfaces/esplora.html", "Esplora"),
         ]),
         ("configuration/index.html", "Configuration"),
         ("building/index.html", "Building"),
@@ -128,9 +129,10 @@ SECTIONS = {
             ("native", "Native REST"),
             ("electrum", "Electrum"),
             ("p2p", "Bitcoin P2P"),
+            ("bitcoind-rpc", "Bitcoind JSON-RPC"),
             ("bitcoind-rest", "Bitcoind REST"),
             ("zeromq", "Bitcoind ZMQ"),
-            ("esplora", "Esplora REST"),
+            ("esplora", "Esplora"),
         ],
     },
 }
@@ -290,7 +292,14 @@ def fix_links(body, slugs):
             return m.group(0)
         return 'href="%s.html%s"' % (name, "#" + anchor if anchor else "")
 
-    return re.sub(r'href="([^"/:]+)"', fix, body)
+    def fix_section(m):
+        key, name, anchor = m.group(1), m.group(2), m.group(3) or ""
+        if key not in SECTIONS or name not in {n for n, _ in SECTIONS[key]["pages"]}:
+            return m.group(0)
+        return 'href="../%s/%s.html%s"' % (key, name, anchor)
+
+    body = re.sub(r'href="([^"/:]+)"', fix, body)
+    return re.sub(r'href="\.\./([\w-]+)/([\w-]+)(#[^"]*)?"', fix_section, body)
 
 
 def add_heading_ids(body):

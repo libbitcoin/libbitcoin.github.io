@@ -249,9 +249,10 @@
         <a href="../interfaces/native.html" class="sub">Native REST</a>
         <a href="../interfaces/electrum.html" class="sub">Electrum</a>
         <a href="../interfaces/p2p.html" class="sub here">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="../interfaces/esplora.html" class="sub">Esplora REST</a>
+        <a href="../interfaces/esplora.html" class="sub">Esplora</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
       </div></details>
@@ -279,16 +280,17 @@
     <a href="native.html">Native REST</a>
     <a href="electrum.html">Electrum</a>
     <a href="p2p.html" class="here">Bitcoin P2P</a>
+    <a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a>
     <a href="bitcoind-rest.html">Bitcoind REST</a>
     <a href="zeromq.html">Bitcoind ZMQ</a>
-    <a href="esplora.html">Esplora REST</a>
+    <a href="esplora.html">Esplora</a>
   </nav>
 
   <article class="doc">
 <p>The Bitcoin P2P interface is Bitcoin's wire protocol, on which <code>bs</code> both
 syncs the chain and serves it. It is configured by the <code>[network]</code>,
 <code>[peer]</code>, <code>[inbound]</code>, <code>[outbound]</code> and <code>[manual]</code> sections (see
-<a href="../configuration/index#518-peer-services-and-policy">Configuration
+<a href="../configuration/index.html#518-peer-services-and-policy">Configuration
 §5.18</a>).</p>
 <p>P2P and P2PS (BIP324) are reached on the same port:</p>
 <div class="scroller"><table>
@@ -621,7 +623,7 @@ an unrequested or invalid header, block, or transaction. There is no
 banning. <code>network.blacklist</code> and <code>network.whitelist</code> set which addresses
 connect at all.</p>
 <p>Limits that protect against denial of service apply to every service,
-including P2P (see <a href="../configuration/index#75-limits">Configuration §7.5</a>).</p>
+including P2P (see <a href="../configuration/index.html#75-limits">Configuration §7.5</a>).</p>
 <h2 id="3-handshake">3. Handshake<a class="anchor" href="#3-handshake" aria-label="Link to this section">#</a></h2>
 <h3 id="version">version<a class="anchor" href="#version" aria-label="Link to this section">#</a></h3>
 <p>Sent on connection, with:</p>
@@ -755,7 +757,7 @@ filtered blocks, and does not advertise <code>node_bloom</code>.</p>
 <p>Not supported, as <code>filterload</code>.</p>
   </article>
 
-  <nav class="pager"><a href="electrum.html">&larr; Electrum</a><a href="bitcoind-rest.html">Bitcoind REST &rarr;</a></nav>
+  <nav class="pager"><a href="electrum.html">&larr; Electrum</a><a href="bitcoind-rpc.html">Bitcoind JSON-RPC &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 

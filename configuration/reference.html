@@ -249,9 +249,10 @@
         <a href="../interfaces/native.html" class="sub">Native REST</a>
         <a href="../interfaces/electrum.html" class="sub">Electrum</a>
         <a href="../interfaces/p2p.html" class="sub">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="../interfaces/esplora.html" class="sub">Esplora REST</a>
+        <a href="../interfaces/esplora.html" class="sub">Esplora</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
       </div></details>
@@ -892,7 +893,7 @@ username =
 allow_opaque_origin = false
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
-<span class="comment"># The certificate authority directory (*.PEM), enables client authentication.</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
 cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
@@ -938,7 +939,7 @@ server = libbitcoin/4
 allow_opaque_origin = false
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
-<span class="comment"># The certificate authority directory (*.PEM), enables client authentication.</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
 cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
@@ -986,7 +987,7 @@ websocket = true
 allow_opaque_origin = false
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
-<span class="comment"># The certificate authority directory (*.PEM), enables client authentication.</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
 cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
@@ -1060,7 +1061,7 @@ rate_limit = 0
 allow_opaque_origin = false
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
-<span class="comment"># The certificate authority directory (*.PEM), enables client authentication.</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
 cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
@@ -1218,13 +1219,13 @@ rate_limit = 0
 server_name = /libbitcoin:4.0.10255/
 </code></pre>
 <h2 id="20-esplora">20. <code>[esplora]</code><a class="anchor" href="#20-esplora" aria-label="Link to this section">#</a></h2>
-<p>The Esplora REST interface.</p>
+<p>The Esplora interface.</p>
 <pre><code class="language-ini"><span class="section">[esplora]</span>
 <span class="comment"># Allow requests from opaque origin (see CORS), defaults to 'false'.</span>
 allow_opaque_origin = false
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
-<span class="comment"># The certificate authority directory (*.PEM), enables client authentication.</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
 cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
