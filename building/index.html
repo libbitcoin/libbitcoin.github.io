@@ -244,6 +244,7 @@
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
+        <a href="../download/index.html">Download</a>
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html" class="here">Building</a>
@@ -347,7 +348,7 @@ $ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-co
 <p>The result is <code>~/libbitcoin/bin/bs</code>. On Windows, see <a href="windows.html">Windows</a>.</p>
 <h2 id="4-hardware-options">4. Hardware options<a class="anchor" href="#4-hardware-options" aria-label="Link to this section">#</a></h2>
 <p>By default <code>bs</code> is built for the baseline instruction set of its
-architecture (AVX2 for Windows x64). Options such as <code>--enable-avx2</code> or <code>--enable-shani</code> make it
+architecture (AVX2 by default on Windows, which can be lowered). Options such as <code>--enable-avx2</code> or <code>--enable-shani</code> make it
 faster on CPUs that have those instructions, and unable to run on CPUs
 that do not. <code>--hardware-optimized</code> enables all that the build machine
 supports, so its <code>bs</code> runs only on CPUs with the same extensions. Run

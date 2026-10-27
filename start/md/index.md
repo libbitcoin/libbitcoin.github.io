@@ -6,6 +6,9 @@ Windows.
 
 ## 1. Build
 
+To use a published build instead, see [Download](../download/index), and
+continue from §2.
+
 On Linux or macOS, a release build installed under `~/libbitcoin`,
 optimized for this machine:
 

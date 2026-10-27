@@ -244,6 +244,7 @@
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
+        <a href="../download/index.html">Download</a>
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
@@ -523,7 +524,8 @@ pages, or <code>/p:Option-&lt;name&gt;=true</code> on the <code>build-msvc.cmd</
 command line. For example, an AVX-512 build:</p>
 <pre class="console"><code>$ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-use-local-src /p:Option-avx512=true
 </code></pre>
-<p>Windows x64 and Win32 builds target AVX2 by default.</p>
+<p>Windows x64 and Win32 builds target AVX2 by default, which can be
+lowered (see <a href="windows.html#4-instruction-set">Windows</a>).</p>
   </article>
 
   <nav class="pager"><a href="windows.html">&larr; Windows</a><a href="toolchains.html">Build systems and toolchains &rarr;</a></nav>

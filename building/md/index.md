@@ -43,7 +43,7 @@ The result is `~/libbitcoin/bin/bs`. On Windows, see [Windows](windows).
 ## 4. Hardware options
 
 By default `bs` is built for the baseline instruction set of its
-architecture (AVX2 for Windows x64). Options such as `--enable-avx2` or `--enable-shani` make it
+architecture (AVX2 by default on Windows, which can be lowered). Options such as `--enable-avx2` or `--enable-shani` make it
 faster on CPUs that have those instructions, and unable to run on CPUs
 that do not. `--hardware-optimized` enables all that the build machine
 supports, so its `bs` runs only on CPUs with the same extensions. Run

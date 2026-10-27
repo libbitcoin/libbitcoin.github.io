@@ -104,4 +104,5 @@ command line. For example, an AVX-512 build:
 $ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-use-local-src /p:Option-avx512=true
 ```
 
-Windows x64 and Win32 builds target AVX2 by default.
+Windows x64 and Win32 builds target AVX2 by default, which can be
+lowered (see [Windows](windows#4-instruction-set)).

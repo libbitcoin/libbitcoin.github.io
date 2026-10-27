@@ -63,5 +63,22 @@ Build options are on each project's property pages, under
 
 ## 4. Instruction set
 
-Windows x64 and Win32 builds target AVX2 by default, so `bs.exe`
-requires a CPU with AVX2 (Intel Haswell, AMD Excavator or later).
+Windows x64 and Win32 builds target AVX2 by default, so such a `bs.exe`
+requires a CPU with AVX2 (Intel Haswell, AMD Excavator or later). This
+is only a default, set by `Option-arch`, and can be lowered for an older
+CPU, for example to AVX or SSE2:
+
+```
+$ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-use-local-src /p:Option-arch=StreamingSIMDExtensions2
+```
+
+| `Option-arch` | Instructions |
+| ------------- | ------------ |
+| `StreamingSIMDExtensions2` | SSE2 |
+| `AdvancedVectorExtensions` | AVX |
+| `AdvancedVectorExtensions2` | AVX2 (default) |
+| `AdvancedVectorExtensions512` | AVX-512 |
+
+An extension option raises it as needed: `Option-sse41` to at least AVX,
+`Option-avx2`, `Option-avxifma`, `Option-vaes` or `Option-sha512` to
+AVX2, and `Option-avx512` to AVX-512.

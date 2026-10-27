@@ -20,6 +20,7 @@ MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 SITE_MENU = [
     ("index.html", "Home"),
     ("Getting Started", [
+        ("download/index.html", "Download"),
         ("start/index.html", "Quick Start"),
         ("configuration/index.html", "Configuration"),
         ("building/index.html", "Building"),
@@ -88,6 +89,16 @@ SECTIONS = {
             ("tables", "Tables"),
             ("storage", "Storage"),
             ("queries", "Queries"),
+        ],
+    },
+    "download": {
+        "title": "Libbitcoin Server Download",
+        "h1": "Download",
+        "description": "Download bs, the libbitcoin server: selecting a build for your hardware and verifying its signature.",
+        "lede": "Download <strong>bs</strong>, the libbitcoin server: selecting a build\n      for your hardware and verifying its signature.",
+        "foot": "",
+        "pages": [
+            ("index", "Download"),
         ],
     },
     "start": {

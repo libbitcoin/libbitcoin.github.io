@@ -244,6 +244,7 @@
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
+        <a href="../download/index.html">Download</a>
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
@@ -357,8 +358,41 @@ libraries in their sibling directories. Select <code>StaticRelease</code> or
 <p>Build options are on each project's property pages, under
 <em>Configuration Properties</em>.</p>
 <h2 id="4-instruction-set">4. Instruction set<a class="anchor" href="#4-instruction-set" aria-label="Link to this section">#</a></h2>
-<p>Windows x64 and Win32 builds target AVX2 by default, so <code>bs.exe</code>
-requires a CPU with AVX2 (Intel Haswell, AMD Excavator or later).</p>
+<p>Windows x64 and Win32 builds target AVX2 by default, so such a <code>bs.exe</code>
+requires a CPU with AVX2 (Intel Haswell, AMD Excavator or later). This
+is only a default, set by <code>Option-arch</code>, and can be lowered for an older
+CPU, for example to AVX or SSE2:</p>
+<pre class="console"><code>$ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-use-local-src /p:Option-arch=StreamingSIMDExtensions2
+</code></pre>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th><code>Option-arch</code></th>
+<th>Instructions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>StreamingSIMDExtensions2</code></td>
+<td>SSE2</td>
+</tr>
+<tr>
+<td><code>AdvancedVectorExtensions</code></td>
+<td>AVX</td>
+</tr>
+<tr>
+<td><code>AdvancedVectorExtensions2</code></td>
+<td>AVX2 (default)</td>
+</tr>
+<tr>
+<td><code>AdvancedVectorExtensions512</code></td>
+<td>AVX-512</td>
+</tr>
+</tbody>
+</table></div>
+<p>An extension option raises it as needed: <code>Option-sse41</code> to at least AVX,
+<code>Option-avx2</code>, <code>Option-avxifma</code>, <code>Option-vaes</code> or <code>Option-sha512</code> to
+AVX2, and <code>Option-avx512</code> to AVX-512.</p>
   </article>
 
   <nav class="pager"><a href="macos.html">&larr; macOS</a><a href="options.html">Build options &rarr;</a></nav>

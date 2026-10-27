@@ -5,4 +5,5 @@ exclude:
   - building/md
   - interfaces/md
   - start/md
+  - download/md
   - tools
