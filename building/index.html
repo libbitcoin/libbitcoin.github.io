@@ -243,20 +243,23 @@
     <h1>Building</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
-      <details class="drop here" name="site"><summary>Server</summary><div>
-        <a href="../interfaces.html">Interfaces</a>
-        <a href="../interfaces/admin.html" class="sub">Admin Console</a>
-        <a href="../interfaces/native.html" class="sub">Native REST</a>
-        <a href="../interfaces/electrum.html" class="sub">Electrum</a>
-        <a href="../interfaces/sparrow.html" class="sub">Sparrow</a>
-        <a href="../interfaces/p2p.html" class="sub">Bitcoin P2P</a>
-        <a href="../interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
-        <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="../interfaces/btcd.html" class="sub">BTCD</a>
-        <a href="../interfaces/esplora.html" class="sub">Esplora</a>
+      <details class="drop here" name="site"><summary>Getting Started</summary><div>
+        <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html" class="here">Building</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Server</summary><div>
+        <a href="../interfaces.html">Interfaces</a>
+        <a href="../interfaces/admin.html">Admin Console</a>
+        <a href="../interfaces/native.html">Native REST</a>
+        <a href="../interfaces/electrum.html">Electrum</a>
+        <a href="../interfaces/sparrow.html">Sparrow</a>
+        <a href="../interfaces/p2p.html">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
+        <a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a>
+        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../interfaces/btcd.html">BTCD</a>
+        <a href="../interfaces/esplora.html">Esplora</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync</a>
@@ -336,18 +339,20 @@ name.</p>
 <p>Nothing else is required (see <a href="options.html">Build options</a>).</p>
 <h2 id="3-quick-start">3. Quick start<a class="anchor" href="#3-quick-start" aria-label="Link to this section">#</a></h2>
 <p>On Linux or macOS, a static release build installed under
-<code>~/libbitcoin</code>:</p>
+<code>~/libbitcoin</code>, optimized for the build machine:</p>
 <pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static --hardware-optimized
 </code></pre>
 <p>The result is <code>~/libbitcoin/bin/bs</code>. On Windows, see <a href="windows.html">Windows</a>.</p>
 <h2 id="4-hardware-options">4. Hardware options<a class="anchor" href="#4-hardware-options" aria-label="Link to this section">#</a></h2>
 <p>By default <code>bs</code> is built for the baseline instruction set of its
 architecture (AVX2 for Windows x64). Options such as <code>--enable-avx2</code> or <code>--enable-shani</code> make it
 faster on CPUs that have those instructions, and unable to run on CPUs
-that do not. Run <code>bs --hardware</code> on the target machine to see what it
-supports, and see <a href="options.html">Build options</a>.</p>
+that do not. <code>--hardware-optimized</code> enables all that the build machine
+supports, so its <code>bs</code> runs only on CPUs with the same extensions. Run
+<code>bs --hardware</code> on the target machine to see what it supports, and see
+<a href="options.html">Build options</a>.</p>
 <h2 id="5-pages">5. Pages<a class="anchor" href="#5-pages" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="linux.html">Linux</a>, <a href="macos.html">macOS</a> and <a href="windows.html">Windows</a>: prerequisites

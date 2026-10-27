@@ -243,20 +243,23 @@
     <h1>Build options</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
-      <details class="drop here" name="site"><summary>Server</summary><div>
-        <a href="../interfaces.html">Interfaces</a>
-        <a href="../interfaces/admin.html" class="sub">Admin Console</a>
-        <a href="../interfaces/native.html" class="sub">Native REST</a>
-        <a href="../interfaces/electrum.html" class="sub">Electrum</a>
-        <a href="../interfaces/sparrow.html" class="sub">Sparrow</a>
-        <a href="../interfaces/p2p.html" class="sub">Bitcoin P2P</a>
-        <a href="../interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
-        <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="../interfaces/btcd.html" class="sub">BTCD</a>
-        <a href="../interfaces/esplora.html" class="sub">Esplora</a>
+      <details class="drop here" name="site"><summary>Getting Started</summary><div>
+        <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Server</summary><div>
+        <a href="../interfaces.html">Interfaces</a>
+        <a href="../interfaces/admin.html">Admin Console</a>
+        <a href="../interfaces/native.html">Native REST</a>
+        <a href="../interfaces/electrum.html">Electrum</a>
+        <a href="../interfaces/sparrow.html">Sparrow</a>
+        <a href="../interfaces/p2p.html">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
+        <a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a>
+        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../interfaces/btcd.html">BTCD</a>
+        <a href="../interfaces/esplora.html">Esplora</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync</a>
@@ -346,6 +349,10 @@ the <code>Option-&lt;name&gt;</code> property.</p>
 <td>Number of parallel jobs (default the number of CPUs).</td>
 </tr>
 <tr>
+<td><code>--hardware-optimized</code></td>
+<td>Optimize for the build machine's CPU (<code>-march=native -mtune=native</code>), with <code>--build-config</code>. See <a href="#2-hardware-options">Hardware options</a>.</td>
+</tr>
+<tr>
 <td><code>--build-post-install-clean</code></td>
 <td>Remove dependency build files after installing.</td>
 </tr>
@@ -366,7 +373,14 @@ the options below are given.</p>
 built with an option runs only on CPUs that have the extension. Run
 <code>bs --hardware</code> on the target machine to see which it has, and do not
 enable an option it lacks.</p>
-<p>All are off by default.</p>
+<p>All are off by default. <code>--hardware-optimized</code> (§1) enables every
+extension of the build machine's CPU instead.</p>
+<blockquote>
+<p><strong>Portability:</strong> a build with <code>--hardware-optimized</code> runs only on CPUs
+that have every instruction set extension of the machine it was built
+on. To build for other machines, omit it, and enable only the
+extensions they all have.</p>
+</blockquote>
 <h3 id="x86">x86<a class="anchor" href="#x86" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>
@@ -439,8 +453,7 @@ enable an option it lacks.</p>
 </table></div>
 <p>On ARM, a CPU flag in <code>CFLAGS</code> and <code>CXXFLAGS</code>, such as
 <code>-mcpu=cortex-a76+crypto</code>, enables the same code as these options (see
-<a href="linux.html">Linux</a>). On x86, <code>-march=native</code> does the same for the build
-machine.</p>
+<a href="linux.html">Linux</a>).</p>
 <h3 id="gpu">GPU<a class="anchor" href="#gpu" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>

@@ -19,21 +19,23 @@ MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 
 SITE_MENU = [
     ("index.html", "Home"),
-    ("Server", [
-        ("interfaces.html", "Interfaces", [
-            ("interfaces/admin.html", "Admin Console"),
-            ("interfaces/native.html", "Native REST"),
-            ("interfaces/electrum.html", "Electrum"),
-            ("interfaces/sparrow.html", "Sparrow"),
-            ("interfaces/p2p.html", "Bitcoin P2P"),
-            ("interfaces/bitcoind-rpc.html", "Bitcoind JSON-RPC"),
-            ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
-            ("interfaces/zeromq.html", "Bitcoind ZMQ"),
-            ("interfaces/btcd.html", "BTCD"),
-            ("interfaces/esplora.html", "Esplora"),
-        ]),
+    ("Getting Started", [
+        ("start/index.html", "Quick Start"),
         ("configuration/index.html", "Configuration"),
         ("building/index.html", "Building"),
+    ]),
+    ("Server", [
+        ("interfaces.html", "Interfaces"),
+        ("interfaces/admin.html", "Admin Console"),
+        ("interfaces/native.html", "Native REST"),
+        ("interfaces/electrum.html", "Electrum"),
+        ("interfaces/sparrow.html", "Sparrow"),
+        ("interfaces/p2p.html", "Bitcoin P2P"),
+        ("interfaces/bitcoind-rpc.html", "Bitcoind JSON-RPC"),
+        ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
+        ("interfaces/zeromq.html", "Bitcoind ZMQ"),
+        ("interfaces/btcd.html", "BTCD"),
+        ("interfaces/esplora.html", "Esplora"),
     ]),
     ("Performance", [
         ("sync.html", "Sync"),
@@ -86,6 +88,16 @@ SECTIONS = {
             ("tables", "Tables"),
             ("storage", "Storage"),
             ("queries", "Queries"),
+        ],
+    },
+    "start": {
+        "title": "Libbitcoin Server Quick Start",
+        "h1": "Quick Start",
+        "description": "Build bs, the libbitcoin server, sync the chain, and serve wallets and a block explorer.",
+        "lede": "Build <strong>bs</strong>, the libbitcoin server, sync the chain,\n      and serve wallets and a block explorer.",
+        "foot": "",
+        "pages": [
+            ("index", "Quick Start"),
         ],
     },
     "configuration": {

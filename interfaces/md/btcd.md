@@ -259,11 +259,18 @@ Ends `notifyspent` for outputs. **Parameters:** `outpoints`.
 
 ### rescan
 
-**Parameters:** `beginblock`, `addresses`, `outpoints`, `endblock`
-(ignored). Served only without addresses and outputs, returning `null`
-and then notifying `rescanfinished` with
-`[hash, height, time]` of the top block. With addresses or outputs, it
-returns -1. btcd deprecates this method in favor of `rescanblocks`.
+Searches past blocks for the transactions of addresses and outputs.
+**Parameters:** `beginblock`, `addresses`, `outpoints`, `endblock`.
+
+In btcd, this searches the blocks from `beginblock` to `endblock`,
+notifying each transaction paying an address (`recvtx`) or spending an
+output (`redeemingtx`), then `rescanfinished`. `bs` does not implement
+the search: with addresses or outputs, it returns -1. With neither,
+there is nothing to search, so it returns `null` and notifies
+`rescanfinished` with `[hash, height, time]` of the top block.
+
+btcd deprecates this method in favor of `loadtxfilter` with
+`rescanblocks`, which `bs` serves.
 
 ## 7. Methods not served
 
@@ -281,7 +288,7 @@ returns -1. btcd deprecates this method in favor of `rescanblocks`.
 | Unauthenticated request | Error 117, connection kept | Connection closed |
 | `session` result | `{"id"}` | `{"sessionid"}` |
 | `notifyreceived`, `notifyspent`, `searchrawtransactions` | Confirmed transactions only | Also memory pool transactions |
-| `rescan` | Without addresses or outputs only | Full |
+| `rescan` | Not implemented, except with no addresses or outputs, which finishes at once | Searches past blocks, notifying each match |
 | Watches per connection | `btcd.maximum_filters` | No limit |
 | Invalid argument | Error -8 | Error -5 or -22 |
 | Mistyped parameter | Connection closed | Error |

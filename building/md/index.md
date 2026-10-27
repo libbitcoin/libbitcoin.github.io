@@ -30,12 +30,12 @@ Nothing else is required (see [Build options](options)).
 ## 3. Quick start
 
 On Linux or macOS, a static release build installed under
-`~/libbitcoin`:
+`~/libbitcoin`, optimized for the build machine:
 
 ```
 $ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static --hardware-optimized
 ```
 
 The result is `~/libbitcoin/bin/bs`. On Windows, see [Windows](windows).
@@ -45,8 +45,10 @@ The result is `~/libbitcoin/bin/bs`. On Windows, see [Windows](windows).
 By default `bs` is built for the baseline instruction set of its
 architecture (AVX2 for Windows x64). Options such as `--enable-avx2` or `--enable-shani` make it
 faster on CPUs that have those instructions, and unable to run on CPUs
-that do not. Run `bs --hardware` on the target machine to see what it
-supports, and see [Build options](options).
+that do not. `--hardware-optimized` enables all that the build machine
+supports, so its `bs` runs only on CPUs with the same extensions. Run
+`bs --hardware` on the target machine to see what it supports, and see
+[Build options](options).
 
 ## 5. Pages
 

@@ -22,6 +22,7 @@ the `Option-<name>` property.
 | `--build-full-repositories` | Clone full history (default is a shallow clone). |
 | `--build-skip-tests` | Do not build or run the tests. |
 | `--build-parallel=<n>` | Number of parallel jobs (default the number of CPUs). |
+| `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). |
 | `--build-post-install-clean` | Remove dependency build files after installing. |
 | `--noninteractive` | Do not prompt. |
 | `--verbose` | Display the commands run. |
@@ -36,7 +37,13 @@ built with an option runs only on CPUs that have the extension. Run
 `bs --hardware` on the target machine to see which it has, and do not
 enable an option it lacks.
 
-All are off by default.
+All are off by default. `--hardware-optimized` (§1) enables every
+extension of the build machine's CPU instead.
+
+> **Portability:** a build with `--hardware-optimized` runs only on CPUs
+> that have every instruction set extension of the machine it was built
+> on. To build for other machines, omit it, and enable only the
+> extensions they all have.
 
 ### x86
 
@@ -62,8 +69,7 @@ All are off by default.
 
 On ARM, a CPU flag in `CFLAGS` and `CXXFLAGS`, such as
 `-mcpu=cortex-a76+crypto`, enables the same code as these options (see
-[Linux](linux)). On x86, `-march=native` does the same for the build
-machine.
+[Linux](linux)).
 
 ### GPU
 

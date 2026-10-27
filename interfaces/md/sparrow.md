@@ -149,6 +149,5 @@ Statistics of a block. Not yet implemented, and returns -32601.
 | Time start | First block with median time past at or after it, returned as given | Last block with header time at or before it, returned as a height |
 | Ranges | Heights or times; also limit later notifications | Heights only |
 | Labels | Any number | Up to 10, nonzero |
-| Progress | Pages sent once the scan completes | Periodic, during the scan |
 | Unsubscribe, not subscribed | `null` | The address |
 | Errors | 1 for invalid keys, -101 for too many subscriptions | -32602 |

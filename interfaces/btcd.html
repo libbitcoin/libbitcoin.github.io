@@ -243,20 +243,23 @@
     <h1>BTCD</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
-      <details class="drop here" name="site"><summary>Server</summary><div>
-        <a href="../interfaces.html">Interfaces</a>
-        <a href="../interfaces/admin.html" class="sub">Admin Console</a>
-        <a href="../interfaces/native.html" class="sub">Native REST</a>
-        <a href="../interfaces/electrum.html" class="sub">Electrum</a>
-        <a href="../interfaces/sparrow.html" class="sub">Sparrow</a>
-        <a href="../interfaces/p2p.html" class="sub">Bitcoin P2P</a>
-        <a href="../interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
-        <a href="../interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
-        <a href="../interfaces/btcd.html" class="sub here">BTCD</a>
-        <a href="../interfaces/esplora.html" class="sub">Esplora</a>
+      <details class="drop" name="site"><summary>Getting Started</summary><div>
+        <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
+      </div></details>
+      <details class="drop here" name="site"><summary>Server</summary><div>
+        <a href="../interfaces.html">Interfaces</a>
+        <a href="../interfaces/admin.html">Admin Console</a>
+        <a href="../interfaces/native.html">Native REST</a>
+        <a href="../interfaces/electrum.html">Electrum</a>
+        <a href="../interfaces/sparrow.html">Sparrow</a>
+        <a href="../interfaces/p2p.html">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
+        <a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a>
+        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../interfaces/btcd.html" class="here">BTCD</a>
+        <a href="../interfaces/esplora.html">Esplora</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync</a>
@@ -627,11 +630,16 @@ spending of that payment. <strong>Parameters:</strong> <code>addresses</code>.</
 <h3 id="stopnotifyspent">stopnotifyspent<a class="anchor" href="#stopnotifyspent" aria-label="Link to this section">#</a></h3>
 <p>Ends <code>notifyspent</code> for outputs. <strong>Parameters:</strong> <code>outpoints</code>.</p>
 <h3 id="rescan">rescan<a class="anchor" href="#rescan" aria-label="Link to this section">#</a></h3>
-<p><strong>Parameters:</strong> <code>beginblock</code>, <code>addresses</code>, <code>outpoints</code>, <code>endblock</code>
-(ignored). Served only without addresses and outputs, returning <code>null</code>
-and then notifying <code>rescanfinished</code> with
-<code>[hash, height, time]</code> of the top block. With addresses or outputs, it
-returns -1. btcd deprecates this method in favor of <code>rescanblocks</code>.</p>
+<p>Searches past blocks for the transactions of addresses and outputs.
+<strong>Parameters:</strong> <code>beginblock</code>, <code>addresses</code>, <code>outpoints</code>, <code>endblock</code>.</p>
+<p>In btcd, this searches the blocks from <code>beginblock</code> to <code>endblock</code>,
+notifying each transaction paying an address (<code>recvtx</code>) or spending an
+output (<code>redeemingtx</code>), then <code>rescanfinished</code>. <code>bs</code> does not implement
+the search: with addresses or outputs, it returns -1. With neither,
+there is nothing to search, so it returns <code>null</code> and notifies
+<code>rescanfinished</code> with <code>[hash, height, time]</code> of the top block.</p>
+<p>btcd deprecates this method in favor of <code>loadtxfilter</code> with
+<code>rescanblocks</code>, which <code>bs</code> serves.</p>
 <h2 id="7-methods-not-served">7. Methods not served<a class="anchor" href="#7-methods-not-served" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
@@ -691,8 +699,8 @@ returns -1. btcd deprecates this method in favor of <code>rescanblocks</code>.</
 </tr>
 <tr>
 <td><code>rescan</code></td>
-<td>Without addresses or outputs only</td>
-<td>Full</td>
+<td>Not implemented, except with no addresses or outputs, which finishes at once</td>
+<td>Searches past blocks, notifying each match</td>
 </tr>
 <tr>
 <td>Watches per connection</td>
