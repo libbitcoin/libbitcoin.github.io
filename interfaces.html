@@ -243,10 +243,12 @@
         <a href="interfaces/admin.html" class="sub">Admin Console</a>
         <a href="interfaces/native.html" class="sub">Native REST</a>
         <a href="interfaces/electrum.html" class="sub">Electrum</a>
+        <a href="interfaces/sparrow.html" class="sub">Sparrow</a>
         <a href="interfaces/p2p.html" class="sub">Bitcoin P2P</a>
         <a href="interfaces/bitcoind-rpc.html" class="sub">Bitcoind JSON-RPC</a>
         <a href="interfaces/bitcoind-rest.html" class="sub">Bitcoind REST</a>
         <a href="interfaces/zeromq.html" class="sub">Bitcoind ZMQ</a>
+        <a href="interfaces/btcd.html" class="sub">BTCD</a>
         <a href="interfaces/esplora.html" class="sub">Esplora</a>
         <a href="configuration/index.html">Configuration</a>
         <a href="building/index.html">Building</a>
@@ -406,7 +408,7 @@ const services = [
   ]
 },
 {
-  id: 'sparrow', name: 'Sparrow', versioned: true,
+  id: 'sparrow', name: 'Sparrow', versioned: true, doc: 'interfaces/sparrow.html',
   note: 'All methods in the Electrum query interface are also served here, with server.features advertising silent payment support. An http/s + ws/s transport is supported on the same port.',
   spec: { Transport: 'tcp/s, http/s, ws/s', Framing: 'json-rpc 2.0', Auth: 'tls server, mutual', Channel: 'full duplex (subscriptions)' },
   methods: [
@@ -623,7 +625,7 @@ const services = [
   ]
 },
 {
-  id: 'btcd', name: 'BTCD',
+  id: 'btcd', name: 'BTCD', doc: 'interfaces/btcd.html', unserved: '7-methods-not-served',
   note: 'All methods in the bitcoind query interface are also served here. A tcp/s transport is supported on the same port. Native btcd implementation of bitcoind is not current or consistent, however this implementation is. Native btcd also does not support json-rpc 2.0 named parameters, which are required for compliance, however this implementation does.',
   spec: { Transport: 'tcp/s, http/s, ws/s', Framing: 'json-rpc 2.0 (with named params)', Auth: 'tls server, mutual; http basic (scoped)', Channel: 'full duplex (notifications)' },
   methods: [

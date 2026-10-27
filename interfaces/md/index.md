@@ -11,10 +11,12 @@ how to call them, with examples and their responses.
 | [Admin Console](admin) | `[admin]` | 8080 | 8043 | HTTP/S, WS/S |
 | [Native REST](native) | `[native]` | 8180 | 8143 | HTTP/S, WS/S |
 | [Electrum](electrum) | `[electrum]` | 8580 | 8543 | TCP/S, HTTP/S, WS/S |
+| [Sparrow](sparrow) | `[sparrow]` | 8680 | 8643 | TCP/S, HTTP/S, WS/S |
 | [Bitcoin P2P](p2p) | `[inbound]` | 8333 |  | P2P/S |
 | [Bitcoind JSON-RPC](bitcoind-rpc) | `[bitcoind]` | 8280 | 8243 | TCP/S, HTTP/S, WS/S |
 | [Bitcoind REST](bitcoind-rest) | `[bitcoind]` | 8280 | 8243 | HTTP/S |
 | [Bitcoind ZMQ](zeromq) | `[bitcoind_zmq]` | 8380 | 8343 | ZMTP/S |
+| [BTCD](btcd) | `[btcd]` | 8480 | 8443 | TCP/S, HTTP/S, WS/S |
 | [Esplora](esplora) | `[esplora]` | 8780 | 8743 | HTTP/S, WS/S |
 
 Each interface reaches all of its protocols on one port, and their secure
