@@ -165,8 +165,7 @@ Upgrade any request on the native port to a websocket.
 - A request that finds nothing returns an empty frame.
 - An invalid request closes the websocket.
 - Subscriptions are per connection.
-- Subscriptions can be made over HTTP.
-- Notifications are sent only over a websocket.
+- HTTP subscriptions are dormant until a websocket upgrade.
 
 To subscribe with the `websockets` package (`pip install websockets`):
 

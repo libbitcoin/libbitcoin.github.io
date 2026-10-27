@@ -365,8 +365,8 @@ asyncio.run(main())
 {&quot;event&quot;:13,&quot;value&quot;:920001,&quot;time&quot;:1792987200123}
 {&quot;event&quot;:13,&quot;value&quot;:920002,&quot;time&quot;:1792987201456}
 </code></pre>
-<p>The same request over HTTP returns the <code>previous</code> object, but nothing
-follows it.</p>
+<p>The same request over HTTP/S returns the <code>previous</code> object, and the
+subscription is dormant until the connection is upgraded to WS/S.</p>
 <h3 id="23-filters">2.3 Filters<a class="anchor" href="#23-filters" aria-label="Link to this section">#</a></h3>
 <p>A filter is a decimal bit mask, where bit n selects log level n or event
 n (§3). To select levels 0 to 6, add their masks:</p>

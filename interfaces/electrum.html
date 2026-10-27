@@ -815,9 +815,10 @@ specification also defines messages over WS/S, as one frame each without
 the line ending, which ElectrumX and Fulcrum serve. HTTP/S is a <code>bs</code>
 extension, on the model of bitcoind's JSON-RPC: each request is posted to
 <code>/</code> and answered in its response. HTTP/S carries no notifications, so a
-subscription returns only its first result.</p>
-<p>Over HTTP/S, each request is a new connection, so a batch that begins
-with <code>server.version</code> sets its version:</p>
+subscription made over HTTP/S is dormant until the connection is upgraded
+to WS/S.</p>
+<p>Each curl command is a new connection, so a batch that begins with
+<code>server.version</code> sets its version:</p>
 <pre class="console"><code>$ curl -d '[{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:0,&quot;method&quot;:&quot;server.version&quot;,&quot;params&quot;:[&quot;curl&quot;,&quot;1.7&quot;]},{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;blockchain.block.header&quot;,&quot;params&quot;:[1]}]' &quot;http://localhost:8580/&quot;
 </code></pre>
 <pre><code class="language-json">[

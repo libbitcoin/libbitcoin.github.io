@@ -645,8 +645,7 @@ there is no status (§2.5).</p>
 <li>A request that finds nothing returns an empty frame.</li>
 <li>An invalid request closes the websocket.</li>
 <li>Subscriptions are per connection.</li>
-<li>Subscriptions can be made over HTTP.</li>
-<li>Notifications are sent only over a websocket.</li>
+<li>HTTP subscriptions are dormant until a websocket upgrade.</li>
 </ul>
 <p>To subscribe with the <code>websockets</code> package (<code>pip install websockets</code>):</p>
 <pre><code class="language-python">import asyncio

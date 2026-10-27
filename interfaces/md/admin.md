@@ -66,8 +66,8 @@ asyncio.run(main())
 {"event":13,"value":920002,"time":1792987201456}
 ```
 
-The same request over HTTP returns the `previous` object, but nothing
-follows it.
+The same request over HTTP/S returns the `previous` object, and the
+subscription is dormant until the connection is upgraded to WS/S.
 
 ### 2.3 Filters
 
