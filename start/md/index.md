@@ -6,7 +6,7 @@ Windows.
 
 ## 1. Build
 
-To use a published build instead, see [Download](../download/index), and
+To use a published build instead, see [Download BS](../download/index), and
 continue from §2.
 
 On Linux or macOS, a release build installed under `~/libbitcoin`,
@@ -39,7 +39,7 @@ to the console. To stop, type `c` and `<enter>`, or press `<ctrl> c`. A
 restart resumes where it stopped.
 
 The time a sync takes and the space its store needs are shown on the
-[Sync](../sync.html) and [Footprint](../footprint.html) pages.
+[Sync BS](../sync.html) and [Footprint](../footprint.html) pages.
 
 ## 3. Serve
 

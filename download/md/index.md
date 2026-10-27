@@ -1,4 +1,4 @@
-# Download
+# Download BS
 
 <div class="banner"><strong>Version 4 release preview builds are planned for early November 2026.</strong> Until then, build <code>bs</code> from source (see <a href="../start/index.html">Quick Start</a>).</div>
 

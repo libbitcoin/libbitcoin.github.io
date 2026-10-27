@@ -20,13 +20,13 @@ MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
 SITE_MENU = [
     ("index.html", "Home"),
     ("Getting Started", [
-        ("download/index.html", "Download"),
+        ("download/index.html", "Download BS"),
         ("start/index.html", "Quick Start"),
         ("configuration/index.html", "Configuration"),
         ("building/index.html", "Building"),
     ]),
     ("Server", [
-        ("interfaces.html", "Interfaces"),
+        ("interfaces.html", "BS Interfaces"),
         ("interfaces/admin.html", "Admin Console"),
         ("interfaces/native.html", "Native REST"),
         ("interfaces/electrum.html", "Electrum"),
@@ -37,9 +37,11 @@ SITE_MENU = [
         ("interfaces/zeromq.html", "Bitcoind ZMQ"),
         ("interfaces/btcd.html", "BTCD"),
         ("interfaces/esplora.html", "Esplora"),
+        ("interfaces/stratum-v1.html", "Stratum v1"),
+        ("interfaces/stratum-v2.html", "Stratum v2"),
     ]),
     ("Performance", [
-        ("sync.html", "Sync"),
+        ("sync.html", "Sync BS"),
         ("footprint.html", "Footprint"),
         ("computation.html", "Computation"),
         ("interface-performance.html", "Interfaces"),
@@ -49,7 +51,7 @@ SITE_MENU = [
         ("database/index.html", "Database"),
     ]),
     ("Client", [
-        ("client/commands.html", "Commands"),
+        ("client/commands.html", "BX Commands"),
     ]),
     ("developers/index.html", "Developers"),
     ("team.html", "Team"),
@@ -63,7 +65,7 @@ SECTIONS = {
         "lede": "Source-anchored architecture documentation for <strong>libbitcoin-node</strong>:\n      the chasers, the event bus, sessions and peer protocols.",
         "foot": 'Adapted from the libbitcoin-node wiki architecture pages by <a href="https://github.com/rsantacroce">rsantacroce</a>.',
         "pages": [
-            ("index", "Architecture"),
+            ("index", "Node"),
             ("overview", "Overview"),
             ("event-bus", "Event bus"),
             ("header-chaser", "Header chaser"),
@@ -86,7 +88,7 @@ SECTIONS = {
         "lede": "Source-anchored architecture documentation for <strong>libbitcoin-database</strong>:\n      heads, bodies, maps, tables, the memory-mapped store and queries.",
         "foot": "",
         "pages": [
-            ("index", "Architecture"),
+            ("index", "Database"),
             ("overview", "Overview"),
             ("reliability", "Reliability"),
             ("primitives", "Primitives"),
@@ -102,7 +104,7 @@ SECTIONS = {
         "lede": "<strong>Bitcoin Explorer</strong> (bx): the libbitcoin command line\n      client and its commands.",
         "foot": "",
         "pages": [
-            ("commands", "Commands"),
+            ("commands", "BX Commands"),
         ],
     },
     "developers": {
@@ -116,13 +118,13 @@ SECTIONS = {
         ],
     },
     "download": {
-        "title": "Libbitcoin Server Download",
-        "h1": "Download",
+        "title": "Libbitcoin Server Download BS",
+        "h1": "Download BS",
         "description": "Download Bitcoin Server (bs): selecting a build for your hardware and verifying its signature.",
         "lede": "Download <strong>Bitcoin Server</strong> (bs): selecting a build\n      for your hardware and verifying its signature.",
         "foot": "",
         "pages": [
-            ("index", "Download"),
+            ("index", "Download BS"),
         ],
     },
     "start": {
@@ -184,6 +186,8 @@ SECTIONS = {
             ("zeromq", "Bitcoind ZMQ"),
             ("btcd", "BTCD"),
             ("esplora", "Esplora"),
+            ("stratum-v1", "Stratum v1"),
+            ("stratum-v2", "Stratum v2"),
         ],
     },
 }
@@ -442,6 +446,14 @@ def site_menu(key, name):
     return "\n".join(items)
 
 
+def section_menu(body):
+    items = []
+    for ident, text in re.findall(r'<h2 id="([^"]+)"[^>]*>(.*?)<a class="anchor"', body):
+        label = re.sub(r"^\d+\.\s*", "", re.sub(r"<[^>]+>", "", text))
+        items.append('    <a href="#%s">%s</a>' % (ident, label))
+    return "\n".join(items)
+
+
 def menu(pages, current):
     items = []
     for name, label in pages:
@@ -670,7 +682,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
 </body>
 </html>
 """ % dict(page_title=page_title, description=description, name=name, guard=guard, logo=logo,
-           style=STYLE, h1=h1, menu=menu(pages, name), body=body, pager=pager(pages, name),
+           style=STYLE, h1=h1, menu=menu(pages, name) if len(pages) > 1 else section_menu(body), body=body, pager=pager(pages, name),
            mermaid=mermaid_src, key=key, site=site_menu(key, name), lede=section["lede"], foot=foot)
 
 

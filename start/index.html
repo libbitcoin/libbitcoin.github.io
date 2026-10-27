@@ -246,13 +246,13 @@
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
-        <a href="../download/index.html">Download</a>
+        <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html" class="here">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../building/index.html">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Server</summary><div>
-        <a href="../interfaces.html">Interfaces</a>
+        <a href="../interfaces.html">BS Interfaces</a>
         <a href="../interfaces/admin.html">Admin Console</a>
         <a href="../interfaces/native.html">Native REST</a>
         <a href="../interfaces/electrum.html">Electrum</a>
@@ -263,9 +263,11 @@
         <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
         <a href="../interfaces/btcd.html">BTCD</a>
         <a href="../interfaces/esplora.html">Esplora</a>
+        <a href="../interfaces/stratum-v1.html">Stratum v1</a>
+        <a href="../interfaces/stratum-v2.html">Stratum v2</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
-        <a href="../sync.html">Sync</a>
+        <a href="../sync.html">Sync BS</a>
         <a href="../footprint.html">Footprint</a>
         <a href="../computation.html">Computation</a>
         <a href="../interface-performance.html">Interfaces</a>
@@ -275,7 +277,7 @@
         <a href="../database/index.html">Database</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
-        <a href="../client/commands.html">Commands</a>
+        <a href="../client/commands.html">BX Commands</a>
       </div></details>
       <a href="../developers/index.html">Developers</a>
       <a href="../team.html">Team</a>
@@ -287,7 +289,10 @@
   </header>
 
   <nav class="menu">
-    <a href="index.html" class="here">Quick Start</a>
+    <a href="#1-build">Build</a>
+    <a href="#2-sync">Sync</a>
+    <a href="#3-serve">Serve</a>
+    <a href="#4-next">Next</a>
   </nav>
 
   <article class="doc">
@@ -295,7 +300,7 @@
 Bitcoin Server (<code>bs</code>) is the libbitcoin server, and runs the same on Linux, macOS and
 Windows.</p>
 <h2 id="1-build">1. Build<a class="anchor" href="#1-build" aria-label="Link to this section">#</a></h2>
-<p>To use a published build instead, see <a href="../download/index.html">Download</a>, and
+<p>To use a published build instead, see <a href="../download/index.html">Download BS</a>, and
 continue from §2.</p>
 <p>On Linux or macOS, a release build installed under <code>~/libbitcoin</code>,
 optimized for this machine:</p>
@@ -320,7 +325,7 @@ current directory, creating it if it does not exist. Progress is logged
 to the console. To stop, type <code>c</code> and <code>&lt;enter&gt;</code>, or press <code>&lt;ctrl&gt; c</code>. A
 restart resumes where it stopped.</p>
 <p>The time a sync takes and the space its store needs are shown on the
-<a href="../sync.html">Sync</a> and <a href="../footprint.html">Footprint</a> pages.</p>
+<a href="../sync.html">Sync BS</a> and <a href="../footprint.html">Footprint</a> pages.</p>
 <h2 id="3-serve">3. Serve<a class="anchor" href="#3-serve" aria-label="Link to this section">#</a></h2>
 <p>Each interface is enabled by an address and a connection limit. This
 configuration serves the admin console and the block explorer locally,

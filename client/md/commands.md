@@ -1,4 +1,4 @@
-# Commands
+# BX Commands
 
 <div class="banner"><strong>Bitcoin Explorer (<code>bx</code>) for version 4 is in development.</strong> Commands may be incomplete or change before release.</div>
 
