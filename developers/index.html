@@ -79,6 +79,7 @@
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
   .menu a.here { color: var(--heading); }
+  .menu .sep { color: var(--ink-3); }
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
   .menu.site { align-items: center; }
@@ -123,6 +124,15 @@
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
+  .doc .api { margin: 0 0 20px; border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 3px; background: var(--surface); font-family: var(--mono); }
+  .doc .api-inc { padding: 8px 14px; font-size: 12.5px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .doc .api-inc a { color: var(--ink-2); text-decoration: none; }
+  .doc .api-inc a:hover { color: var(--heading); text-decoration: underline; }
+  .doc .api-inc a.api-ver { color: var(--ink-3); font-size: 11.5px; }
+  .doc .api-decl { margin: 0; padding: 8px 14px; border-top: 1px solid var(--rule); display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
+  .doc .api-decl div { display: contents; }
+  .doc .api-decl dt { color: var(--ink-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.9; }
+  .doc .api-decl dd { margin: 0; color: #d9ad6a; font-size: 13px; }
   .doc .banner { margin: 0 0 24px; padding: 14px 18px; border: 1px solid var(--accent); border-radius: 3px; background: var(--surface); color: var(--ink); }
   .doc .banner strong { color: var(--heading); }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
@@ -279,7 +289,15 @@
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
       </div></details>
-      <a href="../developers/index.html" class="here">Developers</a>
+      <details class="drop here" name="site"><summary>Developers</summary><div>
+        <a href="../developers/index.html" class="here">Overview</a>
+        <a href="../api/system/index.html">System</a>
+        <a href="../api/database/index.html">Database</a>
+        <a href="../api/network/index.html">Network</a>
+        <a href="../api/node/index.html">Node</a>
+        <a href="../api/server/index.html">Server</a>
+        <a href="../api/explorer/index.html">Explorer</a>
+      </div></details>
       <a href="../team.html">Team</a>
     </nav>
     <p class="lede">
@@ -291,6 +309,7 @@
   <nav class="menu">
     <a href="#1-the-stack">The stack</a>
     <a href="#2-using-a-library">Using a library</a>
+    <a href="#3-api">API</a>
   </nav>
 
   <article class="doc">
@@ -427,6 +446,43 @@ using namespace libbitcoin::system;
 <p>A library and those it depends on are found with <code>pkg-config</code>:</p>
 <pre class="console"><code>$ c++ -std=c++20 app.cpp $(pkg-config --cflags --libs libbitcoin-system)
 </code></pre>
+<h2 id="3-api">3. API<a class="anchor" href="#3-api" aria-label="Link to this section">#</a></h2>
+<p>The API of each library is outlined by module, following its header
+hierarchy:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Library</th>
+<th>API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>libbitcoin-system</td>
+<td><a href="../api/system/index.html">System</a></td>
+</tr>
+<tr>
+<td>libbitcoin-database</td>
+<td><a href="../api/database/index.html">Database</a></td>
+</tr>
+<tr>
+<td>libbitcoin-network</td>
+<td><a href="../api/network/index.html">Network</a></td>
+</tr>
+<tr>
+<td>libbitcoin-node</td>
+<td><a href="../api/node/index.html">Node</a></td>
+</tr>
+<tr>
+<td>libbitcoin-server</td>
+<td><a href="../api/server/index.html">Server</a></td>
+</tr>
+<tr>
+<td>libbitcoin-explorer</td>
+<td><a href="../api/explorer/index.html">Explorer</a></td>
+</tr>
+</tbody>
+</table></div>
   </article>
 
   <nav class="pager"><span></span><span></span></nav>

@@ -79,6 +79,7 @@
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
   .menu a.here { color: var(--heading); }
+  .menu .sep { color: var(--ink-3); }
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
   .menu.site { align-items: center; }
@@ -123,6 +124,15 @@
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
+  .doc .api { margin: 0 0 20px; border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 3px; background: var(--surface); font-family: var(--mono); }
+  .doc .api-inc { padding: 8px 14px; font-size: 12.5px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .doc .api-inc a { color: var(--ink-2); text-decoration: none; }
+  .doc .api-inc a:hover { color: var(--heading); text-decoration: underline; }
+  .doc .api-inc a.api-ver { color: var(--ink-3); font-size: 11.5px; }
+  .doc .api-decl { margin: 0; padding: 8px 14px; border-top: 1px solid var(--rule); display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
+  .doc .api-decl div { display: contents; }
+  .doc .api-decl dt { color: var(--ink-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.9; }
+  .doc .api-decl dd { margin: 0; color: #d9ad6a; font-size: 13px; }
   .doc .banner { margin: 0 0 24px; padding: 14px 18px; border: 1px solid var(--accent); border-radius: 3px; background: var(--surface); color: var(--ink); }
   .doc .banner strong { color: var(--heading); }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
@@ -279,7 +289,15 @@
       <details class="drop here" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html" class="here">BX Commands</a>
       </div></details>
-      <a href="../developers/index.html">Developers</a>
+      <details class="drop" name="site"><summary>Developers</summary><div>
+        <a href="../developers/index.html">Overview</a>
+        <a href="../api/system/index.html">System</a>
+        <a href="../api/database/index.html">Database</a>
+        <a href="../api/network/index.html">Network</a>
+        <a href="../api/node/index.html">Node</a>
+        <a href="../api/server/index.html">Server</a>
+        <a href="../api/explorer/index.html">Explorer</a>
+      </div></details>
       <a href="../team.html">Team</a>
     </nav>
     <p class="lede">
