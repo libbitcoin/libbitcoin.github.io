@@ -59,7 +59,7 @@ SITE_MENU = [
 
 SECTIONS = {
     "architecture": {
-        "title": "Libbitcoin Node Architecture",
+        "title": "Node Architecture",
         "h1": "Node Architecture",
         "description": "Source-anchored architecture documentation for libbitcoin-node: chasers, the event bus, sessions and peer protocols.",
         "lede": "Source-anchored architecture documentation for <strong>libbitcoin-node</strong>:\n      the chasers, the event bus, sessions and peer protocols.",
@@ -82,7 +82,7 @@ SECTIONS = {
         ],
     },
     "database": {
-        "title": "Libbitcoin Database Architecture",
+        "title": "Database Architecture",
         "h1": "Database Architecture",
         "description": "Source-anchored architecture documentation for libbitcoin-database: heads, bodies, maps, tables, the memory-mapped store and queries.",
         "lede": "Source-anchored architecture documentation for <strong>libbitcoin-database</strong>:\n      heads, bodies, maps, tables, the memory-mapped store and queries.",
@@ -98,7 +98,7 @@ SECTIONS = {
         ],
     },
     "client": {
-        "title": "Libbitcoin Client",
+        "title": "BX Commands",
         "h1": "Client",
         "description": "Bitcoin Explorer (bx): the libbitcoin command line client and its commands.",
         "lede": "<strong>Bitcoin Explorer</strong> (bx): the libbitcoin command line\n      client and its commands.",
@@ -108,7 +108,7 @@ SECTIONS = {
         ],
     },
     "developers": {
-        "title": "Libbitcoin Developers",
+        "title": "Developers",
         "h1": "Developers",
         "description": "The libbitcoin C++ libraries, from Bitcoin primitives to a complete server, and their API.",
         "lede": "The libbitcoin C++ libraries, from Bitcoin primitives\n      to a complete server, and their API.",
@@ -118,7 +118,7 @@ SECTIONS = {
         ],
     },
     "download": {
-        "title": "Libbitcoin Server Download BS",
+        "title": "Download BS",
         "h1": "Download BS",
         "description": "Download Bitcoin Server (bs): selecting a build for your hardware and verifying its signature.",
         "lede": "Download <strong>Bitcoin Server</strong> (bs): selecting a build\n      for your hardware and verifying its signature.",
@@ -128,7 +128,7 @@ SECTIONS = {
         ],
     },
     "start": {
-        "title": "Libbitcoin Server Quick Start",
+        "title": "Quick Start",
         "h1": "Quick Start",
         "description": "Build Bitcoin Server (bs), sync the chain, and serve wallets and a block explorer.",
         "lede": "Build <strong>Bitcoin Server</strong> (bs), sync the chain,\n      and serve wallets and a block explorer.",
@@ -138,7 +138,7 @@ SECTIONS = {
         ],
     },
     "configuration": {
-        "title": "Libbitcoin Server Configuration",
+        "title": "Configuration",
         "h1": "Configuration",
         "description": "Configuring Bitcoin Server (bs): command line options, the running console and the configuration file.",
         "lede": "Configuring <strong>Bitcoin Server</strong> (bs):\n      command line options, the running console and the configuration file.",
@@ -153,7 +153,7 @@ SECTIONS = {
         ],
     },
     "building": {
-        "title": "Libbitcoin Server Building",
+        "title": "Building",
         "h1": "Building",
         "description": "Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.",
         "lede": "Building <strong>Bitcoin Server</strong> (bs), on Linux, macOS and Windows:\n      build systems, options, toolchains and libbitcoin-build.",
@@ -169,7 +169,7 @@ SECTIONS = {
         ],
     },
     "interfaces": {
-        "title": "Libbitcoin Server Interfaces",
+        "title": "Interfaces",
         "h1": "Interfaces",
         "description": "Reference documentation for each interface served by Bitcoin Server (bs): calling patterns, examples and responses.",
         "lede": "Reference documentation for each interface served by <strong>Bitcoin Server</strong> (bs):\n      calling patterns, examples and responses.",
@@ -483,7 +483,7 @@ def render(key, name, md, guard, logo, mermaid_src):
     body = wrap_tables(body)
     body = body.replace("<pre><code>$ ", '<pre class="console"><code>$ ')
     body = fade_comments(body)
-    page_title = section["title"] if name == "index" else section["title"] + ": " + lede(title)
+    page_title = section["title"] if name == "index" or len(pages) == 1 else section["title"] + ": " + lede(title)
     description = section["description"]
     h1 = html.escape(lede(title)) if name != "index" else section["h1"]
     foot = '<span>%s</span>\n    ' % section["foot"] if section["foot"] else ""
