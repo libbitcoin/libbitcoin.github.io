@@ -1,12 +1,10 @@
 # Download
 
+<div class="banner"><strong>Version 4 release preview builds are planned for early November 2026.</strong> Until then, build <code>bs</code> from source (see <a href="../start/index.html">Quick Start</a>).</div>
+
 Builds of `bs` are published on the libbitcoin-server
 [releases page](https://github.com/libbitcoin/libbitcoin-server/releases),
 one for each platform and hardware level, each with a signature.
-
-> There are no public builds of version 4 yet. Release preview builds are
-> coming soon. Until then, build `bs` from source (see
-> [Quick Start](../start/index)).
 
 ## 1. A release
 

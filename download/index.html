@@ -123,6 +123,8 @@
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
+  .doc .banner { margin: 0 0 24px; padding: 14px 18px; border: 1px solid var(--accent); border-radius: 3px; background: var(--surface); color: var(--ink); }
+  .doc .banner strong { color: var(--heading); }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
   .doc blockquote p:last-child { margin-bottom: 0; }
   .doc blockquote strong { color: var(--ink); }
@@ -285,14 +287,11 @@
   </nav>
 
   <article class="doc">
+<div class="banner"><strong>Version 4 release preview builds are planned for early November 2026.</strong> Until then, build <code>bs</code> from source (see <a href="../start/index.html">Quick Start</a>).</div>
+
 <p>Builds of <code>bs</code> are published on the libbitcoin-server
 <a href="https://github.com/libbitcoin/libbitcoin-server/releases">releases page</a>,
 one for each platform and hardware level, each with a signature.</p>
-<blockquote>
-<p>There are no public builds of version 4 yet. Release preview builds are
-coming soon. Until then, build <code>bs</code> from source (see
-<a href="../start/index.html">Quick Start</a>).</p>
-</blockquote>
 <h2 id="1-a-release">1. A release<a class="anchor" href="#1-a-release" aria-label="Link to this section">#</a></h2>
 <p>Each release lists the version of each library it was built from, and the
 key that signed its builds. Its assets are the builds, each with a
