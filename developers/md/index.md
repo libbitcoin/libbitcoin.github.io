@@ -72,17 +72,3 @@ A library and those it depends on are found with `pkg-config`:
 ```
 $ c++ -std=c++20 app.cpp $(pkg-config --cflags --libs libbitcoin-system)
 ```
-
-## 3. API
-
-The API of each library is outlined by module, following its header
-hierarchy:
-
-| Library | API |
-| ------- | --- |
-| libbitcoin-system | [System](../api/system/index.html) |
-| libbitcoin-database | [Database](../api/database/index.html) |
-| libbitcoin-network | [Network](../api/network/index.html) |
-| libbitcoin-node | [Node](../api/node/index.html) |
-| libbitcoin-server | [Server](../api/server/index.html) |
-| libbitcoin-explorer | [Explorer](../api/explorer/index.html) |

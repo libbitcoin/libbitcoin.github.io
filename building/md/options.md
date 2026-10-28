@@ -92,13 +92,14 @@ it with `--disable-cuda` (`-Denable-cuda=OFF`, `/p:Option-cuda=false`).
 | `--enable-ndebug` | on | Compile assertions out. `--build-config` sets it. |
 | `--enable-isystem` | off | Treat Boost headers as system headers, which silences their warnings. |
 
-secp256k1 is part of libbitcoin and needs no option.
-
 ## 4. Visual Studio
 
-The same options are `Option-<name>` properties on the project property
-pages, or `/p:Option-<name>=true` on the `build-msvc.cmd` or `msbuild`
-command line. For example, an AVX-512 build:
+The instruction set, GPU, `--with-embedded` and `--with-ssl` options are
+`Option-<name>` properties on the project property pages, or
+`/p:Option-<name>=true` on the `build-msvc.cmd` or `msbuild` command line.
+The others have no property: the tests and `bs` are projects in the
+solution, and the Release configurations define `NDEBUG`. For example, an
+AVX-512 build:
 
 ```
 $ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-use-local-src /p:Option-avx512=true

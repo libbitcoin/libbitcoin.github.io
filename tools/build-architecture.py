@@ -60,15 +60,7 @@ SITE_MENU = [
     ("Client", [
         ("client/commands.html", "BX Commands"),
     ]),
-    ("Developers", [
-        ("developers/index.html", "Overview"),
-        ("api/system/index.html", "System API"),
-        ("api/database/index.html", "Database API"),
-        ("api/network/index.html", "Network API"),
-        ("api/node/index.html", "Node API"),
-        ("api/server/index.html", "Server API"),
-        ("api/explorer/index.html", "Explorer API"),
-    ]),
+    ("developers/index.html", "Developers"),
     ("team.html", "Team"),
 ]
 
@@ -196,60 +188,12 @@ SECTIONS = {
     "developers": {
         "title": "Developers",
         "h1": "Developers",
-        "description": "The libbitcoin C++ libraries, from Bitcoin primitives to a complete server, and their API.",
-        "lede": "The libbitcoin C++ libraries, from Bitcoin primitives\n      to a complete server, and their API.",
+        "description": "The libbitcoin C++ libraries, from Bitcoin primitives to a complete server.",
+        "lede": "The libbitcoin C++ libraries, from Bitcoin primitives\n      to a complete server.",
         "foot": "",
         "pages": [
             ("index", "Developers"),
         ],
-    },
-    "api/system": {
-        "title": "System API",
-        "h1": "System API",
-        "description": "The C++ API of libbitcoin-system, by module: Bitcoin primitives: blocks, transactions, scripts and their execution, hashes and cryptography, keys, addresses and wallets, encodings and serialization.",
-        "lede": "The C++ API of <strong>libbitcoin-system</strong>, by module.",
-        "foot": "",
-        "pages": None,
-    },
-    "api/database": {
-        "title": "Database API",
-        "h1": "Database API",
-        "description": "The C++ API of libbitcoin-database, by module: The store: memory-mapped tables, and the queries over them.",
-        "lede": "The C++ API of <strong>libbitcoin-database</strong>, by module.",
-        "foot": "",
-        "pages": None,
-    },
-    "api/network": {
-        "title": "Network API",
-        "h1": "Network API",
-        "description": "The C++ API of libbitcoin-network, by module: Connections and protocols: the P2P network, and HTTP, websocket, JSON-RPC, TLS and ZMQ services.",
-        "lede": "The C++ API of <strong>libbitcoin-network</strong>, by module.",
-        "foot": "",
-        "pages": None,
-    },
-    "api/node": {
-        "title": "Node API",
-        "h1": "Node API",
-        "description": "The C++ API of libbitcoin-node, by module: The full node: sync, validation and confirmation, and the transaction pool.",
-        "lede": "The C++ API of <strong>libbitcoin-node</strong>, by module.",
-        "foot": "",
-        "pages": None,
-    },
-    "api/server": {
-        "title": "Server API",
-        "h1": "Server API",
-        "description": "The C++ API of libbitcoin-server, by module: The client interfaces of Bitcoin Server (bs).",
-        "lede": "The C++ API of <strong>libbitcoin-server</strong>, by module.",
-        "foot": "",
-        "pages": None,
-    },
-    "api/explorer": {
-        "title": "Explorer API",
-        "h1": "Explorer API",
-        "description": "The C++ API of libbitcoin-explorer, by module: The commands of Bitcoin Explorer (bx).",
-        "lede": "The C++ API of <strong>libbitcoin-explorer</strong>, by module.",
-        "foot": "",
-        "pages": None,
     },
     "download": {
         "title": "Download BS",
@@ -352,7 +296,6 @@ STYLE = """
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
   .menu a.here { color: var(--heading); }
-  .menu .sep { color: var(--ink-3); }
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
   .menu.site { align-items: center; }
@@ -400,15 +343,6 @@ STYLE = """
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
-  .doc .api { margin: 0 0 20px; border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 3px; background: var(--surface); font-family: var(--mono); }
-  .doc .api-inc { padding: 8px 14px; font-size: 12.5px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .doc .api-inc a { color: var(--ink-2); text-decoration: none; }
-  .doc .api-inc a:hover { color: var(--heading); text-decoration: underline; }
-  .doc .api-inc a.api-ver { color: var(--ink-3); font-size: 11.5px; }
-  .doc .api-decl { margin: 0; padding: 8px 14px; border-top: 1px solid var(--rule); display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
-  .doc .api-decl div { display: contents; }
-  .doc .api-decl dt { color: var(--ink-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.9; }
-  .doc .api-decl dd { margin: 0; color: #d9ad6a; font-size: 13px; }
   .doc .download { margin: 8px 0 32px; }
   .doc .download a { display: inline-block; padding: 18px 40px; background: var(--heading); color: #1a1a19; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: .04em; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 0 var(--accent); }
   .doc .download a:hover, .doc .download a:focus { background: #ffb44d; text-decoration: none; }
@@ -578,7 +512,6 @@ def lede(title):
 
 
 def site_menu(key, name):
-    root = "../" * (key.count("/") + 1)
     section = key + "/index.html"
     current = "%s/%s.html" % (key, name)
     items = []
@@ -590,11 +523,11 @@ def site_menu(key, name):
             for href, name, sub in links:
                 classes = " ".join(c for c in (sub, "here" if href == current else "") if c)
                 here_cls = ' class="%s"' % classes if classes else ""
-                items.append('        <a href="%s%s"%s>%s</a>' % (root, href, here_cls, html.escape(name)))
+                items.append('        <a href="../%s"%s>%s</a>' % (href, here_cls, html.escape(name)))
             items.append('      </div></details>')
         else:
             here_cls = ' class="here"' if label == current else ""
-            items.append('      <a href="%s%s"%s>%s</a>' % (root, label, here_cls, html.escape(target)))
+            items.append('      <a href="../%s"%s>%s</a>' % (label, here_cls, html.escape(target)))
     return "\n".join(items)
 
 
@@ -604,14 +537,6 @@ def section_menu(body):
         label = re.sub(r"^\d+\.\s*", "", re.sub(r"<[^>]+>", "", text))
         items.append('    <a href="#%s">%s</a>' % (ident, label))
     return "\n".join(items)
-
-
-def crumbs(pages, current):
-    library = pages[0][1]
-    if current == "index":
-        return '    <a href="index.html" class="here">%s</a>' % html.escape(library)
-    return ('    <a href="index.html">%s</a>\n    <span class="sep">/</span>\n'
-            '    <a href="%s.html" class="here">%s</a>' % (html.escape(library), current, html.escape(current)))
 
 
 def menu(pages, current):
@@ -654,7 +579,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>%(page_title)s</title>
 <meta name="description" content="%(description)s">
-<link rel="icon" type="image/svg+xml" href="%(root)sfavicon.svg">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/%(key)s/%(name)s.html">
 %(guard)s
 <meta property="og:type" content="website">
@@ -679,7 +604,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 
 <div class="wrap">
   <header class="mast">
-    <a href="%(root)s" aria-label="libbitcoin.info">
+    <a href="../" aria-label="libbitcoin.info">
     %(logo)s
     </a>
     <div class="eyebrow">Full stack Bitcoin software</div>
@@ -842,8 +767,8 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
 </body>
 </html>
 """ % dict(page_title=page_title, description=description, name=name, guard=guard, logo=logo,
-           style=STYLE, h1=h1, menu=crumbs(pages, name) if key.startswith("api/") else menu(pages, name) if len(pages) > 1 else section_menu(body), body=body, pager=pager(pages, name),
-           mermaid=mermaid_src, key=key, root="../" * (key.count("/") + 1), site=site_menu(key, name), lede=section["lede"], foot=foot)
+           style=STYLE, h1=h1, menu=menu(pages, name) if len(pages) > 1 else section_menu(body), body=body, pager=pager(pages, name),
+           mermaid=mermaid_src, key=key, site=site_menu(key, name), lede=section["lede"], foot=foot)
 
 
 def check_links(key, pages):
@@ -857,7 +782,7 @@ def check_links(key, pages):
                     bad.append((name, href))
                 continue
             target, _, anchor = href.partition("#")
-            if (not target.endswith(".html") or "/" in target) and os.path.isfile(os.path.join(ROOT, key, target)):
+            if not target.endswith(".html") and os.path.isfile(os.path.join(ROOT, key, target)):
                 continue
             target = target[:-5] if target.endswith(".html") else target
             if target not in ids:
@@ -872,14 +797,6 @@ def main():
     if "--mermaid" in sys.argv:
         mermaid_src = sys.argv[sys.argv.index("--mermaid") + 1]
     guard, logo = chrome()
-    for key, section in SECTIONS.items():
-        if section["pages"] is None:
-            src = os.path.join(ROOT, key, "md")
-            if not os.path.isdir(src):
-                section["pages"] = []
-                continue
-            names = sorted(f[:-3] for f in os.listdir(src) if f.endswith(".md") and f != "index.md")
-            section["pages"] = [("index", section["h1"].replace(" API", ""))] + [(n, n) for n in names]
     for key, section in SECTIONS.items():
         src = os.path.join(ROOT, key, "md")
         if not os.path.isdir(src):

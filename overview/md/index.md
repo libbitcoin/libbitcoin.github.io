@@ -33,7 +33,7 @@ flowchart BT
 | libbitcoin-node | The full node: header and block sync, validation, confirmation and the transaction pool. |
 | libbitcoin-server | The client interfaces of Bitcoin Server, and `bs`. |
 
-The libraries and their API are listed under [Developers](../developers/index).
+The libraries are listed under [Developers](../developers/index).
 
 ## 2. The node
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Developers</title>
-<meta name="description" content="The libbitcoin C++ libraries, from Bitcoin primitives to a complete server, and their API.">
+<meta name="description" content="The libbitcoin C++ libraries, from Bitcoin primitives to a complete server.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/developers/index.html">
 <script>
@@ -41,7 +41,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/developers/index.html">
 <meta property="og:title" content="Developers">
-<meta property="og:description" content="The libbitcoin C++ libraries, from Bitcoin primitives to a complete server, and their API.">
+<meta property="og:description" content="The libbitcoin C++ libraries, from Bitcoin primitives to a complete server.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -50,7 +50,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Developers">
-<meta name="twitter:description" content="The libbitcoin C++ libraries, from Bitcoin primitives to a complete server, and their API.">
+<meta name="twitter:description" content="The libbitcoin C++ libraries, from Bitcoin primitives to a complete server.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -79,7 +79,6 @@
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
   .menu a.here { color: var(--heading); }
-  .menu .sep { color: var(--ink-3); }
   .mast .menu.site { margin: 0; }
   .mast + .menu { border-top: 0; }
   .menu.site { align-items: center; }
@@ -127,15 +126,6 @@
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
-  .doc .api { margin: 0 0 20px; border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 3px; background: var(--surface); font-family: var(--mono); }
-  .doc .api-inc { padding: 8px 14px; font-size: 12.5px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .doc .api-inc a { color: var(--ink-2); text-decoration: none; }
-  .doc .api-inc a:hover { color: var(--heading); text-decoration: underline; }
-  .doc .api-inc a.api-ver { color: var(--ink-3); font-size: 11.5px; }
-  .doc .api-decl { margin: 0; padding: 8px 14px; border-top: 1px solid var(--rule); display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
-  .doc .api-decl div { display: contents; }
-  .doc .api-decl dt { color: var(--ink-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.9; }
-  .doc .api-decl dd { margin: 0; color: #d9ad6a; font-size: 13px; }
   .doc .download { margin: 8px 0 32px; }
   .doc .download a { display: inline-block; padding: 18px 40px; background: var(--heading); color: #1a1a19; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: .04em; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 0 var(--accent); }
   .doc .download a:hover, .doc .download a:focus { background: #ffb44d; text-decoration: none; }
@@ -303,27 +293,18 @@
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
       </div></details>
-      <details class="drop here" name="site"><summary>Developers</summary><div>
-        <a href="../developers/index.html" class="here">Overview</a>
-        <a href="../api/system/index.html">System API</a>
-        <a href="../api/database/index.html">Database API</a>
-        <a href="../api/network/index.html">Network API</a>
-        <a href="../api/node/index.html">Node API</a>
-        <a href="../api/server/index.html">Server API</a>
-        <a href="../api/explorer/index.html">Explorer API</a>
-      </div></details>
+      <a href="../developers/index.html" class="here">Developers</a>
       <a href="../team.html">Team</a>
     </nav>
     <p class="lede">
       The libbitcoin C++ libraries, from Bitcoin primitives
-      to a complete server, and their API.
+      to a complete server.
     </p>
   </header>
 
   <nav class="menu">
     <a href="#1-the-stack">The stack</a>
     <a href="#2-using-a-library">Using a library</a>
-    <a href="#3-api">API</a>
   </nav>
 
   <article class="doc">
@@ -460,43 +441,6 @@ using namespace libbitcoin::system;
 <p>A library and those it depends on are found with <code>pkg-config</code>:</p>
 <pre class="console"><code>$ c++ -std=c++20 app.cpp $(pkg-config --cflags --libs libbitcoin-system)
 </code></pre>
-<h2 id="3-api">3. API<a class="anchor" href="#3-api" aria-label="Link to this section">#</a></h2>
-<p>The API of each library is outlined by module, following its header
-hierarchy:</p>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Library</th>
-<th>API</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>libbitcoin-system</td>
-<td><a href="../api/system/index.html">System</a></td>
-</tr>
-<tr>
-<td>libbitcoin-database</td>
-<td><a href="../api/database/index.html">Database</a></td>
-</tr>
-<tr>
-<td>libbitcoin-network</td>
-<td><a href="../api/network/index.html">Network</a></td>
-</tr>
-<tr>
-<td>libbitcoin-node</td>
-<td><a href="../api/node/index.html">Node</a></td>
-</tr>
-<tr>
-<td>libbitcoin-server</td>
-<td><a href="../api/server/index.html">Server</a></td>
-</tr>
-<tr>
-<td>libbitcoin-explorer</td>
-<td><a href="../api/explorer/index.html">Explorer</a></td>
-</tr>
-</tbody>
-</table></div>
   </article>
 
   <nav class="pager"><span></span><span></span></nav>

@@ -13,6 +13,5 @@ exclude:
   - explorer/md
   - server/md
   - network/md
-  - api
   - client/md
   - tools
