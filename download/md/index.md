@@ -6,6 +6,8 @@ Builds of `bs` are published on the libbitcoin-server
 [releases page](https://github.com/libbitcoin/libbitcoin-server/releases),
 one for each platform and hardware level, each with a signature.
 
+<p class="download"><a href="https://github.com/libbitcoin/libbitcoin-server/releases">Download Bitcoin Server</a></p>
+
 ## 1. A release
 
 Each release lists the version of each library it was built from, and the

@@ -328,6 +328,10 @@ STYLE = """
   .doc .api-decl div { display: contents; }
   .doc .api-decl dt { color: var(--ink-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.9; }
   .doc .api-decl dd { margin: 0; color: #d9ad6a; font-size: 13px; }
+  .doc .download { margin: 8px 0 32px; }
+  .doc .download a { display: inline-block; padding: 18px 40px; background: var(--heading); color: #1a1a19; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: .04em; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 0 var(--accent); }
+  .doc .download a:hover, .doc .download a:focus { background: #ffb44d; text-decoration: none; }
+  .doc .download a::before { content: "↓  "; }
   .doc .banner { margin: 0 0 24px; padding: 14px 18px; border: 1px solid var(--accent); border-radius: 3px; background: var(--surface); color: var(--ink); }
   .doc .banner strong { color: var(--heading); }
   .doc blockquote { margin: 0 0 18px; padding: 10px 16px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink-2); border-radius: 0 3px 3px 0; }
