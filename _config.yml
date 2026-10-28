@@ -9,6 +9,9 @@ exclude:
   - developers/md
   - overview/md
   - system/md
+  - explorer/md
+  - server/md
+  - network/md
   - api
   - client/md
   - tools

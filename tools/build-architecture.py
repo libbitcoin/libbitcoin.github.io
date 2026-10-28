@@ -50,8 +50,11 @@ SITE_MENU = [
     ("Architecture", [
         ("overview/index.html", "Overview"),
         ("system/index.html", "System Architecture"),
-        ("architecture/index.html", "Node Architecture"),
         ("database/index.html", "Database Architecture"),
+        ("network/index.html", "Network Architecture"),
+        ("architecture/index.html", "Node Architecture"),
+        ("server/index.html", "Server Architecture"),
+        ("explorer/index.html", "Explorer Architecture"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
@@ -98,6 +101,36 @@ SECTIONS = {
             ("streamers", "Streamers"),
             ("unicode", "Unicode"),
             ("wallet", "Wallet"),
+        ],
+    },
+    "network": {
+        "title": "Network Architecture",
+        "h1": "Network Architecture",
+        "description": "Architecture of libbitcoin-network: net, sessions, channels and protocols, threading, transports and configuration.",
+        "lede": "Architecture of <strong>libbitcoin-network</strong>:\n      net, sessions, channels and protocols, threading, transports and configuration.",
+        "foot": "",
+        "pages": [
+            ("index", "Network Architecture"),
+        ],
+    },
+    "server": {
+        "title": "Server Architecture",
+        "h1": "Server Architecture",
+        "description": "Architecture of libbitcoin-server: the server node, interface sessions, channels and protocols, requests, responses and notifications.",
+        "lede": "Architecture of <strong>libbitcoin-server</strong>:\n      the server node, interface sessions, channels and protocols, requests,\n      responses and notifications.",
+        "foot": "",
+        "pages": [
+            ("index", "Server Architecture"),
+        ],
+    },
+    "explorer": {
+        "title": "Explorer Architecture",
+        "h1": "Explorer Architecture",
+        "description": "Architecture of libbitcoin-explorer: the command model, generation, parsing and output.",
+        "lede": "Architecture of <strong>libbitcoin-explorer</strong>:\n      the command model, generation, parsing and output.",
+        "foot": "",
+        "pages": [
+            ("index", "Explorer Architecture"),
         ],
     },
     "architecture": {
