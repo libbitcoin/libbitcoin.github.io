@@ -55,6 +55,7 @@ SITE_MENU = [
         ("architecture/index.html", "Node Architecture"),
         ("server/index.html", "Server Architecture"),
         ("explorer/index.html", "Explorer Architecture"),
+        ("build/index.html", "Build Architecture"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
@@ -131,6 +132,16 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Explorer Architecture"),
+        ],
+    },
+    "build": {
+        "title": "Build Architecture",
+        "h1": "Build Architecture",
+        "description": "Architecture of the libbitcoin build: the model, the generator, the generated build files, options, install scripts and CI.",
+        "lede": "Architecture of the <strong>libbitcoin</strong> build:\n      the model, the generator, the generated build files, options, install scripts and CI.",
+        "foot": "",
+        "pages": [
+            ("index", "Build Architecture"),
         ],
     },
     "architecture": {
@@ -382,6 +393,9 @@ STYLE = """
   .hljs-literal, .hljs-number { color: #e39a4c; }
   .hljs-string { color: #d9ad6a; }
   .hljs-attr { color: var(--ink); }
+  .hljs-tag { color: var(--ink-2); }
+  .hljs-name { color: #d0704f; }
+  .hljs-tag .hljs-attr { color: #f0bd6e; }
   .hljs-title, .hljs-title.function_, .hljs-params { color: #f0bd6e; }
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
@@ -739,7 +753,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
-document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp').forEach(function (code) {
+document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
 });
 </script>

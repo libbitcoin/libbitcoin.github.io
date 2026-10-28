@@ -120,6 +120,9 @@
   .hljs-literal, .hljs-number { color: #e39a4c; }
   .hljs-string { color: #d9ad6a; }
   .hljs-attr { color: var(--ink); }
+  .hljs-tag { color: var(--ink-2); }
+  .hljs-name { color: #d0704f; }
+  .hljs-tag .hljs-attr { color: #f0bd6e; }
   .hljs-title, .hljs-title.function_, .hljs-params { color: #f0bd6e; }
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
@@ -295,6 +298,7 @@
         <a href="../architecture/index.html">Node Architecture</a>
         <a href="../server/index.html">Server Architecture</a>
         <a href="../explorer/index.html">Explorer Architecture</a>
+        <a href="../build/index.html">Build Architecture</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
@@ -484,7 +488,7 @@ the sibling checkouts on disk, scanning each target's source roots. So:</p>
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
-document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp').forEach(function (code) {
+document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
 });
 </script>

@@ -120,6 +120,9 @@
   .hljs-literal, .hljs-number { color: #e39a4c; }
   .hljs-string { color: #d9ad6a; }
   .hljs-attr { color: var(--ink); }
+  .hljs-tag { color: var(--ink-2); }
+  .hljs-name { color: #d0704f; }
+  .hljs-tag .hljs-attr { color: #f0bd6e; }
   .hljs-title, .hljs-title.function_, .hljs-params { color: #f0bd6e; }
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
@@ -295,6 +298,7 @@
         <a href="../architecture/index.html">Node Architecture</a>
         <a href="../server/index.html">Server Architecture</a>
         <a href="../explorer/index.html">Explorer Architecture</a>
+        <a href="../build/index.html">Build Architecture</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
@@ -438,20 +442,18 @@ code header::accept(const context&amp; ctx) const NOEXCEPT
 <p>The rules of the block alone:</p>
 <pre><code class="language-cpp">code block::check() const NOEXCEPT
 {
-    // type64 malleated is a subset of first_not_coinbase.
-    // type32 malleated is a subset of is_internal_double_spend.
     if (is_empty())
         return error::empty_block;
     if (is_oversized())
         return error::block_size_limit;
     if (is_first_non_coinbase())
-        return malleated_or(error::first_not_coinbase);
+        return error::first_not_coinbase;
     if (is_extra_coinbases())
         return error::extra_coinbases;
     if (is_forward_reference())
         return error::forward_reference;
     if (is_internal_double_spend())
-        return malleated_or(error::block_internal_double_spend);
+        return error::block_internal_double_spend;
     if (is_invalid_merkle_root())
         return error::invalid_transaction_commitment;
 
@@ -589,6 +591,275 @@ input's scripts to those of its previous output:</p>
 </code></pre>
 <p>The node does not call <code>confirm</code>, as these rules are optimized as
 database queries.</p>
+<h3 id="17-rules">1.7 Rules<a class="anchor" href="#17-rules" aria-label="Link to this section">#</a></h3>
+<p>The stages above enumerate thirty-one consensus rules, and script evaluation.
+<code>connect</code> applies the script rules to each input, through the
+<a href="machine.html">machine</a>, so they are not listed here.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th style="text-align: right;">#</th>
+<th>Error</th>
+<th>Stage</th>
+<th>Object</th>
+<th>Rule</th>
+<th>Fork</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td><code>invalid_proof_of_work</code></td>
+<td>Header check</td>
+<td>Header</td>
+<td>Proof of work meets its own target, within the proof of work limit</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td><code>futuristic_timestamp</code></td>
+<td>Header check</td>
+<td>Header</td>
+<td>Timestamp not too far in the future</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td><code>insufficient_block_version</code></td>
+<td>Header accept</td>
+<td>Header</td>
+<td>Version at least the minimum required at its height</td>
+<td>BIP34, BIP66, BIP65</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td><code>anachronistic_timestamp</code></td>
+<td>Header accept</td>
+<td>Header</td>
+<td>Timestamp after the median time past</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td><code>incorrect_proof_of_work</code></td>
+<td>Header accept</td>
+<td>Header</td>
+<td>Bits equal to the work required</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td><code>early_timestamp</code></td>
+<td>Header accept</td>
+<td>Header</td>
+<td>At a retarget height, timestamp no earlier than the time warp allowance before its predecessor</td>
+<td>BIP94</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td><code>empty_block</code></td>
+<td>Check</td>
+<td>Block</td>
+<td>At least one transaction</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td><code>block_size_limit</code></td>
+<td>Check</td>
+<td>Block</td>
+<td>Serialized size within the limit</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td><code>first_not_coinbase</code></td>
+<td>Check</td>
+<td>Block</td>
+<td>First transaction is a coinbase</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td><code>extra_coinbases</code></td>
+<td>Check</td>
+<td>Block</td>
+<td>No other coinbase</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">11</td>
+<td><code>forward_reference</code></td>
+<td>Check</td>
+<td>Block</td>
+<td>No spend of a later transaction in the block</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">12</td>
+<td><code>block_internal_double_spend</code></td>
+<td>Check</td>
+<td>Block</td>
+<td>No output spent twice within the block</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">13</td>
+<td><code>invalid_transaction_commitment</code></td>
+<td>Check</td>
+<td>Block</td>
+<td>Merkle root commits to the transactions</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td><code>empty_transaction</code></td>
+<td>Check</td>
+<td>Transaction</td>
+<td>At least one input and one output</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td><code>invalid_coinbase_script_size</code></td>
+<td>Check</td>
+<td>Transaction</td>
+<td>Coinbase script size within bounds</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td><code>previous_output_null</code></td>
+<td>Check</td>
+<td>Transaction</td>
+<td>No null previous output outside the coinbase</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">17</td>
+<td><code>block_weight_limit</code></td>
+<td>Check in context</td>
+<td>Block</td>
+<td>Weight within the limit</td>
+<td>BIP141</td>
+</tr>
+<tr>
+<td style="text-align: right;">18</td>
+<td><code>coinbase_height_mismatch</code></td>
+<td>Check in context</td>
+<td>Block</td>
+<td>Coinbase script begins with the height</td>
+<td>BIP34</td>
+</tr>
+<tr>
+<td style="text-align: right;">19</td>
+<td><code>temporary_hash_limit</code></td>
+<td>Check in context</td>
+<td>Block</td>
+<td>Hash count within the temporary limit</td>
+<td>BIP50</td>
+</tr>
+<tr>
+<td style="text-align: right;">20</td>
+<td><code>invalid_witness_commitment</code></td>
+<td>Check in context</td>
+<td>Block</td>
+<td>Witness commitment matches the witnesses</td>
+<td>BIP141</td>
+</tr>
+<tr>
+<td style="text-align: right;">21</td>
+<td><code>invalid_signet_solution</code></td>
+<td>Check in context</td>
+<td>Block</td>
+<td>Signet solution satisfies the challenge</td>
+<td>Signet</td>
+</tr>
+<tr>
+<td style="text-align: right;">22</td>
+<td><code>absolute_time_locked</code></td>
+<td>Check in context</td>
+<td>Transaction</td>
+<td>Absolute locktime satisfied</td>
+<td>BIP113 (median time past)</td>
+</tr>
+<tr>
+<td style="text-align: right;">23</td>
+<td><code>coinbase_value_limit</code></td>
+<td>Accept</td>
+<td>Block</td>
+<td>Coinbase claims no more than subsidy plus fees</td>
+<td>BIP42 (subsidy)</td>
+</tr>
+<tr>
+<td style="text-align: right;">24</td>
+<td><code>block_sigop_limit</code></td>
+<td>Accept</td>
+<td>Block</td>
+<td>Signature operations within the limit</td>
+<td>BIP16, BIP141</td>
+</tr>
+<tr>
+<td style="text-align: right;">25</td>
+<td><code>missing_previous_output</code></td>
+<td>Accept</td>
+<td>Transaction</td>
+<td>Every previous output present</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">26</td>
+<td><code>spend_exceeds_value</code></td>
+<td>Accept</td>
+<td>Transaction</td>
+<td>Outputs spend no more than inputs</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">27</td>
+<td><code>unspent_coinbase_collision</code></td>
+<td>Confirm</td>
+<td>Block</td>
+<td>Coinbase does not duplicate an unspent coinbase, except the two mainnet exception blocks</td>
+<td>BIP30</td>
+</tr>
+<tr>
+<td style="text-align: right;">28</td>
+<td><code>relative_time_locked</code></td>
+<td>Confirm</td>
+<td>Transaction</td>
+<td>Relative locktime satisfied</td>
+<td>BIP68</td>
+</tr>
+<tr>
+<td style="text-align: right;">29</td>
+<td><code>unconfirmed_spend</code></td>
+<td>Confirm</td>
+<td>Transaction</td>
+<td>No spend of an unconfirmed output</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">30</td>
+<td><code>coinbase_maturity</code></td>
+<td>Confirm</td>
+<td>Transaction</td>
+<td>Coinbase outputs spent only after maturity</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align: right;">31</td>
+<td><code>confirmed_double_spend</code></td>
+<td>Confirm</td>
+<td>Transaction</td>
+<td>No spend of an already spent output</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Chain organization, the selection among valid chains by cumulative work, is
+outside the stages (see above). The node performs BIP30 (rule 27), with the
+other confirmation rules, by its queries in the store.</p>
 <h2 id="2-dos-guards">2. DoS guards<a class="anchor" href="#2-dos-guards" aria-label="Link to this section">#</a></h2>
 <p>The same sources contain guards. They protect against denial of service,
 and are not consensus rules: the consensus rules above are complete without
@@ -907,7 +1178,7 @@ stage directly, with no chain to build and no store to query.</p>
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
-document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp').forEach(function (code) {
+document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
 });
 </script>

@@ -9,6 +9,7 @@ exclude:
   - developers/md
   - overview/md
   - system/md
+  - build/md
   - explorer/md
   - server/md
   - network/md

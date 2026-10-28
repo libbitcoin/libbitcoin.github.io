@@ -93,20 +93,18 @@ The rules of the block alone:
 ```cpp
 code block::check() const NOEXCEPT
 {
-    // type64 malleated is a subset of first_not_coinbase.
-    // type32 malleated is a subset of is_internal_double_spend.
     if (is_empty())
         return error::empty_block;
     if (is_oversized())
         return error::block_size_limit;
     if (is_first_non_coinbase())
-        return malleated_or(error::first_not_coinbase);
+        return error::first_not_coinbase;
     if (is_extra_coinbases())
         return error::extra_coinbases;
     if (is_forward_reference())
         return error::forward_reference;
     if (is_internal_double_spend())
-        return malleated_or(error::block_internal_double_spend);
+        return error::block_internal_double_spend;
     if (is_invalid_merkle_root())
         return error::invalid_transaction_commitment;
 
@@ -264,6 +262,50 @@ code transaction::confirm(const context& ctx) const NOEXCEPT
 
 The node does not call `confirm`, as these rules are optimized as
 database queries.
+
+### 1.7 Rules
+
+The stages above enumerate thirty-one consensus rules, and script evaluation.
+`connect` applies the script rules to each input, through the
+[machine](machine), so they are not listed here.
+
+| # | Error | Stage | Object | Rule | Fork |
+| -: | ----- | ----- | ------ | ---- | ---- |
+| 1 | `invalid_proof_of_work` | Header check | Header | Proof of work meets its own target, within the proof of work limit |  |
+| 2 | `futuristic_timestamp` | Header check | Header | Timestamp not too far in the future |  |
+| 3 | `insufficient_block_version` | Header accept | Header | Version at least the minimum required at its height | BIP34, BIP66, BIP65 |
+| 4 | `anachronistic_timestamp` | Header accept | Header | Timestamp after the median time past |  |
+| 5 | `incorrect_proof_of_work` | Header accept | Header | Bits equal to the work required |  |
+| 6 | `early_timestamp` | Header accept | Header | At a retarget height, timestamp no earlier than the time warp allowance before its predecessor | BIP94 |
+| 7 | `empty_block` | Check | Block | At least one transaction |  |
+| 8 | `block_size_limit` | Check | Block | Serialized size within the limit |  |
+| 9 | `first_not_coinbase` | Check | Block | First transaction is a coinbase |  |
+| 10 | `extra_coinbases` | Check | Block | No other coinbase |  |
+| 11 | `forward_reference` | Check | Block | No spend of a later transaction in the block |  |
+| 12 | `block_internal_double_spend` | Check | Block | No output spent twice within the block |  |
+| 13 | `invalid_transaction_commitment` | Check | Block | Merkle root commits to the transactions |  |
+| 14 | `empty_transaction` | Check | Transaction | At least one input and one output |  |
+| 15 | `invalid_coinbase_script_size` | Check | Transaction | Coinbase script size within bounds |  |
+| 16 | `previous_output_null` | Check | Transaction | No null previous output outside the coinbase |  |
+| 17 | `block_weight_limit` | Check in context | Block | Weight within the limit | BIP141 |
+| 18 | `coinbase_height_mismatch` | Check in context | Block | Coinbase script begins with the height | BIP34 |
+| 19 | `temporary_hash_limit` | Check in context | Block | Hash count within the temporary limit | BIP50 |
+| 20 | `invalid_witness_commitment` | Check in context | Block | Witness commitment matches the witnesses | BIP141 |
+| 21 | `invalid_signet_solution` | Check in context | Block | Signet solution satisfies the challenge | Signet |
+| 22 | `absolute_time_locked` | Check in context | Transaction | Absolute locktime satisfied | BIP113 (median time past) |
+| 23 | `coinbase_value_limit` | Accept | Block | Coinbase claims no more than subsidy plus fees | BIP42 (subsidy) |
+| 24 | `block_sigop_limit` | Accept | Block | Signature operations within the limit | BIP16, BIP141 |
+| 25 | `missing_previous_output` | Accept | Transaction | Every previous output present |  |
+| 26 | `spend_exceeds_value` | Accept | Transaction | Outputs spend no more than inputs |  |
+| 27 | `unspent_coinbase_collision` | Confirm | Block | Coinbase does not duplicate an unspent coinbase, except the two mainnet exception blocks | BIP30 |
+| 28 | `relative_time_locked` | Confirm | Transaction | Relative locktime satisfied | BIP68 |
+| 29 | `unconfirmed_spend` | Confirm | Transaction | No spend of an unconfirmed output |  |
+| 30 | `coinbase_maturity` | Confirm | Transaction | Coinbase outputs spent only after maturity |  |
+| 31 | `confirmed_double_spend` | Confirm | Transaction | No spend of an already spent output |  |
+
+Chain organization, the selection among valid chains by cumulative work, is
+outside the stages (see above). The node performs BIP30 (rule 27), with the
+other confirmation rules, by its queries in the store.
 
 ## 2. DoS guards
 
