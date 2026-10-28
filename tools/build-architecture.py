@@ -23,6 +23,7 @@ SITE_MENU = [
         ("download/index.html", "Download BS"),
         ("start/index.html", "Quick Start"),
         ("configuration/index.html", "Configuration"),
+        ("configuration/reference.html", "Settings Reference"),
         ("building/index.html", "Building"),
     ]),
     ("Server", [
@@ -47,25 +48,58 @@ SITE_MENU = [
         ("interface-performance.html", "Interfaces"),
     ]),
     ("Architecture", [
-        ("architecture/index.html", "Node"),
-        ("database/index.html", "Database"),
+        ("overview/index.html", "Overview"),
+        ("system/index.html", "System Architecture"),
+        ("architecture/index.html", "Node Architecture"),
+        ("database/index.html", "Database Architecture"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
     ]),
     ("Developers", [
         ("developers/index.html", "Overview"),
-        ("api/system/index.html", "System"),
-        ("api/database/index.html", "Database"),
-        ("api/network/index.html", "Network"),
-        ("api/node/index.html", "Node"),
-        ("api/server/index.html", "Server"),
-        ("api/explorer/index.html", "Explorer"),
+        ("api/system/index.html", "System API"),
+        ("api/database/index.html", "Database API"),
+        ("api/network/index.html", "Network API"),
+        ("api/node/index.html", "Node API"),
+        ("api/server/index.html", "Server API"),
+        ("api/explorer/index.html", "Explorer API"),
     ]),
     ("team.html", "Team"),
 ]
 
 SECTIONS = {
+    "overview": {
+        "title": "Architecture Overview",
+        "h1": "Architecture Overview",
+        "description": "How the libbitcoin libraries of Bitcoin Server (bs) fit together: the stack, the node, the store and the server.",
+        "lede": "How the libraries of <strong>Bitcoin Server</strong> (bs) fit together:\n      the stack, the node, the store and the server.",
+        "foot": "",
+        "pages": [
+            ("index", "Architecture Overview"),
+        ],
+    },
+    "system": {
+        "title": "System Architecture",
+        "h1": "System Architecture",
+        "description": "Architecture of libbitcoin-system: chain, config, crypto, hash, machine, math, radix, stream, streamers, unicode and wallet.",
+        "lede": "Architecture of <strong>libbitcoin-system</strong>:\n      chain, config, crypto, hash, machine, math, radix, stream,\n      streamers, unicode and wallet.",
+        "foot": "",
+        "pages": [
+            ("index", "System"),
+            ("chain", "Chain"),
+            ("config", "Config"),
+            ("crypto", "Crypto"),
+            ("hash", "Hash"),
+            ("machine", "Machine"),
+            ("math", "Math"),
+            ("radix", "Radix"),
+            ("stream", "Stream"),
+            ("streamers", "Streamers"),
+            ("unicode", "Unicode"),
+            ("wallet", "Wallet"),
+        ],
+    },
     "architecture": {
         "title": "Node Architecture",
         "h1": "Node Architecture",
@@ -311,7 +345,7 @@ STYLE = """
   .copy { position: absolute; top: 8px; right: 8px; padding: 5px; line-height: 0; color: var(--ink-3); background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; }
   .copy:hover, .copy:focus-visible { color: var(--heading); }
   .copy.done { color: var(--heading); border-color: var(--heading); }
-  .hljs-keyword, .hljs-built_in, .hljs-meta { color: #d0704f; }
+  .hljs-keyword, .hljs-built_in, .hljs-meta, .hljs-type { color: #d0704f; }
   .hljs-literal, .hljs-number { color: #e39a4c; }
   .hljs-string { color: #d9ad6a; }
   .hljs-attr { color: var(--ink); }
@@ -672,7 +706,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
-document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json').forEach(function (code) {
+document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp').forEach(function (code) {
   hljs.highlightElement(code);
 });
 </script>

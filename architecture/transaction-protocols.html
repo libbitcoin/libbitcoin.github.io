@@ -116,7 +116,7 @@
   .copy { position: absolute; top: 8px; right: 8px; padding: 5px; line-height: 0; color: var(--ink-3); background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; }
   .copy:hover, .copy:focus-visible { color: var(--heading); }
   .copy.done { color: var(--heading); border-color: var(--heading); }
-  .hljs-keyword, .hljs-built_in, .hljs-meta { color: #d0704f; }
+  .hljs-keyword, .hljs-built_in, .hljs-meta, .hljs-type { color: #d0704f; }
   .hljs-literal, .hljs-number { color: #e39a4c; }
   .hljs-string { color: #d9ad6a; }
   .hljs-attr { color: var(--ink); }
@@ -263,6 +263,7 @@
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
+        <a href="../configuration/reference.html">Settings Reference</a>
         <a href="../building/index.html">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Server</summary><div>
@@ -287,20 +288,22 @@
         <a href="../interface-performance.html">Interfaces</a>
       </div></details>
       <details class="drop here" name="site"><summary>Architecture</summary><div>
-        <a href="../architecture/index.html">Node</a>
-        <a href="../database/index.html">Database</a>
+        <a href="../overview/index.html">Overview</a>
+        <a href="../system/index.html">System Architecture</a>
+        <a href="../architecture/index.html">Node Architecture</a>
+        <a href="../database/index.html">Database Architecture</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
       </div></details>
       <details class="drop" name="site"><summary>Developers</summary><div>
         <a href="../developers/index.html">Overview</a>
-        <a href="../api/system/index.html">System</a>
-        <a href="../api/database/index.html">Database</a>
-        <a href="../api/network/index.html">Network</a>
-        <a href="../api/node/index.html">Node</a>
-        <a href="../api/server/index.html">Server</a>
-        <a href="../api/explorer/index.html">Explorer</a>
+        <a href="../api/system/index.html">System API</a>
+        <a href="../api/database/index.html">Database API</a>
+        <a href="../api/network/index.html">Network API</a>
+        <a href="../api/node/index.html">Node API</a>
+        <a href="../api/server/index.html">Server API</a>
+        <a href="../api/explorer/index.html">Explorer API</a>
       </div></details>
       <a href="../team.html">Team</a>
     </nav>
@@ -749,7 +752,7 @@ the peer.</p>
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
-document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json').forEach(function (code) {
+document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp').forEach(function (code) {
   hljs.highlightElement(code);
 });
 </script>

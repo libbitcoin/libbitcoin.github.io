@@ -7,6 +7,8 @@ exclude:
   - start/md
   - download/md
   - developers/md
+  - overview/md
+  - system/md
   - api
   - client/md
   - tools

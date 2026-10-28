@@ -102,6 +102,10 @@
   .video .play::after { content: ""; position: absolute; left: 30px; top: 15px; border-style: solid; border-width: 12px 0 12px 20px; border-color: transparent transparent transparent var(--heading); }
   .video:hover .play, .video:focus-visible .play { background: var(--accent); }
   .video:hover .play::after, .video:focus-visible .play::after { border-left-color: var(--ink); }
+  .contrib { max-width: 72ch; margin: 0 0 40px; color: var(--ink-2); font-size: 15px; }
+  .contrib h2 { color: var(--heading); font-family: var(--mono); font-size: 22px; font-weight: 600; margin: 0 0 12px; }
+  .contrib p { margin: 0 0 12px; }
+  .contrib code { font-family: var(--mono); font-size: 13.5px; color: var(--ink); }
 </style>
 </head>
 <body>
@@ -194,6 +198,7 @@
         <a href="download/index.html">Download BS</a>
         <a href="start/index.html">Quick Start</a>
         <a href="configuration/index.html">Configuration</a>
+        <a href="configuration/reference.html">Settings Reference</a>
         <a href="building/index.html">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Server</summary><div>
@@ -218,20 +223,22 @@
         <a href="interface-performance.html">Interfaces</a>
       </div></details>
       <details class="drop" name="site"><summary>Architecture</summary><div>
-        <a href="architecture/index.html">Node</a>
-        <a href="database/index.html">Database</a>
+        <a href="overview/index.html">Overview</a>
+        <a href="system/index.html">System Architecture</a>
+        <a href="architecture/index.html">Node Architecture</a>
+        <a href="database/index.html">Database Architecture</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="client/commands.html">BX Commands</a>
       </div></details>
       <details class="drop" name="site"><summary>Developers</summary><div>
         <a href="developers/index.html">Overview</a>
-        <a href="api/system/index.html">System</a>
-        <a href="api/database/index.html">Database</a>
-        <a href="api/network/index.html">Network</a>
-        <a href="api/node/index.html">Node</a>
-        <a href="api/server/index.html">Server</a>
-        <a href="api/explorer/index.html">Explorer</a>
+        <a href="api/system/index.html">System API</a>
+        <a href="api/database/index.html">Database API</a>
+        <a href="api/network/index.html">Network API</a>
+        <a href="api/node/index.html">Node API</a>
+        <a href="api/server/index.html">Server API</a>
+        <a href="api/explorer/index.html">Explorer API</a>
       </div></details>
       <a href="team.html" class="here">Team</a>
     </nav>
@@ -249,6 +256,25 @@
     <span class="play" aria-hidden="true"></span>
   </a>
 
+  <section class="contrib" id="contributing">
+    <h2>Contributing</h2>
+    <p>
+      Libbitcoin is developed in the open on <a href="https://github.com/libbitcoin">GitHub</a>.
+      Each library is its own repository, and every change is a pull request against
+      <code>master</code>, built and tested by CI on Linux, macOS and Windows before review.
+      See <a href="developers/index.html">Developers</a> for the stack and its API, and
+      <a href="building/index.html">Building</a> to build it.
+    </p>
+    <p>
+      Report bugs and propose features as issues on the relevant repository. A pull request
+      should follow the style of the code around it and carry tests for what it changes.
+      Discussion takes place in the team Slack, archived in the <a href="slack/index.html">Slack mirror</a>.
+    </p>
+    <p>
+      The libraries are licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">AGPL</a>
+      with a lesser clause, and contributions are accepted under the same license.
+    </p>
+  </section>
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
