@@ -238,16 +238,30 @@
       <a href="team.html">Team</a>
     </nav>
     <p class="lede">
-      A full stack of C++20 Bitcoin software.
-      <a href="interfaces.html"><strong>Bitcoin Server</strong></a> (bs) is one node that speaks the
-      protocols your software already uses: point Electrum wallets, lnd and btcwallet, bitcoind
-      tooling or your own explorer at it, with an integrated block explorer and administrative
-      dashboard. <a href="client/commands.html"><strong>Bitcoin Explorer</strong></a> (bx) is its
-      command line client, for keys, addresses, transactions and scripts, and for querying a
-      server. For <a href="developers/index.html"><strong>developers</strong></a>, every layer
-      beneath them, from Bitcoin primitives to the full node, is a C++ library for any
-      application.
-    </p>
+  <strong>Libbitcoin</strong> is a full stack of C++20 Bitcoin software, from primitives to a
+  production-ready server.
+</p>
+
+<p class="lede">
+  <a href="interfaces.html"><strong>Bitcoin Server</strong></a> (<code>bs</code>) is a full node
+  and query server built for interoperability — point your Electrum wallets, <code>lnd</code>,
+  <code>BTC wallet</code>, <code>bitcoind</code> tooling, or your own explorer at it without
+  changing a line of client code. It ships with an integrated block explorer and administrative
+  dashboard.
+</p>
+
+<p class="lede">
+  <a href="client/commands.html"><strong>Bitcoin Explorer</strong></a> (<code>bx</code>) is its
+  command line client: generate keys and addresses, construct and decode transactions, inspect
+  scripts, and query a running server — all from the terminal.
+</p>
+
+<p class="lede">
+  For <a href="developers/index.html"><strong>developers</strong></a>, the entire stack is
+  available as a set of independent, composable C++ libraries — from Bitcoin primitives to the
+  full node. Each library can be used on its own: pull in exactly what your application needs,
+  nothing more.
+</p>
   </header>
 
   <p class="foot">
