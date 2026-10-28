@@ -49,18 +49,22 @@ SITE_MENU = [
     ]),
     ("Architecture", [
         ("overview/index.html", "Overview"),
-        ("system/index.html", "System Architecture"),
-        ("database/index.html", "Database Architecture"),
-        ("network/index.html", "Network Architecture"),
-        ("architecture/index.html", "Node Architecture"),
-        ("server/index.html", "Server Architecture"),
-        ("explorer/index.html", "Explorer Architecture"),
-        ("build/index.html", "Build Architecture"),
+        ("system/index.html", "System"),
+        ("database/index.html", "Database"),
+        ("network/index.html", "Network"),
+        ("architecture/index.html", "Node"),
+        ("server/index.html", "Server"),
+        ("explorer/index.html", "Explorer"),
+        ("build/index.html", "Build"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
     ]),
-    ("developers/index.html", "Developers"),
+    ("Developers", [
+        ("developers/index.html", "Overview"),
+        ("developers/style.html", "Style Guide"),
+        ("developers/testing.html", "Test Practices"),
+    ]),
     ("team.html", "Team"),
 ]
 
@@ -193,6 +197,8 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Developers"),
+            ("style", "Style guide"),
+            ("testing", "Test practices"),
         ],
     },
     "download": {
@@ -286,6 +292,7 @@ STYLE = """
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 96px; }
   .logo { width: 132px; height: auto; display: block; }
   .mast { padding: 56px 0 28px; border-bottom: 2px solid var(--ink); display: flex; flex-direction: column; gap: 14px; }
+  .mast > a { align-self: flex-start; text-decoration: none; }
   .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
   h1 { color: var(--heading); font-family: var(--mono); font-size: clamp(28px, 4.4vw, 44px); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
   .lede { max-width: 66ch; color: var(--ink-2); font-size: 16px; }
@@ -361,6 +368,7 @@ STYLE = """
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc .nw { white-space: nowrap; }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }

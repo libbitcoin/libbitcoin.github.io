@@ -6,7 +6,7 @@ store are each described in depth, against their source, in
 [Node Architecture](../architecture/index) and
 [Database Architecture](../database/index).
 
-## 1. The stack
+## 1. Stack
 
 ```mermaid
 flowchart BT
@@ -35,7 +35,7 @@ flowchart BT
 
 The libraries are listed under [Developers](../developers/index).
 
-## 2. The node
+## 2. Node
 
 Synchronization is headers-first. Peer protocols prove and archive each
 peer's headers, and a chain of **chasers** carries them from there to
@@ -59,7 +59,7 @@ snapshots and disk space.
 
 Quiescing the pipeline allows store snapshot, remap and shutdown.
 
-## 3. The store
+## 3. Store
 
 The store is strictly relational, without a query engine. Every relation is
 resolved by one of two physical operations chosen when the table is
@@ -71,7 +71,7 @@ becomes visible atomically, and a snapshot is a copy of the heads. All files
 are memory-mapped, and grow by remapping. A store that closes cleanly reopens as
 it was; one that does not is restored from its last snapshot.
 
-## 4. The server
+## 4. Server
 
 Bitcoin Server adds client interfaces to the node, on the services of
 libbitcoin-network, serving from the node's store. The interfaces are listed in [BS Interfaces](../interfaces.html).

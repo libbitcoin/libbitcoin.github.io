@@ -69,6 +69,7 @@
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 96px; }
   .logo { width: 132px; height: auto; display: block; }
   .mast { padding: 56px 0 28px; border-bottom: 2px solid var(--ink); display: flex; flex-direction: column; gap: 14px; }
+  .mast > a { align-self: flex-start; text-decoration: none; }
   .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
   h1 { color: var(--heading); font-family: var(--mono); font-size: clamp(28px, 4.4vw, 44px); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
   .lede { max-width: 66ch; color: var(--ink-2); font-size: 16px; }
@@ -144,6 +145,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc .nw { white-space: nowrap; }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
@@ -282,18 +284,22 @@
       </div></details>
       <details class="drop here" name="site"><summary>Architecture</summary><div>
         <a href="../overview/index.html" class="here">Overview</a>
-        <a href="../system/index.html">System Architecture</a>
-        <a href="../database/index.html">Database Architecture</a>
-        <a href="../network/index.html">Network Architecture</a>
-        <a href="../architecture/index.html">Node Architecture</a>
-        <a href="../server/index.html">Server Architecture</a>
-        <a href="../explorer/index.html">Explorer Architecture</a>
-        <a href="../build/index.html">Build Architecture</a>
+        <a href="../system/index.html">System</a>
+        <a href="../database/index.html">Database</a>
+        <a href="../network/index.html">Network</a>
+        <a href="../architecture/index.html">Node</a>
+        <a href="../server/index.html">Server</a>
+        <a href="../explorer/index.html">Explorer</a>
+        <a href="../build/index.html">Build</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
       </div></details>
-      <a href="../developers/index.html">Developers</a>
+      <details class="drop" name="site"><summary>Developers</summary><div>
+        <a href="../developers/index.html">Overview</a>
+        <a href="../developers/style.html">Style Guide</a>
+        <a href="../developers/testing.html">Test Practices</a>
+      </div></details>
       <a href="../team.html">Team</a>
     </nav>
     <p class="lede">
@@ -303,10 +309,10 @@
   </header>
 
   <nav class="menu">
-    <a href="#1-the-stack">The stack</a>
-    <a href="#2-the-node">The node</a>
-    <a href="#3-the-store">The store</a>
-    <a href="#4-the-server">The server</a>
+    <a href="#1-stack">Stack</a>
+    <a href="#2-node">Node</a>
+    <a href="#3-store">Store</a>
+    <a href="#4-server">Server</a>
     <a href="#5-design-documents">Design documents</a>
   </nav>
 
@@ -316,7 +322,7 @@ below it. This page outlines how the layers fit together. The node and the
 store are each described in depth, against their source, in
 <a href="../architecture/index.html">Node Architecture</a> and
 <a href="../database/index.html">Database Architecture</a>.</p>
-<h2 id="1-the-stack">1. The stack<a class="anchor" href="#1-the-stack" aria-label="Link to this section">#</a></h2>
+<h2 id="1-stack">1. Stack<a class="anchor" href="#1-stack" aria-label="Link to this section">#</a></h2>
 <div class="mermaid">
 flowchart BT
     sys["libbitcoin-system&lt;br/&gt;consensus, script, hashing, chain types"]
@@ -364,7 +370,7 @@ flowchart BT
 </tbody>
 </table></div>
 <p>The libraries are listed under <a href="../developers/index.html">Developers</a>.</p>
-<h2 id="2-the-node">2. The node<a class="anchor" href="#2-the-node" aria-label="Link to this section">#</a></h2>
+<h2 id="2-node">2. Node<a class="anchor" href="#2-node" aria-label="Link to this section">#</a></h2>
 <p>Synchronization is headers-first. Peer protocols prove and archive each
 peer's headers, and a chain of <strong>chasers</strong> carries them from there to
 confirmation:</p>
@@ -383,7 +389,7 @@ communicate only through an event bus, and share state only through the
 store. Further chasers maintain the transaction pool, fee estimates, store
 snapshots and disk space.</p>
 <p>Quiescing the pipeline allows store snapshot, remap and shutdown.</p>
-<h2 id="3-the-store">3. The store<a class="anchor" href="#3-the-store" aria-label="Link to this section">#</a></h2>
+<h2 id="3-store">3. Store<a class="anchor" href="#3-store" aria-label="Link to this section">#</a></h2>
 <p>The store is strictly relational, without a query engine. Every relation is
 resolved by one of two physical operations chosen when the table is
 designed: <strong>navigation</strong>, following a link that is a row's position, or
@@ -392,7 +398,7 @@ designed: <strong>navigation</strong>, following a link that is a row's position
 becomes visible atomically, and a snapshot is a copy of the heads. All files
 are memory-mapped, and grow by remapping. A store that closes cleanly reopens as
 it was; one that does not is restored from its last snapshot.</p>
-<h2 id="4-the-server">4. The server<a class="anchor" href="#4-the-server" aria-label="Link to this section">#</a></h2>
+<h2 id="4-server">4. Server<a class="anchor" href="#4-server" aria-label="Link to this section">#</a></h2>
 <p>Bitcoin Server adds client interfaces to the node, on the services of
 libbitcoin-network, serving from the node's store. The interfaces are listed in <a href="../interfaces.html">BS Interfaces</a>.</p>
 <h2 id="5-design-documents">5. Design documents<a class="anchor" href="#5-design-documents" aria-label="Link to this section">#</a></h2>

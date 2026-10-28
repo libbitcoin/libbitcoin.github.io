@@ -73,6 +73,7 @@
 
   .logo { width: 132px; height: auto; display: block; }
   .mast { padding: 56px 0 28px; border-bottom: 2px solid var(--ink); display: flex; flex-direction: column; gap: 14px; }
+  .mast > a { align-self: flex-start; text-decoration: none; }
   .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
   h1 { color: var(--heading); font-family: var(--mono); font-size: clamp(28px, 4.4vw, 44px); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
   .lede { max-width: 66ch; color: var(--ink-2); font-size: 16px; }
@@ -290,18 +291,22 @@
       </div></details>
       <details class="drop" name="site"><summary>Architecture</summary><div>
         <a href="overview/index.html">Overview</a>
-        <a href="system/index.html">System Architecture</a>
-        <a href="database/index.html">Database Architecture</a>
-        <a href="network/index.html">Network Architecture</a>
-        <a href="architecture/index.html">Node Architecture</a>
-        <a href="server/index.html">Server Architecture</a>
-        <a href="explorer/index.html">Explorer Architecture</a>
-        <a href="build/index.html">Build Architecture</a>
+        <a href="system/index.html">System</a>
+        <a href="database/index.html">Database</a>
+        <a href="network/index.html">Network</a>
+        <a href="architecture/index.html">Node</a>
+        <a href="server/index.html">Server</a>
+        <a href="explorer/index.html">Explorer</a>
+        <a href="build/index.html">Build</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="client/commands.html">BX Commands</a>
       </div></details>
-      <a href="developers/index.html">Developers</a>
+      <details class="drop" name="site"><summary>Developers</summary><div>
+        <a href="developers/index.html">Overview</a>
+        <a href="developers/style.html">Style Guide</a>
+        <a href="developers/testing.html">Test Practices</a>
+      </div></details>
       <a href="team.html">Team</a>
     </nav>
     <p class="lede">

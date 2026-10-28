@@ -3,11 +3,7 @@
 Libbitcoin is a full stack of C++20 libraries, from Bitcoin primitives
 to a complete server and client. Bitcoin Server (`bs`) is built on
 libbitcoin-server, and Bitcoin Explorer (`bx`) on libbitcoin-explorer.
-Each library can be used on its own, by any application. This section
-documents their C++ API.
-
-> The API reference is in progress. This page introduces the libraries
-> and how to use them.
+Each library can be used on its own, by any application.
 
 ## 1. The stack
 
@@ -36,14 +32,14 @@ flowchart BT
     explorer --> bx
 ```
 
-| Library | Namespace | Builds on | Provides |
-| ------- | --------- | --------- | -------- |
-| [libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system) | `libbitcoin::system` | | Bitcoin primitives: blocks, transactions, scripts and their execution, hashes and cryptography, keys, addresses and wallets, encodings and serialization |
-| [libbitcoin-database](https://github.com/libbitcoin/libbitcoin-database) | `libbitcoin::database` | system | The store: memory-mapped tables, and the queries over them |
-| [libbitcoin-network](https://github.com/libbitcoin/libbitcoin-network) | `libbitcoin::network` | system | Connections and protocols: the P2P network, and HTTP, websocket, JSON-RPC, TLS and ZMQ services |
-| [libbitcoin-node](https://github.com/libbitcoin/libbitcoin-node) | `libbitcoin::node` | database, network | The full node: sync, validation and confirmation, and the transaction pool |
-| [libbitcoin-server](https://github.com/libbitcoin/libbitcoin-server) | `libbitcoin::server` | node | The client interfaces of Bitcoin Server, and `bs` |
-| [libbitcoin-explorer](https://github.com/libbitcoin/libbitcoin-explorer) | `libbitcoin::explorer` | system | The commands of Bitcoin Explorer, and `bx` |
+| Library | Namespace | Dependencies | Provides |
+| ------- | --------- | ------------ | -------- |
+| <span class="nw">[libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system)</span> | `libbitcoin::system` | <span class="nw">boost</span> | Bitcoin primitives: blocks, transactions, scripts and their execution, hashes and cryptography, keys, addresses and wallets, encodings and serialization |
+| <span class="nw">[libbitcoin-database](https://github.com/libbitcoin/libbitcoin-database)</span> | `libbitcoin::database` | <span class="nw">system</span> | The store: memory-mapped tables, and the queries over them |
+| <span class="nw">[libbitcoin-network](https://github.com/libbitcoin/libbitcoin-network)</span> | `libbitcoin::network` | <span class="nw">system</span> | Connections and protocols: the P2P network, and HTTP, websocket, JSON-RPC, TLS and ZMQ services |
+| <span class="nw">[libbitcoin-node](https://github.com/libbitcoin/libbitcoin-node)</span> | `libbitcoin::node` | <span class="nw">database, network</span> | The full node: sync, validation and confirmation, and the transaction pool |
+| <span class="nw">[libbitcoin-server](https://github.com/libbitcoin/libbitcoin-server)</span> | `libbitcoin::server` | <span class="nw">node</span> | The client interfaces of Bitcoin Server, and `bs` |
+| <span class="nw">[libbitcoin-explorer](https://github.com/libbitcoin/libbitcoin-explorer)</span> | `libbitcoin::explorer` | <span class="nw">system</span> | The commands of Bitcoin Explorer, and `bx` |
 
 The node and the store are described in [Architecture](../architecture/index)
 and [Database](../database/index).

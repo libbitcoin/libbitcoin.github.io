@@ -69,6 +69,7 @@
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 96px; }
   .logo { width: 132px; height: auto; display: block; }
   .mast { padding: 56px 0 28px; border-bottom: 2px solid var(--ink); display: flex; flex-direction: column; gap: 14px; }
+  .mast > a { align-self: flex-start; text-decoration: none; }
   .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
   h1 { color: var(--heading); font-family: var(--mono); font-size: clamp(28px, 4.4vw, 44px); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
   .lede { max-width: 66ch; color: var(--ink-2); font-size: 16px; }
@@ -144,6 +145,7 @@
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
   .doc td code { white-space: nowrap; }
+  .doc .nw { white-space: nowrap; }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
@@ -282,18 +284,22 @@
       </div></details>
       <details class="drop" name="site"><summary>Architecture</summary><div>
         <a href="../overview/index.html">Overview</a>
-        <a href="../system/index.html">System Architecture</a>
-        <a href="../database/index.html">Database Architecture</a>
-        <a href="../network/index.html">Network Architecture</a>
-        <a href="../architecture/index.html">Node Architecture</a>
-        <a href="../server/index.html">Server Architecture</a>
-        <a href="../explorer/index.html">Explorer Architecture</a>
-        <a href="../build/index.html">Build Architecture</a>
+        <a href="../system/index.html">System</a>
+        <a href="../database/index.html">Database</a>
+        <a href="../network/index.html">Network</a>
+        <a href="../architecture/index.html">Node</a>
+        <a href="../server/index.html">Server</a>
+        <a href="../explorer/index.html">Explorer</a>
+        <a href="../build/index.html">Build</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
       </div></details>
-      <a href="../developers/index.html" class="here">Developers</a>
+      <details class="drop here" name="site"><summary>Developers</summary><div>
+        <a href="../developers/index.html" class="here">Overview</a>
+        <a href="../developers/style.html">Style Guide</a>
+        <a href="../developers/testing.html">Test Practices</a>
+      </div></details>
       <a href="../team.html">Team</a>
     </nav>
     <p class="lede">
@@ -303,20 +309,16 @@
   </header>
 
   <nav class="menu">
-    <a href="#1-the-stack">The stack</a>
-    <a href="#2-using-a-library">Using a library</a>
+    <a href="index.html" class="here">Developers</a>
+    <a href="style.html">Style guide</a>
+    <a href="testing.html">Test practices</a>
   </nav>
 
   <article class="doc">
 <p>Libbitcoin is a full stack of C++20 libraries, from Bitcoin primitives
 to a complete server and client. Bitcoin Server (<code>bs</code>) is built on
 libbitcoin-server, and Bitcoin Explorer (<code>bx</code>) on libbitcoin-explorer.
-Each library can be used on its own, by any application. This section
-documents their C++ API.</p>
-<blockquote>
-<p>The API reference is in progress. This page introduces the libraries
-and how to use them.</p>
-</blockquote>
+Each library can be used on its own, by any application.</p>
 <h2 id="1-the-stack">1. The stack<a class="anchor" href="#1-the-stack" aria-label="Link to this section">#</a></h2>
 <p>Both executables rest on libbitcoin-system: Bitcoin Server through the
 node's libraries, and Bitcoin Explorer directly. The only other dependency
@@ -346,45 +348,45 @@ flowchart BT
 <tr>
 <th>Library</th>
 <th>Namespace</th>
-<th>Builds on</th>
+<th>Dependencies</th>
 <th>Provides</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></td>
+<td><span class="nw"><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></span></td>
 <td><code>libbitcoin::system</code></td>
-<td></td>
+<td><span class="nw">boost</span></td>
 <td>Bitcoin primitives: blocks, transactions, scripts and their execution, hashes and cryptography, keys, addresses and wallets, encodings and serialization</td>
 </tr>
 <tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-database">libbitcoin-database</a></td>
+<td><span class="nw"><a href="https://github.com/libbitcoin/libbitcoin-database">libbitcoin-database</a></span></td>
 <td><code>libbitcoin::database</code></td>
-<td>system</td>
+<td><span class="nw">system</span></td>
 <td>The store: memory-mapped tables, and the queries over them</td>
 </tr>
 <tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-network">libbitcoin-network</a></td>
+<td><span class="nw"><a href="https://github.com/libbitcoin/libbitcoin-network">libbitcoin-network</a></span></td>
 <td><code>libbitcoin::network</code></td>
-<td>system</td>
+<td><span class="nw">system</span></td>
 <td>Connections and protocols: the P2P network, and HTTP, websocket, JSON-RPC, TLS and ZMQ services</td>
 </tr>
 <tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-node">libbitcoin-node</a></td>
+<td><span class="nw"><a href="https://github.com/libbitcoin/libbitcoin-node">libbitcoin-node</a></span></td>
 <td><code>libbitcoin::node</code></td>
-<td>database, network</td>
+<td><span class="nw">database, network</span></td>
 <td>The full node: sync, validation and confirmation, and the transaction pool</td>
 </tr>
 <tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-server">libbitcoin-server</a></td>
+<td><span class="nw"><a href="https://github.com/libbitcoin/libbitcoin-server">libbitcoin-server</a></span></td>
 <td><code>libbitcoin::server</code></td>
-<td>node</td>
+<td><span class="nw">node</span></td>
 <td>The client interfaces of Bitcoin Server, and <code>bs</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer</a></td>
+<td><span class="nw"><a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer</a></span></td>
 <td><code>libbitcoin::explorer</code></td>
-<td>system</td>
+<td><span class="nw">system</span></td>
 <td>The commands of Bitcoin Explorer, and <code>bx</code></td>
 </tr>
 </tbody>
@@ -443,7 +445,7 @@ using namespace libbitcoin::system;
 </code></pre>
   </article>
 
-  <nav class="pager"><span></span><span></span></nav>
+  <nav class="pager"><span></span><a href="style.html">Style guide &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 
