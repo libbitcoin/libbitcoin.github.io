@@ -92,7 +92,7 @@ excluding the paths listed in the repository's `coverage` element of the
 build model.
 
 **Constant time.** A libbitcoin-system job in the expanded matrix runs the
-secp256k1 constant-time tests under valgrind, which reports any branch or
+secp256k1 constant-time tests under [valgrind](https://valgrind.org/), which reports any branch or
 memory access that depends on secret data.
 
 **Fuzzing.** libbitcoin-system is a module of
