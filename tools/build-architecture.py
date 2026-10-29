@@ -62,10 +62,11 @@ SITE_MENU = [
     ]),
     ("Developers", [
         ("developers/index.html", "Overview"),
+        ("developers/contributing.html", "Contributing"),
         ("developers/style.html", "Style Guide"),
         ("developers/testing.html", "Test Practices"),
     ]),
-    ("team.html", "Team"),
+    ("about.html", "About"),
 ]
 
 SECTIONS = {
@@ -197,6 +198,7 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Developers"),
+            ("contributing", "Contributing"),
             ("style", "Style guide"),
             ("testing", "Test practices"),
         ],
@@ -350,9 +352,9 @@ STYLE = """
   .hljs-comment { color: var(--ink-3); }
   .hljs-punctuation, .hljs-operator { color: var(--ink-2); }
   .doc pre.console code { font-family: inherit; }
-  .doc .download { margin: 8px 0 32px; }
-  .doc .download a { display: inline-block; padding: 18px 40px; background: var(--heading); color: #1a1a19; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: .04em; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 0 var(--accent); }
-  .doc .download a:hover, .doc .download a:focus { background: #ffb44d; text-decoration: none; }
+  .doc .download, .doc .button { margin: 8px 0 32px; }
+  .doc .download a, .doc .button a { display: inline-block; padding: 18px 40px; background: var(--heading); color: #1a1a19; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: .04em; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 0 var(--accent); }
+  .doc .download a:hover, .doc .download a:focus, .doc .button a:hover, .doc .button a:focus { background: #ffb44d; text-decoration: none; }
   .doc .download a::before { content: "↓  "; }
   .doc .banner { margin: 0 0 24px; padding: 14px 18px; border: 1px solid var(--accent); border-radius: 3px; background: var(--surface); color: var(--ink); }
   .doc .banner strong { color: var(--heading); }
