@@ -151,6 +151,7 @@
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
+  .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
   .lightbox.panning { cursor: grabbing; user-select: none; }
@@ -290,6 +291,7 @@
         <a href="../architecture/index.html">Node</a>
         <a href="../server/index.html">Server</a>
         <a href="../explorer/index.html">Explorer</a>
+        <a href="../test/index.html">Test</a>
         <a href="../build/index.html">Build</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
@@ -331,22 +333,22 @@ makes it harder to scan, or that would itself need testing, is excluded.</p>
 <tbody>
 <tr>
 <td>unit</td>
-<td>One method, with its callees faked.</td>
+<td>A method or function, isolated to the extent practical.</td>
 </tr>
 <tr>
 <td>component</td>
-<td>Several real units together.</td>
+<td>A group of units, such as a class.</td>
 </tr>
 <tr>
 <td>functional</td>
-<td>The public interface end to end.</td>
+<td>A feature group, such as client-server communication.</td>
 </tr>
 </tbody>
 </table></div>
 <ul>
 <li><code>BC_ASSERT</code> paths are unreachable by design and are not tested.</li>
-<li>Server interfaces also have a Python suite in <code>endpoints/</code>, run against
-  a live node.</li>
+<li>Acceptance tests are the server's Python suite in <code>endpoints/</code>, run
+  against a live node (see <a href="../test/index.html">Test architecture</a>).</li>
 </ul>
 <h2 id="2-files-and-structure">2. Files and structure<a class="anchor" href="#2-files-and-structure" aria-label="Link to this section">#</a></h2>
 <ul>
@@ -515,7 +517,7 @@ documentation.</p>
     var svg = e.target.closest('.mermaid svg');
     if (svg) open(svg);
     var img = e.target.closest('.doc img');
-    if (img) {
+    if (img && !img.closest('a')) {
       var copy = img.cloneNode(true);
       copy.style.width = img.naturalWidth + 'px';
       box.innerHTML = ''; box.appendChild(copy); box.hidden = false;

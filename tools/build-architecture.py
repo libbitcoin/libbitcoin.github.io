@@ -55,6 +55,7 @@ SITE_MENU = [
         ("architecture/index.html", "Node"),
         ("server/index.html", "Server"),
         ("explorer/index.html", "Explorer"),
+        ("test/index.html", "Test"),
         ("build/index.html", "Build"),
     ]),
     ("Client", [
@@ -129,6 +130,16 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Explorer Architecture"),
+        ],
+    },
+    "test": {
+        "title": "Test Architecture",
+        "h1": "Test Architecture",
+        "description": "How libbitcoin is tested: testability without test hooks, kinds of test, public vectors, continuous integration and coverage.",
+        "lede": "How <strong>libbitcoin</strong> is tested: testability, kinds of test,\n      public vectors, continuous integration and coverage.",
+        "foot": "",
+        "pages": [
+            ("index", "Test Architecture"),
         ],
     },
     "build": {
@@ -376,6 +387,7 @@ STYLE = """
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
+  .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
   .lightbox.panning { cursor: grabbing; user-select: none; }
@@ -659,7 +671,7 @@ def render(key, name, md, guard, logo, mermaid_src):
     var svg = e.target.closest('.mermaid svg');
     if (svg) open(svg);
     var img = e.target.closest('.doc img');
-    if (img) {
+    if (img && !img.closest('a')) {
       var copy = img.cloneNode(true);
       copy.style.width = img.naturalWidth + 'px';
       box.innerHTML = ''; box.appendChild(copy); box.hidden = false;

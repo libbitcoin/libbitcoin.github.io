@@ -151,6 +151,7 @@
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
+  .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
   .lightbox.panning { cursor: grabbing; user-select: none; }
@@ -290,6 +291,7 @@
         <a href="../architecture/index.html">Node</a>
         <a href="../server/index.html">Server</a>
         <a href="../explorer/index.html">Explorer</a>
+        <a href="../test/index.html">Test</a>
         <a href="../build/index.html">Build</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
@@ -571,7 +573,7 @@ member list that has no comments, a new member also goes in bare.</p>
 </code></pre>
 <h2 id="4-layout">4. Layout<a class="anchor" href="#4-layout" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>Indent four spaces, never tabs. Braces go on their own lines (Allman).</li>
+<li>Indent four spaces, never tabs.</li>
 <li><strong>Limit lines to 80 columns.</strong> The limit may be bent slightly when one
   line reads better than a wrap.</li>
 <li>Base classes and constructor initializers start on a continuation line
@@ -592,8 +594,9 @@ CLASS::hashmap(storage&amp; header, storage&amp; body, const Link&amp; buckets,
 <li><strong>Do not wrap call arguments.</strong> Shorten the line instead: hoist named
   locals, or put <code>using in_t = input_link::integer;</code> aliases at the top of
   the function. Wrapping a signature is fine.</li>
-<li><strong>Braced initializers fit on one line, or stand alone.</strong> Never wrap from
-  inside a brace pair.</li>
+<li><strong>Braces balance horizontally or vertically.</strong> A brace pair either opens
+  and closes on one line, or its closing brace is in the same column as its
+  opening brace. Never wrap from inside a brace pair.</li>
 </ul>
 <pre><code class="language-cpp">// Right.
 item =
@@ -721,8 +724,7 @@ compiler in front of you. For floating point, use <code>to_integer</code> and
   <code>subtract&lt;T&gt;</code> and <code>is_add_overflow&lt;T&gt;</code> (in the target type), and
   <code>is_lesser</code> and <code>is_greater</code>. For mixed types use <code>greater</code> and
   <code>lesser</code>, never <code>std::max</code> or <code>std::min</code>, which require both arguments
-  of one type. <code>size_t</code> and <code>uint64_t</code> are different types; never assume a
-  64-bit build.</li>
+  of one type.</li>
 <li>Use <code>is_zero(x)</code>, <code>is_nonzero(x)</code>, <code>is_one(x)</code>, <code>zero</code>, <code>one</code>, <code>two</code>,
   <code>add1</code> and <code>sub1</code> rather than raw literals and <code>== 0</code>.</li>
 <li>Add a literal suffix (<code>_size</code>, <code>_u64</code>) only where it establishes a type.
@@ -730,6 +732,9 @@ compiler in front of you. For floating point, use <code>to_integer</code> and
 <li>Derive constants from domain constants: <code>ec_xonly_size * two</code>, not <code>64</code>.</li>
 <li>Use <code>size_t</code> for the system's own quantities, and an explicit width for
   wire and disk fields and external totals.</li>
+<li><code>size_t</code> is not fixed at 64 bits; 32-bit builds are supported. Convert to
+  and from it only with the <code>possible_*</code> casts, except a same-width sign
+  change, which is <code>sign_cast</code>.</li>
 <li>Arithmetic templates are constrained to unsigned types. Do not declare
   signed overloads.</li>
 <li>Prefix OS and global symbols with <code>::</code>: <code>::CloseHandle</code>,
@@ -786,8 +791,8 @@ compiler in front of you. For floating point, use <code>to_integer</code> and
 <h2 id="10-pre-commit-checklist-for-agents">10. Pre-commit checklist for agents<a class="anchor" href="#10-pre-commit-checklist-for-agents" aria-label="Link to this section">#</a></h2>
 <p>Run these against the diff before committing.</p>
 <ol>
-<li><strong>Wrapped calls and initializers.</strong> No argument list is wrapped, and no
-   braced list is wrapped from inside the braces.</li>
+<li><strong>Wrapped calls and braces.</strong> No argument list is wrapped, and every
+   brace pair balances on one line or vertically.</li>
 <li><strong>Comments.</strong> Each added comment passes the "written this way from the
    start" test in section 5. Delete any that narrate the change.</li>
 <li><strong>Includes.</strong> No forbidden standard headers, no individual header from
@@ -831,7 +836,7 @@ compiler in front of you. For floating point, use <code>to_integer</code> and
     var svg = e.target.closest('.mermaid svg');
     if (svg) open(svg);
     var img = e.target.closest('.doc img');
-    if (img) {
+    if (img && !img.closest('a')) {
       var copy = img.cloneNode(true);
       copy.style.width = img.naturalWidth + 'px';
       box.innerHTML = ''; box.appendChild(copy); box.hidden = false;

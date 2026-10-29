@@ -151,6 +151,7 @@
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
+  .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
   .lightbox.panning { cursor: grabbing; user-select: none; }
@@ -290,6 +291,7 @@
         <a href="../architecture/index.html">Node</a>
         <a href="../server/index.html">Server</a>
         <a href="../explorer/index.html">Explorer</a>
+        <a href="../test/index.html">Test</a>
         <a href="../build/index.html">Build</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
@@ -541,7 +543,7 @@ version, and on an extended channel the extranonce.</p>
     var svg = e.target.closest('.mermaid svg');
     if (svg) open(svg);
     var img = e.target.closest('.doc img');
-    if (img) {
+    if (img && !img.closest('a')) {
       var copy = img.cloneNode(true);
       copy.style.width = img.naturalWidth + 'px';
       box.innerHTML = ''; box.appendChild(copy); box.hidden = false;

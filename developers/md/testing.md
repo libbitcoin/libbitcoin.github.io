@@ -8,13 +8,13 @@ makes it harder to scan, or that would itself need testing, is excluded.
 
 | Level | Scope |
 |---|---|
-| unit | One method, with its callees faked. |
-| component | Several real units together. |
-| functional | The public interface end to end. |
+| unit | A method or function, isolated to the extent practical. |
+| component | A group of units, such as a class. |
+| functional | A feature group, such as client-server communication. |
 
 - `BC_ASSERT` paths are unreachable by design and are not tested.
-- Server interfaces also have a Python suite in `endpoints/`, run against
-  a live node.
+- Acceptance tests are the server's Python suite in `endpoints/`, run
+  against a live node (see [Test architecture](../test/index)).
 
 ## 2. Files and structure
 

@@ -195,7 +195,7 @@ Implementation section banners use double slashes and run to column 80:
 
 ## 4. Layout
 
-- Indent four spaces, never tabs. Braces go on their own lines (Allman).
+- Indent four spaces, never tabs.
 - **Limit lines to 80 columns.** The limit may be bent slightly when one
   line reads better than a wrap.
 - Base classes and constructor initializers start on a continuation line
@@ -219,8 +219,9 @@ CLASS::hashmap(storage& header, storage& body, const Link& buckets,
 - **Do not wrap call arguments.** Shorten the line instead: hoist named
   locals, or put `using in_t = input_link::integer;` aliases at the top of
   the function. Wrapping a signature is fine.
-- **Braced initializers fit on one line, or stand alone.** Never wrap from
-  inside a brace pair.
+- **Braces balance horizontally or vertically.** A brace pair either opens
+  and closes on one line, or its closing brace is in the same column as its
+  opening brace. Never wrap from inside a brace pair.
 
 ```cpp
 // Right.
@@ -305,8 +306,7 @@ compiler in front of you. For floating point, use `to_integer` and
   `subtract<T>` and `is_add_overflow<T>` (in the target type), and
   `is_lesser` and `is_greater`. For mixed types use `greater` and
   `lesser`, never `std::max` or `std::min`, which require both arguments
-  of one type. `size_t` and `uint64_t` are different types; never assume a
-  64-bit build.
+  of one type.
 - Use `is_zero(x)`, `is_nonzero(x)`, `is_one(x)`, `zero`, `one`, `two`,
   `add1` and `sub1` rather than raw literals and `== 0`.
 - Add a literal suffix (`_size`, `_u64`) only where it establishes a type.
@@ -314,6 +314,9 @@ compiler in front of you. For floating point, use `to_integer` and
 - Derive constants from domain constants: `ec_xonly_size * two`, not `64`.
 - Use `size_t` for the system's own quantities, and an explicit width for
   wire and disk fields and external totals.
+- `size_t` is not fixed at 64 bits; 32-bit builds are supported. Convert to
+  and from it only with the `possible_*` casts, except a same-width sign
+  change, which is `sign_cast`.
 - Arithmetic templates are constrained to unsigned types. Do not declare
   signed overloads.
 - Prefix OS and global symbols with `::`: `::CloseHandle`,
@@ -371,8 +374,8 @@ compiler in front of you. For floating point, use `to_integer` and
 
 Run these against the diff before committing.
 
-1. **Wrapped calls and initializers.** No argument list is wrapped, and no
-   braced list is wrapped from inside the braces.
+1. **Wrapped calls and braces.** No argument list is wrapped, and every
+   brace pair balances on one line or vertically.
 2. **Comments.** Each added comment passes the "written this way from the
    start" test in section 5. Delete any that narrate the change.
 3. **Includes.** No forbidden standard headers, no individual header from
