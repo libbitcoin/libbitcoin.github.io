@@ -40,11 +40,47 @@ as its clients do, over its own protocols.
 A test case tests one thing, and its name states that thing: the method,
 the condition and the expected result. A failing test is then a diagnosis.
 
-## 4. Public vectors
+## 4. Reference vectors
 
-Tests establish correctness, using public vectors wherever they exist:
-BIPs, RFCs, NIST, Wycheproof, and the consensus vectors shared across
-Bitcoin implementations.
+Tests establish correctness, using reference vectors wherever they exist.
+
+| Source | Vectors | Repositories |
+|---|---|---|
+| BIP-21 | URI scheme | explorer |
+| BIP-32 | HD wallets, test vectors 1, 2 and 5 | system, explorer |
+| BIP-38 | Encrypted private keys | system, explorer |
+| BIP-39 | Mnemonics (trezor python-mnemonic, bip32JP Japanese) | system |
+| BIP-143 | Segwit v0 signature hash | system |
+| BIP-158 | Compact block filters | system |
+| BIP-173 | Bech32 addresses, valid and invalid | system |
+| BIP-174, BIP-370 | PSBT, PSBT v2 | system, server |
+| BIP-324 | ElligatorSwift, v2 transport packet encoding | system, network |
+| BIP-340 | Schnorr signatures | system |
+| BIP-341 | Taproot signature hash and wallet vectors | system |
+| BIP-352 | Silent payments, send and receive | system, database, node, server |
+| BIP-380, BIP-386 | Descriptor checksums, `tr()` descriptors | system, server |
+| RFC 2202, RFC 4231 | HMAC-SHA1, HMAC-SHA256 and HMAC-SHA512 | system |
+| RFC 4648 | Base16, base32 and base64 encodings | system, explorer |
+| RFC 5869 | HKDF | system |
+| RFC 6070, RFC 7914 | PBKDF2 and scrypt | system |
+| RFC 6979 | Deterministic ECDSA (P-256) | system |
+| RFC 7617 | HTTP basic authentication | network |
+| RFC 7748 | X25519 | system, network, server |
+| RFC 8439 | ChaCha20, Poly1305 and their AEAD | system |
+| RFC 8448 | TLS 1.3 handshake traces | network |
+| FIPS 180-4, CAVP | SHA-1 and SHA-2, including SHA-512/224 and SHA-512/256 | system, explorer |
+| FIPS 197, SP 800-38A | AES and its modes | system |
+| FIPS 202 | SHA-3 | system |
+| Wycheproof | secp256k1 ECDSA, P-256 and P-384 ECDSA and ECDH, AES-GCM | system |
+| SLIP-39 | Shamir mnemonics (trezor python-shamir-mnemonic) | system |
+| Unicode | `NormalizationTest.txt` | system |
+| RIPEMD | RIPEMD-128 and RIPEMD-160 reference vectors | system |
+| eSTREAM, NaCl | Salsa20, XSalsa20-Poly1305 | system |
+| Bitcoin Core | Script tests, valid and invalid, by fork | system |
+| Bitcoin Core | `key_io_valid.json`, `blockfilters.json`, MuHash, descriptors | system, network, server |
+| Electrum | Electrum mnemonics, v1 and current | system |
+| ElectrumX | Merkle proofs with `cp_height`, block headers | database, server |
+| Bitcoin Wiki | P2P message samples, wallet import format | network, explorer |
 
 ## 5. Continuous integration
 
@@ -64,7 +100,7 @@ configurable metadata (see [Build architecture](../build/index)).
 | Platform | Architecture | Word | Byte order | Compilers | Build systems |
 |---|---|---|---|---|---|
 | Linux (Ubuntu 24.04) | x64 | 64 | little | GCC 13 to 16, Clang 18 and 19 | Autotools, CMake, presets |
-| Linux (QEMU) | s390x | 64 | big | GCC, cross compiled, tested in QEMU | Autotools |
+| Linux (Ubuntu 24.04) | s390x | 64 | big | GCC, cross compiled, tested in QEMU | Autotools |
 | macOS | arm64 (Apple silicon) | 64 | little | Apple clang (current Xcode) | Autotools, CMake |
 | Windows | x64 | 64 | little | MSVC v145 | Visual Studio |
 | Windows | x86 (Win32) | 32 | little | MSVC v145 | Visual Studio |

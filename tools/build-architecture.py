@@ -55,8 +55,8 @@ SITE_MENU = [
         ("architecture/index.html", "Node"),
         ("server/index.html", "Server"),
         ("explorer/index.html", "Explorer"),
-        ("test/index.html", "Test"),
         ("build/index.html", "Build"),
+        ("test/index.html", "Test"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
@@ -135,8 +135,8 @@ SECTIONS = {
     "test": {
         "title": "Test Architecture",
         "h1": "Test Architecture",
-        "description": "How libbitcoin is tested: testability without test hooks, kinds of test, public vectors, continuous integration and coverage.",
-        "lede": "How <strong>libbitcoin</strong> is tested: testability, kinds of test,\n      public vectors, continuous integration and coverage.",
+        "description": "How libbitcoin is tested: testability without test hooks, kinds of test, reference vectors, continuous integration and coverage.",
+        "lede": "How <strong>libbitcoin</strong> is tested: testability, kinds of test,\n      reference vectors, continuous integration and coverage.",
         "foot": "",
         "pages": [
             ("index", "Test Architecture"),

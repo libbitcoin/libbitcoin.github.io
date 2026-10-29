@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Test Architecture</title>
-<meta name="description" content="How libbitcoin is tested: testability without test hooks, kinds of test, public vectors, continuous integration and coverage.">
+<meta name="description" content="How libbitcoin is tested: testability without test hooks, kinds of test, reference vectors, continuous integration and coverage.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/test/index.html">
 <script>
@@ -41,7 +41,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/test/index.html">
 <meta property="og:title" content="Test Architecture">
-<meta property="og:description" content="How libbitcoin is tested: testability without test hooks, kinds of test, public vectors, continuous integration and coverage.">
+<meta property="og:description" content="How libbitcoin is tested: testability without test hooks, kinds of test, reference vectors, continuous integration and coverage.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -50,7 +50,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Test Architecture">
-<meta name="twitter:description" content="How libbitcoin is tested: testability without test hooks, kinds of test, public vectors, continuous integration and coverage.">
+<meta name="twitter:description" content="How libbitcoin is tested: testability without test hooks, kinds of test, reference vectors, continuous integration and coverage.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -291,8 +291,8 @@
         <a href="../architecture/index.html">Node</a>
         <a href="../server/index.html">Server</a>
         <a href="../explorer/index.html">Explorer</a>
-        <a href="../test/index.html" class="here">Test</a>
         <a href="../build/index.html">Build</a>
+        <a href="../test/index.html" class="here">Test</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
@@ -307,7 +307,7 @@
     </nav>
     <p class="lede">
       How <strong>libbitcoin</strong> is tested: testability, kinds of test,
-      public vectors, continuous integration and coverage.
+      reference vectors, continuous integration and coverage.
     </p>
   </header>
 
@@ -315,7 +315,7 @@
     <a href="#1-testability">Testability</a>
     <a href="#2-kinds-of-test">Kinds of test</a>
     <a href="#3-one-thing-named">One thing, named</a>
-    <a href="#4-public-vectors">Public vectors</a>
+    <a href="#4-reference-vectors">Reference vectors</a>
     <a href="#5-continuous-integration">Continuous integration</a>
     <a href="#6-build-status">Build status</a>
     <a href="#7-coverage">Coverage</a>
@@ -384,10 +384,194 @@ as its clients do, over its own protocols.</p>
 <h2 id="3-one-thing-named">3. One thing, named<a class="anchor" href="#3-one-thing-named" aria-label="Link to this section">#</a></h2>
 <p>A test case tests one thing, and its name states that thing: the method,
 the condition and the expected result. A failing test is then a diagnosis.</p>
-<h2 id="4-public-vectors">4. Public vectors<a class="anchor" href="#4-public-vectors" aria-label="Link to this section">#</a></h2>
-<p>Tests establish correctness, using public vectors wherever they exist:
-BIPs, RFCs, NIST, Wycheproof, and the consensus vectors shared across
-Bitcoin implementations.</p>
+<h2 id="4-reference-vectors">4. Reference vectors<a class="anchor" href="#4-reference-vectors" aria-label="Link to this section">#</a></h2>
+<p>Tests establish correctness, using reference vectors wherever they exist.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Vectors</th>
+<th>Repositories</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BIP-21</td>
+<td>URI scheme</td>
+<td>explorer</td>
+</tr>
+<tr>
+<td>BIP-32</td>
+<td>HD wallets, test vectors 1, 2 and 5</td>
+<td>system, explorer</td>
+</tr>
+<tr>
+<td>BIP-38</td>
+<td>Encrypted private keys</td>
+<td>system, explorer</td>
+</tr>
+<tr>
+<td>BIP-39</td>
+<td>Mnemonics (trezor python-mnemonic, bip32JP Japanese)</td>
+<td>system</td>
+</tr>
+<tr>
+<td>BIP-143</td>
+<td>Segwit v0 signature hash</td>
+<td>system</td>
+</tr>
+<tr>
+<td>BIP-158</td>
+<td>Compact block filters</td>
+<td>system</td>
+</tr>
+<tr>
+<td>BIP-173</td>
+<td>Bech32 addresses, valid and invalid</td>
+<td>system</td>
+</tr>
+<tr>
+<td>BIP-174, BIP-370</td>
+<td>PSBT, PSBT v2</td>
+<td>system, server</td>
+</tr>
+<tr>
+<td>BIP-324</td>
+<td>ElligatorSwift, v2 transport packet encoding</td>
+<td>system, network</td>
+</tr>
+<tr>
+<td>BIP-340</td>
+<td>Schnorr signatures</td>
+<td>system</td>
+</tr>
+<tr>
+<td>BIP-341</td>
+<td>Taproot signature hash and wallet vectors</td>
+<td>system</td>
+</tr>
+<tr>
+<td>BIP-352</td>
+<td>Silent payments, send and receive</td>
+<td>system, database, node, server</td>
+</tr>
+<tr>
+<td>BIP-380, BIP-386</td>
+<td>Descriptor checksums, <code>tr()</code> descriptors</td>
+<td>system, server</td>
+</tr>
+<tr>
+<td>RFC 2202, RFC 4231</td>
+<td>HMAC-SHA1, HMAC-SHA256 and HMAC-SHA512</td>
+<td>system</td>
+</tr>
+<tr>
+<td>RFC 4648</td>
+<td>Base16, base32 and base64 encodings</td>
+<td>system, explorer</td>
+</tr>
+<tr>
+<td>RFC 5869</td>
+<td>HKDF</td>
+<td>system</td>
+</tr>
+<tr>
+<td>RFC 6070, RFC 7914</td>
+<td>PBKDF2 and scrypt</td>
+<td>system</td>
+</tr>
+<tr>
+<td>RFC 6979</td>
+<td>Deterministic ECDSA (P-256)</td>
+<td>system</td>
+</tr>
+<tr>
+<td>RFC 7617</td>
+<td>HTTP basic authentication</td>
+<td>network</td>
+</tr>
+<tr>
+<td>RFC 7748</td>
+<td>X25519</td>
+<td>system, network, server</td>
+</tr>
+<tr>
+<td>RFC 8439</td>
+<td>ChaCha20, Poly1305 and their AEAD</td>
+<td>system</td>
+</tr>
+<tr>
+<td>RFC 8448</td>
+<td>TLS 1.3 handshake traces</td>
+<td>network</td>
+</tr>
+<tr>
+<td>FIPS 180-4, CAVP</td>
+<td>SHA-1 and SHA-2, including SHA-512/224 and SHA-512/256</td>
+<td>system, explorer</td>
+</tr>
+<tr>
+<td>FIPS 197, SP 800-38A</td>
+<td>AES and its modes</td>
+<td>system</td>
+</tr>
+<tr>
+<td>FIPS 202</td>
+<td>SHA-3</td>
+<td>system</td>
+</tr>
+<tr>
+<td>Wycheproof</td>
+<td>secp256k1 ECDSA, P-256 and P-384 ECDSA and ECDH, AES-GCM</td>
+<td>system</td>
+</tr>
+<tr>
+<td>SLIP-39</td>
+<td>Shamir mnemonics (trezor python-shamir-mnemonic)</td>
+<td>system</td>
+</tr>
+<tr>
+<td>Unicode</td>
+<td><code>NormalizationTest.txt</code></td>
+<td>system</td>
+</tr>
+<tr>
+<td>RIPEMD</td>
+<td>RIPEMD-128 and RIPEMD-160 reference vectors</td>
+<td>system</td>
+</tr>
+<tr>
+<td>eSTREAM, NaCl</td>
+<td>Salsa20, XSalsa20-Poly1305</td>
+<td>system</td>
+</tr>
+<tr>
+<td>Bitcoin Core</td>
+<td>Script tests, valid and invalid, by fork</td>
+<td>system</td>
+</tr>
+<tr>
+<td>Bitcoin Core</td>
+<td><code>key_io_valid.json</code>, <code>blockfilters.json</code>, MuHash, descriptors</td>
+<td>system, network, server</td>
+</tr>
+<tr>
+<td>Electrum</td>
+<td>Electrum mnemonics, v1 and current</td>
+<td>system</td>
+</tr>
+<tr>
+<td>ElectrumX</td>
+<td>Merkle proofs with <code>cp_height</code>, block headers</td>
+<td>database, server</td>
+</tr>
+<tr>
+<td>Bitcoin Wiki</td>
+<td>P2P message samples, wallet import format</td>
+<td>network, explorer</td>
+</tr>
+</tbody>
+</table></div>
 <h2 id="5-continuous-integration">5. Continuous integration<a class="anchor" href="#5-continuous-integration" aria-label="Link to this section">#</a></h2>
 <p>Every change is built and tested by CI (GitHub Actions) before review.
 Each library repository runs the same matrix. The gate runs on push and
@@ -421,7 +605,7 @@ configurable metadata (see <a href="../build/index.html">Build architecture</a>)
 <td>Autotools, CMake, presets</td>
 </tr>
 <tr>
-<td>Linux (QEMU)</td>
+<td>Linux (Ubuntu 24.04)</td>
 <td>s390x</td>
 <td>64</td>
 <td>big</td>
