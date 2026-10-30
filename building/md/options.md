@@ -15,7 +15,7 @@ the `Option-<name>` property.
 | `--build-preset=<name>` | CMake preset (presets script only, required). |
 | `--build-config=<debug\|release>` | Debug (`-Og -g1`, assertions on) or release (`-O3`, assertions off). |
 | `--build-link=<dynamic\|static>` | Build shared or static libraries (default both). |
-| `--build-boost` | Download and build Boost 1.86.0. |
+| `--build-boost` | Download and install Boost 1.86.0. Only its headers are used, so its build step compiles nothing. |
 | `--build-src-dir=<path>` | Where sources are cloned (default the current directory). |
 | `--build-obj-dir=<path>` | Where objects are built (default `obj` in the current directory). |
 | `--build-use-local-src` | Use existing source directories instead of cloning. |

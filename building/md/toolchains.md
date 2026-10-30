@@ -67,7 +67,7 @@ follow those images.
 
 | Build system | Boost | Source |
 | ------------ | ----- | ------ |
-| Autotools, CMake | 1.86.0 (minimum) | Downloaded and built by `--build-boost` |
+| Autotools, CMake | 1.86.0 (minimum) | Downloaded and installed by `--build-boost` |
 | Visual Studio | 1.91.0 | NuGet package `libbitcoin-boost` |
 
 libbitcoin uses only Boost's header libraries, so `--build-boost` builds

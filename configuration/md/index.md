@@ -215,8 +215,7 @@ A milestone is a block you have previously validated and therefore know
 to be valid, which implies that all preceding blocks are valid. A
 milestone sync verifies the identity of the milestone block and all of
 its ancestors, and validates the blocks above it. The default milestone
-is block 950,000. The milestone and pruning are fixed when the store is
-created (§10).
+is block 950,000.
 
 ```ini
 [bitcoin]
@@ -233,15 +232,26 @@ blocks above the milestone to peers.
 limited_blocks = true
 ```
 
+> **Fixed at store creation.** The values are recorded in the store when
+> the store is created. Each time the store is opened, the recorded
+> values are used in place of the configured values, and a configured
+> value that differs from its recorded value is logged. Changing them
+> requires a new store ([§10](#10-settings-fixed-at-store-creation)).
+
 ### 5.3 Full validation
 
-To validate every block, set the milestone to the genesis block when
-creating the store (§10):
+To validate every block, set the milestone to the genesis block:
 
 ```ini
 [bitcoin]
 milestone = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
 ```
+
+> **Fixed at store creation.** The value is recorded in the store when
+> the store is created. Each time the store is opened, the recorded
+> value is used in place of the configured value, and a configured
+> value that differs from it is logged. Changing it requires a new
+> store ([§10](#10-settings-fixed-at-store-creation)).
 
 ### 5.4 Checkpoints
 
@@ -488,25 +498,36 @@ buckets = 950001
 buckets = 950001
 ```
 
-Client filters are enabled when the store is created (§10). Any count
-above 0 on both tables enables the client filters index. The value
-given initializes the index to entries for that many blocks, but the index
-grows as required.
+Any count above 0 on both tables enables the client filters index. The
+value given initializes the index to entries for that many blocks, but
+the index grows as required.
+
+> **Fixed at store creation.** The value is recorded in the store when
+> the store is created. Each time the store is opened, the recorded
+> value is used in place of the configured value, and a configured
+> value that differs from it is logged. Changing it requires a new
+> store ([§10](#10-settings-fixed-at-store-creation)).
 
 ### 5.13 Disable the address index
 
-The address index is disabled when the store is created (§10):
+The address index is enabled by default. Setting the `outs` table's
+buckets to 0 disables it:
 
 ```ini
 [table.outs]
 buckets = 0
 ```
 
+> **Fixed at store creation.** The value is recorded in the store when
+> the store is created. Each time the store is opened, the recorded
+> value is used in place of the configured value, and a configured
+> value that differs from it is logged. Changing it requires a new
+> store ([§10](#10-settings-fixed-at-store-creation)).
+
 ### 5.14 Silent payments
 
 Silent payments are indexed from `node.silent_start_height`, and never below
-taproot activation, so 0 indexes from there. The start height is fixed when
-the store is created (§10). The index is served to Sparrow
+taproot activation, so 0 indexes from there. The index is served to Sparrow
 by the `[sparrow]` service, the Electrum protocol with silent payment
 extensions:
 
@@ -525,6 +546,12 @@ key_path = server.key
 The Sparrow interface is the Electrum interface with silent payment and
 block statistics methods added, and provides the same transports and
 security as `[electrum]` (§5.7).
+
+> **Fixed at store creation.** The value is recorded in the store when
+> the store is created. Each time the store is opened, the recorded
+> value is used in place of the configured value, and a configured
+> value that differs from it is logged. Changing it requires a new
+> store ([§10](#10-settings-fixed-at-store-creation)).
 
 ### 5.15 Tor
 

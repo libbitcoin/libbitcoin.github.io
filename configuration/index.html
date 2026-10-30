@@ -666,8 +666,7 @@ maximum_height = 900,000
 to be valid, which implies that all preceding blocks are valid. A
 milestone sync verifies the identity of the milestone block and all of
 its ancestors, and validates the blocks above it. The default milestone
-is block 950,000. The milestone and pruning are fixed when the store is
-created (§10).</p>
+is block 950,000.</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
 </code></pre>
@@ -678,12 +677,25 @@ blocks above the milestone to peers.</p>
 <pre><code class="language-ini"><span class="section">[node]</span>
 limited_blocks = true
 </code></pre>
+<blockquote>
+<p><strong>Fixed at store creation.</strong> The values are recorded in the store when
+the store is created. Each time the store is opened, the recorded
+values are used in place of the configured values, and a configured
+value that differs from its recorded value is logged. Changing them
+requires a new store (<a href="#10-settings-fixed-at-store-creation">§10</a>).</p>
+</blockquote>
 <h3 id="53-full-validation">5.3 Full validation<a class="anchor" href="#53-full-validation" aria-label="Link to this section">#</a></h3>
-<p>To validate every block, set the milestone to the genesis block when
-creating the store (§10):</p>
+<p>To validate every block, set the milestone to the genesis block:</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 milestone = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
 </code></pre>
+<blockquote>
+<p><strong>Fixed at store creation.</strong> The value is recorded in the store when
+the store is created. Each time the store is opened, the recorded
+value is used in place of the configured value, and a configured
+value that differs from it is logged. Changing it requires a new
+store (<a href="#10-settings-fixed-at-store-creation">§10</a>).</p>
+</blockquote>
 <h3 id="54-checkpoints">5.4 Checkpoints<a class="anchor" href="#54-checkpoints" aria-label="Link to this section">#</a></h3>
 <p>Checkpoints are consensus checks, and removing them is a hard fork.
 However, to do so set a checkpoint to the genesis block:</p>
@@ -918,19 +930,32 @@ buckets = 950001
 <span class="section">[table.filter_tx]</span>
 buckets = 950001
 </code></pre>
-<p>Client filters are enabled when the store is created (§10). Any count
-above 0 on both tables enables the client filters index. The value
-given initializes the index to entries for that many blocks, but the index
-grows as required.</p>
+<p>Any count above 0 on both tables enables the client filters index. The
+value given initializes the index to entries for that many blocks, but
+the index grows as required.</p>
+<blockquote>
+<p><strong>Fixed at store creation.</strong> The value is recorded in the store when
+the store is created. Each time the store is opened, the recorded
+value is used in place of the configured value, and a configured
+value that differs from it is logged. Changing it requires a new
+store (<a href="#10-settings-fixed-at-store-creation">§10</a>).</p>
+</blockquote>
 <h3 id="513-disable-the-address-index">5.13 Disable the address index<a class="anchor" href="#513-disable-the-address-index" aria-label="Link to this section">#</a></h3>
-<p>The address index is disabled when the store is created (§10):</p>
+<p>The address index is enabled by default. Setting the <code>outs</code> table's
+buckets to 0 disables it:</p>
 <pre><code class="language-ini"><span class="section">[table.outs]</span>
 buckets = 0
 </code></pre>
+<blockquote>
+<p><strong>Fixed at store creation.</strong> The value is recorded in the store when
+the store is created. Each time the store is opened, the recorded
+value is used in place of the configured value, and a configured
+value that differs from it is logged. Changing it requires a new
+store (<a href="#10-settings-fixed-at-store-creation">§10</a>).</p>
+</blockquote>
 <h3 id="514-silent-payments">5.14 Silent payments<a class="anchor" href="#514-silent-payments" aria-label="Link to this section">#</a></h3>
 <p>Silent payments are indexed from <code>node.silent_start_height</code>, and never below
-taproot activation, so 0 indexes from there. The start height is fixed when
-the store is created (§10). The index is served to Sparrow
+taproot activation, so 0 indexes from there. The index is served to Sparrow
 by the <code>[sparrow]</code> service, the Electrum protocol with silent payment
 extensions:</p>
 <pre><code class="language-ini"><span class="section">[node]</span>
@@ -946,6 +971,13 @@ key_path = server.key
 <p>The Sparrow interface is the Electrum interface with silent payment and
 block statistics methods added, and provides the same transports and
 security as <code>[electrum]</code> (§5.7).</p>
+<blockquote>
+<p><strong>Fixed at store creation.</strong> The value is recorded in the store when
+the store is created. Each time the store is opened, the recorded
+value is used in place of the configured value, and a configured
+value that differs from it is logged. Changing it requires a new
+store (<a href="#10-settings-fixed-at-store-creation">§10</a>).</p>
+</blockquote>
 <h3 id="515-tor">5.15 Tor<a class="anchor" href="#515-tor" aria-label="Link to this section">#</a></h3>
 <p>Outbound through Tor's SOCKS5 proxy, inbound through a Tor hidden service
 (<code>HiddenServiceDir</code> and <code>HiddenServicePort</code> in <code>torrc</code>) pointing at the node's

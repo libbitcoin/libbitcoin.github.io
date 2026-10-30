@@ -21,7 +21,7 @@ name.
 
 - A C++20 compiler. The versions tested in CI are listed in
   [Build systems and toolchains](toolchains).
-- Boost 1.86.0 or later. The Linux and macOS scripts download and build
+- Boost 1.86.0 or later. The Linux and macOS scripts download and install
   it with `--build-boost`. Visual Studio restores it as a NuGet package.
 - Git, to fetch the libbitcoin sources.
 
