@@ -36,7 +36,21 @@
     '.menu .skin option { background: var(--surface); color: var(--ink); }' +
     '.doc p, .lede { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }' +
     '@media (max-width: 760px) { .doc p, .lede { text-align: left; } }' +
+    'a { -webkit-user-drag: none; }' +
     '</style>');
+
+  // A mouse drag selects text; the click that ends it does not follow a link
+  // or open an image.
+  var down = null;
+  document.addEventListener('mousedown', function (e) { down = { x: e.clientX, y: e.clientY }; }, true);
+  document.addEventListener('click', function (e) {
+    var moved = down && Math.abs(e.clientX - down.x) + Math.abs(e.clientY - down.y) > 4;
+    down = null;
+    if (moved && !e.target.closest('.lightbox')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
 
   // Classic is the page's own style; each other skin is a stylesheet over it.
   SKINS.forEach(function (s) {

@@ -8,15 +8,19 @@
 ## 1. Layers
 
 ```mermaid
+%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 6, "bottom": 18}}}}%%
 flowchart TB
+    server["libbitcoin-server\nclient interfaces"]
     node["libbitcoin-node\nchasers, protocols"]
-    query["query\nnavigate, archive, consensus,\nheight, pool, batch, address, filters"]
-    store["store\ntables, envelope, transactor,\ncreate, open, snapshot, restore, prune, close"]
-    tables["tables\nheader, tx, ins, outs, txs, strong, ..."]
-    prims["primitives\nhashmap, arraymap, nomap, headmap\nhashhead, arrayhead, nohead, body"]
-    memory["memory\nmmap, accessor, remap lock"]
-    files["files\nheads/*.head, *.data"]
-    node --> query --> store --> tables --> prims --> memory --> files
+    subgraph database["libbitcoin-database"]
+        query["query\nnavigate, archive, consensus,\nheight, pool, batch, address, filters"]
+        store["store\ntables, envelope, transactor,\ncreate, open, snapshot, restore, prune, close"]
+        tables["tables\nheader, tx, ins, outs, txs, strong, ..."]
+        prims["primitives\nhashmap, arraymap, nomap, headmap\nhashhead, arrayhead, nohead, body"]
+        memory["memory\nmap, allocator, accessor"]
+        files["files\nheads/*.head, *.data"]
+    end
+    server --> node --> query --> store --> tables --> prims --> memory --> files
 ```
 
 | Layer      | Location                                   | Role |

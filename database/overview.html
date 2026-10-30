@@ -331,15 +331,19 @@
 <hr />
 <h2 id="1-layers">1. Layers<a class="anchor" href="#1-layers" aria-label="Link to this section">#</a></h2>
 <div class="mermaid">
+%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 6, "bottom": 18}}}}%%
 flowchart TB
+    server["libbitcoin-server&lt;br/&gt;client interfaces"]
     node["libbitcoin-node&lt;br/&gt;chasers, protocols"]
-    query["query&lt;br/&gt;navigate, archive, consensus,&lt;br/&gt;height, pool, batch, address, filters"]
-    store["store&lt;br/&gt;tables, envelope, transactor,&lt;br/&gt;create, open, snapshot, restore, prune, close"]
-    tables["tables&lt;br/&gt;header, tx, ins, outs, txs, strong, ..."]
-    prims["primitives&lt;br/&gt;hashmap, arraymap, nomap, headmap&lt;br/&gt;hashhead, arrayhead, nohead, body"]
-    memory["memory&lt;br/&gt;mmap, accessor, remap lock"]
-    files["files&lt;br/&gt;heads/*.head, *.data"]
-    node --&gt; query --&gt; store --&gt; tables --&gt; prims --&gt; memory --&gt; files
+    subgraph database["libbitcoin-database"]
+        query["query&lt;br/&gt;navigate, archive, consensus,&lt;br/&gt;height, pool, batch, address, filters"]
+        store["store&lt;br/&gt;tables, envelope, transactor,&lt;br/&gt;create, open, snapshot, restore, prune, close"]
+        tables["tables&lt;br/&gt;header, tx, ins, outs, txs, strong, ..."]
+        prims["primitives&lt;br/&gt;hashmap, arraymap, nomap, headmap&lt;br/&gt;hashhead, arrayhead, nohead, body"]
+        memory["memory&lt;br/&gt;map, allocator, accessor"]
+        files["files&lt;br/&gt;heads/*.head, *.data"]
+    end
+    server --&gt; node --&gt; query --&gt; store --&gt; tables --&gt; prims --&gt; memory --&gt; files
 </div>
 <div class="scroller"><table>
 <thead>
