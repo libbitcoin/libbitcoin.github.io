@@ -21,9 +21,9 @@ name.
 
 | | x64 | x86 (32-bit) | arm64 | arm32 | s390x (big-endian) |
 | --- | --- | --- | --- | --- | --- |
-| **Linux** | ✔ CI | ✔ | ● | ✔ | ✔ CI |
-| **macOS** | ● | Obsolete | ✔ CI | N/A | N/A |
-| **Windows** | ✔ CI | ✔ CI | ● | Obsolete | N/A |
+| **Linux** | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI |
+| **macOS** | ✔ CI | Obsolete | ✔ CI | N/A | N/A |
+| **Windows** | ✔ CI | ✔ CI | ✔ CI | Obsolete | N/A |
 
 - ✔ CI: built and tested on every change.
 - ● Built and tested outside of CI.

@@ -5,15 +5,15 @@
 | Platform | Architecture | Libbitcoin | Bitcoin Core |
 | -------- | ------------ | ---------- | ------------ |
 | Linux | x64 | ✔ CI | ✔ CI |
-| Linux | x86 (32-bit) | ● | ✔ CI |
-| Linux | arm64 | ✔ | ✔ |
-| Linux | arm32 | ● | ✔ CI |
+| Linux | x86 (32-bit) | ✔ CI | ✔ CI |
+| Linux | arm64 | ✔ CI | ✔ |
+| Linux | arm32 | ✔ CI | ✔ CI |
 | Linux | s390x (big-endian) | ✔ CI | ● |
-| macOS | x64 | ✔ | ✔ |
+| macOS | x64 | ✔ CI | ✔ |
 | macOS | arm64 | ✔ CI | ✔ CI |
 | Windows | x64 | ✔ CI | ✔ CI |
 | Windows | x86 (32-bit) | ✔ CI | No target |
-| Windows | arm64 | ✔ | No target |
+| Windows | arm64 | ✔ CI | No target |
 
 ## 2. Compilers
 
