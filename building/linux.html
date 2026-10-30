@@ -345,8 +345,9 @@ libbitcoin-database, libbitcoin-network and libbitcoin-node. It then
 builds, tests and installs each in order, ending with libbitcoin-server.
 The result is <code>$HOME/libbitcoin/bin/bs</code>.</p>
 <p>The dependencies are cloned into the current directory. Add
-<code>--build-src-dir=&lt;path&gt;</code> to put them elsewhere, and <code>--build-skip-tests</code>
-to skip the test suites.</p>
+<code>--build-src-dir=&lt;path&gt;</code> to put them elsewhere, <code>--build-skip-tests</code>
+to skip the test suites, and <code>--build-skip-test-run</code> to build the test
+suites without running them.</p>
 <p>The default prefix, <code>/usr/local</code>, requires <code>sudo</code> for the install step.
 A prefix in the home directory does not.</p>
 <h2 id="3-cmake">3. CMake<a class="anchor" href="#3-cmake" aria-label="Link to this section">#</a></h2>

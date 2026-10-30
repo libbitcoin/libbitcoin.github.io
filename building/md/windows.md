@@ -45,6 +45,7 @@ result is `bin\x64\Release\v145\static\bs.exe`.
 | `--build-config` | `StaticRelease` or `StaticDebug` (required) |
 | `--build-platform` | `x64` (default), `ARM64` or `Win32` |
 | `--build-skip-tests` | Do not build or run the tests |
+| `--disable-cuda` | Build without GPU support (`/p:Option-cuda=false`) |
 | `--build-symbols` | `default`, `disabled` or `public-only` |
 
 Other arguments are passed to `msbuild`. Build options are set as

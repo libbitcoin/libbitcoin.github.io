@@ -380,6 +380,10 @@ the <code>Option-&lt;name&gt;</code> property.</p>
 <td>Do not build or run the tests.</td>
 </tr>
 <tr>
+<td><code>--build-skip-test-run</code></td>
+<td>Build the tests without running them.</td>
+</tr>
+<tr>
 <td><code>--build-parallel=&lt;n&gt;</code></td>
 <td>Number of parallel jobs (default the number of CPUs).</td>
 </tr>
@@ -508,7 +512,8 @@ extensions they all have.</p>
 </table></div>
 <p>GPU support needs no CUDA toolkit to build. <code>bs</code> loads the NVIDIA driver
 when it starts, and uses the CPU when there is no driver or GPU. Disable
-it with <code>--disable-cuda</code> (<code>-Denable-cuda=OFF</code>, <code>/p:Option-cuda=false</code>).</p>
+it with <code>--disable-cuda</code> in any build script, including <code>build-msvc.cmd</code>
+(<code>-Denable-cuda=OFF</code>, <code>/p:Option-cuda=false</code>).</p>
 <h2 id="3-feature-options">3. Feature options<a class="anchor" href="#3-feature-options" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>

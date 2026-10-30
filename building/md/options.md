@@ -21,6 +21,7 @@ the `Option-<name>` property.
 | `--build-use-local-src` | Use existing source directories instead of cloning. |
 | `--build-full-repositories` | Clone full history (default is a shallow clone). |
 | `--build-skip-tests` | Do not build or run the tests. |
+| `--build-skip-test-run` | Build the tests without running them. |
 | `--build-parallel=<n>` | Number of parallel jobs (default the number of CPUs). |
 | `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). |
 | `--build-post-install-clean` | Remove dependency build files after installing. |
@@ -79,7 +80,8 @@ On ARM, a CPU flag in `CFLAGS` and `CXXFLAGS`, such as
 
 GPU support needs no CUDA toolkit to build. `bs` loads the NVIDIA driver
 when it starts, and uses the CPU when there is no driver or GPU. Disable
-it with `--disable-cuda` (`-Denable-cuda=OFF`, `/p:Option-cuda=false`).
+it with `--disable-cuda` in any build script, including `build-msvc.cmd`
+(`-Denable-cuda=OFF`, `/p:Option-cuda=false`).
 
 ## 3. Feature options
 

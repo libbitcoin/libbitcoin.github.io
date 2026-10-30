@@ -29,8 +29,9 @@ builds, tests and installs each in order, ending with libbitcoin-server.
 The result is `$HOME/libbitcoin/bin/bs`.
 
 The dependencies are cloned into the current directory. Add
-`--build-src-dir=<path>` to put them elsewhere, and `--build-skip-tests`
-to skip the test suites.
+`--build-src-dir=<path>` to put them elsewhere, `--build-skip-tests`
+to skip the test suites, and `--build-skip-test-run` to build the test
+suites without running them.
 
 The default prefix, `/usr/local`, requires `sudo` for the install step.
 A prefix in the home directory does not.

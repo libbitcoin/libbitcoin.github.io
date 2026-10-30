@@ -204,7 +204,7 @@ they are not available.
 | Option | Scope | Effect |
 | ------ | ----- | ------ |
 | `--with-valgrind` | libbitcoin-system | defines `WITH_VALGRIND` (valgrind memcheck client requests) |
-| `--enable-cuda` | libbitcoin-system | defines `ENABLE_CUDA` (default on) |
+| `--enable-cuda` | libbitcoin-system | defines `WITH_CUDA` (default on) |
 | `--with-ssl` | libbitcoin-network | defines `WITH_SSL` and adds the `src/ssl` sources (default on) |
 | `--with-embedded` | `bs` | defines `WITH_EMBEDDED`, compiling web pages into the console application |
 | `--enable-ndebug`, `--enable-isystem` | autotools | define `NDEBUG` (default on); use `-isystem` for dependency includes |
