@@ -330,6 +330,9 @@ blocks.</p>
 </code></pre>
 <p>The store is created in a <code>testnet3</code> directory under the working
 directory, apart from any mainnet store.</p>
+<p>Without a configuration file, <code>bs -n testnet3</code> creates a store with the same
+testnet3 settings in the <code>bitcoin</code> directory. Later runs read the network
+from that store, so they need neither <code>-n</code> nor a configuration file.</p>
 <pre><code class="language-ini"><span class="section">[database]</span>
 path = testnet3
 
@@ -404,10 +407,6 @@ size = 981182034
 
 <span class="section">[table.output]</span>
 size = 600719803
-
-<span class="section">[table.strong]</span>
-expected = 536643888
-size = 59030828
 
 <span class="section">[table.candidate]</span>
 buckets = 5100001

@@ -14,6 +14,10 @@ $ bs -c regtest.cfg
 The store is created in a `regtest` directory under the working
 directory, apart from any mainnet store.
 
+Without a configuration file, `bs -n regtest` creates a store with the same
+regtest settings in the `bitcoin` directory. Later runs read the network
+from that store, so they need neither `-n` nor a configuration file.
+
 ```ini
 [database]
 path = regtest
@@ -87,10 +91,6 @@ size = 0
 size = 0
 
 [table.output]
-size = 0
-
-[table.strong]
-expected = 100000
 size = 0
 
 [table.candidate]

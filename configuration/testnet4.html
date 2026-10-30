@@ -329,6 +329,9 @@
 </code></pre>
 <p>The store is created in a <code>testnet4</code> directory under the working
 directory, apart from any mainnet store.</p>
+<p>Without a configuration file, <code>bs -n testnet4</code> creates a store with the same
+testnet4 settings in the <code>bitcoin</code> directory. Later runs read the network
+from that store, so they need neither <code>-n</code> nor a configuration file.</p>
 <pre><code class="language-ini"><span class="section">[database]</span>
 path = testnet4
 
@@ -400,14 +403,10 @@ expected = 57089349
 size = 5138041
 
 <span class="section">[table.input]</span>
-size = 9000000000
+size = 87852864
 
 <span class="section">[table.output]</span>
 size = 20343818
-
-<span class="section">[table.strong]</span>
-expected = 14810011
-size = 1629101
 
 <span class="section">[table.candidate]</span>
 buckets = 150001

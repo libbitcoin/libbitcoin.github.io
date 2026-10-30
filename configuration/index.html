@@ -334,6 +334,9 @@ the current directory if it does not exist.</p>
 <p>With a configuration file:</p>
 <pre class="console"><code>$ bs --config bs.cfg
 </code></pre>
+<p>To create the store for testnet3, testnet4, regtest or signet:</p>
+<pre class="console"><code>$ bs -n testnet4
+</code></pre>
 <hr />
 <h2 id="2-command-line">2. Command line<a class="anchor" href="#2-command-line" aria-label="Link to this section">#</a></h2>
 <p>All options, grouped by purpose:</p>
@@ -378,8 +381,8 @@ the current directory if it does not exist.</p>
 </tr>
 <tr>
 <td>Store</td>
-<td><code>-n</code>, <code>--newstore</code></td>
-<td>Create a new store in the configured directory</td>
+<td><code>-n</code>, <code>--newstore [&lt;network&gt;]</code></td>
+<td>Create a new store in the configured directory for the network (<code>mainnet</code>, <code>testnet3</code>, <code>testnet4</code>, <code>regtest</code> or <code>signet</code>), by default <code>mainnet</code> unless overridden by <code>bitcoin.network</code> in the configuration file</td>
 </tr>
 <tr>
 <td></td>
@@ -423,6 +426,14 @@ the current directory if it does not exist.</p>
 </tr>
 </tbody>
 </table></div>
+<p><code>-n</code> only creates the store. To create the store and run on a test
+network in one command, set the network in the configuration file
+instead, and start <code>bs</code> with it:</p>
+<pre><code class="language-ini"><span class="section">[bitcoin]</span>
+network = testnet4
+</code></pre>
+<pre class="console"><code>$ bs --config bs.cfg
+</code></pre>
 <p>Display command line help:</p>
 <pre class="console"><code>$ bs -h
 
@@ -442,7 +453,7 @@ Options (named):
 -i [--information]   Scan and display store information.
 -k [--buckets]       Scan and display hashmap bucket fill.
 -l [--collisions]    Scan and show hashmap collision stats (may SIGKILL).
--n [--newstore]      Create new store in configured directory.
+-n [--newstore]      Create new store for the network (mainnet|testnet3|testnet4|regtest|signet), defaults to the configured network.
 -r [--restore]       Restore from most recent snapshot.
 -s [--settings]      Display all configuration settings.
 -u [--user]          Daemon logon credential, defaults to system account.
@@ -1713,7 +1724,7 @@ by name:</p>
 <tbody>
 <tr>
 <td><code>[bitcoin]</code></td>
-<td>the chain parameters, soft fork activations and the milestone</td>
+<td><code>network</code>, the chain parameters, soft fork activations and the milestone</td>
 </tr>
 <tr>
 <td><code>[forks]</code></td>

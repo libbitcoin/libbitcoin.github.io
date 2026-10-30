@@ -331,6 +331,9 @@ instead of being mined competitively, so it produces blocks steadily, about
 </code></pre>
 <p>The store is created in a <code>signet</code> directory under the working directory,
 apart from any mainnet store.</p>
+<p>Without a configuration file, <code>bs -n signet</code> creates a store with the same
+signet settings in the <code>bitcoin</code> directory. Later runs read the network
+from that store, so they need neither <code>-n</code> nor a configuration file.</p>
 <pre><code class="language-ini"><span class="section">[database]</span>
 path = signet
 
@@ -378,9 +381,29 @@ seed = seed.signet.achownodes.xyz:38333
 
 <span class="section">[table.header]</span>
 expected = 330000
+size = 0
 
 <span class="section">[table.txs]</span>
 buckets = 330001
+size = 0
+
+<span class="section">[table.tx]</span>
+expected = 100000
+size = 0
+
+<span class="section">[table.ins]</span>
+expected = 200000
+size = 0
+
+<span class="section">[table.outs]</span>
+expected = 300000
+size = 0
+
+<span class="section">[table.input]</span>
+size = 0
+
+<span class="section">[table.output]</span>
+size = 0
 
 <span class="section">[table.candidate]</span>
 buckets = 330001
@@ -404,7 +427,8 @@ buckets = 330001
 <li><code>[outbound]</code> replaces the mainnet seeds.</li>
 <li><code>[wallet]</code> sets the testnet address and key prefixes used by the server
   (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
-<li><code>[table.*]</code> sizes the chain-height tables for about 330,000 blocks.</li>
+<li><code>[table.*]</code> sizes the chain-height tables for about 330,000 blocks and
+  starts every table body empty.</li>
 <li><code>[table.scan]</code> is commented out because it enables silent payments
   (<a href="index.html#514-silent-payments">§5.14</a>). Uncomment it to index them.</li>
 </ul>

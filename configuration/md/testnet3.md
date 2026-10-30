@@ -12,6 +12,10 @@ $ bs -c testnet3.cfg
 The store is created in a `testnet3` directory under the working
 directory, apart from any mainnet store.
 
+Without a configuration file, `bs -n testnet3` creates a store with the same
+testnet3 settings in the `bitcoin` directory. Later runs read the network
+from that store, so they need neither `-n` nor a configuration file.
+
 ```ini
 [database]
 path = testnet3
@@ -87,10 +91,6 @@ size = 981182034
 
 [table.output]
 size = 600719803
-
-[table.strong]
-expected = 536643888
-size = 59030828
 
 [table.candidate]
 buckets = 5100001

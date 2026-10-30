@@ -331,6 +331,9 @@ testing.</p>
 </code></pre>
 <p>The store is created in a <code>regtest</code> directory under the working
 directory, apart from any mainnet store.</p>
+<p>Without a configuration file, <code>bs -n regtest</code> creates a store with the same
+regtest settings in the <code>bitcoin</code> directory. Later runs read the network
+from that store, so they need neither <code>-n</code> nor a configuration file.</p>
 <pre><code class="language-ini"><span class="section">[database]</span>
 path = regtest
 
@@ -403,10 +406,6 @@ size = 0
 size = 0
 
 <span class="section">[table.output]</span>
-size = 0
-
-<span class="section">[table.strong]</span>
-expected = 100000
 size = 0
 
 <span class="section">[table.candidate]</span>

@@ -11,6 +11,10 @@ $ bs -c testnet4.cfg
 The store is created in a `testnet4` directory under the working
 directory, apart from any mainnet store.
 
+Without a configuration file, `bs -n testnet4` creates a store with the same
+testnet4 settings in the `bitcoin` directory. Later runs read the network
+from that store, so they need neither `-n` nor a configuration file.
+
 ```ini
 [database]
 path = testnet4
@@ -83,14 +87,10 @@ expected = 57089349
 size = 5138041
 
 [table.input]
-size = 9000000000
+size = 87852864
 
 [table.output]
 size = 20343818
-
-[table.strong]
-expected = 14810011
-size = 1629101
 
 [table.candidate]
 buckets = 150001

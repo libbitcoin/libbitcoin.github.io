@@ -13,6 +13,10 @@ $ bs -c signet.cfg
 The store is created in a `signet` directory under the working directory,
 apart from any mainnet store.
 
+Without a configuration file, `bs -n signet` creates a store with the same
+signet settings in the `bitcoin` directory. Later runs read the network
+from that store, so they need neither `-n` nor a configuration file.
+
 ```ini
 [database]
 path = signet
@@ -61,9 +65,29 @@ seed = seed.signet.achownodes.xyz:38333
 
 [table.header]
 expected = 330000
+size = 0
 
 [table.txs]
 buckets = 330001
+size = 0
+
+[table.tx]
+expected = 100000
+size = 0
+
+[table.ins]
+expected = 200000
+size = 0
+
+[table.outs]
+expected = 300000
+size = 0
+
+[table.input]
+size = 0
+
+[table.output]
+size = 0
 
 [table.candidate]
 buckets = 330001
@@ -87,6 +111,7 @@ buckets = 330001
 - `[outbound]` replaces the mainnet seeds.
 - `[wallet]` sets the testnet address and key prefixes used by the server
   ([Settings Reference](reference#6-wallet)).
-- `[table.*]` sizes the chain-height tables for about 330,000 blocks.
+- `[table.*]` sizes the chain-height tables for about 330,000 blocks and
+  starts every table body empty.
 - `[table.scan]` is commented out because it enables silent payments
   ([§5.14](index#514-silent-payments)). Uncomment it to index them.

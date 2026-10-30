@@ -19,6 +19,12 @@ With a configuration file:
 $ bs --config bs.cfg
 ```
 
+To create the store for testnet3, testnet4, regtest or signet:
+
+```
+$ bs -n testnet4
+```
+
 ---
 
 ## 2. Command line
@@ -33,7 +39,7 @@ All options, grouped by purpose:
 | | `-s`, `--settings` | Display all configuration settings (with any `--config` applied) |
 | | `-v`, `--version` | Display version information |
 | | `-w`, `--hardware` | Display hardware compatibility (CPU features, GPU) |
-| Store | `-n`, `--newstore` | Create a new store in the configured directory |
+| Store | `-n`, `--newstore [<network>]` | Create a new store in the configured directory for the network (`mainnet`, `testnet3`, `testnet4`, `regtest` or `signet`), by default `mainnet` unless overridden by `bitcoin.network` in the configuration file |
 | | `-b`, `--backup` | Snapshot the store (also available live from the console) |
 | | `-r`, `--restore` | Restore from the most recent snapshot |
 | Service | `-d`, `--daemon <value>` | Install (`true`) or uninstall (`false`) as a daemon/service |
@@ -42,6 +48,19 @@ All options, grouped by purpose:
 | | `-f`, `--flags` | Display all fork flag transitions |
 | | `-k`, `--buckets` | Display hashmap bucket fill |
 | | `-l`, `--collisions` | Display hashmap collision statistics (time consuming) |
+
+`-n` only creates the store. To create the store and run on a test
+network in one command, set the network in the configuration file
+instead, and start `bs` with it:
+
+```ini
+[bitcoin]
+network = testnet4
+```
+
+```
+$ bs --config bs.cfg
+```
 
 Display command line help:
 
@@ -64,7 +83,7 @@ Options (named):
 -i [--information]   Scan and display store information.
 -k [--buckets]       Scan and display hashmap bucket fill.
 -l [--collisions]    Scan and show hashmap collision stats (may SIGKILL).
--n [--newstore]      Create new store in configured directory.
+-n [--newstore]      Create new store for the network (mainnet|testnet3|testnet4|regtest|signet), defaults to the configured network.
 -r [--restore]       Restore from most recent snapshot.
 -s [--settings]      Display all configuration settings.
 -u [--user]          Daemon logon credential, defaults to system account.
@@ -1072,7 +1091,7 @@ The captured settings are:
 
 | Section | Settings |
 | ------- | -------- |
-| `[bitcoin]` | the chain parameters, soft fork activations and the milestone |
+| `[bitcoin]` | `network`, the chain parameters, soft fork activations and the milestone |
 | `[forks]` | all |
 | `[database]` | `interval_depth` |
 | `[table.*]` | `buckets` of `header`, `tx`, `ins`, `outs`, `duplicate`, `pool` and `wtxid`, and whether client filters are enabled |

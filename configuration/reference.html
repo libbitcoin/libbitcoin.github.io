@@ -555,7 +555,7 @@ rate = 1
 size = 0
 </code></pre>
 <h2 id="4-bitcoin">4. <code>[bitcoin]</code><a class="anchor" href="#4-bitcoin" aria-label="Link to this section">#</a></h2>
-<p>Chain parameters: genesis block, soft fork activation, checkpoints, milestone and minimum work. The defaults are mainnet, and change only for another chain.</p>
+<p>Chain parameters: genesis block, soft fork activation, checkpoints, milestone and minimum work. <code>network</code> selects the defaults of every network-dependent setting, including those in other sections (ports, seeds, wallet prefixes and table sizing). The defaults are mainnet.</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 <span class="comment"># The activation time for bip16 in unix time, defaults to '1333238400'.</span>
 bip16_activation_time = 1333238400
@@ -605,6 +605,8 @@ initial_block_subsidy_bitcoin = 50
 milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
 <span class="comment"># The minimum work for any branch to be considered valid, defaults to '000000000000000000000000000000000000000052b2559353df4117b7348b64'.</span>
 minimum_work = 000000000000000000000000000000000000000052b2559353df4117b7348b64
+<span class="comment"># The network of the chain defaults, defaults to 'mainnet'.</span>
+network = mainnet
 <span class="comment"># The proof of work limit, defaults to '486604799'.</span>
 proof_of_work_limit = 486604799
 <span class="comment"># The difficulty retargeting factor, defaults to '4'.</span>

@@ -246,7 +246,7 @@ size = 0
 
 ## 4. `[bitcoin]`
 
-Chain parameters: genesis block, soft fork activation, checkpoints, milestone and minimum work. The defaults are mainnet, and change only for another chain.
+Chain parameters: genesis block, soft fork activation, checkpoints, milestone and minimum work. `network` selects the defaults of every network-dependent setting, including those in other sections (ports, seeds, wallet prefixes and table sizing). The defaults are mainnet.
 
 ```ini
 [bitcoin]
@@ -298,6 +298,8 @@ initial_block_subsidy_bitcoin = 50
 milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
 # The minimum work for any branch to be considered valid, defaults to '000000000000000000000000000000000000000052b2559353df4117b7348b64'.
 minimum_work = 000000000000000000000000000000000000000052b2559353df4117b7348b64
+# The network of the chain defaults, defaults to 'mainnet'.
+network = mainnet
 # The proof of work limit, defaults to '486604799'.
 proof_of_work_limit = 486604799
 # The difficulty retargeting factor, defaults to '4'.
