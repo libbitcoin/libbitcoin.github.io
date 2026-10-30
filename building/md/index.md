@@ -26,12 +26,10 @@ name.
 | **Windows** | ✔ CI | ✔ CI | ✔ CI | Obsolete | N/A |
 
 - ✔ CI: built and tested on every change.
-- ● Built and tested outside of CI.
-- ✔ Expected to build: the toolchain supports it.
 - Obsolete: no current toolchain targets it.
 - N/A: the platform does not exist on that architecture.
 
-BSD, Cygwin, and MinGW are not supported.
+BSD, Cygwin, and MinGW are not tested.
 
 [Platform support](platforms) compares platforms, compilers and build
 systems with Bitcoin Core.
