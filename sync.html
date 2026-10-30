@@ -167,9 +167,10 @@
   .shot h3 { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 0; }
   .shot img { display: block; width: 100%; height: auto; border-radius: 2px; }
   .shot figcaption { color: var(--ink-2); font-size: 13px; line-height: 1.45; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.88); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.88); overflow: auto; padding: 24px; cursor: grab; }
+  .lightbox.panning { cursor: grabbing; user-select: none; }
   .lightbox[hidden] { display: none; }
-  .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
   @media (max-width: 560px) { .gallery { grid-template-columns: 1fr; } }
 </style>
 <script src="skins/skins.js"></script>
@@ -443,7 +444,26 @@
     el.addEventListener('click', function () { open(el); });
     el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(el); } });
   });
-  box.addEventListener('click', close);
+  var drag = null, dragged = false;
+  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  box.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    e.preventDefault();
+    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
+    dragged = false;
+  });
+  box.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
+    box.scrollLeft = drag.left - dx;
+    box.scrollTop = drag.top - dy;
+  });
+  function release() { drag = null; box.classList.remove('panning'); }
+  box.addEventListener('pointerup', release);
+  box.addEventListener('pointercancel', release);
+  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
 </script>

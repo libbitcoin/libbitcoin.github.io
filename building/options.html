@@ -152,7 +152,7 @@
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
   .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
-  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
+  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
   .lightbox.panning { cursor: grabbing; user-select: none; }
   .lightbox[hidden] { display: none; }
@@ -657,6 +657,7 @@ maintained or tested with libbitcoin. Alternatively add the paths in a
     }
   });
   var drag = null, dragged = false;
+  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
   box.addEventListener('pointerdown', function (e) {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
     drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };

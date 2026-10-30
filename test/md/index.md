@@ -102,7 +102,7 @@ configurable metadata (see [Build architecture](../build/index)).
 | Linux (Ubuntu 24.04) | x64 | 64 | little | GCC 13 to 16, Clang 18 and 19 | Autotools, CMake, presets |
 | Linux (Ubuntu 24.04) | s390x | 64 | big | GCC, cross compiled, tested in QEMU | Autotools |
 | macOS | arm64 (Apple silicon) | 64 | little | Apple clang (current Xcode) | Autotools, CMake |
-| Windows | x64 | 64 | little | MSVC v145 | Visual Studio |
+| Windows | x64 | 64 | little | MSVC v145, Clang (clang-cl) | Visual Studio |
 | Windows | x86 (Win32) | 32 | little | MSVC v145 | Visual Studio |
 
 ## 6. Build status

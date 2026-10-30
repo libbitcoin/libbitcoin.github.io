@@ -152,7 +152,7 @@
   .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
   .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
-  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; }
+  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
   .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
   .lightbox.panning { cursor: grabbing; user-select: none; }
   .lightbox[hidden] { display: none; }
@@ -345,32 +345,32 @@
 <tr>
 <td>Linux</td>
 <td>x86 (32-bit)</td>
-<td>✔</td>
+<td>●</td>
 <td>✔ CI</td>
 </tr>
 <tr>
 <td>Linux</td>
 <td>arm64</td>
-<td>●</td>
-<td>●</td>
+<td>✔</td>
+<td>✔</td>
 </tr>
 <tr>
 <td>Linux</td>
 <td>arm32</td>
-<td>✔</td>
+<td>●</td>
 <td>✔ CI</td>
 </tr>
 <tr>
 <td>Linux</td>
 <td>s390x (big-endian)</td>
 <td>✔ CI</td>
-<td>✔</td>
+<td>●</td>
 </tr>
 <tr>
 <td>macOS</td>
 <td>x64</td>
-<td>●</td>
-<td>●</td>
+<td>✔</td>
+<td>✔</td>
 </tr>
 <tr>
 <td>macOS</td>
@@ -393,7 +393,7 @@
 <tr>
 <td>Windows</td>
 <td>arm64</td>
-<td>●</td>
+<td>✔</td>
 <td>No target</td>
 </tr>
 </tbody>
@@ -424,26 +424,26 @@
 <tr>
 <td>macOS</td>
 <td>Apple Clang (Xcode)</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
+<td>✔ CI (Xcode 26.6)</td>
+<td>✔ CI (Xcode 26.3)</td>
 </tr>
 <tr>
 <td>Windows</td>
 <td>MSVC (Visual Studio 2026)</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
+<td>✔ CI (v145)</td>
+<td>✔ CI (v145)</td>
 </tr>
 <tr>
 <td>Windows</td>
 <td>Clang (clang-cl, with Visual Studio)</td>
-<td>●</td>
+<td>✔ CI (18.11)</td>
 <td>No target</td>
 </tr>
 <tr>
 <td>Windows</td>
 <td>MinGW-w64 GCC</td>
 <td>No target</td>
-<td>✔ CI (cross compiled from Linux)</td>
+<td>✔ CI (14)</td>
 </tr>
 </tbody>
 </table></div>
@@ -473,7 +473,7 @@
 <td>No target</td>
 </tr>
 <tr>
-<td>Install scripts</td>
+<td>Install script</td>
 <td>✔ CI (Linux, macOS, Windows)</td>
 <td>No target</td>
 </tr>
@@ -489,8 +489,8 @@
 <h2 id="5-notes">5. Notes<a class="anchor" href="#5-notes" aria-label="Link to this section">#</a></h2>
 <ul>
 <li>✔ CI: built and tested on every change.</li>
-<li>● Built and tested outside of CI.</li>
-<li>✔ Expected to build: the toolchain supports it.</li>
+<li>✔ Built and tested outside of CI.</li>
+<li>● Expected to build: the toolchain supports it.</li>
 <li>No target: no documented build or CI for the platform.</li>
 </ul>
 <p>POWER, RISC-V and BSD are not shown. Compiler versions are those built in CI.
@@ -529,6 +529,7 @@ Bitcoin Core is shown from its build files and CI configuration at master
     }
   });
   var drag = null, dragged = false;
+  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
   box.addEventListener('pointerdown', function (e) {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
     drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };

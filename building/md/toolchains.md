@@ -58,6 +58,7 @@ build systems.
 | Clang | 19 | Ubuntu 24.04 x64 | Autotools, CMake, presets |
 | Apple clang | current Xcode | macOS, Apple silicon | Autotools, CMake |
 | MSVC | v145 (Visual Studio 2026) | Windows x64 | Visual Studio |
+| Clang (clang-cl) | Included with Visual Studio 2026 | Windows x64 | Visual Studio |
 
 GCC 15 and 16 come from the Ubuntu toolchain PPA. The macOS and Windows
 runners use the current GitHub images, so their exact compiler versions
