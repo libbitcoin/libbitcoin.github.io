@@ -1,0 +1,90 @@
+:root {
+  --paper: #05080f; --surface: #0a1220;
+  --ink: #e4f3ff; --ink-2: #9fb4cf; --ink-3: #5a6d8a;
+  --rule: #1b2c47; --rule-soft: #111c30;
+  --accent: #2fd8ff; --heading: #7df9ff; --hot: #ff4fd8;
+  --edge: rgba(47, 216, 255, .28);
+  --glow: 0 0 6px rgba(47, 216, 255, .55), 0 0 18px rgba(47, 216, 255, .22);
+  --yes: #3dffa8; --partial: #ffd23f; --pending: #4f8dff;
+  --rejected: #ff3d6e; --wip: #b77bff;
+  --shadow: 0 0 0 1px rgba(47, 216, 255, .15), 0 12px 32px -12px rgba(0, 0, 0, .9), 0 0 24px -8px rgba(47, 216, 255, .3);
+  --chamfer: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+html { background: var(--paper); scrollbar-color: #1f4a66 var(--paper); }
+body {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(47, 216, 255, .10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(255, 79, 216, .07), transparent 60%),
+    linear-gradient(rgba(47, 216, 255, .035) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(47, 216, 255, .035) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--paper);
+  background-attachment: fixed;
+}
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .16) 0 1px, transparent 1px 3px);
+}
+::selection { background: rgba(255, 79, 216, .35); color: #fff; }
+
+.logo { filter: hue-rotate(160deg) saturate(1.4) brightness(1.1) drop-shadow(0 0 10px rgba(47, 216, 255, .45)); }
+.mast, .foot { border-color: transparent; border-image: linear-gradient(90deg, var(--accent), var(--hot) 55%, transparent) 1; }
+.eyebrow { color: var(--hot); text-shadow: 0 0 8px rgba(255, 79, 216, .5); }
+.eyebrow::before { content: "// "; opacity: .7; }
+h1 { text-transform: uppercase; letter-spacing: .04em; font-weight: 700; text-shadow: var(--glow); }
+
+a { color: var(--accent); text-decoration-color: rgba(47, 216, 255, .4); text-underline-offset: 3px; }
+a:hover { color: var(--heading); text-shadow: var(--glow); }
+.menu { border-color: var(--edge); }
+.menu a:hover, .menu a:focus, .menu a.here, .drop > summary:hover, .drop[open] > summary, .drop.here > summary { color: var(--heading); text-shadow: var(--glow); }
+.drop > div { background: rgba(10, 18, 32, .94); border-color: var(--edge); border-radius: 0; backdrop-filter: blur(6px); }
+
+.doc h2 { text-transform: uppercase; letter-spacing: .08em; font-size: 17px; text-shadow: var(--glow); padding-bottom: 8px; border-bottom: 1px solid; border-image: linear-gradient(90deg, var(--edge), transparent 70%) 1; }
+.doc h2::before { content: ""; display: inline-block; width: 8px; height: 8px; margin: 0 12px 2px 2px; border: 1px solid var(--accent); transform: rotate(45deg); box-shadow: var(--glow); }
+.doc h3 { color: #a8f4ff; letter-spacing: .04em; }
+.doc h3::before { content: "▸ "; color: var(--hot); }
+.doc li::marker { color: var(--accent); }
+.doc hr { border-top-color: var(--edge); }
+
+.doc code { color: #8affc1; background: rgba(47, 216, 255, .06); border-color: var(--edge); border-radius: 0; }
+.doc pre, .scroller, .mermaid { border-color: var(--edge); border-radius: 0; clip-path: var(--chamfer); background: linear-gradient(180deg, rgba(47, 216, 255, .05), transparent 50%), var(--surface); }
+.doc pre.console { color: #a6ffcb; text-shadow: 0 0 4px rgba(61, 255, 168, .35); }
+.copy { border-radius: 0; border-color: var(--edge); }
+.copy:hover, .copy:focus-visible, .copy.done { color: var(--heading); border-color: var(--accent); box-shadow: var(--glow); }
+
+.hljs-keyword, .hljs-built_in, .hljs-meta, .hljs-type, .hljs-name { color: #ff7ae0; }
+.hljs-literal, .hljs-number { color: #ffd23f; }
+.hljs-string { color: #8affc1; }
+.hljs-title, .hljs-title.function_, .hljs-params, .hljs-tag .hljs-attr { color: var(--heading); }
+
+.doc .download a, .doc .button a { background: linear-gradient(90deg, var(--accent), #b77bff); color: #03060c; border-radius: 0; clip-path: var(--chamfer); box-shadow: none; text-transform: uppercase; }
+.doc .download a:hover, .doc .download a:focus, .doc .button a:hover, .doc .button a:focus { background: linear-gradient(90deg, var(--heading), var(--hot)); }
+.doc .banner { border-color: var(--edge); border-left: 3px solid var(--hot); border-radius: 0; }
+.doc blockquote { border-left: 2px solid var(--accent); background: rgba(47, 216, 255, .05); border-radius: 0; box-shadow: inset 12px 0 24px -20px var(--accent); }
+.doc blockquote strong { color: var(--heading); }
+
+.doc th { color: var(--accent); border-bottom-color: var(--edge); }
+.doc tbody tr:hover td { background: rgba(47, 216, 255, .05); }
+.doc img { border-color: var(--edge); border-radius: 0; }
+
+.mermaid svg .node rect, .mermaid svg .node polygon, .mermaid svg .node circle, .mermaid svg .node path { stroke: var(--accent) !important; fill: #0d1a2e !important; }
+.mermaid svg .cluster rect { stroke: var(--hot) !important; fill: rgba(255, 79, 216, .04) !important; }
+.mermaid svg .flowchart-link, .mermaid svg .edgePath path, .mermaid svg .messageLine0, .mermaid svg .messageLine1 { stroke: #5a8fb8 !important; }
+.mermaid svg marker path, .mermaid svg .arrowheadPath { fill: #5a8fb8 !important; stroke: #5a8fb8 !important; }
+.mermaid svg rect.actor, .mermaid svg .actor-man circle, .mermaid svg .actor-man line { stroke: var(--accent) !important; fill: #0d1a2e !important; }
+.mermaid svg text.actor, .mermaid svg text.actor tspan { fill: var(--ink) !important; stroke: none !important; }
+.mermaid svg .edgeLabel rect, .mermaid svg .edgeLabels rect { fill: var(--surface) !important; }
+.mermaid svg rect.note { fill: rgba(255, 79, 216, .06) !important; stroke: var(--hot) !important; }
+.mermaid svg text { fill: var(--ink) !important; }
+
+.video { border-color: var(--edge); border-radius: 0; clip-path: var(--chamfer); box-shadow: var(--shadow); }
+.video .play { background: rgba(5, 8, 15, .82); border-radius: 0; clip-path: var(--chamfer); box-shadow: var(--glow); }
+.video:hover .play, .video:focus-visible .play { background: var(--accent); }
+.video:hover .play::after, .video:focus-visible .play::after { border-left-color: var(--paper); }
+
+.card, .spec, .scroller, .shot, .term { border-color: var(--edge); border-radius: 0; }
+.card, .shot { clip-path: var(--chamfer); background: linear-gradient(180deg, rgba(47, 216, 255, .05), transparent 50%), var(--surface); }
+.mermaid svg marker#sequencenumber circle { fill: var(--accent) !important; stroke: var(--accent) !important; }
+.mermaid svg marker.lollipop circle { stroke: var(--accent) !important; }
+.mermaid svg text.sequenceNumber { fill: var(--paper) !important; }
+.mermaid svg .actor-line { stroke: #2a4766 !important; }

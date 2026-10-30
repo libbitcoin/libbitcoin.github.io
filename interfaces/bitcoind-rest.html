@@ -166,6 +166,7 @@
     .doc table { font-size: 12px; }
   }
 </style>
+<script src="../skins/skins.js"></script>
 </head>
 <body>
 
@@ -262,21 +263,6 @@
         <a href="../configuration/reference.html">Settings Reference</a>
         <a href="../building/index.html">Building</a>
       </div></details>
-      <details class="drop here" name="site"><summary>Server</summary><div>
-        <a href="../interfaces.html">BS Interfaces</a>
-        <a href="../interfaces/admin.html">Admin Console</a>
-        <a href="../interfaces/native.html">Native REST</a>
-        <a href="../interfaces/electrum.html">Electrum</a>
-        <a href="../interfaces/sparrow.html">Sparrow</a>
-        <a href="../interfaces/p2p.html">Bitcoin P2P</a>
-        <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
-        <a href="../interfaces/bitcoind-rest.html" class="here">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
-        <a href="../interfaces/btcd.html">BTCD</a>
-        <a href="../interfaces/esplora.html">Esplora</a>
-        <a href="../interfaces/stratum-v1.html">Stratum v1</a>
-        <a href="../interfaces/stratum-v2.html">Stratum v2</a>
-      </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync BS</a>
         <a href="../footprint.html">Footprint</a>
@@ -293,6 +279,21 @@
         <a href="../explorer/index.html">Explorer</a>
         <a href="../build/index.html">Build</a>
         <a href="../test/index.html">Test</a>
+      </div></details>
+      <details class="drop here" name="site"><summary>Server</summary><div>
+        <a href="../interfaces.html">BS Interfaces</a>
+        <a href="../interfaces/admin.html">Admin Console</a>
+        <a href="../interfaces/native.html">Native REST</a>
+        <a href="../interfaces/electrum.html">Electrum</a>
+        <a href="../interfaces/sparrow.html">Sparrow</a>
+        <a href="../interfaces/p2p.html">Bitcoin P2P</a>
+        <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
+        <a href="../interfaces/bitcoind-rest.html" class="here">Bitcoind REST</a>
+        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../interfaces/btcd.html">BTCD</a>
+        <a href="../interfaces/esplora.html">Esplora</a>
+        <a href="../interfaces/stratum-v1.html">Stratum v1</a>
+        <a href="../interfaces/stratum-v2.html">Stratum v2</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
@@ -485,11 +486,6 @@ header.</p>
 </table></div>
 <p>Not every endpoint supports every extension. Each endpoint below lists its
 extensions, and an unsupported one returns 404.</p>
-<blockquote>
-<p>JSON numbers may be written differently than in bitcoind, for
-example <code>1E0</code> for <code>1</code>, or <code>5E1</code> for <code>50.00000000</code>. These are equivalent
-JSON encodings.</p>
-</blockquote>
 <h3 id="23-http-status-codes">2.3 HTTP status codes<a class="anchor" href="#23-http-status-codes" aria-label="Link to this section">#</a></h3>
 <p>Each response carries one of these statuses
 (<a href="https://www.rfc-editor.org/rfc/rfc9110.txt">RFC 9110 §15</a>).</p>
@@ -611,7 +607,7 @@ which are distinct from the RPC names (see
     &quot;headers&quot;: 9,
     &quot;bestblockhash&quot;: &quot;000000008d9dc510f23c2657fc4f67bea30078cc05a90eb89e84cc475c080805&quot;,
     &quot;bits&quot;: &quot;1d00ffff&quot;,
-    &quot;difficulty&quot;: 1E0,
+    &quot;difficulty&quot;: 1,
     &quot;time&quot;: 1231473279,
     &quot;mediantime&quot;: 1231471428,
     &quot;pruned&quot;: false
@@ -658,7 +654,7 @@ in bitcoind.</p>
     &quot;nonce&quot;: 2573394689,
     &quot;bits&quot;: &quot;1d00ffff&quot;,
     &quot;target&quot;: &quot;00000000ffff0000000000000000000000000000000000000000000000000000&quot;,
-    &quot;difficulty&quot;: 1E0,
+    &quot;difficulty&quot;: 1,
     &quot;nTx&quot;: 1,
     &quot;strippedsize&quot;: 215,
     &quot;size&quot;: 215,
@@ -681,7 +677,7 @@ in bitcoind.</p>
             ],
             &quot;vout&quot;: [
                 {
-                    &quot;value&quot;: 5E1,
+                    &quot;value&quot;: 50.00000000,
                     &quot;scriptPubKey&quot;: {
                         &quot;asm&quot;: &quot;0496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858ee OP_CHECKSIG&quot;,
                         &quot;hex&quot;: &quot;410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac&quot;,
@@ -743,7 +739,7 @@ to 2000.</p>
         &quot;nonce&quot;: 2573394689,
         &quot;bits&quot;: &quot;1d00ffff&quot;,
         &quot;target&quot;: &quot;00000000ffff0000000000000000000000000000000000000000000000000000&quot;,
-        &quot;difficulty&quot;: 1E0
+        &quot;difficulty&quot;: 1
     }
 ]
 </code></pre>
@@ -1015,7 +1011,15 @@ window.addEventListener('load', function () {
     var target = id && document.getElementById(id);
     if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
   }
-  mermaid.run().then(settle, settle);
+  function decode() {
+    var area = document.createElement('textarea');
+    document.querySelectorAll('.mermaid svg text, .mermaid svg tspan').forEach(function (text) {
+      if (text.children.length || text.textContent.indexOf('&') < 0) return;
+      area.innerHTML = text.textContent;
+      text.textContent = area.value;
+    });
+  }
+  mermaid.run().then(function () { decode(); settle(); }, settle);
 });
 </script>
 <script>

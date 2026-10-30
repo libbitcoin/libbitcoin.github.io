@@ -55,10 +55,6 @@ $ curl --user user:pass -d '{"jsonrpc":"2.0","id":1,"method":"getblockcount","pa
 - A version 1.0 request (no `jsonrpc`) must have `params` as an array and
   an `id`, and is answered with both `result` and `error`.
 
-> JSON numbers may be written differently than by bitcoind, for example
-> `1E0` for `1`, or `5E1` for `50.00000000`. These are equivalent JSON
-> encodings.
-
 ### 2.2 Errors
 
 An error carries bitcoind's code, and its name as the message:
@@ -205,10 +201,10 @@ The state of the chain. **Parameters:** none.
     "bestblockhash": "000000008d9dc510f23c2657fc4f67bea30078cc05a90eb89e84cc475c080805",
     "bits": "1d00ffff",
     "target": "00000000ffff0000000000000000000000000000000000000000000000000000",
-    "difficulty": 1E0,
+    "difficulty": 1,
     "time": 1231473279,
     "mediantime": 1231471428,
-    "verificationprogress": 1E0,
+    "verificationprogress": 1,
     "initialblockdownload": true,
     "chainwork": "0000000000000000000000000000000000000000000000000000000a000a000a",
     "size_on_disk": <bytes>,

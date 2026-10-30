@@ -70,10 +70,6 @@ header.
 Not every endpoint supports every extension. Each endpoint below lists its
 extensions, and an unsupported one returns 404.
 
-> JSON numbers may be written differently than in bitcoind, for
-> example `1E0` for `1`, or `5E1` for `50.00000000`. These are equivalent
-> JSON encodings.
-
 ### 2.3 HTTP status codes
 
 Each response carries one of these statuses
@@ -134,7 +130,7 @@ $ curl "http://localhost:8280/rest/chaininfo.json"
     "headers": 9,
     "bestblockhash": "000000008d9dc510f23c2657fc4f67bea30078cc05a90eb89e84cc475c080805",
     "bits": "1d00ffff",
-    "difficulty": 1E0,
+    "difficulty": 1,
     "time": 1231473279,
     "mediantime": 1231471428,
     "pruned": false
@@ -202,7 +198,7 @@ $ curl "http://localhost:8280/rest/block/00000000839a8e6886ab5951d76f411475428af
     "nonce": 2573394689,
     "bits": "1d00ffff",
     "target": "00000000ffff0000000000000000000000000000000000000000000000000000",
-    "difficulty": 1E0,
+    "difficulty": 1,
     "nTx": 1,
     "strippedsize": 215,
     "size": 215,
@@ -225,7 +221,7 @@ $ curl "http://localhost:8280/rest/block/00000000839a8e6886ab5951d76f411475428af
             ],
             "vout": [
                 {
-                    "value": 5E1,
+                    "value": 50.00000000,
                     "scriptPubKey": {
                         "asm": "0496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858ee OP_CHECKSIG",
                         "hex": "410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac",
@@ -318,7 +314,7 @@ $ curl "http://localhost:8280/rest/headers/00000000839a8e6886ab5951d76f411475428
         "nonce": 2573394689,
         "bits": "1d00ffff",
         "target": "00000000ffff0000000000000000000000000000000000000000000000000000",
-        "difficulty": 1E0
+        "difficulty": 1
     }
 ]
 ```

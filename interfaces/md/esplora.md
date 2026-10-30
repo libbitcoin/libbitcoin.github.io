@@ -90,9 +90,6 @@ The format is fixed by the path. There is no format query and the
 | Hex, hashes and numbers | `text/plain` |
 | `/raw` paths | `application/octet-stream` |
 
-> JSON numbers may be written differently than in Esplora, for example
-> `1E0` for `1`. These are equivalent JSON encodings.
-
 ### 2.3 HTTP status codes
 
 Each response carries one of these statuses
@@ -450,7 +447,7 @@ $ curl "http://localhost:8780/block/000000000019d6689c085ae165831e934ff763ae46a2
     "timestamp": 1231006505,
     "bits": 486604799,
     "nonce": 2083236893,
-    "difficulty": 1E0,
+    "difficulty": 1,
     "merkle_root": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
     "tx_count": 1,
     "size": 285,

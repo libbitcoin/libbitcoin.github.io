@@ -76,6 +76,10 @@
   h1 { color: var(--heading); font-family: var(--mono); font-size: clamp(28px, 4.4vw, 44px); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
   .lede { max-width: 66ch; color: var(--ink-2); font-size: 16px; }
   .lede strong { color: var(--ink); font-weight: 600; }
+  .doc .download { margin: 4px 0; }
+  .doc .download a { display: inline-block; padding: 18px 40px; background: var(--heading); color: #1a1a19; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: .04em; text-decoration: none; border-radius: 4px; box-shadow: 0 2px 0 var(--accent); }
+  .doc .download a:hover, .doc .download a:focus { background: #ffb44d; text-decoration: none; }
+  .doc .download a::before { content: "↓  "; }
   @media (max-width: 760px) {
     .wrap { padding: 0 14px 72px; }
   }
@@ -99,6 +103,7 @@
   .drop > div a.sub { padding-left: 14px; }
   .mast + .foot { border-top: 0; margin-top: 0; }
 </style>
+<script src="skins/skins.js"></script>
 </head>
 <body>
 
@@ -193,21 +198,6 @@
         <a href="configuration/reference.html">Settings Reference</a>
         <a href="building/index.html">Building</a>
       </div></details>
-      <details class="drop" name="site"><summary>Server</summary><div>
-        <a href="interfaces.html">BS Interfaces</a>
-        <a href="interfaces/admin.html">Admin Console</a>
-        <a href="interfaces/native.html">Native REST</a>
-        <a href="interfaces/electrum.html">Electrum</a>
-        <a href="interfaces/sparrow.html">Sparrow</a>
-        <a href="interfaces/p2p.html">Bitcoin P2P</a>
-        <a href="interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
-        <a href="interfaces/bitcoind-rest.html">Bitcoind REST</a>
-        <a href="interfaces/zeromq.html">Bitcoind ZMQ</a>
-        <a href="interfaces/btcd.html">BTCD</a>
-        <a href="interfaces/esplora.html">Esplora</a>
-        <a href="interfaces/stratum-v1.html">Stratum v1</a>
-        <a href="interfaces/stratum-v2.html">Stratum v2</a>
-      </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="sync.html">Sync BS</a>
         <a href="footprint.html">Footprint</a>
@@ -224,6 +214,21 @@
         <a href="explorer/index.html">Explorer</a>
         <a href="build/index.html">Build</a>
         <a href="test/index.html">Test</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Server</summary><div>
+        <a href="interfaces.html">BS Interfaces</a>
+        <a href="interfaces/admin.html">Admin Console</a>
+        <a href="interfaces/native.html">Native REST</a>
+        <a href="interfaces/electrum.html">Electrum</a>
+        <a href="interfaces/sparrow.html">Sparrow</a>
+        <a href="interfaces/p2p.html">Bitcoin P2P</a>
+        <a href="interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
+        <a href="interfaces/bitcoind-rest.html">Bitcoind REST</a>
+        <a href="interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="interfaces/btcd.html">BTCD</a>
+        <a href="interfaces/esplora.html">Esplora</a>
+        <a href="interfaces/stratum-v1.html">Stratum v1</a>
+        <a href="interfaces/stratum-v2.html">Stratum v2</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="client/commands.html">BX Commands</a>
@@ -246,6 +251,7 @@
       bitcoind tooling or your own explorer at it. It includes an integrated block explorer and
       administrative dashboard.
     </p>
+    <div class="doc"><p class="download"><a href="download/index.html">Download Bitcoin Server</a></p></div>
     <p class="lede">
       <a href="client/commands.html"><strong>Bitcoin Explorer</strong></a> (bx) is its command
       line client: generate keys and addresses, construct and decode transactions, inspect
@@ -253,7 +259,9 @@
     </p>
     <p class="lede">
       For <a href="developers/index.html"><strong>developers</strong></a>, every layer beneath
-      them, from Bitcoin primitives to the full node, is a C++ library for any application.
+      them, from Bitcoin primitives to the full node, is a C++ library for any application,
+      and the running node is a server for client applications over all common Bitcoin
+      interfaces and protocols.
     </p>
   </header>
 

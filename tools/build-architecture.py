@@ -26,21 +26,6 @@ SITE_MENU = [
         ("configuration/reference.html", "Settings Reference"),
         ("building/index.html", "Building"),
     ]),
-    ("Server", [
-        ("interfaces.html", "BS Interfaces"),
-        ("interfaces/admin.html", "Admin Console"),
-        ("interfaces/native.html", "Native REST"),
-        ("interfaces/electrum.html", "Electrum"),
-        ("interfaces/sparrow.html", "Sparrow"),
-        ("interfaces/p2p.html", "Bitcoin P2P"),
-        ("interfaces/bitcoind-rpc.html", "Bitcoind JSON-RPC"),
-        ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
-        ("interfaces/zeromq.html", "Bitcoind ZMQ"),
-        ("interfaces/btcd.html", "BTCD"),
-        ("interfaces/esplora.html", "Esplora"),
-        ("interfaces/stratum-v1.html", "Stratum v1"),
-        ("interfaces/stratum-v2.html", "Stratum v2"),
-    ]),
     ("Performance", [
         ("sync.html", "Sync BS"),
         ("footprint.html", "Footprint"),
@@ -57,6 +42,21 @@ SITE_MENU = [
         ("explorer/index.html", "Explorer"),
         ("build/index.html", "Build"),
         ("test/index.html", "Test"),
+    ]),
+    ("Server", [
+        ("interfaces.html", "BS Interfaces"),
+        ("interfaces/admin.html", "Admin Console"),
+        ("interfaces/native.html", "Native REST"),
+        ("interfaces/electrum.html", "Electrum"),
+        ("interfaces/sparrow.html", "Sparrow"),
+        ("interfaces/p2p.html", "Bitcoin P2P"),
+        ("interfaces/bitcoind-rpc.html", "Bitcoind JSON-RPC"),
+        ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
+        ("interfaces/zeromq.html", "Bitcoind ZMQ"),
+        ("interfaces/btcd.html", "BTCD"),
+        ("interfaces/esplora.html", "Esplora"),
+        ("interfaces/stratum-v1.html", "Stratum v1"),
+        ("interfaces/stratum-v2.html", "Stratum v2"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
@@ -621,6 +621,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>%(style)s</style>
+<script src="../skins/skins.js"></script>
 </head>
 <body>
 
@@ -752,7 +753,15 @@ window.addEventListener('load', function () {
     var target = id && document.getElementById(id);
     if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
   }
-  mermaid.run().then(settle, settle);
+  function decode() {
+    var area = document.createElement('textarea');
+    document.querySelectorAll('.mermaid svg text, .mermaid svg tspan').forEach(function (text) {
+      if (text.children.length || text.textContent.indexOf('&') < 0) return;
+      area.innerHTML = text.textContent;
+      text.textContent = area.value;
+    });
+  }
+  mermaid.run().then(function () { decode(); settle(); }, settle);
 });
 </script>
 <script>
