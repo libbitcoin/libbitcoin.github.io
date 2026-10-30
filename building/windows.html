@@ -424,6 +424,33 @@ CPU, for example to AVX or SSE2:</p>
 <p>An extension option raises it as needed: <code>Option-sse41</code> to at least AVX,
 <code>Option-avx2</code>, <code>Option-avxifma</code>, <code>Option-vaes</code> or <code>Option-sha512</code> to
 AVX2, and <code>Option-avx512</code> to AVX-512.</p>
+<h2 id="5-machine-options">5. Machine options<a class="anchor" href="#5-machine-options" aria-label="Link to this section">#</a></h2>
+<p>Options given on the command line apply to one build, and options set on
+the property pages are saved in the project files. To set options for
+every build on a machine, put them in a <code>Directory.Build.props</code> file in
+the directory that holds the cloned repositories (<code>libbitcoin</code> above).
+MSBuild imports this file into every project below its directory, so the
+options apply to all five libraries, whether built by <code>build-msvc.cmd</code> or
+in Visual Studio. The file is outside the repositories and is never
+checked in.</p>
+<p>For example, an AVX-512 machine with IFMA, AES-NI, VAES and the SHA
+extensions:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;Project xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;
+  &lt;PropertyGroup&gt;
+    &lt;Option-arch&gt;AdvancedVectorExtensions512&lt;/Option-arch&gt;
+    &lt;Option-avx512ifma&gt;true&lt;/Option-avx512ifma&gt;
+    &lt;Option-avxifma&gt;false&lt;/Option-avxifma&gt;
+    &lt;Option-aesni&gt;true&lt;/Option-aesni&gt;
+    &lt;Option-vaes&gt;true&lt;/Option-vaes&gt;
+    &lt;Option-sha&gt;true&lt;/Option-sha&gt;
+    &lt;Option-cuda&gt;true&lt;/Option-cuda&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;
+</code></pre>
+<p>A property not set in the file keeps its default, and a <code>/p:</code> property
+on the command line overrides the file. The build prints the resulting
+options at the start of each library's build.</p>
   </article>
 
   <nav class="pager"><a href="macos.html">&larr; macOS</a><a href="options.html">Build options &rarr;</a></nav>

@@ -82,3 +82,36 @@ $ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --b
 An extension option raises it as needed: `Option-sse41` to at least AVX,
 `Option-avx2`, `Option-avxifma`, `Option-vaes` or `Option-sha512` to
 AVX2, and `Option-avx512` to AVX-512.
+
+## 5. Machine options
+
+Options given on the command line apply to one build, and options set on
+the property pages are saved in the project files. To set options for
+every build on a machine, put them in a `Directory.Build.props` file in
+the directory that holds the cloned repositories (`libbitcoin` above).
+MSBuild imports this file into every project below its directory, so the
+options apply to all five libraries, whether built by `build-msvc.cmd` or
+in Visual Studio. The file is outside the repositories and is never
+checked in.
+
+For example, an AVX-512 machine with IFMA, AES-NI, VAES and the SHA
+extensions:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Option-arch>AdvancedVectorExtensions512</Option-arch>
+    <Option-avx512ifma>true</Option-avx512ifma>
+    <Option-avxifma>false</Option-avxifma>
+    <Option-aesni>true</Option-aesni>
+    <Option-vaes>true</Option-vaes>
+    <Option-sha>true</Option-sha>
+    <Option-cuda>true</Option-cuda>
+  </PropertyGroup>
+</Project>
+```
+
+A property not set in the file keeps its default, and a `/p:` property
+on the command line overrides the file. The build prints the resulting
+options at the start of each library's build.

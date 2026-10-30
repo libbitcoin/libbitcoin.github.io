@@ -94,7 +94,8 @@ it with `--disable-cuda` (`-Denable-cuda=OFF`, `/p:Option-cuda=false`).
 
 ## 4. Visual Studio
 
-The instruction set, GPU, `--with-embedded` and `--with-ssl` options are
+The instruction set, GPU, `--with-embedded`, `--with-ssl` and
+`--with-secp256k1` options are
 `Option-<name>` properties on the project property pages, or
 `/p:Option-<name>=true` on the `build-msvc.cmd` or `msbuild` command line.
 The others have no property: the tests and `bs` are projects in the
@@ -107,3 +108,64 @@ $ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --b
 
 Windows x64 and Win32 builds target AVX2 by default, which can be
 lowered (see [Windows](windows#4-instruction-set)).
+
+## 5. External libraries
+
+The Boost headers are the only required external dependency. libbitcoin implements
+secp256k1 and TLS itself, and either can be replaced by an external
+library.
+
+### secp256k1
+
+| Option | Default | Purpose |
+| ------ | ------- | ------- |
+| `--with-secp256k1` | off | Use [bitcoin-core/secp256k1](https://github.com/bitcoin-core/secp256k1) 0.8.0 or later. |
+
+The option replaces the calls made through the libsecp256k1 interface, so
+any other implementation of that interface can be linked in its place.
+Batch verification remains internal.
+
+- **Autotools and CMake.** `--build-secp256k1` makes the install script
+  build it from source, with its ellswift, recovery and schnorrsig
+  modules, along with the other dependencies. Otherwise it must be
+  installed where the build can find it (`-Dwith-secp256k1=ON` for
+  CMake).
+- **Visual Studio.** `/p:Option-secp256k1=true` links the
+  `secp256k1_vc145` NuGet package, which is restored with the Boost
+  package.
+
+### OpenSSL
+
+The embedded TLS library (`--with-ssl`, on by default) is used only for
+TLS, by the secure service endpoints. `--without-ssl`
+(`-Dwith-ssl=OFF`, `/p:Option-ssl=false`) omits it, and TLS then
+requires an external OpenSSL, which Boost.Asio uses in its place.
+
+The build scripts and project files have no option for OpenSSL, and no
+package of it is maintained, so its paths must be added to the build by
+hand: OpenSSL's include directory must be on the include path of every
+library and executable built, and `libssl` and `libcrypto` must be linked
+into every executable.
+
+**Autotools.** Set `CPPFLAGS`, `LDFLAGS` and `LIBS` for the install
+script, for example:
+
+```
+$ CPPFLAGS="-I/opt/openssl/include" LDFLAGS="-L/opt/openssl/lib" LIBS="-lssl -lcrypto" ./install-gnu.sh --without-ssl ...
+```
+
+**Visual Studio.** An OpenSSL NuGet package may work, though none is
+maintained or tested with libbitcoin. Alternatively add the paths in a
+`Directory.Build.props` file (see [Windows](windows#5-machine-options)):
+
+```xml
+<ItemDefinitionGroup>
+  <ClCompile>
+    <AdditionalIncludeDirectories>C:\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+  </ClCompile>
+  <Link>
+    <AdditionalLibraryDirectories>C:\openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+  </Link>
+</ItemDefinitionGroup>
+```

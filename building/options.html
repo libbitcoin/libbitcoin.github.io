@@ -549,7 +549,8 @@ it with <code>--disable-cuda</code> (<code>-Denable-cuda=OFF</code>, <code>/p:Op
 </tbody>
 </table></div>
 <h2 id="4-visual-studio">4. Visual Studio<a class="anchor" href="#4-visual-studio" aria-label="Link to this section">#</a></h2>
-<p>The instruction set, GPU, <code>--with-embedded</code> and <code>--with-ssl</code> options are
+<p>The instruction set, GPU, <code>--with-embedded</code>, <code>--with-ssl</code> and
+<code>--with-secp256k1</code> options are
 <code>Option-&lt;name&gt;</code> properties on the project property pages, or
 <code>/p:Option-&lt;name&gt;=true</code> on the <code>build-msvc.cmd</code> or <code>msbuild</code> command line.
 The others have no property: the tests and <code>bs</code> are projects in the
@@ -559,6 +560,67 @@ AVX-512 build:</p>
 </code></pre>
 <p>Windows x64 and Win32 builds target AVX2 by default, which can be
 lowered (see <a href="windows.html#4-instruction-set">Windows</a>).</p>
+<h2 id="5-external-libraries">5. External libraries<a class="anchor" href="#5-external-libraries" aria-label="Link to this section">#</a></h2>
+<p>The Boost headers are the only required external dependency. libbitcoin implements
+secp256k1 and TLS itself, and either can be replaced by an external
+library.</p>
+<h3 id="secp256k1">secp256k1<a class="anchor" href="#secp256k1" aria-label="Link to this section">#</a></h3>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--with-secp256k1</code></td>
+<td>off</td>
+<td>Use <a href="https://github.com/bitcoin-core/secp256k1">bitcoin-core/secp256k1</a> 0.8.0 or later.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The option replaces the calls made through the libsecp256k1 interface, so
+any other implementation of that interface can be linked in its place.
+Batch verification remains internal.</p>
+<ul>
+<li><strong>Autotools and CMake.</strong> <code>--build-secp256k1</code> makes the install script
+  build it from source, with its ellswift, recovery and schnorrsig
+  modules, along with the other dependencies. Otherwise it must be
+  installed where the build can find it (<code>-Dwith-secp256k1=ON</code> for
+  CMake).</li>
+<li><strong>Visual Studio.</strong> <code>/p:Option-secp256k1=true</code> links the
+  <code>secp256k1_vc145</code> NuGet package, which is restored with the Boost
+  package.</li>
+</ul>
+<h3 id="openssl">OpenSSL<a class="anchor" href="#openssl" aria-label="Link to this section">#</a></h3>
+<p>The embedded TLS library (<code>--with-ssl</code>, on by default) is used only for
+TLS, by the secure service endpoints. <code>--without-ssl</code>
+(<code>-Dwith-ssl=OFF</code>, <code>/p:Option-ssl=false</code>) omits it, and TLS then
+requires an external OpenSSL, which Boost.Asio uses in its place.</p>
+<p>The build scripts and project files have no option for OpenSSL, and no
+package of it is maintained, so its paths must be added to the build by
+hand: OpenSSL's include directory must be on the include path of every
+library and executable built, and <code>libssl</code> and <code>libcrypto</code> must be linked
+into every executable.</p>
+<p><strong>Autotools.</strong> Set <code>CPPFLAGS</code>, <code>LDFLAGS</code> and <code>LIBS</code> for the install
+script, for example:</p>
+<pre class="console"><code>$ CPPFLAGS=&quot;-I/opt/openssl/include&quot; LDFLAGS=&quot;-L/opt/openssl/lib&quot; LIBS=&quot;-lssl -lcrypto&quot; ./install-gnu.sh --without-ssl ...
+</code></pre>
+<p><strong>Visual Studio.</strong> An OpenSSL NuGet package may work, though none is
+maintained or tested with libbitcoin. Alternatively add the paths in a
+<code>Directory.Build.props</code> file (see <a href="windows.html#5-machine-options">Windows</a>):</p>
+<pre><code class="language-xml">&lt;ItemDefinitionGroup&gt;
+  &lt;ClCompile&gt;
+    &lt;AdditionalIncludeDirectories&gt;C:\openssl\include;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
+  &lt;/ClCompile&gt;
+  &lt;Link&gt;
+    &lt;AdditionalLibraryDirectories&gt;C:\openssl\lib;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;
+    &lt;AdditionalDependencies&gt;libssl.lib;libcrypto.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
+  &lt;/Link&gt;
+&lt;/ItemDefinitionGroup&gt;
+</code></pre>
   </article>
 
   <nav class="pager"><a href="windows.html">&larr; Windows</a><a href="toolchains.html">Build systems and toolchains &rarr;</a></nav>
