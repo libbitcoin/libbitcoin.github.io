@@ -261,6 +261,7 @@
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../building/platforms.html">Platform Support</a>
         <a href="../building/index.html">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
@@ -417,8 +418,8 @@ buckets = 10001
 <span class="section">[table.state]</span>
 buckets = 10001
 
-<span class="section">[table.scan]</span>
-buckets = 10001
+<span class="comment"># [table.scan]</span>
+<span class="comment"># buckets = 10001</span>
 </code></pre>
 <ul>
 <li><code>[bitcoin]</code> sets the regtest genesis block and difficulty limit, all
@@ -434,6 +435,8 @@ buckets = 10001
   18445 since <code>bs</code> listens on 18444.</li>
 <li><code>[table.*]</code> keeps the store small, since the mainnet defaults
   preallocate for the mainnet chain.</li>
+<li><code>[table.scan]</code> is commented out because it enables silent payments
+  (<a href="index.html#514-silent-payments">§5.14</a>). Uncomment it to index them.</li>
 </ul>
   </article>
 

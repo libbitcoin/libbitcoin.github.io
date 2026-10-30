@@ -101,8 +101,8 @@ buckets = 5100001
 [table.state]
 buckets = 5100001
 
-[table.scan]
-buckets = 5100001
+# [table.scan]
+# buckets = 5100001
 ```
 
 - `[bitcoin]` replaces the chain parameters: genesis block, soft fork
@@ -113,5 +113,7 @@ buckets = 5100001
 - `[wallet]` sets the testnet address and key prefixes used by the server
   ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the store for the chain at 5.1 million blocks.
+- `[table.scan]` is commented out because it enables silent payments
+  ([§5.14](index#514-silent-payments)). Uncomment it to index them.
 - `node.maximum_concurrency` raises the download window, since testnet
   blocks are small.

@@ -261,6 +261,7 @@
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../building/platforms.html">Platform Support</a>
         <a href="../building/index.html">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
@@ -511,7 +512,7 @@ by publishing events. The other axis, equally important, is <strong>per-channel
 strands</strong>: every peer connection also runs on its own strand. Peers and
 chasers therefore execute concurrently with each other, bounded only by
 the shared threadpool size. <code>chaser_validate</code> additionally fans block
-validation out over its own pool (doc 04).</p>
+validation out over its own pool (<a href="validation-chaser.html">doc 04</a>).</p>
 <h3 id="34-lock-free">3.4 Lock-free<a class="anchor" href="#34-lock-free" aria-label="Link to this section">#</a></h3>
 <p>The node, with the network and system layers beneath it and the server
 above it, is lock-free: at every point some thread completes its step,
@@ -523,8 +524,8 @@ another.</p>
   other work; a strand serializes handlers, not threads.</li>
 <li><strong>Cross-thread state is atomic.</strong> State shared outside a strand is
   <code>std::atomic</code>: latches and counters such as <code>chaser_validate</code>'s
-  <code>validate_backlog_</code> and bank flags (doc 04), <code>chaser_snapshot::pruned_</code>
-  (doc 12), <code>protocol_block_out_70012::superseded_</code> (doc 08), and the
+  <code>validate_backlog_</code> and bank flags (<a href="validation-chaser.html">doc 04</a>), <code>chaser_snapshot::pruned_</code>
+  (<a href="periphery-chasers.html">doc 12</a>), <code>protocol_block_out_70012::superseded_</code> (<a href="block-out-protocols.html">doc 08</a>), and the
   network's suspend flags and channel counts (<code>network/net.hpp:381-388</code>).</li>
 <li><strong>Results cross strands by posting.</strong> A broadcast that gathers a result
   from many channels (diagnostics) has each channel post its row to the
@@ -873,12 +874,12 @@ flowchart LR
 </div>
 <p>Synchronization is <strong>headers-first only</strong>. Headers are synced by the
 header protocols, which validate and prove each peer's branch before
-archiving it (doc 07); the header chaser organizes proven headers into
-the candidate chain (doc 02); <code>chaser_download</code> partitions unassociated
-candidates into download windows (doc 03); blocks are identified and
-archived by <code>protocol_block_in_31800</code> (doc 06) or filled from the pool by
-compact blocks (docs 07, 11); <code>chaser_validate</code> validates (doc 04) and
-<code>chaser_confirm</code> confirms (doc 05). The blocks-first mode and its
+archiving it (<a href="header-protocols.html">doc 07</a>); the header chaser organizes proven headers into
+the candidate chain (<a href="header-chaser.html">doc 02</a>); <code>chaser_download</code> partitions unassociated
+candidates into download windows (<a href="download-chaser.html">doc 03</a>); blocks are identified and
+archived by <code>protocol_block_in_31800</code> (<a href="sessions-and-protocols.html">doc 06</a>) or filled from the pool by
+compact blocks (docs <a href="header-protocols.html">07</a>, <a href="transaction-chaser.html">11</a>); <code>chaser_validate</code> validates (<a href="validation-chaser.html">doc 04</a>) and
+<code>chaser_confirm</code> confirms (<a href="confirmation-chaser.html">doc 05</a>). The blocks-first mode and its
 <code>chaser_block</code> organizer were removed in September 2026.</p>
 <hr />
 <h2 id="6-lifecycle">6. Lifecycle<a class="anchor" href="#6-lifecycle" aria-label="Link to this section">#</a></h2>
@@ -997,7 +998,7 @@ height can activate inbound service and block serving at that ceiling.</p>
 estimate, performance). The mixin's job is to give every protocol
 instance on every channel a reference to the node's event bus and
 organizers. <code>session_outbound</code> additionally subscribes to the bus to
-reduce outbound connections while recent (doc 06 §1.4).</p>
+reduce outbound connections while recent (<a href="sessions-and-protocols.html#14-outbound-connection-reduction">doc 06 §1.4</a>).</p>
 <p>Protocols are versioned by Bitcoin P2P protocol number:</p>
 <div class="scroller"><table>
 <thead>
@@ -1054,7 +1055,7 @@ reduce outbound connections while recent (doc 06 §1.4).</p>
 implemented in <code>src/protocols/</code>. <code>protocol_block_in_31800</code> is the central
 performance-sensitive class — it's the only protocol referenced from many
 <code>chase</code> event handlers (download, starved, split, stall, purge, report,
-checked, unchecked). See <a href="sessions-and-protocols.html"><code>06</code></a> §5.</p>
+checked, unchecked). See <a href="sessions-and-protocols.html#5-protocol_block_in_31800--the-block-download-protocol"><code>06</code> §5</a>.</p>
 <hr />
 <h2 id="8-memory-model">8. Memory model<a class="anchor" href="#8-memory-model" aria-label="Link to this section">#</a></h2>
 <p><code>block_arena</code> / <code>block_memory</code> (<code>include/bitcoin/node/block_arena.hpp</code>,
@@ -1110,23 +1111,23 @@ the architecture docs refer to:</p>
 <tbody>
 <tr>
 <td><code>threads</code>, <code>thread_priority</code></td>
-<td>validation threadpool (04), scan threadpool priority (11)</td>
+<td>validation threadpool (<a href="validation-chaser.html">04</a>), scan threadpool priority (<a href="transaction-chaser.html">11</a>)</td>
 </tr>
 <tr>
 <td><code>delay_inbound</code></td>
-<td>inbound gate and <code>blocks_out</code> (06)</td>
+<td>inbound gate and <code>blocks_out</code> (<a href="sessions-and-protocols.html">06</a>)</td>
 </tr>
 <tr>
 <td><code>provide_blocks</code> / <code>require_blocks</code></td>
-<td><code>node_network</code> service bit; attach tree (06)</td>
+<td><code>node_network</code> service bit; attach tree (<a href="sessions-and-protocols.html">06</a>)</td>
 </tr>
 <tr>
 <td><code>provide_witness</code> / <code>require_witness</code></td>
-<td>witness service bits; block/tx serving and requests (06, 08, 10)</td>
+<td>witness service bits; block/tx serving and requests (<a href="sessions-and-protocols.html">06</a>, <a href="block-out-protocols.html">08</a>, <a href="transaction-protocols.html">10</a>)</td>
 </tr>
 <tr>
 <td><code>provide_filters</code></td>
-<td><code>node_client_filters</code>; attaches filter serving (09)</td>
+<td><code>node_client_filters</code>; attaches filter serving (<a href="filter-out-protocol.html">09</a>)</td>
 </tr>
 <tr>
 <td><code>provide_privacy</code></td>
@@ -1134,58 +1135,74 @@ the architecture docs refer to:</p>
 </tr>
 <tr>
 <td><code>limited_blocks</code></td>
-<td>pruned node: bypassed blocks stored without input scripts (06, 08)</td>
+<td>pruned node: bypassed blocks stored without input scripts (<a href="sessions-and-protocols.html">06</a>, <a href="block-out-protocols.html">08</a>)</td>
 </tr>
 <tr>
 <td><code>use_gpu</code>, <code>cpu_batch_verify</code>, <code>cpu_batch_silent</code>, <code>batch_verify</code>, <code>batch_silent</code></td>
-<td>batching (04)</td>
+<td>batching (<a href="validation-chaser.html">04</a>)</td>
 </tr>
 <tr>
 <td><code>allowed_deviation</code></td>
-<td>slow-peer detection (03)</td>
+<td>slow-peer detection (<a href="download-chaser.html">03</a>)</td>
 </tr>
 <tr>
 <td><code>minimum_fee_rate</code>, <code>minimum_bump_rate</code></td>
-<td>pool admission and fee filter (10, 11)</td>
+<td>pool admission and fee filter (<a href="transaction-protocols.html">10</a>, <a href="transaction-chaser.html">11</a>)</td>
 </tr>
 <tr>
 <td><code>current_connections</code></td>
-<td>outbound reduction when recent (06)</td>
+<td>outbound reduction when recent (<a href="sessions-and-protocols.html">06</a>)</td>
 </tr>
 <tr>
 <td><code>announcement_cache</code></td>
-<td>per-channel anti-echo cache size (07)</td>
+<td>per-channel anti-echo cache size (<a href="header-protocols.html">07</a>)</td>
 </tr>
 <tr>
 <td><code>fee_estimate_horizon</code></td>
-<td>estimator (12)</td>
+<td>estimator (<a href="periphery-chasers.html">12</a>)</td>
 </tr>
 <tr>
 <td><code>maximum_height</code></td>
-<td>stop height for check and validate (03, 04); <code>is_recent</code></td>
+<td>stop height for check and validate (<a href="download-chaser.html">03</a>, <a href="validation-chaser.html">04</a>); <code>is_recent</code></td>
 </tr>
 <tr>
 <td><code>maximum_concurrency</code></td>
-<td>download window and validation backlog (03, 04)</td>
+<td>download window and validation backlog (<a href="download-chaser.html">03</a>, <a href="validation-chaser.html">04</a>)</td>
 </tr>
 <tr>
 <td><code>silent_start_height</code></td>
-<td>silent payment indexing start (04, 11)</td>
+<td>silent payment indexing start (<a href="validation-chaser.html">04</a>, <a href="transaction-chaser.html">11</a>)</td>
 </tr>
 <tr>
 <td><code>sample_period_seconds</code></td>
-<td>performance timer (06)</td>
+<td>performance timer (<a href="sessions-and-protocols.html">06</a>)</td>
 </tr>
 <tr>
 <td><code>compact_timeout_seconds</code>, <code>compact_missing_percent</code></td>
-<td>compact block fill (03, 07)</td>
+<td>compact block fill (<a href="download-chaser.html">03</a>, <a href="header-protocols.html">07</a>)</td>
 </tr>
 <tr>
 <td><code>currency_window_minutes</code></td>
-<td>all currency predicates (§6.3); header tree window (02); stale timer (05)</td>
+<td>all currency predicates (§6.3); header tree window (<a href="header-chaser.html">02</a>); stale timer (<a href="confirmation-chaser.html">05</a>)</td>
 </tr>
 </tbody>
 </table></div>
+<hr />
+<h2 id="11-subsystem-documents">11. Subsystem documents<a class="anchor" href="#11-subsystem-documents" aria-label="Link to this section">#</a></h2>
+<ul>
+<li><a href="event-bus.html">01 — Event bus</a>: every <code>chase</code> event with its verified issuer and handler sites.</li>
+<li><a href="header-chaser.html">02 — Header chaser</a>: header organization, tree pruning and disorganization.</li>
+<li><a href="download-chaser.html">03 — Download chaser</a>: block download orchestration and the download window.</li>
+<li><a href="validation-chaser.html">04 — Validation chaser</a>: consensus validation and batched verification.</li>
+<li><a href="confirmation-chaser.html">05 — Confirmation chaser</a>: order-based consensus checks and the confirmed chain.</li>
+<li><a href="sessions-and-protocols.html">06 — Sessions and protocols</a>: sessions, the protocol attach tree and <code>protocol_block_in_31800</code>.</li>
+<li><a href="header-protocols.html">07 — Header protocols</a>: header sync and compact blocks.</li>
+<li><a href="block-out-protocols.html">08 — Block out protocols</a>: serving blocks to peers.</li>
+<li><a href="filter-out-protocol.html">09 — Filter out protocol</a>: BIP157/158 client filters.</li>
+<li><a href="transaction-protocols.html">10 — Transaction protocols</a>: transaction relay in and out.</li>
+<li><a href="transaction-chaser.html">11 — Transaction chaser</a>: the transaction pool and compact block fill.</li>
+<li><a href="periphery-chasers.html">12 — Periphery chasers</a>: snapshot, storage, template and fee estimate.</li>
+</ul>
 <hr />
 <h2 id="appendix-a--glossary">Appendix A — Glossary<a class="anchor" href="#appendix-a--glossary" aria-label="Link to this section">#</a></h2>
 <ul>

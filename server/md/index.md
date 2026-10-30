@@ -200,9 +200,8 @@ that sparrow extends is overridden, not reimplemented (`add_features` for
 | Stratum v1 | `protocol_stratum_v1` | [Stratum v1](../interfaces/stratum-v1) |
 | Stratum v2 | `protocol_stratum_v2` | [Stratum v2](../interfaces/stratum-v2) |
 
-The stratum sessions, channels and interfaces exist, but the protocols are
-not implemented: stratum v1 handlers reply `not_implemented`, and stratum v2
-subscribes to no messages.
+Stratum v1 and Stratum v2 each have their own session, channel and
+interface.
 
 ## 5. Requests
 

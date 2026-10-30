@@ -168,7 +168,7 @@ by publishing events. The other axis, equally important, is **per-channel
 strands**: every peer connection also runs on its own strand. Peers and
 chasers therefore execute concurrently with each other, bounded only by
 the shared threadpool size. `chaser_validate` additionally fans block
-validation out over its own pool (doc 04).
+validation out over its own pool ([doc 04](validation-chaser)).
 
 ### 3.4 Lock-free
 
@@ -182,8 +182,8 @@ another.
   other work; a strand serializes handlers, not threads.
 - **Cross-thread state is atomic.** State shared outside a strand is
   `std::atomic`: latches and counters such as `chaser_validate`'s
-  `validate_backlog_` and bank flags (doc 04), `chaser_snapshot::pruned_`
-  (doc 12), `protocol_block_out_70012::superseded_` (doc 08), and the
+  `validate_backlog_` and bank flags ([doc 04](validation-chaser)), `chaser_snapshot::pruned_`
+  ([doc 12](periphery-chasers)), `protocol_block_out_70012::superseded_` ([doc 08](block-out-protocols)), and the
   network's suspend flags and channel counts (`network/net.hpp:381-388`).
 - **Results cross strands by posting.** A broadcast that gathers a result
   from many channels (diagnostics) has each channel post its row to the
@@ -337,12 +337,12 @@ flowchart LR
 
 Synchronization is **headers-first only**. Headers are synced by the
 header protocols, which validate and prove each peer's branch before
-archiving it (doc 07); the header chaser organizes proven headers into
-the candidate chain (doc 02); `chaser_download` partitions unassociated
-candidates into download windows (doc 03); blocks are identified and
-archived by `protocol_block_in_31800` (doc 06) or filled from the pool by
-compact blocks (docs 07, 11); `chaser_validate` validates (doc 04) and
-`chaser_confirm` confirms (doc 05). The blocks-first mode and its
+archiving it ([doc 07](header-protocols)); the header chaser organizes proven headers into
+the candidate chain ([doc 02](header-chaser)); `chaser_download` partitions unassociated
+candidates into download windows ([doc 03](download-chaser)); blocks are identified and
+archived by `protocol_block_in_31800` ([doc 06](sessions-and-protocols)) or filled from the pool by
+compact blocks (docs [07](header-protocols), [11](transaction-chaser)); `chaser_validate` validates ([doc 04](validation-chaser)) and
+`chaser_confirm` confirms ([doc 05](confirmation-chaser)). The blocks-first mode and its
 `chaser_block` organizer were removed in September 2026.
 
 ---
@@ -457,7 +457,7 @@ Each `node::session_*` adds a `node::session` mixin
 estimate, performance). The mixin's job is to give every protocol
 instance on every channel a reference to the node's event bus and
 organizers. `session_outbound` additionally subscribes to the bus to
-reduce outbound connections while recent (doc 06 §1.4).
+reduce outbound connections while recent ([doc 06 §1.4](sessions-and-protocols#14-outbound-connection-reduction)).
 
 Protocols are versioned by Bitcoin P2P protocol number:
 
@@ -476,7 +476,7 @@ Each protocol class lives in `include/bitcoin/node/protocols/` and is
 implemented in `src/protocols/`. `protocol_block_in_31800` is the central
 performance-sensitive class — it's the only protocol referenced from many
 `chase` event handlers (download, starved, split, stall, purge, report,
-checked, unchecked). See [`06`](sessions-and-protocols) §5.
+checked, unchecked). See [`06` §5](sessions-and-protocols#5-protocol_block_in_31800--the-block-download-protocol).
 
 ---
 
@@ -531,25 +531,42 @@ the architecture docs refer to:
 
 | Setting                    | Used by                                                            |
 | -------------------------- | ------------------------------------------------------------------ |
-| `threads`, `thread_priority` | validation threadpool (04), scan threadpool priority (11)        |
-| `delay_inbound`            | inbound gate and `blocks_out` (06)                                 |
-| `provide_blocks` / `require_blocks` | `node_network` service bit; attach tree (06)              |
-| `provide_witness` / `require_witness` | witness service bits; block/tx serving and requests (06, 08, 10) |
-| `provide_filters`          | `node_client_filters`; attaches filter serving (09)                |
+| `threads`, `thread_priority` | validation threadpool ([04](validation-chaser)), scan threadpool priority ([11](transaction-chaser))        |
+| `delay_inbound`            | inbound gate and `blocks_out` ([06](sessions-and-protocols))                                 |
+| `provide_blocks` / `require_blocks` | `node_network` service bit; attach tree ([06](sessions-and-protocols))              |
+| `provide_witness` / `require_witness` | witness service bits; block/tx serving and requests ([06](sessions-and-protocols), [08](block-out-protocols), [10](transaction-protocols)) |
+| `provide_filters`          | `node_client_filters`; attaches filter serving ([09](filter-out-protocol))                |
 | `provide_privacy`          | silent payment service bit                                         |
-| `limited_blocks`           | pruned node: bypassed blocks stored without input scripts (06, 08) |
-| `use_gpu`, `cpu_batch_verify`, `cpu_batch_silent`, `batch_verify`, `batch_silent` | batching (04) |
-| `allowed_deviation`        | slow-peer detection (03)                                           |
-| `minimum_fee_rate`, `minimum_bump_rate` | pool admission and fee filter (10, 11)                |
-| `current_connections`      | outbound reduction when recent (06)                                |
-| `announcement_cache`       | per-channel anti-echo cache size (07)                              |
-| `fee_estimate_horizon`     | estimator (12)                                                     |
-| `maximum_height`           | stop height for check and validate (03, 04); `is_recent`           |
-| `maximum_concurrency`      | download window and validation backlog (03, 04)                    |
-| `silent_start_height`      | silent payment indexing start (04, 11)                             |
-| `sample_period_seconds`    | performance timer (06)                                             |
-| `compact_timeout_seconds`, `compact_missing_percent` | compact block fill (03, 07)              |
-| `currency_window_minutes`  | all currency predicates (§6.3); header tree window (02); stale timer (05) |
+| `limited_blocks`           | pruned node: bypassed blocks stored without input scripts ([06](sessions-and-protocols), [08](block-out-protocols)) |
+| `use_gpu`, `cpu_batch_verify`, `cpu_batch_silent`, `batch_verify`, `batch_silent` | batching ([04](validation-chaser)) |
+| `allowed_deviation`        | slow-peer detection ([03](download-chaser))                                           |
+| `minimum_fee_rate`, `minimum_bump_rate` | pool admission and fee filter ([10](transaction-protocols), [11](transaction-chaser))                |
+| `current_connections`      | outbound reduction when recent ([06](sessions-and-protocols))                                |
+| `announcement_cache`       | per-channel anti-echo cache size ([07](header-protocols))                              |
+| `fee_estimate_horizon`     | estimator ([12](periphery-chasers))                                                     |
+| `maximum_height`           | stop height for check and validate ([03](download-chaser), [04](validation-chaser)); `is_recent`           |
+| `maximum_concurrency`      | download window and validation backlog ([03](download-chaser), [04](validation-chaser))                    |
+| `silent_start_height`      | silent payment indexing start ([04](validation-chaser), [11](transaction-chaser))                             |
+| `sample_period_seconds`    | performance timer ([06](sessions-and-protocols))                                             |
+| `compact_timeout_seconds`, `compact_missing_percent` | compact block fill ([03](download-chaser), [07](header-protocols))              |
+| `currency_window_minutes`  | all currency predicates (§6.3); header tree window ([02](header-chaser)); stale timer ([05](confirmation-chaser)) |
+
+---
+
+## 11. Subsystem documents
+
+- [01 — Event bus](event-bus): every `chase` event with its verified issuer and handler sites.
+- [02 — Header chaser](header-chaser): header organization, tree pruning and disorganization.
+- [03 — Download chaser](download-chaser): block download orchestration and the download window.
+- [04 — Validation chaser](validation-chaser): consensus validation and batched verification.
+- [05 — Confirmation chaser](confirmation-chaser): order-based consensus checks and the confirmed chain.
+- [06 — Sessions and protocols](sessions-and-protocols): sessions, the protocol attach tree and `protocol_block_in_31800`.
+- [07 — Header protocols](header-protocols): header sync and compact blocks.
+- [08 — Block out protocols](block-out-protocols): serving blocks to peers.
+- [09 — Filter out protocol](filter-out-protocol): BIP157/158 client filters.
+- [10 — Transaction protocols](transaction-protocols): transaction relay in and out.
+- [11 — Transaction chaser](transaction-chaser): the transaction pool and compact block fill.
+- [12 — Periphery chasers](periphery-chasers): snapshot, storage, template and fee estimate.
 
 ---
 

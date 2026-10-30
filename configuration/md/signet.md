@@ -74,8 +74,8 @@ buckets = 330001
 [table.state]
 buckets = 330001
 
-[table.scan]
-buckets = 330001
+# [table.scan]
+# buckets = 330001
 ```
 
 - `[bitcoin]` replaces the chain parameters: genesis block, soft fork
@@ -88,3 +88,5 @@ buckets = 330001
 - `[wallet]` sets the testnet address and key prefixes used by the server
   ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the chain-height tables for about 330,000 blocks.
+- `[table.scan]` is commented out because it enables silent payments
+  ([§5.14](index#514-silent-payments)). Uncomment it to index them.

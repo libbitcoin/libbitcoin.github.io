@@ -17,7 +17,34 @@ The three build systems produce the same `bs`. CMake and autotools are
 equivalent on Linux and macOS. CMake presets select a configuration by
 name.
 
-## 2. What every build needs
+## 2. Supported platforms
+
+| | x64 | x86 (32-bit) | arm64 | arm32 | s390x (big-endian) |
+| --- | --- | --- | --- | --- | --- |
+| **Linux** | ✔ CI | ✔ | ● | ✔ | ✔ CI |
+| **macOS** | ● | Obsolete | ✔ CI | N/A | N/A |
+| **Windows** | ✔ CI | ✔ CI | ● | Obsolete | N/A |
+
+- ✔ CI: built and tested on every change.
+- ● Built and tested outside of CI.
+- ✔ Expected to build: the toolchain supports it.
+- Obsolete: no current toolchain targets it.
+- N/A: the platform does not exist on that architecture.
+
+BSD, Cygwin, and MinGW are not supported.
+
+[Platform support](platforms) compares platforms, compilers and build
+systems with Bitcoin Core.
+
+## 3. Supported compilers
+
+| Platform | Compilers | Build systems |
+| -------- | --------- | ------------- |
+| Linux | GCC 13 to 16, Clang 18 and 19 | Autotools, CMake, CMake presets |
+| macOS | Apple Clang (Xcode) | Autotools, CMake |
+| Windows | MSVC v145 (Visual Studio 2026), Clang (clang-cl, with Visual Studio) | Visual Studio, MSBuild |
+
+## 4. What every build needs
 
 - A C++20 compiler. The versions tested in CI are listed in
   [Build systems and toolchains](toolchains).
@@ -27,7 +54,7 @@ name.
 
 Nothing else is required (see [Build options](options)).
 
-## 3. Quick start
+## 5. Quick start
 
 On Linux or macOS, a static release build installed under
 `~/libbitcoin`, optimized for the build machine:
@@ -40,7 +67,7 @@ $ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-co
 
 The result is `~/libbitcoin/bin/bs`. On Windows, see [Windows](windows).
 
-## 4. Hardware options
+## 6. Hardware options
 
 By default `bs` is built for the baseline instruction set of its
 architecture (AVX2 by default on Windows, which can be lowered). Options such as `--enable-avx2` or `--enable-shani` make it
@@ -50,7 +77,7 @@ supports, so its `bs` runs only on CPUs with the same extensions. Run
 `bs --hardware` on the target machine to see what it supports, and see
 [Build options](options).
 
-## 5. Pages
+## 7. Pages
 
 - [Linux](linux), [macOS](macos) and [Windows](windows): prerequisites
   and steps for each platform.
@@ -58,5 +85,7 @@ supports, so its `bs` runs only on CPUs with the same extensions. Run
   options shared by all three build systems.
 - [Build systems and toolchains](toolchains): autotools, CMake and
   Visual Studio, and the compilers and Boost versions tested in CI.
+- [Platform support](platforms): platforms, compilers and build systems
+  compared with Bitcoin Core.
 - [libbitcoin-build](libbitcoin-build): the generator behind the build
   files, for maintainers.

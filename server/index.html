@@ -261,6 +261,7 @@
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../building/platforms.html">Platform Support</a>
         <a href="../building/index.html">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
@@ -654,9 +655,8 @@ that sparrow extends is overridden, not reimplemented (<code>add_features</code>
 </tr>
 </tbody>
 </table></div>
-<p>The stratum sessions, channels and interfaces exist, but the protocols are
-not implemented: stratum v1 handlers reply <code>not_implemented</code>, and stratum v2
-subscribes to no messages.</p>
+<p>Stratum v1 and Stratum v2 each have their own session, channel and
+interface.</p>
 <h2 id="5-requests">5. Requests<a class="anchor" href="#5-requests" aria-label="Link to this section">#</a></h2>
 <p>An interface is a compile-time tuple of methods, each a name with typed
 parameters, constructed with the parameter names (<code>interfaces/</code>). Optional

@@ -24,6 +24,7 @@ SITE_MENU = [
         ("start/index.html", "Quick Start"),
         ("configuration/index.html", "Configuration"),
         ("configuration/reference.html", "Settings Reference"),
+        ("building/platforms.html", "Platform Support"),
         ("building/index.html", "Building"),
     ]),
     ("Performance", [
@@ -263,6 +264,7 @@ SECTIONS = {
             ("options", "Build options"),
             ("toolchains", "Build systems and toolchains"),
             ("libbitcoin-build", "libbitcoin-build"),
+            ("platforms", "Platform Support"),
         ],
     },
     "interfaces": {

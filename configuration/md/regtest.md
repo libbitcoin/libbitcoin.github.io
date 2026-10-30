@@ -102,8 +102,8 @@ buckets = 10001
 [table.state]
 buckets = 10001
 
-[table.scan]
-buckets = 10001
+# [table.scan]
+# buckets = 10001
 ```
 
 - `[bitcoin]` sets the regtest genesis block and difficulty limit, all
@@ -119,3 +119,5 @@ buckets = 10001
   18445 since `bs` listens on 18444.
 - `[table.*]` keeps the store small, since the mainnet defaults
   preallocate for the mainnet chain.
+- `[table.scan]` is commented out because it enables silent payments
+  ([§5.14](index#514-silent-payments)). Uncomment it to index them.

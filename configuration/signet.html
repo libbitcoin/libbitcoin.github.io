@@ -261,6 +261,7 @@
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../building/platforms.html">Platform Support</a>
         <a href="../building/index.html">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
@@ -390,8 +391,8 @@ buckets = 330001
 <span class="section">[table.state]</span>
 buckets = 330001
 
-<span class="section">[table.scan]</span>
-buckets = 330001
+<span class="comment"># [table.scan]</span>
+<span class="comment"># buckets = 330001</span>
 </code></pre>
 <ul>
 <li><code>[bitcoin]</code> replaces the chain parameters: genesis block, soft fork
@@ -404,6 +405,8 @@ buckets = 330001
 <li><code>[wallet]</code> sets the testnet address and key prefixes used by the server
   (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
 <li><code>[table.*]</code> sizes the chain-height tables for about 330,000 blocks.</li>
+<li><code>[table.scan]</code> is commented out because it enables silent payments
+  (<a href="index.html#514-silent-payments">§5.14</a>). Uncomment it to index them.</li>
 </ul>
   </article>
 

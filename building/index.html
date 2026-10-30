@@ -261,6 +261,7 @@
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../building/platforms.html">Platform Support</a>
         <a href="../building/index.html" class="here">Building</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
@@ -320,6 +321,7 @@
     <a href="options.html">Build options</a>
     <a href="toolchains.html">Build systems and toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
+    <a href="platforms.html">Platform Support</a>
   </nav>
 
   <article class="doc">
@@ -361,7 +363,83 @@ order, along with Boost where needed.</p>
 <p>The three build systems produce the same <code>bs</code>. CMake and autotools are
 equivalent on Linux and macOS. CMake presets select a configuration by
 name.</p>
-<h2 id="2-what-every-build-needs">2. What every build needs<a class="anchor" href="#2-what-every-build-needs" aria-label="Link to this section">#</a></h2>
+<h2 id="2-supported-platforms">2. Supported platforms<a class="anchor" href="#2-supported-platforms" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th></th>
+<th>x64</th>
+<th>x86 (32-bit)</th>
+<th>arm64</th>
+<th>arm32</th>
+<th>s390x (big-endian)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Linux</strong></td>
+<td>✔ CI</td>
+<td>✔</td>
+<td>●</td>
+<td>✔</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td><strong>macOS</strong></td>
+<td>●</td>
+<td>Obsolete</td>
+<td>✔ CI</td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Windows</strong></td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>●</td>
+<td>Obsolete</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>✔ CI: built and tested on every change.</li>
+<li>● Built and tested outside of CI.</li>
+<li>✔ Expected to build: the toolchain supports it.</li>
+<li>Obsolete: no current toolchain targets it.</li>
+<li>N/A: the platform does not exist on that architecture.</li>
+</ul>
+<p>BSD, Cygwin, and MinGW are not supported.</p>
+<p><a href="platforms.html">Platform support</a> compares platforms, compilers and build
+systems with Bitcoin Core.</p>
+<h2 id="3-supported-compilers">3. Supported compilers<a class="anchor" href="#3-supported-compilers" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Compilers</th>
+<th>Build systems</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux</td>
+<td>GCC 13 to 16, Clang 18 and 19</td>
+<td>Autotools, CMake, CMake presets</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>Apple Clang (Xcode)</td>
+<td>Autotools, CMake</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>MSVC v145 (Visual Studio 2026), Clang (clang-cl, with Visual Studio)</td>
+<td>Visual Studio, MSBuild</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="4-what-every-build-needs">4. What every build needs<a class="anchor" href="#4-what-every-build-needs" aria-label="Link to this section">#</a></h2>
 <ul>
 <li>A C++20 compiler. The versions tested in CI are listed in
   <a href="toolchains.html">Build systems and toolchains</a>.</li>
@@ -370,7 +448,7 @@ name.</p>
 <li>Git, to fetch the libbitcoin sources.</li>
 </ul>
 <p>Nothing else is required (see <a href="options.html">Build options</a>).</p>
-<h2 id="3-quick-start">3. Quick start<a class="anchor" href="#3-quick-start" aria-label="Link to this section">#</a></h2>
+<h2 id="5-quick-start">5. Quick start<a class="anchor" href="#5-quick-start" aria-label="Link to this section">#</a></h2>
 <p>On Linux or macOS, a static release build installed under
 <code>~/libbitcoin</code>, optimized for the build machine:</p>
 <pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-server
@@ -378,7 +456,7 @@ $ cd libbitcoin-server
 $ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static --hardware-optimized
 </code></pre>
 <p>The result is <code>~/libbitcoin/bin/bs</code>. On Windows, see <a href="windows.html">Windows</a>.</p>
-<h2 id="4-hardware-options">4. Hardware options<a class="anchor" href="#4-hardware-options" aria-label="Link to this section">#</a></h2>
+<h2 id="6-hardware-options">6. Hardware options<a class="anchor" href="#6-hardware-options" aria-label="Link to this section">#</a></h2>
 <p>By default <code>bs</code> is built for the baseline instruction set of its
 architecture (AVX2 by default on Windows, which can be lowered). Options such as <code>--enable-avx2</code> or <code>--enable-shani</code> make it
 faster on CPUs that have those instructions, and unable to run on CPUs
@@ -386,7 +464,7 @@ that do not. <code>--hardware-optimized</code> enables all that the build machin
 supports, so its <code>bs</code> runs only on CPUs with the same extensions. Run
 <code>bs --hardware</code> on the target machine to see what it supports, and see
 <a href="options.html">Build options</a>.</p>
-<h2 id="5-pages">5. Pages<a class="anchor" href="#5-pages" aria-label="Link to this section">#</a></h2>
+<h2 id="7-pages">7. Pages<a class="anchor" href="#7-pages" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="linux.html">Linux</a>, <a href="macos.html">macOS</a> and <a href="windows.html">Windows</a>: prerequisites
   and steps for each platform.</li>
@@ -394,6 +472,8 @@ supports, so its <code>bs</code> runs only on CPUs with the same extensions. Run
   options shared by all three build systems.</li>
 <li><a href="toolchains.html">Build systems and toolchains</a>: autotools, CMake and
   Visual Studio, and the compilers and Boost versions tested in CI.</li>
+<li><a href="platforms.html">Platform support</a>: platforms, compilers and build systems
+  compared with Bitcoin Core.</li>
 <li><a href="libbitcoin-build.html">libbitcoin-build</a>: the generator behind the build
   files, for maintainers.</li>
 </ul>
