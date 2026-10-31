@@ -13,13 +13,15 @@ master `0cd57fcf` (2026-10-27).
 The consensus rules are implemented by the chain types, divided into
 validation stages by what each needs:
 
-| Stage | Requires | Examples |
-| ----- | -------- | -------- |
-| `check` | The block alone | Size, merkle root, coinbase position, double spends and forward references within the block |
-| `check` (contextual) | Its context in the chain | Weight, coinbase height (BIP34), witness commitment, signet solution |
-| `accept` | Previous output values | Coinbase value against subsidy and fees, sigop limit |
-| `connect` | Previous output scripts | Script execution of each input, including signatures |
-| `confirm` | The confirmed chain | Coinbase maturity, relative locktime (BIP68), spends of unconfirmed or already spent outputs |
+| Stage | Requires | Rules |
+| ----- | -------- | ----- |
+| `header::check()` |  | Proof of work, future timestamp |
+| `header::accept(context)` |  | Version, median time past, work required, time warp (BIP94) |
+| `block::check()` |  | Empty block, size, coinbase position and count, forward references, internal double spends, merkle root, empty transactions, coinbase script size, null previous outputs |
+| `block::check(context)` |  | Weight (BIP141), coinbase height (BIP34), hash limit (BIP50), witness commitment (BIP141), signet solution, absolute locktime (BIP113) |
+| `block::accept(context)` | Prevout&nbsp;values | Coinbase value against subsidy and fees, sigop limit, missing previous outputs, spends exceeding value |
+| `block::connect(context)` | Prevout&nbsp;scripts | Script execution of each input, including signatures |
+| `block::confirm(context)` | Prevout&nbsp;metadata | Coinbase collision (BIP30), relative locktime (BIP68), unconfirmed spends, coinbase maturity, confirmed double spends |
 
 ```mermaid
 flowchart LR
@@ -203,6 +205,11 @@ Script execution of each input against its previous output, by the
 [machine](machine):
 
 ```cpp
+code block::connect(const context& ctx) const NOEXCEPT
+{
+    return connect_transactions(ctx);
+}
+
 code transaction::connect(const context& ctx) const NOEXCEPT
 {
     if (is_coinbase())
@@ -240,6 +247,16 @@ code transaction::connect_input(const context& ctx,
 The rules that depend on the confirmed chain:
 
 ```cpp
+code block::confirm(const context& ctx) const NOEXCEPT
+{
+    const auto bip30 = ctx.is_enabled(bip30_rule);
+
+    if (bip30 && is_unspent_coinbase_collision())
+        return error::unspent_coinbase_collision;
+
+    return confirm_transactions(ctx);
+}
+
 code transaction::confirm(const context& ctx) const NOEXCEPT
 {
     const auto bip68 = ctx.is_enabled(bip68_rule);

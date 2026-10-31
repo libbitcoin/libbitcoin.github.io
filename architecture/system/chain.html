@@ -345,34 +345,44 @@ validation stages by what each needs:</p>
 <tr>
 <th>Stage</th>
 <th>Requires</th>
-<th>Examples</th>
+<th>Rules</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>check</code></td>
-<td>The block alone</td>
-<td>Size, merkle root, coinbase position, double spends and forward references within the block</td>
+<td><code>header::check()</code></td>
+<td></td>
+<td>Proof of work, future timestamp</td>
 </tr>
 <tr>
-<td><code>check</code> (contextual)</td>
-<td>Its context in the chain</td>
-<td>Weight, coinbase height (BIP34), witness commitment, signet solution</td>
+<td><code>header::accept(context)</code></td>
+<td></td>
+<td>Version, median time past, work required, time warp (BIP94)</td>
 </tr>
 <tr>
-<td><code>accept</code></td>
-<td>Previous output values</td>
-<td>Coinbase value against subsidy and fees, sigop limit</td>
+<td><code>block::check()</code></td>
+<td></td>
+<td>Empty block, size, coinbase position and count, forward references, internal double spends, merkle root, empty transactions, coinbase script size, null previous outputs</td>
 </tr>
 <tr>
-<td><code>connect</code></td>
-<td>Previous output scripts</td>
+<td><code>block::check(context)</code></td>
+<td></td>
+<td>Weight (BIP141), coinbase height (BIP34), hash limit (BIP50), witness commitment (BIP141), signet solution, absolute locktime (BIP113)</td>
+</tr>
+<tr>
+<td><code>block::accept(context)</code></td>
+<td>Prevout&nbsp;values</td>
+<td>Coinbase value against subsidy and fees, sigop limit, missing previous outputs, spends exceeding value</td>
+</tr>
+<tr>
+<td><code>block::connect(context)</code></td>
+<td>Prevout&nbsp;scripts</td>
 <td>Script execution of each input, including signatures</td>
 </tr>
 <tr>
-<td><code>confirm</code></td>
-<td>The confirmed chain</td>
-<td>Coinbase maturity, relative locktime (BIP68), spends of unconfirmed or already spent outputs</td>
+<td><code>block::confirm(context)</code></td>
+<td>Prevout&nbsp;metadata</td>
+<td>Coinbase collision (BIP30), relative locktime (BIP68), unconfirmed spends, coinbase maturity, confirmed double spends</td>
 </tr>
 </tbody>
 </table></div>
@@ -534,7 +544,12 @@ code transaction::accept(const context&amp;) const NOEXCEPT
 <h3 id="15-connect">1.5 Connect<a class="anchor" href="#15-connect" aria-label="Link to this section">#</a></h3>
 <p>Script execution of each input against its previous output, by the
 <a href="machine.html">machine</a>:</p>
-<pre><code class="language-cpp">code transaction::connect(const context&amp; ctx) const NOEXCEPT
+<pre><code class="language-cpp">code block::connect(const context&amp; ctx) const NOEXCEPT
+{
+    return connect_transactions(ctx);
+}
+
+code transaction::connect(const context&amp; ctx) const NOEXCEPT
 {
     if (is_coinbase())
         return error::transaction_success;
@@ -564,7 +579,17 @@ input's scripts to those of its previous output:</p>
 </code></pre>
 <h3 id="16-confirm">1.6 Confirm<a class="anchor" href="#16-confirm" aria-label="Link to this section">#</a></h3>
 <p>The rules that depend on the confirmed chain:</p>
-<pre><code class="language-cpp">code transaction::confirm(const context&amp; ctx) const NOEXCEPT
+<pre><code class="language-cpp">code block::confirm(const context&amp; ctx) const NOEXCEPT
+{
+    const auto bip30 = ctx.is_enabled(bip30_rule);
+
+    if (bip30 &amp;&amp; is_unspent_coinbase_collision())
+        return error::unspent_coinbase_collision;
+
+    return confirm_transactions(ctx);
+}
+
+code transaction::confirm(const context&amp; ctx) const NOEXCEPT
 {
     const auto bip68 = ctx.is_enabled(bip68_rule);
 
