@@ -228,13 +228,13 @@ SECTIONS = {
         ],
     },
     "security": {
-        "title": "Security",
-        "h1": "Security",
+        "title": "Vulnerability Reporting",
+        "h1": "Vulnerability Reporting",
         "description": "How to report a vulnerability in Bitcoin Server (bs), Bitcoin Explorer (bx) or the libbitcoin libraries.",
         "lede": "How to report a vulnerability in <strong>Bitcoin Server</strong> (bs),\n      <strong>Bitcoin Explorer</strong> (bx) or the libbitcoin libraries.",
         "foot": "",
         "pages": [
-            ("index", "Security"),
+            ("index", "Vulnerability Reporting"),
         ],
     },
     "start": {

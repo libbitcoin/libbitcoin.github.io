@@ -1,4 +1,4 @@
-# Security
+# Vulnerability Reporting
 
 ## 1. Reporting
 
