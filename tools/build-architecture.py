@@ -28,6 +28,7 @@ SITE_MENU = [
         ("configuration/reference.html", "Settings Reference"),
         ("building/platforms.html", "Platform Support"),
         ("building/index.html", "Building"),
+        ("packages/index.html", "Packages"),
     ]),
     ("Performance", [
         ("sync.html", "Sync BS"),
@@ -153,6 +154,9 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Build Architecture"),
+            ("deterministic", "Deterministic builds"),
+            ("release", "Release builds"),
+            ("packaging", "Packaging"),
         ],
     },
     "architecture/node": {
@@ -225,6 +229,16 @@ SECTIONS = {
         "foot": "",
         "pages": [
             ("index", "Download BS"),
+        ],
+    },
+    "packages": {
+        "title": "Packages",
+        "h1": "Packages",
+        "description": "Getting Bitcoin Server (bs): from a package manager, as a signed download, or built from source.",
+        "lede": "Getting <strong>Bitcoin Server</strong> (bs): from a package manager,\n      as a signed download, or built from source.",
+        "foot": "",
+        "pages": [
+            ("index", "Packages"),
         ],
     },
     "security": {

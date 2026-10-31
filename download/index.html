@@ -264,6 +264,7 @@
         <a href="../configuration/reference.html">Settings Reference</a>
         <a href="../building/platforms.html">Platform Support</a>
         <a href="../building/index.html">Building</a>
+        <a href="../packages/index.html">Packages</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync BS</a>
@@ -342,7 +343,7 @@ bs-linux-x64-shani.asc
 </code></pre>
 <h2 id="2-selecting-a-build">2. Selecting a build<a class="anchor" href="#2-selecting-a-build" aria-label="Link to this section">#</a></h2>
 <p>A build is named <code>bs-&lt;platform&gt;-&lt;architecture&gt;</code>, followed by the
-instruction set extensions it uses, if any. Windows builds end in <code>.exe</code>.</p>
+extension level it is built for, if any. Windows builds end in <code>.exe</code>.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -372,30 +373,54 @@ instruction set extensions it uses, if any. Windows builds end in <code>.exe</co
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>Architecture</th>
-<th>Extensions</th>
+<th>Build</th>
+<th>Also uses</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>x64</code></td>
-<td><code>shani</code> (SHA), <code>avx512</code> (AVX-512), <code>avxifma</code> (AVX-IFMA)</td>
+<td></td>
+</tr>
+<tr>
+<td><code>x64-shani</code></td>
+<td>SHA extensions</td>
+</tr>
+<tr>
+<td><code>x64-avxifma</code></td>
+<td>SHA extensions, AVX-IFMA</td>
+</tr>
+<tr>
+<td><code>x64-avx512ifma</code></td>
+<td>SHA extensions, AVX-512 IFMA</td>
 </tr>
 <tr>
 <td><code>arm64</code></td>
-<td><code>crypto</code> (ARMv8 SHA and AES), <code>sha3</code> (ARMv8.2 SHA-3)</td>
+<td></td>
+</tr>
+<tr>
+<td><code>arm64-crypto</code></td>
+<td>ARMv8 SHA</td>
+</tr>
+<tr>
+<td><code>arm64-sha3</code></td>
+<td>ARMv8 SHA, ARMv8.2 SHA-3</td>
 </tr>
 </tbody>
 </table></div>
-<p>A build runs only on a CPU that has every extension in its name, and is
-faster for using them. To select one, run the build without extensions,
-which runs on any CPU of its architecture, with <code>--hardware</code>:</p>
+<p>Linux and Windows have every build above, and musl has the <code>x64</code>
+builds. macOS has one build for each architecture: <code>arm64</code>, which uses
+ARMv8 SHA, SHA-3 and AES, and <code>x64</code>, which uses AES-NI.</p>
+<p>A build runs only on a CPU that has every extension it uses, and is
+faster for using them. To select one, run the build without an extension
+level, which runs on any CPU of its architecture, with <code>--hardware</code>:</p>
 <pre class="console"><code>$ bs-linux-x64 --hardware
 </code></pre>
 <p>It lists the extensions of the CPU. Use the build whose extensions are
-all among them, with the most extensions. For example, a CPU with SHA and
-AVX-512, but not AVX-IFMA, uses <code>bs-linux-x64-avx512-shani</code>. For what
-each extension does, see <a href="../building/options.html#2-hardware-options">Hardware options</a>.</p>
+all among them, preferring <code>avx512ifma</code> to <code>avxifma</code>, and either to
+<code>shani</code>. For example, a CPU with SHA extensions and AVX-512 IFMA uses
+<code>bs-linux-x64-avx512ifma</code>. For what each extension does, see
+<a href="../building/options.html#2-hardware-options">Hardware options</a>.</p>
 <h2 id="3-verifying-a-build">3. Verifying a build<a class="anchor" href="#3-verifying-a-build" aria-label="Link to this section">#</a></h2>
 <p>Verify a build before running it. A build is verified by its signature,
 made with the libbitcoin release key. The signature proves the build is

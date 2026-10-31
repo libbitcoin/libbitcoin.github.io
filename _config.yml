@@ -13,6 +13,8 @@ exclude:
   - interfaces/md
   - start/md
   - download/md
+  - packages/md
+  - security/md
   - developers/md
   - client/md
   - tools

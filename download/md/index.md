@@ -26,7 +26,7 @@ bs-linux-x64-shani.asc
 ## 2. Selecting a build
 
 A build is named `bs-<platform>-<architecture>`, followed by the
-instruction set extensions it uses, if any. Windows builds end in `.exe`.
+extension level it is built for, if any. Windows builds end in `.exe`.
 
 | Platform | Runs on |
 | -------- | ------- |
@@ -35,23 +35,33 @@ instruction set extensions it uses, if any. Windows builds end in `.exe`.
 | `macos` | macOS |
 | `windows` | Windows |
 
-| Architecture | Extensions |
-| ------------ | ---------- |
-| `x64` | `shani` (SHA), `avx512` (AVX-512), `avxifma` (AVX-IFMA) |
-| `arm64` | `crypto` (ARMv8 SHA and AES), `sha3` (ARMv8.2 SHA-3) |
+| Build | Also uses |
+| ----- | --------- |
+| `x64` | |
+| `x64-shani` | SHA extensions |
+| `x64-avxifma` | SHA extensions, AVX-IFMA |
+| `x64-avx512ifma` | SHA extensions, AVX-512 IFMA |
+| `arm64` | |
+| `arm64-crypto` | ARMv8 SHA |
+| `arm64-sha3` | ARMv8 SHA, ARMv8.2 SHA-3 |
 
-A build runs only on a CPU that has every extension in its name, and is
-faster for using them. To select one, run the build without extensions,
-which runs on any CPU of its architecture, with `--hardware`:
+Linux and Windows have every build above, and musl has the `x64`
+builds. macOS has one build for each architecture: `arm64`, which uses
+ARMv8 SHA, SHA-3 and AES, and `x64`, which uses AES-NI.
+
+A build runs only on a CPU that has every extension it uses, and is
+faster for using them. To select one, run the build without an extension
+level, which runs on any CPU of its architecture, with `--hardware`:
 
 ```
 $ bs-linux-x64 --hardware
 ```
 
 It lists the extensions of the CPU. Use the build whose extensions are
-all among them, with the most extensions. For example, a CPU with SHA and
-AVX-512, but not AVX-IFMA, uses `bs-linux-x64-avx512-shani`. For what
-each extension does, see [Hardware options](../building/options#2-hardware-options).
+all among them, preferring `avx512ifma` to `avxifma`, and either to
+`shani`. For example, a CPU with SHA extensions and AVX-512 IFMA uses
+`bs-linux-x64-avx512ifma`. For what each extension does, see
+[Hardware options](../building/options#2-hardware-options).
 
 ## 3. Verifying a build
 
