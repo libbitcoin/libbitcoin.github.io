@@ -16,6 +16,7 @@ import markdown
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHROME = os.path.join(ROOT, "computation.html")
 MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
+MERMAID_SRI = "sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I"
 
 SITE_MENU = [
     ("index.html", "Home"),
@@ -702,13 +703,13 @@ def render(key, name, md, guard, logo, mermaid_src):
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
 });
 </script>
-<script src="%(mermaid)s"></script>
+<script src="%(mermaid)s"%(mermaid_sri)s></script>
 <script>
 mermaid.initialize({
   startOnLoad: false,
@@ -757,11 +758,15 @@ window.addEventListener('load', function () {
     if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
   }
   function decode() {
-    var area = document.createElement('textarea');
+    var named = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: '\u00a0' };
+    function entity(match, dec, hex, name) {
+      if (dec) return String.fromCodePoint(parseInt(dec, 10));
+      if (hex) return String.fromCodePoint(parseInt(hex, 16));
+      return Object.prototype.hasOwnProperty.call(named, name) ? named[name] : match;
+    }
     document.querySelectorAll('.mermaid svg text, .mermaid svg tspan').forEach(function (text) {
       if (text.children.length || text.textContent.indexOf('&') < 0) return;
-      area.innerHTML = text.textContent;
-      text.textContent = area.value;
+      text.textContent = text.textContent.replace(/&(?:#(\d+)|#x([0-9a-fA-F]+)|([a-z]+));/g, entity);
     });
   }
   mermaid.run().then(function () { decode(); settle(); }, settle);
@@ -802,7 +807,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
 </html>
 """ % dict(page_title=page_title, description=description, name=name, guard=guard, logo=logo,
            style=STYLE, h1=h1, menu=menu(pages, name) if len(pages) > 1 else section_menu(body), body=body, pager=pager(pages, name),
-           mermaid=mermaid_src, key=key, site=site_menu(key, name), lede=section["lede"], foot=foot)
+           mermaid=mermaid_src, mermaid_sri=' integrity="%s" crossorigin="anonymous"' % MERMAID_SRI if mermaid_src == MERMAID else "", key=key, site=site_menu(key, name), lede=section["lede"], foot=foot)
 
 
 def check_links(key, pages):

@@ -32,8 +32,9 @@
       '<h1 style="color:#ff2357;font-size:22px">Warning: unofficial mirror</h1>' +
       '<p>This page is being served from a domain not controlled by the ' +
       'libbitcoin project. Do not trust content, links, or downloads here.</p>' +
-      '<p>The official site is <a style="color:#ffa022" ' +
-      'href="' + url + '">https://libbitcoin.info</a>.</p></div>';
+      '<p>The official site is <a style="color:#ffa022">' +
+      'https://libbitcoin.info</a>.</p></div>';
+    document.body.querySelector('a').href = url;
   });
 })();
 </script>
@@ -683,13 +684,13 @@ maintained or tested with libbitcoin. Alternatively add the paths in a
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
 });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>
 <script>
 mermaid.initialize({
   startOnLoad: false,
@@ -738,11 +739,15 @@ window.addEventListener('load', function () {
     if (target) requestAnimationFrame(function () { target.scrollIntoView(); });
   }
   function decode() {
-    var area = document.createElement('textarea');
+    var named = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+    function entity(match, dec, hex, name) {
+      if (dec) return String.fromCodePoint(parseInt(dec, 10));
+      if (hex) return String.fromCodePoint(parseInt(hex, 16));
+      return Object.prototype.hasOwnProperty.call(named, name) ? named[name] : match;
+    }
     document.querySelectorAll('.mermaid svg text, .mermaid svg tspan').forEach(function (text) {
       if (text.children.length || text.textContent.indexOf('&') < 0) return;
-      area.innerHTML = text.textContent;
-      text.textContent = area.value;
+      text.textContent = text.textContent.replace(/&(?:#(\d+)|#x([0-9a-fA-F]+)|([a-z]+));/g, entity);
     });
   }
   mermaid.run().then(function () { decode(); settle(); }, settle);
