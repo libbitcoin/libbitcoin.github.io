@@ -439,8 +439,14 @@
 <script>
 (function () {
   var box = document.getElementById('lightbox'), img = box.querySelector('img');
-  function open(el) { img.src = el.getAttribute('data-full'); img.alt = el.querySelector('h3').textContent; box.hidden = false; }
-  function close() { box.hidden = true; img.removeAttribute('src'); }
+  function open(el) {
+    var copy = el.querySelector('img').cloneNode(true);
+    copy.removeAttribute('loading');
+    img.replaceWith(copy);
+    img = copy;
+    box.hidden = false;
+  }
+  function close() { box.hidden = true; }
   document.querySelectorAll('.shot').forEach(function (el) {
     el.addEventListener('click', function () { open(el); });
     el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(el); } });
