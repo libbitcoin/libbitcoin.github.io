@@ -2,7 +2,7 @@
   'use strict';
   var SKINS = [['moon', 'Moon'], ['spec', 'Spec'], ['classic', 'Classic']];
   var DEFAULT = 'classic';
-  var base = document.currentScript.src.replace(/[^\/]*$/, '');
+  var base = document.currentScript.src;
 
   // A skin given in the query (?skin=name) is remembered and enables the
   // selector; ?skin=off forgets it.
@@ -55,8 +55,12 @@
   // Classic is the page's own style; each other skin is a stylesheet over it.
   SKINS.forEach(function (s) {
     if (s[0] === 'classic') return;
-    document.write('<link rel="stylesheet" data-skin="' + s[0] + '" href="' +
-      base + s[0] + '.css"' + (s[0] === skin ? '' : ' media="not all"') + '>');
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.setAttribute('data-skin', s[0]);
+    link.href = new URL(s[0] + '.css', base).href;
+    if (s[0] !== skin) link.media = 'not all';
+    document.head.appendChild(link);
   });
 
   function apply(name) {
