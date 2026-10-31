@@ -28,7 +28,7 @@ flowchart LR
     chk["check\nblock, context"]
     acc["accept\nprevout values"]
     con["connect\nprevout scripts"]
-    cnf["confirm\nconfirmed chain"]
+    cnf["confirm\nprevout metadata"]
 
     chk --> acc --> con --> cnf
 ```
