@@ -14,7 +14,7 @@ makes it harder to scan, or that would itself need testing, is excluded.
 
 - `BC_ASSERT` paths are unreachable by design and are not tested.
 - Acceptance tests are the server's Python suite in `endpoints/`, run
-  against a live node (see [Test architecture](../test/index)).
+  against a live node (see [Test architecture](../architecture/test/index)).
 
 ## 2. Files and structure
 

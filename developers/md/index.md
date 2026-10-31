@@ -41,8 +41,8 @@ flowchart BT
 | <span class="nw">[libbitcoin-server](https://github.com/libbitcoin/libbitcoin-server)</span> | `libbitcoin::server` | <span class="nw">node</span> | The client interfaces of Bitcoin Server, and `bs` |
 | <span class="nw">[libbitcoin-explorer](https://github.com/libbitcoin/libbitcoin-explorer)</span> | `libbitcoin::explorer` | <span class="nw">system</span> | The commands of Bitcoin Explorer, and `bx` |
 
-The node and the store are described in [Architecture](../architecture/index)
-and [Database](../database/index).
+The node and the store are described in [Architecture](../architecture/node/index)
+and [Database](../architecture/database/index).
 
 ## 2. Using a library
 

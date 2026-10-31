@@ -1,4 +1,4 @@
-"""Render architecture/md/*.md into architecture/*.html using the site chrome.
+"""Render each section's <section>/md/*.md into <section>/*.html using the site chrome.
 
 Usage: python tools/build-architecture.py [--mermaid URL]
 
@@ -8,6 +8,7 @@ the pages share one copy of each. Mermaid diagrams are emitted as
 """
 import html
 import os
+import posixpath
 import re
 import sys
 
@@ -35,15 +36,15 @@ SITE_MENU = [
         ("interface-performance.html", "Interfaces"),
     ]),
     ("Architecture", [
-        ("overview/index.html", "Overview"),
-        ("system/index.html", "System"),
-        ("database/index.html", "Database"),
-        ("network/index.html", "Network"),
-        ("architecture/index.html", "Node"),
-        ("server/index.html", "Server"),
-        ("explorer/index.html", "Explorer"),
-        ("build/index.html", "Build"),
-        ("test/index.html", "Test"),
+        ("architecture/index.html", "Overview"),
+        ("architecture/system/index.html", "System"),
+        ("architecture/database/index.html", "Database"),
+        ("architecture/network/index.html", "Network"),
+        ("architecture/node/index.html", "Node"),
+        ("architecture/server/index.html", "Server"),
+        ("architecture/explorer/index.html", "Explorer"),
+        ("architecture/build/index.html", "Build"),
+        ("architecture/test/index.html", "Test"),
     ]),
     ("Server", [
         ("interfaces.html", "BS Interfaces"),
@@ -73,7 +74,7 @@ SITE_MENU = [
 ]
 
 SECTIONS = {
-    "overview": {
+    "architecture": {
         "title": "Architecture Overview",
         "h1": "Architecture Overview",
         "description": "How the libbitcoin libraries of Bitcoin Server (bs) fit together: the stack, the node, the store and the server.",
@@ -83,7 +84,7 @@ SECTIONS = {
             ("index", "Architecture Overview"),
         ],
     },
-    "system": {
+    "architecture/system": {
         "title": "System Architecture",
         "h1": "System Architecture",
         "description": "Architecture of libbitcoin-system: chain, config, crypto, hash, machine, math, radix, stream, streamers, unicode and wallet.",
@@ -104,7 +105,7 @@ SECTIONS = {
             ("wallet", "Wallet"),
         ],
     },
-    "network": {
+    "architecture/network": {
         "title": "Network Architecture",
         "h1": "Network Architecture",
         "description": "Architecture of libbitcoin-network: net, sessions, channels and protocols, threading, transports and configuration.",
@@ -114,7 +115,7 @@ SECTIONS = {
             ("index", "Network Architecture"),
         ],
     },
-    "server": {
+    "architecture/server": {
         "title": "Server Architecture",
         "h1": "Server Architecture",
         "description": "Architecture of libbitcoin-server: the server node, interface sessions, channels and protocols, requests, responses and notifications.",
@@ -124,7 +125,7 @@ SECTIONS = {
             ("index", "Server Architecture"),
         ],
     },
-    "explorer": {
+    "architecture/explorer": {
         "title": "Explorer Architecture",
         "h1": "Explorer Architecture",
         "description": "Architecture of libbitcoin-explorer: the command model, generation, parsing and output.",
@@ -134,7 +135,7 @@ SECTIONS = {
             ("index", "Explorer Architecture"),
         ],
     },
-    "test": {
+    "architecture/test": {
         "title": "Test Architecture",
         "h1": "Test Architecture",
         "description": "How libbitcoin is tested: testability without test hooks, kinds of test, reference vectors, continuous integration and coverage.",
@@ -144,7 +145,7 @@ SECTIONS = {
             ("index", "Test Architecture"),
         ],
     },
-    "build": {
+    "architecture/build": {
         "title": "Build Architecture",
         "h1": "Build Architecture",
         "description": "Architecture of the libbitcoin build: the model, the generator, the generated build files, options, install scripts and CI.",
@@ -154,7 +155,7 @@ SECTIONS = {
             ("index", "Build Architecture"),
         ],
     },
-    "architecture": {
+    "architecture/node": {
         "title": "Node Architecture",
         "h1": "Node Architecture",
         "description": "Source-anchored architecture documentation for libbitcoin-node: chasers, the event bus, sessions and peer protocols.",
@@ -177,7 +178,7 @@ SECTIONS = {
             ("periphery-chasers", "Periphery chasers"),
         ],
     },
-    "database": {
+    "architecture/database": {
         "title": "Database Architecture",
         "h1": "Database Architecture",
         "description": "Source-anchored architecture documentation for libbitcoin-database: heads, bodies, maps, tables, the memory-mapped store and queries.",
@@ -459,24 +460,22 @@ def restore_mermaid(body, blocks):
     return re.sub(r"<p>MERMAIDBLOCK(\d+)</p>", put, body)
 
 
-def fix_links(body, slugs):
+def fix_links(body, key):
     def fix(m):
-        target = m.group(1)
-        name, _, anchor = target.partition("#")
+        path, anchor = m.group(1), m.group(2) or ""
+        directory, _, name = posixpath.join(key, path).rpartition("/")
+        directory = posixpath.normpath(directory)
         if name == "Architecture":
             name = "index"
-        if name not in slugs:
+        if directory not in SECTIONS or name not in {n for n, _ in SECTIONS[directory]["pages"]}:
             return m.group(0)
-        return 'href="%s.html%s"' % (name, "#" + anchor if anchor else "")
+        return 'href="%s.html%s"' % (path[:-len(m.group(1).rpartition("/")[2])] + name, anchor)
 
-    def fix_section(m):
-        key, name, anchor = m.group(1), m.group(2), m.group(3) or ""
-        if key not in SECTIONS or name not in {n for n, _ in SECTIONS[key]["pages"]}:
-            return m.group(0)
-        return 'href="../%s/%s.html%s"' % (key, name, anchor)
+    return re.sub(r'href="([\w./-]*[\w-])(#[^"]*)?"', fix, body)
 
-    body = re.sub(r'href="([^"/:]+)"', fix, body)
-    return re.sub(r'href="\.\./([\w-]+)/([\w-]+)(#[^"]*)?"', fix_section, body)
+
+def root(key):
+    return "../" * (key.count("/") + 1)
 
 
 def add_heading_ids(body):
@@ -558,11 +557,11 @@ def site_menu(key, name):
             for href, name, sub in links:
                 classes = " ".join(c for c in (sub, "here" if href == current else "") if c)
                 here_cls = ' class="%s"' % classes if classes else ""
-                items.append('        <a href="../%s"%s>%s</a>' % (href, here_cls, html.escape(name)))
+                items.append('        <a href="%s%s"%s>%s</a>' % (root(key), href, here_cls, html.escape(name)))
             items.append('      </div></details>')
         else:
             here_cls = ' class="here"' if label == current else ""
-            items.append('      <a href="../%s"%s>%s</a>' % (label, here_cls, html.escape(target)))
+            items.append('      <a href="%s%s"%s>%s</a>' % (root(key), label, here_cls, html.escape(target)))
     return "\n".join(items)
 
 
@@ -598,7 +597,7 @@ def render(key, name, md, guard, logo, mermaid_src):
     converter = markdown.Markdown(extensions=["tables", "fenced_code"])
     body = converter.convert(body_md)
     body = restore_mermaid(body, blocks)
-    body = fix_links(body, {n for n, _ in pages})
+    body = fix_links(body, key)
     body = add_heading_ids(body)
     body = wrap_tables(body)
     body = body.replace("<pre><code>$ ", '<pre class="console"><code>$ ')
@@ -614,7 +613,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>%(page_title)s</title>
 <meta name="description" content="%(description)s">
-<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="icon" type="image/svg+xml" href="%(root)sfavicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/%(key)s/%(name)s.html">
 %(guard)s
 <meta property="og:type" content="website">
@@ -634,13 +633,13 @@ def render(key, name, md, guard, logo, mermaid_src):
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>%(style)s</style>
-<script src="../skins/skins.js"></script>
+<script src="%(root)sskins/skins.js"></script>
 </head>
 <body>
 
 <div class="wrap">
   <header class="mast">
-    <a href="../" aria-label="libbitcoin.info">
+    <a href="%(root)s" aria-label="libbitcoin.info">
     %(logo)s
     </a>
     <div class="eyebrow">Full stack Bitcoin software</div>
@@ -817,7 +816,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
 </html>
 """ % dict(page_title=page_title, description=description, name=name, guard=guard, logo=logo,
            style=STYLE, h1=h1, menu=menu(pages, name) if len(pages) > 1 else section_menu(body), body=body, pager=pager(pages, name),
-           mermaid=mermaid_src, mermaid_sri=' integrity="%s" crossorigin="anonymous"' % MERMAID_SRI if mermaid_src == MERMAID else "", key=key, site=site_menu(key, name), lede=section["lede"], foot=foot)
+           mermaid=mermaid_src, mermaid_sri=' integrity="%s" crossorigin="anonymous"' % MERMAID_SRI if mermaid_src == MERMAID else "", key=key, root=root(key), site=site_menu(key, name), lede=section["lede"], foot=foot)
 
 
 def check_links(key, pages):
@@ -826,7 +825,7 @@ def check_links(key, pages):
     for name, body in pages.items():
         article = re.search(r'<article class="doc">(.*?)</article>', body, re.S).group(1)
         for href in re.findall(r'href="([^"]+)"', article):
-            if href.startswith(("http", "../", "#", "mailto")):
+            if href.startswith(("http", "../", "#", "mailto")) or "/" in href.partition("#")[0]:
                 if href.startswith("#") and href[1:] not in ids[name]:
                     bad.append((name, href))
                 continue

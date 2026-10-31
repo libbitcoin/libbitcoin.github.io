@@ -1,17 +1,18 @@
 exclude:
   - architecture/md
-  - database/md
+  - architecture/node/md
+  - architecture/system/md
+  - architecture/database/md
+  - architecture/network/md
+  - architecture/server/md
+  - architecture/explorer/md
+  - architecture/build/md
+  - architecture/test/md
   - configuration/md
   - building/md
   - interfaces/md
   - start/md
   - download/md
   - developers/md
-  - overview/md
-  - system/md
-  - build/md
-  - explorer/md
-  - server/md
-  - network/md
   - client/md
   - tools

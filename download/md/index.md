@@ -83,7 +83,7 @@ DpAL
 -----END PGP PUBLIC KEY BLOCK-----
 ```
 
-Save it as `libbitcoin.asc`, or download [libbitcoin.asc](../download/libbitcoin.asc),
+Save it as `libbitcoin.asc`, or download [libbitcoin.asc](libbitcoin.asc),
 import it, and check its fingerprint:
 
 ```

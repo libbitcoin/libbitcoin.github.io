@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Node Architecture</title>
-<meta name="description" content="Source-anchored architecture documentation for libbitcoin-node: chasers, the event bus, sessions and peer protocols.">
+<title>Architecture Overview</title>
+<meta name="description" content="How the libbitcoin libraries of Bitcoin Server (bs) fit together: the stack, the node, the store and the server.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/architecture/index.html">
 <script>
@@ -41,8 +41,8 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/architecture/index.html">
-<meta property="og:title" content="Node Architecture">
-<meta property="og:description" content="Source-anchored architecture documentation for libbitcoin-node: chasers, the event bus, sessions and peer protocols.">
+<meta property="og:title" content="Architecture Overview">
+<meta property="og:description" content="How the libbitcoin libraries of Bitcoin Server (bs) fit together: the stack, the node, the store and the server.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -50,8 +50,8 @@
 <meta property="og:image:height" content="1260">
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Node Architecture">
-<meta name="twitter:description" content="Source-anchored architecture documentation for libbitcoin-node: chasers, the event bus, sessions and peer protocols.">
+<meta name="twitter:title" content="Architecture Overview">
+<meta name="twitter:description" content="How the libbitcoin libraries of Bitcoin Server (bs) fit together: the stack, the node, the store and the server.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -254,7 +254,7 @@
 </svg>
     </a>
     <div class="eyebrow">Full stack Bitcoin software</div>
-    <h1>Node Architecture</h1>
+    <h1>Architecture Overview</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop" name="site"><summary>Getting Started</summary><div>
@@ -272,15 +272,15 @@
         <a href="../interface-performance.html">Interfaces</a>
       </div></details>
       <details class="drop here" name="site"><summary>Architecture</summary><div>
-        <a href="../overview/index.html">Overview</a>
-        <a href="../system/index.html">System</a>
-        <a href="../database/index.html">Database</a>
-        <a href="../network/index.html">Network</a>
-        <a href="../architecture/index.html" class="here">Node</a>
-        <a href="../server/index.html">Server</a>
-        <a href="../explorer/index.html">Explorer</a>
-        <a href="../build/index.html">Build</a>
-        <a href="../test/index.html">Test</a>
+        <a href="../architecture/index.html" class="here">Overview</a>
+        <a href="../architecture/system/index.html">System</a>
+        <a href="../architecture/database/index.html">Database</a>
+        <a href="../architecture/network/index.html">Network</a>
+        <a href="../architecture/node/index.html">Node</a>
+        <a href="../architecture/server/index.html">Server</a>
+        <a href="../architecture/explorer/index.html">Explorer</a>
+        <a href="../architecture/build/index.html">Build</a>
+        <a href="../architecture/test/index.html">Test</a>
       </div></details>
       <details class="drop" name="site"><summary>Server</summary><div>
         <a href="../interfaces.html">BS Interfaces</a>
@@ -309,356 +309,131 @@
       <a href="../about.html">About</a>
     </nav>
     <p class="lede">
-      Source-anchored architecture documentation for <strong>libbitcoin-node</strong>:
-      the chasers, the event bus, sessions and peer protocols.
+      How the libraries of <strong>Bitcoin Server</strong> (bs) fit together:
+      the stack, the node, the store and the server.
     </p>
   </header>
 
   <nav class="menu">
-    <a href="index.html" class="here">Node</a>
-    <a href="overview.html">Overview</a>
-    <a href="event-bus.html">Event bus</a>
-    <a href="header-chaser.html">Header chaser</a>
-    <a href="download-chaser.html">Download chaser</a>
-    <a href="validation-chaser.html">Validation chaser</a>
-    <a href="confirmation-chaser.html">Confirmation chaser</a>
-    <a href="sessions-and-protocols.html">Sessions and protocols</a>
-    <a href="header-protocols.html">Header protocols</a>
-    <a href="block-out-protocols.html">Block out protocols</a>
-    <a href="filter-out-protocol.html">Filter out protocol</a>
-    <a href="transaction-protocols.html">Transaction protocols</a>
-    <a href="transaction-chaser.html">Transaction chaser</a>
-    <a href="periphery-chasers.html">Periphery chasers</a>
+    <a href="#1-stack">Stack</a>
+    <a href="#2-node">Node</a>
+    <a href="#3-store">Store</a>
+    <a href="#4-server">Server</a>
+    <a href="#5-design-documents">Design documents</a>
   </nav>
 
   <article class="doc">
-<p>This is a top-down, source-anchored description of libbitcoin-node. It is
-also written to support a <strong>formal-verification effort</strong>, which needs
-state machines, invariants, pre/post-conditions, and a clear bus-vs.-store
-ownership model.</p>
-<p>The architectural concepts (parallel block download, sequential chasers
-following concurrent download and validation, validation bypass by
-checkpoints and milestones, append-only store writes with small copyable
-indexes, and quiescence for snapshot, remap and shutdown) are from the
-2021 <a href="libbitcoin-v4-node-design.pdf">design document</a> for the version 4 node.</p>
-<p>Every behavioural claim is anchored with <code>file:line</code> references into the
-C++ source so it can be re-verified or re-derived if source drifts. The
-citations in this revision were verified against libbitcoin-node master at
-commit <code>a5173475</code> (2026-10-20), with <code>chaser_check</code> renamed to <code>chaser_download</code> (node branch <code>download</code>, <code>ea1e1264</code>).</p>
-<hr />
-<h2 id="the-13-documents">The 13 documents<a class="anchor" href="#the-13-documents" aria-label="Link to this section">#</a></h2>
+<p>Bitcoin Server (<code>bs</code>) is a stack of C++ libraries, each built on those
+below it. This page outlines how the layers fit together. The node and the
+store are each described in depth, against their source, in
+<a href="node/index.html">Node Architecture</a> and
+<a href="database/index.html">Database Architecture</a>.</p>
+<h2 id="1-stack">1. Stack<a class="anchor" href="#1-stack" aria-label="Link to this section">#</a></h2>
+<div class="mermaid">
+flowchart BT
+    sys["libbitcoin-system&lt;br/&gt;consensus, script, hashing, chain types"]
+    db["libbitcoin-database&lt;br/&gt;memory-mapped store, queries"]
+    net["libbitcoin-network&lt;br/&gt;P2P and client services"]
+    node["libbitcoin-node&lt;br/&gt;chasers, peer protocols, pool"]
+    server["libbitcoin-server&lt;br/&gt;client interfaces"]
+    bs(["bs&lt;br/&gt;Bitcoin Server"])
+
+    sys --&gt; db
+    sys --&gt; net
+    db --&gt; node
+    net --&gt; node
+    node --&gt; server
+    server --&gt; bs
+</div>
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>#</th>
-<th>File</th>
+<th>Layer</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>libbitcoin-system</td>
+<td>Bitcoin primitives and consensus rules: blocks, transactions, script execution, hashing and cryptography.</td>
+</tr>
+<tr>
+<td>libbitcoin-database</td>
+<td>The store: append-only, memory-mapped tables and the queries over them.</td>
+</tr>
+<tr>
+<td>libbitcoin-network</td>
+<td>Connections, sessions and protocols: the Bitcoin P2P network, and the HTTP, websocket, JSON-RPC, TLS and ZMQ services.</td>
+</tr>
+<tr>
+<td>libbitcoin-node</td>
+<td>The full node: header and block sync, validation, confirmation and the transaction pool.</td>
+</tr>
+<tr>
+<td>libbitcoin-server</td>
+<td>The client interfaces of Bitcoin Server, and <code>bs</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The libraries are listed under <a href="../developers/index.html">Developers</a>.</p>
+<h2 id="2-node">2. Node<a class="anchor" href="#2-node" aria-label="Link to this section">#</a></h2>
+<p>Synchronization is headers-first. Peer protocols prove and archive each
+peer's headers, and a chain of <strong>chasers</strong> carries them from there to
+confirmation:</p>
+<div class="mermaid">
+flowchart LR
+    hdr["header&lt;br/&gt;organize candidates"]
+    dl["download&lt;br/&gt;windowed block requests"]
+    val["validate&lt;br/&gt;consensus, in parallel"]
+    cnf["confirm&lt;br/&gt;confirmed chain"]
+
+    hdr --&gt; dl --&gt; val --&gt; cnf
+</div>
+<p>Blocks are downloaded from many peers at once and validated concurrently,
+while organization and confirmation follow in order. The chasers
+communicate only through an event bus, and share state only through the
+store. Further chasers maintain the transaction pool, fee estimates, store
+snapshots and disk space.</p>
+<p>Quiescing the pipeline allows store snapshot, remap and shutdown.</p>
+<h2 id="3-store">3. Store<a class="anchor" href="#3-store" aria-label="Link to this section">#</a></h2>
+<p>The store is strictly relational, without a query engine. Every relation is
+resolved by one of two physical operations chosen when the table is
+designed: <strong>navigation</strong>, following a link that is a row's position, or
+<strong>search</strong>, a hash lookup through a table's head.</p>
+<p>Table bodies are append-only and published by small heads, so every write
+becomes visible atomically, and a snapshot is a copy of the heads. All files
+are memory-mapped, and grow by remapping. A store that closes cleanly reopens as
+it was; one that does not is restored from its last snapshot.</p>
+<h2 id="4-server">4. Server<a class="anchor" href="#4-server" aria-label="Link to this section">#</a></h2>
+<p>Bitcoin Server adds client interfaces to the node, on the services of
+libbitcoin-network, serving from the node's store. The interfaces are listed in <a href="../interfaces.html">BS Interfaces</a>.</p>
+<h2 id="5-design-documents">5. Design documents<a class="anchor" href="#5-design-documents" aria-label="Link to this section">#</a></h2>
+<p>The architecture follows the 2021 design documents for version 4:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Document</th>
 <th>Topic</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>00</td>
-<td><a href="overview.html"><code>00-overview</code></a></td>
-<td>Top-down map: layer stack, object graph, threading model, lifecycle</td>
+<td><a href="node/libbitcoin-v4-node-design.pdf">Node design</a></td>
+<td>Parallel download, sequential chasers, validation bypass, append-only writes, quiescence</td>
 </tr>
 <tr>
-<td>01</td>
-<td><a href="event-bus.html"><code>01-event-bus</code></a></td>
-<td>Every <code>chase</code> event with verified issuer/handler sites; methodology</td>
-</tr>
-<tr>
-<td>02</td>
-<td><a href="header-chaser.html"><code>02-chaser-header</code></a></td>
-<td>Header organize state machine, tree pruning, disorganize; 15 <code>organizeN</code> fault sites</td>
-</tr>
-<tr>
-<td>03</td>
-<td><a href="download-chaser.html"><code>03-chaser-download</code></a></td>
-<td>Block-download orchestration; race_all purge barrier; σ slow-peer detector; download window</td>
-</tr>
-<tr>
-<td>04</td>
-<td><a href="validation-chaser.html"><code>04-chaser-validate</code></a></td>
-<td>Consensus validation; own threadpool; batched signature and silent-payment verification; 12 <code>validateN</code> fault sites</td>
-</tr>
-<tr>
-<td>05</td>
-<td><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a></td>
-<td>Order-based consensus check + confirmed-chain writer; stale timer; 12 <code>confirmN</code> fault sites</td>
-</tr>
-<tr>
-<td>06</td>
-<td><a href="sessions-and-protocols.html"><code>06-sessions-and-protocols</code></a></td>
-<td>Sessions, the protocol attach tree, <code>protocol_block_in_31800</code></td>
-</tr>
-<tr>
-<td>07</td>
-<td><a href="header-protocols.html"><code>07-header-protocols</code></a></td>
-<td>Header in/out at 31800, 70012 and 70014 (compact blocks); prove-then-archive sync</td>
-</tr>
-<tr>
-<td>08</td>
-<td><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a></td>
-<td>Block out at 106, 70001, 70012 and 70014; streaming send loop; <code>not_found</code></td>
-</tr>
-<tr>
-<td>09</td>
-<td><a href="filter-out-protocol.html"><code>09-filter-out-protocol</code></a></td>
-<td>BIP157/158 client filters; three request types</td>
-</tr>
-<tr>
-<td>10</td>
-<td><a href="transaction-protocols.html"><code>10-tx-protocols</code></a></td>
-<td>Tx in/out ladder at 106, 60002, 70001, 70013 and 70016</td>
-</tr>
-<tr>
-<td>11</td>
-<td><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a></td>
-<td>The transaction pool: package submission, compact block fill, scan starts; 9 <code>transactionN</code> fault sites</td>
-</tr>
-<tr>
-<td>12</td>
-<td><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a></td>
-<td><code>chaser_snapshot</code>, <code>chaser_storage</code>, <code>chaser_template</code>, <code>chaser_estimate</code></td>
+<td><a href="database/libbitcoin-v4-relational-database.pdf">Relational database</a></td>
+<td>Natural, foreign and search keys, navigation versus search, recoverability</td>
 </tr>
 </tbody>
 </table></div>
-<hr />
-<h2 id="recommended-reading-orders">Recommended reading orders<a class="anchor" href="#recommended-reading-orders" aria-label="Link to this section">#</a></h2>
-<h3 id="for-a-new-contributor">For a new contributor<a class="anchor" href="#for-a-new-contributor" aria-label="Link to this section">#</a></h3>
-<p>Read in order: <strong>00 → 01 → 02 → 03 → 04 → 05</strong> for the consensus
-pipeline, then <strong>06 → 07/08</strong> for the corresponding peer protocols, then
-<strong>10 → 11</strong> for the transaction pool. Skim 09 and 12 as needed.</p>
-<h3 id="for-a-formal-verification-reader">For a formal-verification reader<a class="anchor" href="#for-a-formal-verification-reader" aria-label="Link to this section">#</a></h3>
-<p><strong>01</strong> is foundational — the <code>chase</code> events are the inter-process
-interface. Then <strong>02 §3, §5, §7</strong> (organize state machine, disorganize
-state machine, error-code → proof-obligation list), <strong>04 §4–§7</strong>
-(validate consensus, batching, error inventory), <strong>05 §4–§8</strong> (confirm
-algorithm, rollback atomicity, error inventory). The numbered
-invariants throughout (<code>Validate-Backlog-1</code>, <code>Confirm-Rollback-1</code>,
-etc.) are the recommended target set for a TLA+/Alloy spec.</p>
-<h3 id="for-a-peer-protocol-implementer">For a peer-protocol implementer<a class="anchor" href="#for-a-peer-protocol-implementer" aria-label="Link to this section">#</a></h3>
-<p><strong>00 §7</strong> for the network-layer overview, then <strong>06</strong> for the
-attach tree, then read whichever versioned family you need
-(<strong>07</strong> for headers and compact blocks, <strong>08</strong> for blocks, <strong>09</strong> for
-filters, <strong>10</strong> for tx).</p>
-<hr />
-<h2 id="conventions-used-throughout">Conventions used throughout<a class="anchor" href="#conventions-used-throughout" aria-label="Link to this section">#</a></h2>
-<h3 id="fileline-citations">File:line citations<a class="anchor" href="#fileline-citations" aria-label="Link to this section">#</a></h3>
-<p>Every non-trivial behavioural claim has a <code>path/to/file.cpp:N</code> (or
-<code>.hpp</code>, <code>.ipp</code>) citation. If you change source, run
-<code>grep -rn 'pattern' src include</code> from the repo root to find new
-locations and update the citation.</p>
-<h3 id="numbered-invariants">Numbered invariants<a class="anchor" href="#numbered-invariants" aria-label="Link to this section">#</a></h3>
-<p>Each doc names its invariants in the form <code>Topic-N</code> (e.g.
-<code>Validate-Bypass-1</code>, <code>Confirm-Rollback-1</code>). The intent is that a
-formal-spec encoding can cite them stably. Major invariant
-families:</p>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Prefix</th>
-<th>Doc</th>
-<th>Roughly</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Concurrency-*</code></td>
-<td>00</td>
-<td>Strand discipline across the node</td>
-</tr>
-<tr>
-<td><code>Lifecycle-*</code></td>
-<td>00</td>
-<td>start/run/close ordering</td>
-</tr>
-<tr>
-<td><code>Store-*</code></td>
-<td>00</td>
-<td>Suspend/resume around store maintenance</td>
-</tr>
-<tr>
-<td><code>Bus-*</code></td>
-<td>01</td>
-<td>Subscription/unsubscription semantics</td>
-</tr>
-<tr>
-<td><code>Organize-*</code></td>
-<td>02</td>
-<td>Header organize state machine</td>
-</tr>
-<tr>
-<td><code>Download-*</code></td>
-<td>03</td>
-<td>Download orchestration</td>
-</tr>
-<tr>
-<td><code>Validate-*</code></td>
-<td>04</td>
-<td>Consensus validation and batching</td>
-</tr>
-<tr>
-<td><code>Confirm-*</code></td>
-<td>05</td>
-<td>Confirmation + order-based consensus</td>
-</tr>
-<tr>
-<td><code>Session-*</code>, <code>Attach-*</code>, <code>Protocol-*</code>, <code>Observer-*</code>, <code>Performer-*</code>, <code>BlockIn-*</code>, <code>HeaderIn-*</code>, <code>HeaderOut-*</code>, <code>Compact-*</code>, <code>Anti-Echo-*</code>, <code>BlockOut-*</code>, <code>Filter-*</code>, <code>TxIn-*</code>, <code>TxOut-*</code></td>
-<td>06–10</td>
-<td>Network layer</td>
-</tr>
-<tr>
-<td><code>Pool-*</code></td>
-<td>11</td>
-<td>Transaction pool</td>
-</tr>
-<tr>
-<td><code>Snapshot-*</code>, <code>Storage-*</code>, <code>Estimate-*</code>, <code>Periphery-*</code></td>
-<td>12</td>
-<td>Periphery chasers</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="mermaid-diagrams">Mermaid diagrams<a class="anchor" href="#mermaid-diagrams" aria-label="Link to this section">#</a></h3>
-<p>All diagrams use Mermaid (sequence, flowchart, stateDiagram-v2,
-classDiagram).</p>
-<h3 id="spec-view--implementation-notes--notes-for-the-formal-model">"Spec view" / "Implementation notes" / "Notes for the formal model"<a class="anchor" href="#spec-view--implementation-notes--notes-for-the-formal-model" aria-label="Link to this section">#</a></h3>
-<p>Most subsystem docs have these three closing sections. They are the
-distilled-for-export view of each subsystem.</p>
-<hr />
-<h2 id="caveats">Caveats<a class="anchor" href="#caveats" aria-label="Link to this section">#</a></h2>
-<ol>
-<li><strong>No build verification.</strong> Citations are textual. They were
-   re-grepped during writing but the code has not been built or
-   executed during this documentation effort. A version drift
-   between source and docs is possible.</li>
-<li><strong><code>block.accept</code> / <code>block.connect</code> semantics</strong> live in
-   libbitcoin-system, not this repo. Docs 02/04/05 describe the
-   <em>sequencing</em> of those calls, not their content. The consensus
-   surface is delegated to libbitcoin-system documentation.</li>
-<li><strong>Store consistency</strong> is treated as an oracle. Every numbered
-   <code>organizeN</code>/<code>validateN</code>/<code>confirmN</code>/<code>transactionN</code> fault is documented
-   as a proof obligation against store-consistency invariants supplied by
-   libbitcoin-database. A full proof would require importing those.</li>
-<li><strong>Discrepancies with <code>chase.hpp</code> comments</strong>: the inline event-bus
-   doc in <code>chase.hpp</code> has a few stale entries (incomplete handler lists,
-   dormant events). All are flagged in
-   <a href="event-bus.html"><code>01-event-bus</code></a> with <code>⚠</code> and discussed in
-   §2 of that doc.</li>
-<li><strong>Stub subsystems</strong>: <code>chaser_template</code> is a stub. The doc describes
-   its wiring and intended design but notes clearly that current
-   behaviour is "no-op".</li>
-<li><strong>Database-side batching.</strong> The signature and silent-payment batch
-   tables, their verification kernels (CPU or GPU) and the pooled-block
-   validation query live in libbitcoin-database and libbitcoin-system.
-   Doc 04 describes the node's bank/drain protocol around them, not the
-   kernels.</li>
-</ol>
-<hr />
-<h2 id="coverage-map">Coverage map<a class="anchor" href="#coverage-map" aria-label="Link to this section">#</a></h2>
-<pre><code>libbitcoin-node
-├── src/
-│   ├── full_node.cpp ........................ 00
-│   ├── configuration.cpp / settings.cpp ..... (mentioned in 00, not detailed)
-│   ├── error.cpp ............................ 00 §9
-│   ├── estimator.cpp ........................ 12 §4 (interface only)
-│   │
-│   ├── chasers/
-│   │   ├── chaser.cpp ....................... 00 §3 (base; per-doc as needed)
-│   │   ├── chaser_header.cpp ................ 02
-│   │   ├── chaser_download.cpp ................. 03
-│   │   ├── chaser_validate.cpp .............. 04
-│   │   ├── chaser_validate_parallel.cpp ..... 04 §4
-│   │   ├── chaser_validate_batch.cpp ........ 04 §5
-│   │   ├── chaser_validate_capture.cpp ...... 04 §5
-│   │   ├── chaser_confirm.cpp ............... 05
-│   │   ├── chaser_transaction.cpp ........... 11
-│   │   ├── chaser_template.cpp .............. 12 §3
-│   │   ├── chaser_estimate.cpp .............. 12 §4
-│   │   ├── chaser_snapshot.cpp .............. 12 §1
-│   │   └── chaser_storage.cpp ............... 12 §2
-│   │
-│   ├── sessions/
-│   │   ├── session.cpp ...................... 06 §1
-│   │   ├── session_inbound.cpp .............. 06 §1.3
-│   │   ├── session_outbound.cpp ............. 06 §1.4
-│   │   └── session_manual.cpp ............... 06 §1 (typedef)
-│   │
-│   ├── channels/
-│   │   └── channel_peer.cpp ................. 07 §8 (announcement cache)
-│   │
-│   └── protocols/
-│       ├── protocol.cpp ..................... 06 §3
-│       ├── protocol_peer.cpp ................ 06 §3; 07 §8 anti-echo
-│       ├── protocol_observer.cpp ............ 06 §3.2
-│       ├── protocol_performer.cpp ........... 06 §4
-│       │
-│       ├── protocol_block_in_31800.cpp ...... 06 §5
-│       ├── protocol_block_out_106.cpp ....... 08 §2
-│       ├── protocol_block_out_70001.cpp ..... 08 §3
-│       ├── protocol_block_out_70012.cpp ..... 08 §4
-│       ├── protocol_block_out_70014.cpp ..... 08 §5
-│       │
-│       ├── protocol_header_in_31800.cpp ..... 07 §2
-│       ├── protocol_header_in_70012.cpp ..... 07 §3
-│       ├── protocol_header_in_70014.cpp ..... 07 §4
-│       ├── protocol_header_out_31800.cpp .... 07 §5
-│       ├── protocol_header_out_70012.cpp .... 07 §6
-│       ├── protocol_header_out_70014.cpp .... 07 §7
-│       │
-│       ├── protocol_filter_out_70015.cpp .... 09
-│       ├── protocol_transaction_in_106.cpp .. 10 §2
-│       ├── protocol_transaction_in_70001.cpp  10 §2
-│       ├── protocol_transaction_in_70013.cpp  10 §2
-│       ├── protocol_transaction_in_70016.cpp  10 §2
-│       ├── protocol_transaction_out_106.cpp . 10 §3
-│       ├── protocol_transaction_out_60002.cpp 10 §3
-│       ├── protocol_transaction_out_70001.cpp 10 §3
-│       ├── protocol_transaction_out_70013.cpp 10 §3
-│       └── protocol_transaction_out_70016.cpp 10 §3
-│
-└── include/bitcoin/node/
-    ├── full_node.hpp ........................ 00
-    ├── chase.hpp ............................ 00 §4; 01 (verified against source)
-    ├── events.hpp ........................... 00 §4 (metrics enum)
-    ├── error.hpp ............................ 00 §9
-    ├── settings.hpp ......................... 00 §10
-    ├── estimator.hpp ........................ 12 §4
-    └── impl/sessions/session_peer.ipp ....... 06 §2
-</code></pre>
-<p>Files <strong>not</strong> detailed (treated as "use as documented"):</p>
-<ul>
-<li><code>configuration.cpp</code> / <code>settings.cpp</code> / <code>parser.cpp</code> — configuration</li>
-<li><code>messages/</code> headers — wire types from libbitcoin-network</li>
-<li><code>block_arena.hpp</code> / <code>block_memory.hpp</code> — arena allocator (not currently
-  wired into channel construction; see 00 §8)</li>
-</ul>
-<hr />
-<h2 id="how-to-update-these-docs-after-source-changes">How to update these docs after source changes<a class="anchor" href="#how-to-update-these-docs-after-source-changes" aria-label="Link to this section">#</a></h2>
-<ol>
-<li>Run the verification greps from
-   <a href="event-bus.html#4-methodology"><code>01-event-bus §4</code></a> to detect
-   bus-graph drift.</li>
-<li>For per-chaser docs, the relevant invariants reference specific
-   <code>file:line</code>s — re-grep those when their files change.</li>
-<li>The error inventories in each chaser doc (<code>organizeN</code>,
-   <code>validateN</code>, <code>confirmN</code>, <code>transactionN</code>, <code>batchN</code>, <code>estimates_*</code>) are
-   exhaustive at the time of writing — any new <code>error::&lt;chaser&gt;N</code> entry
-   should add a row.</li>
-<li>The attach tree in
-   <a href="sessions-and-protocols.html#23-attach_protocolschannel--session_peeripp71-190"><code>06 §2.3</code></a>
-   should be re-checked whenever <code>session_peer.ipp</code> is modified.</li>
-<li>Update the verification commit at the top of this page.</li>
-</ol>
   </article>
 
-  <nav class="pager"><span></span><a href="overview.html">Overview &rarr;</a></nav>
+  <nav class="pager"><span></span><span></span></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 
   <p class="foot">
-    <span>Adapted from the libbitcoin-node wiki architecture pages by <a href="https://github.com/rsantacroce">rsantacroce</a>.</span>
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
 </div>
