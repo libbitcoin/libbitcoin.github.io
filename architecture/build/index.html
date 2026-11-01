@@ -262,7 +262,7 @@
         <a href="../../start/index.html">Quick Start</a>
         <a href="../../configuration/index.html">Configuration</a>
         <a href="../../configuration/reference.html">Settings Reference</a>
-        <a href="../../building/platforms.html">Platform Support</a>
+        <a href="../../building/platforms.html">Platform Coverage</a>
         <a href="../../building/index.html">Building</a>
         <a href="../../packages/index.html">Packages</a>
       </div></details>
@@ -482,47 +482,116 @@ flowchart LR
 </div>
 <h3 id="21-templates-and-artifacts">2.1 Templates and artifacts<a class="anchor" href="#21-templates-and-artifacts" aria-label="Link to this section">#</a></h3>
 <p>Each template writes one kind of file into each repository. Templates are
-under <code>templates/</code>; <code>[library]</code> is the repository name and <code>[suffix]</code> the
-name without <code>libbitcoin-</code>.</p>
+under <code>templates/</code>; <code>[library]</code> is the repository name, <code>[suffix]</code> the
+name without <code>libbitcoin-</code>, and <code>[target]</code> a library, test or executable
+project.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>Templates</th>
-<th>Artifacts</th>
+<th>Template</th>
+<th>Artifact</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>gnu/configure.ac.gsl</code>, <code>Makefile.am.gsl</code>, <code>pc.in.gsl</code>, <code>shell/runner.sh.gsl</code></td>
-<td><code>builds/gnu/configure.ac</code>, <code>Makefile.am</code>, <code>[library].pc.in</code> (pkg-config), <code>test_runner.sh</code></td>
+<td><code>gnu/configure.ac.gsl</code></td>
+<td><code>builds/gnu/configure.ac</code></td>
 </tr>
 <tr>
-<td><code>cmake/CMakeLists.txt.gsl</code>, <code>CMakePresets.json.gsl</code>, <code>config.cmake.in.gsl</code></td>
-<td><code>builds/cmake/CMakeLists.txt</code>, <code>CMakePresets.json</code>, <code>[library]-config.cmake.in</code></td>
+<td><code>gnu/Makefile.am.gsl</code></td>
+<td><code>builds/gnu/Makefile.am</code></td>
 </tr>
 <tr>
-<td><code>msbuild/sln.gsl</code>, <code>vcxproj.gsl</code>, <code>vcxproj.filters.gsl</code>, <code>packages.config.gsl</code>, <code>debug.natvis.gsl</code></td>
-<td><code>builds/msvc/vs2026/</code>: the solution, and per target a project, its filters and NuGet <code>packages.config</code>; <code>builds/msvc/debug.natvis</code></td>
+<td><code>gnu/pc.in.gsl</code></td>
+<td><code>builds/gnu/[library].pc.in</code></td>
 </tr>
 <tr>
-<td><code>shell/install-gnu.sh.gsl</code>, <code>install-cmake.sh.gsl</code>, <code>install-presets.sh.gsl</code>, <code>build-msvc.cmd.gsl</code></td>
-<td><code>builds/gnu/install-gnu.sh</code>, <code>builds/cmake/install-cmake.sh</code>, <code>install-presets.sh</code>, <code>builds/msvc/build-msvc.cmd</code></td>
+<td><code>shell/runner.sh.gsl</code></td>
+<td><code>builds/gnu/test_runner.sh</code></td>
 </tr>
 <tr>
-<td><code>yml/ci.yml.gsl</code>, <code>ci-expanded.yml.gsl</code>, <code>version-tag.yml.gsl</code></td>
-<td><code>.github/workflows/</code></td>
+<td><code>shell/install-gnu.sh.gsl</code></td>
+<td><code>builds/gnu/install-gnu.sh</code></td>
 </tr>
 <tr>
-<td><code>vscode/code-workspace.gsl</code>, <code>settings.json.gsl</code></td>
-<td><code>builds/vscode/[suffix].code-workspace</code>, <code>.vscode/settings.json</code></td>
+<td><code>cmake/CMakeLists.txt.gsl</code></td>
+<td><code>builds/cmake/CMakeLists.txt</code></td>
 </tr>
 <tr>
-<td><code>src/include.hpp.gsl</code>, <code>version.hpp.in.gsl</code></td>
-<td><code>include/bitcoin/[suffix].hpp</code>, <code>version.hpp.in</code></td>
+<td><code>cmake/CMakePresets.json.gsl</code></td>
+<td><code>builds/cmake/CMakePresets.json</code></td>
 </tr>
 <tr>
-<td><code>git/gitignore.gsl</code>, <code>CODEOWNERS.gsl</code></td>
-<td><code>.gitignore</code>, <code>.github/CODEOWNERS</code></td>
+<td><code>cmake/config.cmake.in.gsl</code></td>
+<td><code>builds/cmake/[library]-config.cmake.in</code></td>
+</tr>
+<tr>
+<td><code>shell/install-cmake.sh.gsl</code></td>
+<td><code>builds/cmake/install-cmake.sh</code></td>
+</tr>
+<tr>
+<td><code>shell/install-presets.sh.gsl</code></td>
+<td><code>builds/cmake/install-presets.sh</code></td>
+</tr>
+<tr>
+<td><code>msbuild/sln.gsl</code></td>
+<td><code>builds/msvc/vs2026/[library].sln</code></td>
+</tr>
+<tr>
+<td><code>msbuild/vcxproj.gsl</code></td>
+<td><code>builds/msvc/vs2026/[target]/[target].vcxproj</code></td>
+</tr>
+<tr>
+<td><code>msbuild/vcxproj.filters.gsl</code></td>
+<td><code>builds/msvc/vs2026/[target]/[target].vcxproj.filters</code></td>
+</tr>
+<tr>
+<td><code>msbuild/packages.config.gsl</code></td>
+<td><code>builds/msvc/vs2026/[target]/packages.config</code></td>
+</tr>
+<tr>
+<td><code>msbuild/debug.natvis.gsl</code></td>
+<td><code>builds/msvc/debug.natvis</code></td>
+</tr>
+<tr>
+<td><code>shell/build-msvc.cmd.gsl</code></td>
+<td><code>builds/msvc/build-msvc.cmd</code></td>
+</tr>
+<tr>
+<td><code>yml/ci.yml.gsl</code></td>
+<td><code>.github/workflows/ci.yml</code></td>
+</tr>
+<tr>
+<td><code>yml/ci-expanded.yml.gsl</code></td>
+<td><code>.github/workflows/ci-expanded.yml</code></td>
+</tr>
+<tr>
+<td><code>yml/version-tag.yml.gsl</code></td>
+<td><code>.github/workflows/version-tag.yml</code></td>
+</tr>
+<tr>
+<td><code>vscode/code-workspace.gsl</code></td>
+<td><code>builds/vscode/[suffix].code-workspace</code></td>
+</tr>
+<tr>
+<td><code>vscode/settings.json.gsl</code></td>
+<td><code>.vscode/settings.json</code></td>
+</tr>
+<tr>
+<td><code>src/include.hpp.gsl</code></td>
+<td><code>include/bitcoin/[suffix].hpp</code></td>
+</tr>
+<tr>
+<td><code>src/version.hpp.in.gsl</code></td>
+<td><code>include/bitcoin/[suffix]/version.hpp.in</code></td>
+</tr>
+<tr>
+<td><code>git/gitignore.gsl</code></td>
+<td><code>.gitignore</code></td>
+</tr>
+<tr>
+<td><code>git/CODEOWNERS.gsl</code></td>
+<td><code>.github/CODEOWNERS</code></td>
 </tr>
 </tbody>
 </table></div>

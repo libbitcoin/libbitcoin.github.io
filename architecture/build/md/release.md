@@ -54,28 +54,42 @@ the tests (`--build-skip-tests`):
 | CMake (Linux, macOS) | `builds/cmake/install-cmake.sh` | `release`, `static`, with `--build-boost` |
 | Visual Studio (Windows) | `builds/msvc/build-msvc.cmd` | `StaticRelease`, toolset `v145`, `vs2026` |
 
-| Build | Runner | Compiler | Target | Options |
-| ----- | ------ | -------- | ------ | ------- |
-| `bs-linux-x64` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx2, sse41 |
-| `bs-linux-x64-shani` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | shani, avx2, sse41 |
-| `bs-linux-x64-avxifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avxifma, shani, avx2, sse41 |
-| `bs-linux-x64-avx512ifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
-| `bs-linux-arm64` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a` | |
-| `bs-linux-arm64-crypto` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a+crypto` | sha |
-| `bs-linux-arm64-sha3` | `ubuntu-24.04-arm` | gcc 14 | `armv8.2-a+crypto+sha3` | sha, sha3 |
-| `bs-musl-x64` | Alpine 3.22 | gcc | `x86-64-v3` | avx2, sse41 |
-| `bs-musl-x64-shani` | Alpine 3.22 | gcc | `x86-64-v3` | shani, avx2, sse41 |
-| `bs-musl-x64-avxifma` | Alpine 3.22 | gcc | `x86-64-v3` | avxifma, shani, avx2, sse41 |
-| `bs-musl-x64-avx512ifma` | Alpine 3.22 | gcc | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
-| `bs-macos-arm64` | `macos-latest` | Apple Clang | `apple-m1`, macOS 13.3 | sha3, sha, aes |
-| `bs-macos-x64` | `macos-26-intel` | Apple Clang | `x86-64-v3`, macOS 13.3 | avx2, sse41, aesni |
-| `bs-windows-x64` | `windows-latest` | MSVC | x64 | avx2, sse41 |
-| `bs-windows-x64-shani` | `windows-latest` | MSVC | x64 | shani, avx2, sse41 |
-| `bs-windows-x64-avxifma` | `windows-latest` | MSVC | x64 | avxifma, shani, avx2, sse41 |
-| `bs-windows-x64-avx512ifma` | `windows-latest` | MSVC | x64 | avx512ifma, shani, avx2, sse41 |
-| `bs-windows-arm64` | `windows-11-vs2026-arm` | MSVC | ARM64 | |
-| `bs-windows-arm64-crypto` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha |
-| `bs-windows-arm64-sha3` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha, sha3 |
+| Build | Runner | Compiler | Target | Options | Guix |
+| ----- | ------ | -------- | ------ | ------- | ---- |
+| `bs-linux-x64` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx2, sse41 | WIP |
+| `bs-linux-x64-shani` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | shani, avx2, sse41 | WIP |
+| `bs-linux-x64-avxifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avxifma, shani, avx2, sse41 | WIP |
+| `bs-linux-x64-avx512ifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx512ifma, shani, avx2, sse41 | WIP |
+| `bs-linux-arm64` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a` | | WIP |
+| `bs-linux-arm64-crypto` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a+crypto` | sha | WIP |
+| `bs-linux-arm64-sha3` | `ubuntu-24.04-arm` | gcc 14 | `armv8.2-a+crypto+sha3` | sha, sha3 | WIP |
+| `bs-musl-x64` | Alpine 3.22 | gcc | `x86-64-v3` | avx2, sse41 | WIP |
+| `bs-musl-x64-shani` | Alpine 3.22 | gcc | `x86-64-v3` | shani, avx2, sse41 | WIP |
+| `bs-musl-x64-avxifma` | Alpine 3.22 | gcc | `x86-64-v3` | avxifma, shani, avx2, sse41 | WIP |
+| `bs-musl-x64-avx512ifma` | Alpine 3.22 | gcc | `x86-64-v3` | avx512ifma, shani, avx2, sse41 | WIP |
+| `bs-macos-arm64` | `macos-latest` | Apple Clang | `apple-m1`, macOS 13.3 | sha3, sha, aes | WIP |
+| `bs-macos-x64` | `macos-26-intel` | Apple Clang | `x86-64-v3`, macOS 13.3 | avx2, sse41, aesni | WIP |
+| `bs-windows-x64` | `windows-latest` | MSVC | x64 | avx2, sse41 | WIP |
+| `bs-windows-x64-shani` | `windows-latest` | MSVC | x64 | shani, avx2, sse41 | WIP |
+| `bs-windows-x64-avxifma` | `windows-latest` | MSVC | x64 | avxifma, shani, avx2, sse41 | WIP |
+| `bs-windows-x64-avx512ifma` | `windows-latest` | MSVC | x64 | avx512ifma, shani, avx2, sse41 | WIP |
+| `bs-windows-arm64` | `windows-11-vs2026-arm` | MSVC | ARM64 | | WIP |
+| `bs-windows-arm64-crypto` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha | WIP |
+| `bs-windows-arm64-sha3` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha, sha3 | WIP |
+
+The Guix column marks the builds that Guix reproduces from the same tags
+([Deterministic builds](deterministic)).
+
+The same job also builds the `selector` of libbitcoin-system, which reports
+the processor's features, for the packages that choose a variant at install
+([Packaging](packaging)):
+
+| Build | Runner | Compiler |
+| ----- | ------ | -------- |
+| `selector-linux-x64` | `ubuntu-24.04` | clang 18 |
+| `selector-linux-arm64` | `ubuntu-24.04-arm` | gcc 14 |
+| `selector-windows-x64` | `windows-latest` | MSVC (SSE2) |
+| `selector-windows-arm64` | `windows-11-vs2026-arm` | MSVC |
 
 Every x64 build assumes AVX2 and SSE4.1 (`x86-64-v3`) as the baseline of
 its architecture.
@@ -86,29 +100,38 @@ statically (`--static`). Windows builds end in `.exe`.
 
 After the build, each job:
 
-1. copies `bs` to its build name,
+1. copies the program to its build name,
 2. removes any embedded RPATH/RUNPATH (`patchelf`, glibc Linux builds),
-3. strips symbols (all but Windows),
+3. separates its debug symbols from the binary and strips it,
 4. runs `--version` and `--hardware`, and shows the linkage (`ldd`,
    `readelf -d`, `otool -L`),
-5. uploads the build as an artifact, kept for one day.
+5. uploads the build and its symbols as artifacts, kept for one day.
+
+Every build is compiled with debug information (`-g`, and a PDB with
+MSVC), and its symbols are published beside it:
+
+| Platform | Symbols | Linked to the binary by |
+| -------- | ------- | ----------------------- |
+| Linux | `<build>.debug` (compressed) | GNU build ID and `.gnu_debuglink` |
+| macOS | `<build>.dSYM.zip` | UUID, which the job fails unless it matches |
+| Windows | `<build>.pdb.zip` | PDB signature |
 
 ### 2.3 sign
 
 Runs in the `release` environment, which holds the signing key and its
 passphrase as secrets, and does not start until a maintainer approves it.
-It downloads every build, imports the key into a
-temporary keyring, and writes a detached, armored signature beside each
-build (`<build>.asc`). It then deletes the key and the keyring, imports
-the public key, and fails unless every signature verifies as a good
-signature. The builds and signatures are uploaded as one artifact.
+It downloads every build, imports the key into a temporary keyring, and
+writes a detached, armored signature beside each build and symbols file
+(`<file>.asc`). It then deletes the key and the keyring, imports the
+public key, and fails unless every signature verifies as a good
+signature. The builds, symbols and signatures are uploaded as one artifact.
 
 ### 2.4 publish
 
-Also in the `release` environment, and also waits for approval. It creates a release at the server
-tag (with the suffix, if any), as a draft prerelease, with the builds and
-their signatures as its assets. Existing assets are not overwritten. The
-release notes link the tag of each of the five repositories it was built
+Also in the `release` environment, and also waits for approval. It
+creates a release at the server tag (with the suffix, if any), as a draft
+prerelease, with the builds, their symbols and the signatures as its
+assets. Existing assets are not overwritten. The release notes link the tag of each of the five repositories it was built
 from, and show the public key that signed it.
 
 The draft is public once a maintainer publishes it.

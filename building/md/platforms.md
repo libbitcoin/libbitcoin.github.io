@@ -1,4 +1,4 @@
-# Platform support
+# Platform coverage
 
 ## 1. Platforms
 
@@ -15,6 +15,9 @@
 | Windows | x86 (32-bit) | ✔ CI | No target |
 | Windows | arm64 | ✔ CI | No target |
 
+On 32-bit platforms the full stack builds and passes its tests, and `bx`
+is supported, but `bs` is not.
+
 ## 2. Compilers
 
 | Platform | Compiler | Libbitcoin | Bitcoin Core |
@@ -24,14 +27,15 @@
 | macOS | Apple Clang (Xcode) | ✔ CI (Xcode 26.6) | ✔ CI (Xcode 26.3) |
 | Windows | MSVC (Visual Studio 2026) | ✔ CI (v145) | ✔ CI (v145) |
 | Windows | Clang (clang-cl, with Visual Studio) | ✔ CI (18.11) | No target |
-| Windows | MinGW-w64 GCC | No target | ✔ CI (14) |
+| Windows | MinGW-w64 GCC | ✔ | ✔ CI (14) |
+| Windows | MinGW-w64 Clang | ✔ | No target |
 
 ## 3. Build systems
 
 | Build system | Libbitcoin | Bitcoin Core |
 | ------------ | ---------- | ------------ |
 | Autotools | ✔ CI (Linux, macOS) | No target |
-| CMake | ✔ CI (Linux, macOS) | ✔ CI (Linux, macOS, Windows) |
+| CMake | ✔ CI (Linux, macOS), ✔ (Windows) | ✔ CI (Linux, macOS, Windows) |
 | Visual Studio | ✔ CI (Windows) | No target |
 | Install script | ✔ CI (Linux, macOS, Windows) | No target |
 | Guix (reproducible release builds) | WIP (Linux, macOS, Windows) | ✔ (Linux, macOS, Windows) |
@@ -45,6 +49,7 @@
 - ✔ CI: built and tested on every change.
 - ✔ Built and tested outside of CI.
 - ● Expected to build: the toolchain supports it.
+- WIP: being added to CI.
 - No target: no documented build or CI for the platform.
 
 POWER, RISC-V and BSD are not shown. Compiler versions are those built in CI.

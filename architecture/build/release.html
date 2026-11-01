@@ -262,7 +262,7 @@
         <a href="../../start/index.html">Quick Start</a>
         <a href="../../configuration/index.html">Configuration</a>
         <a href="../../configuration/reference.html">Settings Reference</a>
-        <a href="../../building/platforms.html">Platform Support</a>
+        <a href="../../building/platforms.html">Platform Coverage</a>
         <a href="../../building/index.html">Building</a>
         <a href="../../packages/index.html">Packages</a>
       </div></details>
@@ -406,6 +406,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <th>Compiler</th>
 <th>Target</th>
 <th>Options</th>
+<th>Guix</th>
 </tr>
 </thead>
 <tbody>
@@ -415,6 +416,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-shani</code></td>
@@ -422,6 +424,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avxifma</code></td>
@@ -429,6 +432,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>avxifma, shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avx512ifma</code></td>
@@ -436,6 +440,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>avx512ifma, shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64</code></td>
@@ -443,6 +448,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc 14</td>
 <td><code>armv8-a</code></td>
 <td></td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64-crypto</code></td>
@@ -450,6 +456,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc 14</td>
 <td><code>armv8-a+crypto</code></td>
 <td>sha</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64-sha3</code></td>
@@ -457,6 +464,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc 14</td>
 <td><code>armv8.2-a+crypto+sha3</code></td>
 <td>sha, sha3</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64</code></td>
@@ -464,6 +472,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64-shani</code></td>
@@ -471,6 +480,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64-avxifma</code></td>
@@ -478,6 +488,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>avxifma, shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64-avx512ifma</code></td>
@@ -485,6 +496,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>avx512ifma, shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-macos-arm64</code></td>
@@ -492,6 +504,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>Apple Clang</td>
 <td><code>apple-m1</code>, macOS 13.3</td>
 <td>sha3, sha, aes</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-macos-x64</code></td>
@@ -499,6 +512,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>Apple Clang</td>
 <td><code>x86-64-v3</code>, macOS 13.3</td>
 <td>avx2, sse41, aesni</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64</code></td>
@@ -506,6 +520,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-shani</code></td>
@@ -513,6 +528,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avxifma</code></td>
@@ -520,6 +536,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>avxifma, shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avx512ifma</code></td>
@@ -527,6 +544,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>avx512ifma, shani, avx2, sse41</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64</code></td>
@@ -534,6 +552,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>ARM64</td>
 <td></td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64-crypto</code></td>
@@ -541,6 +560,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>ARM64</td>
 <td>sha</td>
+<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64-sha3</code></td>
@@ -548,6 +568,43 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>ARM64</td>
 <td>sha, sha3</td>
+<td>WIP</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Guix column marks the builds that Guix reproduces from the same tags
+(<a href="deterministic.html">Deterministic builds</a>).</p>
+<p>The same job also builds the <code>selector</code> of libbitcoin-system, which reports
+the processor's features, for the packages that choose a variant at install
+(<a href="packaging.html">Packaging</a>):</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Build</th>
+<th>Runner</th>
+<th>Compiler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>selector-linux-x64</code></td>
+<td><code>ubuntu-24.04</code></td>
+<td>clang 18</td>
+</tr>
+<tr>
+<td><code>selector-linux-arm64</code></td>
+<td><code>ubuntu-24.04-arm</code></td>
+<td>gcc 14</td>
+</tr>
+<tr>
+<td><code>selector-windows-x64</code></td>
+<td><code>windows-latest</code></td>
+<td>MSVC (SSE2)</td>
+</tr>
+<tr>
+<td><code>selector-windows-arm64</code></td>
+<td><code>windows-11-vs2026-arm</code></td>
+<td>MSVC</td>
 </tr>
 </tbody>
 </table></div>
@@ -558,26 +615,54 @@ its architecture.</p>
 statically (<code>--static</code>). Windows builds end in <code>.exe</code>.</p>
 <p>After the build, each job:</p>
 <ol>
-<li>copies <code>bs</code> to its build name,</li>
+<li>copies the program to its build name,</li>
 <li>removes any embedded RPATH/RUNPATH (<code>patchelf</code>, glibc Linux builds),</li>
-<li>strips symbols (all but Windows),</li>
+<li>separates its debug symbols from the binary and strips it,</li>
 <li>runs <code>--version</code> and <code>--hardware</code>, and shows the linkage (<code>ldd</code>,
    <code>readelf -d</code>, <code>otool -L</code>),</li>
-<li>uploads the build as an artifact, kept for one day.</li>
+<li>uploads the build and its symbols as artifacts, kept for one day.</li>
 </ol>
+<p>Every build is compiled with debug information (<code>-g</code>, and a PDB with
+MSVC), and its symbols are published beside it:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Symbols</th>
+<th>Linked to the binary by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux</td>
+<td><code>&lt;build&gt;.debug</code> (compressed)</td>
+<td>GNU build ID and <code>.gnu_debuglink</code></td>
+</tr>
+<tr>
+<td>macOS</td>
+<td><code>&lt;build&gt;.dSYM.zip</code></td>
+<td>UUID, which the job fails unless it matches</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>&lt;build&gt;.pdb.zip</code></td>
+<td>PDB signature</td>
+</tr>
+</tbody>
+</table></div>
 <h3 id="23-sign">2.3 sign<a class="anchor" href="#23-sign" aria-label="Link to this section">#</a></h3>
 <p>Runs in the <code>release</code> environment, which holds the signing key and its
 passphrase as secrets, and does not start until a maintainer approves it.
-It downloads every build, imports the key into a
-temporary keyring, and writes a detached, armored signature beside each
-build (<code>&lt;build&gt;.asc</code>). It then deletes the key and the keyring, imports
-the public key, and fails unless every signature verifies as a good
-signature. The builds and signatures are uploaded as one artifact.</p>
+It downloads every build, imports the key into a temporary keyring, and
+writes a detached, armored signature beside each build and symbols file
+(<code>&lt;file&gt;.asc</code>). It then deletes the key and the keyring, imports the
+public key, and fails unless every signature verifies as a good
+signature. The builds, symbols and signatures are uploaded as one artifact.</p>
 <h3 id="24-publish">2.4 publish<a class="anchor" href="#24-publish" aria-label="Link to this section">#</a></h3>
-<p>Also in the <code>release</code> environment, and also waits for approval. It creates a release at the server
-tag (with the suffix, if any), as a draft prerelease, with the builds and
-their signatures as its assets. Existing assets are not overwritten. The
-release notes link the tag of each of the five repositories it was built
+<p>Also in the <code>release</code> environment, and also waits for approval. It
+creates a release at the server tag (with the suffix, if any), as a draft
+prerelease, with the builds, their symbols and the signatures as its
+assets. Existing assets are not overwritten. The release notes link the tag of each of the five repositories it was built
 from, and show the public key that signed it.</p>
 <p>The draft is public once a maintainer publishes it.</p>
   </article>

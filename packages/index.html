@@ -262,7 +262,7 @@
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../configuration/reference.html">Settings Reference</a>
-        <a href="../building/platforms.html">Platform Support</a>
+        <a href="../building/platforms.html">Platform Coverage</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html" class="here">Packages</a>
       </div></details>
@@ -320,8 +320,6 @@
   </nav>
 
   <article class="doc">
-<div class="banner"><strong>Packages are a work in progress.</strong> Until they are published, download a build or build from source.</div>
-
 <p>There are three ways to get Bitcoin Server (<code>bs</code>):</p>
 <div class="scroller"><table>
 <thead>
@@ -350,7 +348,52 @@
 </tbody>
 </table></div>
 <h2 id="1-package-managers">1. Package managers<a class="anchor" href="#1-package-managers" aria-label="Link to this section">#</a></h2>
-<p>No packages are published yet.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Manager</th>
+<th>Platform</th>
+<th>Install</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>apt (deb)</td>
+<td>Linux x64, arm64</td>
+<td><code>sudo apt install ./libbitcoin-server_&lt;version&gt;_&lt;arch&gt;.deb</code></td>
+</tr>
+<tr>
+<td>Homebrew</td>
+<td>macOS x64, arm64</td>
+<td><code>brew install --formula ./libbitcoin-server.rb</code></td>
+</tr>
+<tr>
+<td>winget</td>
+<td>Windows x64, arm64</td>
+<td><code>winget install --manifest &lt;directory of the manifests&gt;</code>, or run the installer</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>Linux x64, arm64</td>
+<td><code>docker run -v &lt;data directory&gt;:/data -p 8333:8333 -p 8080:8080 -p 8180:8180 ghcr.io/libbitcoin/libbitcoin-server:&lt;version&gt;</code></td>
+</tr>
+<tr>
+<td>Umbrel</td>
+<td>umbrelOS x64, arm64</td>
+<td>Install the <code>bitcoin-server</code> app</td>
+</tr>
+<tr>
+<td>StartOS</td>
+<td>StartOS 0.4 x64, arm64</td>
+<td>Sideload <code>bitcoin-server</code> (<code>.s9pk</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The deb, the formula, the winget manifests, the Windows installers, the
+Umbrel app and the StartOS packages are assets of each release, and the
+image is in the GitHub container registry. The deb, the Windows installer
+and the image use the best variant of <code>bs</code> the processor supports
+(<a href="../architecture/build/packaging.html">Packaging</a>).</p>
   </article>
 
   <nav class="pager"><span></span><span></span></nav>

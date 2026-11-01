@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Building: Platform support</title>
+<title>Building: Platform coverage</title>
 <meta name="description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/platforms.html">
@@ -41,7 +41,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/platforms.html">
-<meta property="og:title" content="Building: Platform support">
+<meta property="og:title" content="Building: Platform coverage">
 <meta property="og:description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
@@ -50,7 +50,7 @@
 <meta property="og:image:height" content="1260">
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Building: Platform support">
+<meta name="twitter:title" content="Building: Platform coverage">
 <meta name="twitter:description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
@@ -254,7 +254,7 @@
 </svg>
     </a>
     <div class="eyebrow">Full stack Bitcoin software</div>
-    <h1>Platform support</h1>
+    <h1>Platform coverage</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
@@ -262,7 +262,7 @@
         <a href="../start/index.html">Quick Start</a>
         <a href="../configuration/index.html">Configuration</a>
         <a href="../configuration/reference.html">Settings Reference</a>
-        <a href="../building/platforms.html" class="here">Platform Support</a>
+        <a href="../building/platforms.html" class="here">Platform Coverage</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
       </div></details>
@@ -323,7 +323,7 @@
     <a href="options.html">Build options</a>
     <a href="toolchains.html">Build systems and toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
-    <a href="platforms.html" class="here">Platform Support</a>
+    <a href="platforms.html" class="here">Platform Coverage</a>
   </nav>
 
   <article class="doc">
@@ -400,6 +400,8 @@
 </tr>
 </tbody>
 </table></div>
+<p>On 32-bit platforms the full stack builds and passes its tests, and <code>bx</code>
+is supported, but <code>bs</code> is not.</p>
 <h2 id="2-compilers">2. Compilers<a class="anchor" href="#2-compilers" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
@@ -444,8 +446,14 @@
 <tr>
 <td>Windows</td>
 <td>MinGW-w64 GCC</td>
-<td>No target</td>
+<td>✔</td>
 <td>✔ CI (14)</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>MinGW-w64 Clang</td>
+<td>✔</td>
+<td>No target</td>
 </tr>
 </tbody>
 </table></div>
@@ -466,7 +474,7 @@
 </tr>
 <tr>
 <td>CMake</td>
-<td>✔ CI (Linux, macOS)</td>
+<td>✔ CI (Linux, macOS), ✔ (Windows)</td>
 <td>✔ CI (Linux, macOS, Windows)</td>
 </tr>
 <tr>
@@ -493,6 +501,7 @@
 <li>✔ CI: built and tested on every change.</li>
 <li>✔ Built and tested outside of CI.</li>
 <li>● Expected to build: the toolchain supports it.</li>
+<li>WIP: being added to CI.</li>
 <li>No target: no documented build or CI for the platform.</li>
 </ul>
 <p>POWER, RISC-V and BSD are not shown. Compiler versions are those built in CI.

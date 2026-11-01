@@ -31,7 +31,7 @@ name.
 
 BSD, Cygwin, and MinGW are not tested.
 
-[Platform support](platforms) compares platforms, compilers and build
+[Platform coverage](platforms) compares platforms, compilers and build
 systems with Bitcoin Core.
 
 ## 3. Supported compilers
@@ -83,7 +83,7 @@ supports, so its `bs` runs only on CPUs with the same extensions. Run
   options shared by all three build systems.
 - [Build systems and toolchains](toolchains): autotools, CMake and
   Visual Studio, and the compilers and Boost versions tested in CI.
-- [Platform support](platforms): platforms, compilers and build systems
+- [Platform coverage](platforms): platforms, compilers and build systems
   compared with Bitcoin Core.
 - [libbitcoin-build](libbitcoin-build): the generator behind the build
   files, for maintainers.

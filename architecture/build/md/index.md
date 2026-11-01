@@ -121,19 +121,37 @@ flowchart LR
 ### 2.1 Templates and artifacts
 
 Each template writes one kind of file into each repository. Templates are
-under `templates/`; `[library]` is the repository name and `[suffix]` the
-name without `libbitcoin-`.
+under `templates/`; `[library]` is the repository name, `[suffix]` the
+name without `libbitcoin-`, and `[target]` a library, test or executable
+project.
 
-| Templates | Artifacts |
-| --------- | --------- |
-| `gnu/configure.ac.gsl`, `Makefile.am.gsl`, `pc.in.gsl`, `shell/runner.sh.gsl` | `builds/gnu/configure.ac`, `Makefile.am`, `[library].pc.in` (pkg-config), `test_runner.sh` |
-| `cmake/CMakeLists.txt.gsl`, `CMakePresets.json.gsl`, `config.cmake.in.gsl` | `builds/cmake/CMakeLists.txt`, `CMakePresets.json`, `[library]-config.cmake.in` |
-| `msbuild/sln.gsl`, `vcxproj.gsl`, `vcxproj.filters.gsl`, `packages.config.gsl`, `debug.natvis.gsl` | `builds/msvc/vs2026/`: the solution, and per target a project, its filters and NuGet `packages.config`; `builds/msvc/debug.natvis` |
-| `shell/install-gnu.sh.gsl`, `install-cmake.sh.gsl`, `install-presets.sh.gsl`, `build-msvc.cmd.gsl` | `builds/gnu/install-gnu.sh`, `builds/cmake/install-cmake.sh`, `install-presets.sh`, `builds/msvc/build-msvc.cmd` |
-| `yml/ci.yml.gsl`, `ci-expanded.yml.gsl`, `version-tag.yml.gsl` | `.github/workflows/` |
-| `vscode/code-workspace.gsl`, `settings.json.gsl` | `builds/vscode/[suffix].code-workspace`, `.vscode/settings.json` |
-| `src/include.hpp.gsl`, `version.hpp.in.gsl` | `include/bitcoin/[suffix].hpp`, `version.hpp.in` |
-| `git/gitignore.gsl`, `CODEOWNERS.gsl` | `.gitignore`, `.github/CODEOWNERS` |
+| Template | Artifact |
+| -------- | -------- |
+| `gnu/configure.ac.gsl` | `builds/gnu/configure.ac` |
+| `gnu/Makefile.am.gsl` | `builds/gnu/Makefile.am` |
+| `gnu/pc.in.gsl` | `builds/gnu/[library].pc.in` |
+| `shell/runner.sh.gsl` | `builds/gnu/test_runner.sh` |
+| `shell/install-gnu.sh.gsl` | `builds/gnu/install-gnu.sh` |
+| `cmake/CMakeLists.txt.gsl` | `builds/cmake/CMakeLists.txt` |
+| `cmake/CMakePresets.json.gsl` | `builds/cmake/CMakePresets.json` |
+| `cmake/config.cmake.in.gsl` | `builds/cmake/[library]-config.cmake.in` |
+| `shell/install-cmake.sh.gsl` | `builds/cmake/install-cmake.sh` |
+| `shell/install-presets.sh.gsl` | `builds/cmake/install-presets.sh` |
+| `msbuild/sln.gsl` | `builds/msvc/vs2026/[library].sln` |
+| `msbuild/vcxproj.gsl` | `builds/msvc/vs2026/[target]/[target].vcxproj` |
+| `msbuild/vcxproj.filters.gsl` | `builds/msvc/vs2026/[target]/[target].vcxproj.filters` |
+| `msbuild/packages.config.gsl` | `builds/msvc/vs2026/[target]/packages.config` |
+| `msbuild/debug.natvis.gsl` | `builds/msvc/debug.natvis` |
+| `shell/build-msvc.cmd.gsl` | `builds/msvc/build-msvc.cmd` |
+| `yml/ci.yml.gsl` | `.github/workflows/ci.yml` |
+| `yml/ci-expanded.yml.gsl` | `.github/workflows/ci-expanded.yml` |
+| `yml/version-tag.yml.gsl` | `.github/workflows/version-tag.yml` |
+| `vscode/code-workspace.gsl` | `builds/vscode/[suffix].code-workspace` |
+| `vscode/settings.json.gsl` | `.vscode/settings.json` |
+| `src/include.hpp.gsl` | `include/bitcoin/[suffix].hpp` |
+| `src/version.hpp.in.gsl` | `include/bitcoin/[suffix]/version.hpp.in` |
+| `git/gitignore.gsl` | `.gitignore` |
+| `git/CODEOWNERS.gsl` | `.github/CODEOWNERS` |
 
 The Visual Studio property sheets are maintained as files under
 `props/version4/`, not generated: shared sheets per platform and
