@@ -820,6 +820,27 @@ request when source, test or build paths change. <code>ci-expanded.yml</code> ho
 every job and runs on manual dispatch. The coverage job sends lcov output
 to Coveralls, excluding the paths in the entry's <code>coverage</code> element.
 <code>version-tag.yml</code> creates a version tag on manual dispatch.</p>
+<h3 id="61-check-in-gate">6.1 Check-in gate<a class="anchor" href="#61-check-in-gate" aria-label="Link to this section">#</a></h3>
+<p><code>ci.yml</code> of libbitcoin-server, as run on GitHub Actions:</p>
+<div class="mermaid">
+flowchart TD
+    push["push"] --&gt; paths
+    pr["pull request"] --&gt; paths
+    paths{"source, test or&lt;br/&gt;build paths changed?"} --&gt;|yes| cancel["cancel the running gate"]
+    paths --&gt;|no| skip["no run"]
+    cancel --&gt; gnu["gnu jobs"]
+    cancel --&gt; cmake["cmake jobs"]
+    cancel --&gt; presets["presets jobs"]
+    cancel --&gt; msvc["msvc jobs"]
+    gnu --&gt; build
+    cmake --&gt; build
+    presets --&gt; build
+    msvc --&gt; build
+    build["each job: check out the&lt;br/&gt;branch, build and test"] --&gt; result{"all jobs pass?"}
+    result --&gt;|yes| pass["gate passes"]
+    result --&gt;|no| fail["gate fails"]
+</div>
+<p>Every job must pass for the run to pass.</p>
 <p>libbitcoin-build has its own CI, which clones all six repositories and runs
 <code>generate4.sh</code> on Ubuntu and macOS.</p>
   </article>

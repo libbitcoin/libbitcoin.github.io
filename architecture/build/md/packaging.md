@@ -13,9 +13,9 @@ contain the signed builds of a release ([Release builds](release)).
 | apt (deb) | Linux | x64, arm64 | `libbitcoin-server_<version>_<arch>.deb` (`amd64`, `arm64`) | The best variant the processor supports, linked as `/usr/bin/bs` |
 | Homebrew | macOS | x64, arm64 | Formula `libbitcoin-server.rb` | `bs-macos-arm64` or `bs-macos-x64`, as `bs` |
 | winget | Windows | x64, arm64 | `Libbitcoin.Server`, an Inno Setup installer (`libbitcoin-server-<version>-windows-<arch>-setup.exe`) | The best variant the processor supports, as `bs.exe`, with its directory added to the system `PATH` unless that installer task is unchecked |
-| Docker | Linux | x64, arm64 | Image `ghcr.io/libbitcoin/libbitcoin-server:<version>` (`linux/amd64`, `linux/arm64`) | Runs the best variant the processor supports ([§4](#4-containers)) |
-| Umbrel | umbrelOS | x64, arm64 | App `bitcoin-server` (`libbitcoin-server-<version>-umbrel.tar.gz`), on the Docker image | As Docker ([§4.2](#42-umbrel)) |
-| StartOS | StartOS 0.4 | x64, arm64 | Package `bitcoin-server` (`.s9pk`), on the Docker image | As Docker ([§4.3](#43-startos)) |
+| Docker | Linux | x64, arm64 | Image `ghcr.io/libbitcoin/libbitcoin-server:<version>` (`linux/amd64`, `linux/arm64`) | Runs the best variant the processor supports ([§5](#5-containers)) |
+| Umbrel | umbrelOS | x64, arm64 | App `bitcoin-server` (`libbitcoin-server-<version>-umbrel.tar.gz`), on the Docker image | As Docker ([§5.2](#52-umbrel)) |
+| StartOS | StartOS 0.4 | x64, arm64 | Package `bitcoin-server` (`.s9pk`), on the Docker image | As Docker ([§5.3](#53-startos)) |
 
 ## 2. Variants
 
@@ -48,19 +48,62 @@ processor of a Mac supported by macOS 13 (2017 and later).
 tag. Each job that takes builds from the release downloads them with their
 signatures, and fails unless every signature verifies. Its jobs:
 
+```mermaid
+flowchart TD
+    dispatch["package-release\nwith a release tag"] --> version["version"]
+    version --> debian["debian\ndeb packages"]
+    version --> windows["windows\ninstallers"]
+    debian --> docker["docker\ncontainer image"]
+    docker --> startos["startos\nStartOS packages"]
+    docker --> manifests
+    windows --> manifests["manifests\nHomebrew, winget, Umbrel"]
+    debian --> publish
+    startos --> publish
+    manifests --> publish
+    windows --> publish
+    publish["publish\nattach to the release"]
+```
+
 | Job | Does |
 | --- | ---- |
 | version | Takes the version from the tag (without its `v`) |
 | debian | Builds a deb per architecture (`dpkg-deb`), and assembles the variants of each architecture for the image |
 | docker | Builds the image for both architectures and pushes it to the GitHub container registry |
 | windows | Builds an installer per architecture (Inno Setup) |
-| manifests | Writes the Homebrew formula and the winget manifests, with the release URL and the SHA-256 of each build or installer, and the Umbrel app, with the image pinned by digest |
+| manifests | Writes the Homebrew formula, the winget manifests and the Umbrel app |
 | startos | Builds a StartOS package per architecture, with the image pinned by digest |
 | publish | Attaches the packages, formula, manifests and apps to the release, with their SHA-256 checksums (`packages-sha256.txt`) |
 
-## 4. Containers
+## 4. Distribution
 
-### 4.1 Docker
+The container image is pushed to the GitHub container registry by the
+`docker` job. Every other package is published as an asset of the release,
+and reaches its distribution repository from there:
+
+| Package | Repository | Submission |
+| ------- | ---------- | ---------- |
+| deb | A libbitcoin apt repository | The deb is added, the index regenerated and its `Release` file signed with the repository key |
+| Homebrew formula | A libbitcoin tap (`libbitcoin/homebrew-tap`) | The formula is committed to the tap |
+| winget manifests | `microsoft/winget-pkgs` | A pull request with the manifests, validated and merged by Microsoft |
+| Docker image | `ghcr.io/libbitcoin/libbitcoin-server` | Pushed by `package-release`; the package is public |
+| Umbrel app | A libbitcoin community app store, or `getumbrel/umbrel-apps` | The app is committed to the store, or submitted to Umbrel by pull request |
+| StartOS package | A StartOS registry | The package is submitted to the registry |
+
+The formula, manifests and Umbrel app refer to the release's download
+URLs, so each is submitted once the release is published.
+
+| Package | Users install with |
+| ------- | ------------------ |
+| deb | `apt install libbitcoin-server`, once the repository and its key are added |
+| Homebrew formula | `brew install libbitcoin/tap/libbitcoin-server` |
+| winget manifests | `winget install Libbitcoin.Server` |
+| Docker image | `docker pull ghcr.io/libbitcoin/libbitcoin-server:<version>` |
+| Umbrel app | The app store in umbrelOS |
+| StartOS package | The registry in StartOS |
+
+## 5. Containers
+
+### 5.1 Docker
 
 The image runs `bs` as user and group 1000, with its data in the `/data`
 volume and its configuration in `/data/bs.cfg`. On first start, when
@@ -91,7 +134,7 @@ connections = 10
 
 `docker stop` sends SIGTERM, which closes the store.
 
-### 4.2 Umbrel
+### 5.2 Umbrel
 
 The app runs the image, pinned by digest, with its data under the app's
 `data/bs` directory.
@@ -105,7 +148,7 @@ The app runs the image, pinned by digest, with its data under the app's
 Backups exclude the store (`bitcoin/`) and the logs (`log/`). The stop
 grace period is 5 minutes 30 seconds, for the store to close.
 
-### 4.3 StartOS
+### 5.3 StartOS
 
 The package runs the image, pinned by digest, on x86_64 and aarch64.
 

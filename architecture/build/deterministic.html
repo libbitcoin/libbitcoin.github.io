@@ -327,6 +327,55 @@
 
 <p>How release builds of <code>bs</code> are made reproducible, so that anyone building
 the same source gets the same files as those released.</p>
+<p>The first step is the Double Build: two independent builders on GitHub's
+hosted runners build the same commits, and the run passes only if their
+output is bit-identical. Guix, a pinned and bootstrappable toolchain, is
+the later step.</p>
+<h2 id="1-double-build">1. Double Build<a class="anchor" href="#1-double-build" aria-label="Link to this section">#</a></h2>
+<p><code>double-build.yml</code>, in libbitcoin-server, runs on push and by hand. Run by
+hand, it takes a branch or tag (<code>ref</code>) for all five repositories, by
+default the branch it runs on.</p>
+<div class="mermaid">
+flowchart TD
+    trigger["push or by hand"] --&gt; resolve["resolve&lt;br/&gt;commits"]
+    resolve --&gt; a["builder a&lt;br/&gt;build and hash"]
+    resolve --&gt; b["builder b&lt;br/&gt;build and hash"]
+    a --&gt; compare{"compare&lt;br/&gt;identical?"}
+    b --&gt; compare
+    compare --&gt;|yes| pass["run passes"]
+    compare --&gt;|no| fail["diffoscope report,&lt;br/&gt;run fails"]
+</div>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>resolve</td>
+<td>Resolves <code>ref</code> to one commit in each repository (<code>git ls-remote</code>, the tagged commit of an annotated tag), so that both builders build the same commits</td>
+</tr>
+<tr>
+<td>build</td>
+<td>Two builders, each on its own <code>ubuntu-24.04</code> runner, differing in checkout path, time zone, umask, machine and start time</td>
+</tr>
+<tr>
+<td>compare</td>
+<td>Tabulates the hashes of both builds; if any differ, writes a diffoscope report per file and fails</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each builder builds as the release does: CMake, clang 18, static release,
+<code>-march=x86-64-v3 -mtune=generic -g</code> with AVX2 and SSE4.1, static C++ and
+GCC runtimes and a build ID. It then removes RPATH, separates the debug
+symbols into a compressed <code>.debug</code> file, strips the binary and adds a debug
+link. Its artifact holds <code>bs-linux-x64</code>, <code>selector-linux-x64</code>, their
+<code>.debug</code> files, <code>SHA256SUMS</code> and <code>toolchain.txt</code> (the runner image, clang,
+ld and cmake versions, path, time zone and umask).</p>
+<p>The Double Build compares its two builders with each other, not with a
+published release.</p>
   </article>
 
   <nav class="pager"><a href="index.html">&larr; Build Architecture</a><a href="release.html">Release builds &rarr;</a></nav>

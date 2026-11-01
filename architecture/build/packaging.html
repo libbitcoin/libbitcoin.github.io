@@ -366,21 +366,21 @@ contain the signed builds of a release (<a href="release.html">Release builds</a
 <td>Linux</td>
 <td>x64, arm64</td>
 <td>Image <code>ghcr.io/libbitcoin/libbitcoin-server:&lt;version&gt;</code> (<code>linux/amd64</code>, <code>linux/arm64</code>)</td>
-<td>Runs the best variant the processor supports (<a href="#4-containers">§4</a>)</td>
+<td>Runs the best variant the processor supports (<a href="#5-containers">§5</a>)</td>
 </tr>
 <tr>
 <td>Umbrel</td>
 <td>umbrelOS</td>
 <td>x64, arm64</td>
 <td>App <code>bitcoin-server</code> (<code>libbitcoin-server-&lt;version&gt;-umbrel.tar.gz</code>), on the Docker image</td>
-<td>As Docker (<a href="#42-umbrel">§4.2</a>)</td>
+<td>As Docker (<a href="#52-umbrel">§5.2</a>)</td>
 </tr>
 <tr>
 <td>StartOS</td>
 <td>StartOS 0.4</td>
 <td>x64, arm64</td>
 <td>Package <code>bitcoin-server</code> (<code>.s9pk</code>), on the Docker image</td>
-<td>As Docker (<a href="#43-startos">§4.3</a>)</td>
+<td>As Docker (<a href="#53-startos">§5.3</a>)</td>
 </tr>
 </tbody>
 </table></div>
@@ -462,6 +462,21 @@ processor of a Mac supported by macOS 13 (2017 and later).</p>
 <p><code>package-release.yml</code>, in libbitcoin-server, is run by hand with a release
 tag. Each job that takes builds from the release downloads them with their
 signatures, and fails unless every signature verifies. Its jobs:</p>
+<div class="mermaid">
+flowchart TD
+    dispatch["package-release&lt;br/&gt;with a release tag"] --&gt; version["version"]
+    version --&gt; debian["debian&lt;br/&gt;deb packages"]
+    version --&gt; windows["windows&lt;br/&gt;installers"]
+    debian --&gt; docker["docker&lt;br/&gt;container image"]
+    docker --&gt; startos["startos&lt;br/&gt;StartOS packages"]
+    docker --&gt; manifests
+    windows --&gt; manifests["manifests&lt;br/&gt;Homebrew, winget, Umbrel"]
+    debian --&gt; publish
+    startos --&gt; publish
+    manifests --&gt; publish
+    windows --&gt; publish
+    publish["publish&lt;br/&gt;attach to the release"]
+</div>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -488,7 +503,7 @@ signatures, and fails unless every signature verifies. Its jobs:</p>
 </tr>
 <tr>
 <td>manifests</td>
-<td>Writes the Homebrew formula and the winget manifests, with the release URL and the SHA-256 of each build or installer, and the Umbrel app, with the image pinned by digest</td>
+<td>Writes the Homebrew formula, the winget manifests and the Umbrel app</td>
 </tr>
 <tr>
 <td>startos</td>
@@ -500,8 +515,89 @@ signatures, and fails unless every signature verifies. Its jobs:</p>
 </tr>
 </tbody>
 </table></div>
-<h2 id="4-containers">4. Containers<a class="anchor" href="#4-containers" aria-label="Link to this section">#</a></h2>
-<h3 id="41-docker">4.1 Docker<a class="anchor" href="#41-docker" aria-label="Link to this section">#</a></h3>
+<h2 id="4-distribution">4. Distribution<a class="anchor" href="#4-distribution" aria-label="Link to this section">#</a></h2>
+<p>The container image is pushed to the GitHub container registry by the
+<code>docker</code> job. Every other package is published as an asset of the release,
+and reaches its distribution repository from there:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Repository</th>
+<th>Submission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deb</td>
+<td>A libbitcoin apt repository</td>
+<td>The deb is added, the index regenerated and its <code>Release</code> file signed with the repository key</td>
+</tr>
+<tr>
+<td>Homebrew formula</td>
+<td>A libbitcoin tap (<code>libbitcoin/homebrew-tap</code>)</td>
+<td>The formula is committed to the tap</td>
+</tr>
+<tr>
+<td>winget manifests</td>
+<td><code>microsoft/winget-pkgs</code></td>
+<td>A pull request with the manifests, validated and merged by Microsoft</td>
+</tr>
+<tr>
+<td>Docker image</td>
+<td><code>ghcr.io/libbitcoin/libbitcoin-server</code></td>
+<td>Pushed by <code>package-release</code>; the package is public</td>
+</tr>
+<tr>
+<td>Umbrel app</td>
+<td>A libbitcoin community app store, or <code>getumbrel/umbrel-apps</code></td>
+<td>The app is committed to the store, or submitted to Umbrel by pull request</td>
+</tr>
+<tr>
+<td>StartOS package</td>
+<td>A StartOS registry</td>
+<td>The package is submitted to the registry</td>
+</tr>
+</tbody>
+</table></div>
+<p>The formula, manifests and Umbrel app refer to the release's download
+URLs, so each is submitted once the release is published.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Users install with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deb</td>
+<td><code>apt install libbitcoin-server</code>, once the repository and its key are added</td>
+</tr>
+<tr>
+<td>Homebrew formula</td>
+<td><code>brew install libbitcoin/tap/libbitcoin-server</code></td>
+</tr>
+<tr>
+<td>winget manifests</td>
+<td><code>winget install Libbitcoin.Server</code></td>
+</tr>
+<tr>
+<td>Docker image</td>
+<td><code>docker pull ghcr.io/libbitcoin/libbitcoin-server:&lt;version&gt;</code></td>
+</tr>
+<tr>
+<td>Umbrel app</td>
+<td>The app store in umbrelOS</td>
+</tr>
+<tr>
+<td>StartOS package</td>
+<td>The registry in StartOS</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="5-containers">5. Containers<a class="anchor" href="#5-containers" aria-label="Link to this section">#</a></h2>
+<h3 id="51-docker">5.1 Docker<a class="anchor" href="#51-docker" aria-label="Link to this section">#</a></h3>
 <p>The image runs <code>bs</code> as user and group 1000, with its data in the <code>/data</code>
 volume and its configuration in <code>/data/bs.cfg</code>. On first start, when
 <code>/data/bs.cfg</code> does not exist, the image copies its default configuration
@@ -543,7 +639,7 @@ connections = 10
 </tbody>
 </table></div>
 <p><code>docker stop</code> sends SIGTERM, which closes the store.</p>
-<h3 id="42-umbrel">4.2 Umbrel<a class="anchor" href="#42-umbrel" aria-label="Link to this section">#</a></h3>
+<h3 id="52-umbrel">5.2 Umbrel<a class="anchor" href="#52-umbrel" aria-label="Link to this section">#</a></h3>
 <p>The app runs the image, pinned by digest, with its data under the app's
 <code>data/bs</code> directory.</p>
 <div class="scroller"><table>
@@ -570,7 +666,7 @@ connections = 10
 </table></div>
 <p>Backups exclude the store (<code>bitcoin/</code>) and the logs (<code>log/</code>). The stop
 grace period is 5 minutes 30 seconds, for the store to close.</p>
-<h3 id="43-startos">4.3 StartOS<a class="anchor" href="#43-startos" aria-label="Link to this section">#</a></h3>
+<h3 id="53-startos">5.3 StartOS<a class="anchor" href="#53-startos" aria-label="Link to this section">#</a></h3>
 <p>The package runs the image, pinned by digest, on x86_64 and aarch64.</p>
 <div class="scroller"><table>
 <thead>

@@ -7,11 +7,15 @@ both run by hand: one tags each repository with a version, and one
 builds, signs and publishes the server from those tags.
 
 ```mermaid
-flowchart LR
-    tag["version-tag\neach repository"] --> validate["validate-tags"]
-    validate --> build["build-candidates\none job per build"]
-    build --> sign["sign\napproval"]
-    sign --> publish["publish\napproval"]
+flowchart TD
+    tag["version-tag\nin each repository"] --> dispatch["manual-release\nwith the five tags"]
+    dispatch --> validate{"validate-tags\ntags exist?"}
+    validate -->|no| fail["run fails"]
+    validate -->|yes| build["build-candidates\nbuild, strip, check\neach build"]
+    build --> approve1{{"approval"}}
+    approve1 --> sign["sign\nsign each file"]
+    sign --> approve2{{"approval"}}
+    approve2 --> publish["publish\ndraft release"]
 ```
 
 ## 1. Version tags

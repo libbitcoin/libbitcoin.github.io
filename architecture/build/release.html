@@ -329,11 +329,15 @@
 both run by hand: one tags each repository with a version, and one
 builds, signs and publishes the server from those tags.</p>
 <div class="mermaid">
-flowchart LR
-    tag["version-tag&lt;br/&gt;each repository"] --&gt; validate["validate-tags"]
-    validate --&gt; build["build-candidates&lt;br/&gt;one job per build"]
-    build --&gt; sign["sign&lt;br/&gt;approval"]
-    sign --&gt; publish["publish&lt;br/&gt;approval"]
+flowchart TD
+    tag["version-tag&lt;br/&gt;in each repository"] --&gt; dispatch["manual-release&lt;br/&gt;with the five tags"]
+    dispatch --&gt; validate{"validate-tags&lt;br/&gt;tags exist?"}
+    validate --&gt;|no| fail["run fails"]
+    validate --&gt;|yes| build["build-candidates&lt;br/&gt;build, strip, check&lt;br/&gt;each build"]
+    build --&gt; approve1{{"approval"}}
+    approve1 --&gt; sign["sign&lt;br/&gt;sign each file"]
+    sign --&gt; approve2{{"approval"}}
+    approve2 --&gt; publish["publish&lt;br/&gt;draft release"]
 </div>
 <h2 id="1-version-tags">1. Version tags<a class="anchor" href="#1-version-tags" aria-label="Link to this section">#</a></h2>
 <p>Each of libbitcoin-system, -database, -network, -node and -server has a

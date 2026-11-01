@@ -296,5 +296,30 @@ every job and runs on manual dispatch. The coverage job sends lcov output
 to Coveralls, excluding the paths in the entry's `coverage` element.
 `version-tag.yml` creates a version tag on manual dispatch.
 
+### 6.1 Check-in gate
+
+`ci.yml` of libbitcoin-server, as run on GitHub Actions:
+
+```mermaid
+flowchart TD
+    push["push"] --> paths
+    pr["pull request"] --> paths
+    paths{"source, test or\nbuild paths changed?"} -->|yes| cancel["cancel the running gate"]
+    paths -->|no| skip["no run"]
+    cancel --> gnu["gnu jobs"]
+    cancel --> cmake["cmake jobs"]
+    cancel --> presets["presets jobs"]
+    cancel --> msvc["msvc jobs"]
+    gnu --> build
+    cmake --> build
+    presets --> build
+    msvc --> build
+    build["each job: check out the\nbranch, build and test"] --> result{"all jobs pass?"}
+    result -->|yes| pass["gate passes"]
+    result -->|no| fail["gate fails"]
+```
+
+Every job must pass for the run to pass.
+
 libbitcoin-build has its own CI, which clones all six repositories and runs
 `generate4.sh` on Ubuntu and macOS.
