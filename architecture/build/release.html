@@ -263,6 +263,7 @@
         <a href="../../configuration/index.html">Configuration</a>
         <a href="../../configuration/reference.html">Settings Reference</a>
         <a href="../../building/platforms.html">Platform Coverage</a>
+        <a href="../../building/status.html">Build Status</a>
         <a href="../../building/index.html">Building</a>
         <a href="../../packages/index.html">Packages</a>
       </div></details>
@@ -410,7 +411,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <th>Compiler</th>
 <th>Target</th>
 <th>Options</th>
-<th>Guix</th>
 </tr>
 </thead>
 <tbody>
@@ -420,7 +420,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-shani</code></td>
@@ -428,7 +427,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avxifma</code></td>
@@ -436,7 +434,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>avxifma, shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avx512ifma</code></td>
@@ -444,7 +441,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>clang 18</td>
 <td><code>x86-64-v3</code></td>
 <td>avx512ifma, shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64</code></td>
@@ -452,7 +448,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc 14</td>
 <td><code>armv8-a</code></td>
 <td></td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64-crypto</code></td>
@@ -460,7 +455,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc 14</td>
 <td><code>armv8-a+crypto</code></td>
 <td>sha</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64-sha3</code></td>
@@ -468,7 +462,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc 14</td>
 <td><code>armv8.2-a+crypto+sha3</code></td>
 <td>sha, sha3</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64</code></td>
@@ -476,7 +469,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64-shani</code></td>
@@ -484,7 +476,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64-avxifma</code></td>
@@ -492,7 +483,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>avxifma, shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64-avx512ifma</code></td>
@@ -500,7 +490,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>gcc</td>
 <td><code>x86-64-v3</code></td>
 <td>avx512ifma, shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-macos-arm64</code></td>
@@ -508,7 +497,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>Apple Clang</td>
 <td><code>apple-m1</code>, macOS 13.3</td>
 <td>sha3, sha, aes</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-macos-x64</code></td>
@@ -516,7 +504,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>Apple Clang</td>
 <td><code>x86-64-v3</code>, macOS 13.3</td>
 <td>avx2, sse41, aesni</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64</code></td>
@@ -524,7 +511,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-shani</code></td>
@@ -532,7 +518,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avxifma</code></td>
@@ -540,7 +525,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>avxifma, shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avx512ifma</code></td>
@@ -548,7 +532,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>x64</td>
 <td>avx512ifma, shani, avx2, sse41</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64</code></td>
@@ -556,7 +539,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>ARM64</td>
 <td></td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64-crypto</code></td>
@@ -564,7 +546,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>ARM64</td>
 <td>sha</td>
-<td>WIP</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64-sha3</code></td>
@@ -572,12 +553,9 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>MSVC</td>
 <td>ARM64</td>
 <td>sha, sha3</td>
-<td>WIP</td>
 </tr>
 </tbody>
 </table></div>
-<p>The Guix column marks the builds that Guix reproduces from the same tags
-(<a href="deterministic.html">Deterministic builds</a>).</p>
 <p>The same job also builds the <code>selector</code> of libbitcoin-system, which reports
 the processor's features, for the packages that choose a variant at install
 (<a href="packaging.html">Packaging</a>):</p>

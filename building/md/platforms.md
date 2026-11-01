@@ -38,7 +38,6 @@ is supported, but `bs` is not.
 | CMake | ✔ CI (Linux, macOS), ✔ (Windows) | ✔ CI (Linux, macOS, Windows) |
 | Visual Studio | ✔ CI (Windows) | No target |
 | Install script | ✔ CI (Linux, macOS, Windows) | No target |
-| Guix (reproducible release builds) | WIP (Linux, macOS, Windows) | ✔ (Linux, macOS, Windows) |
 
 ## 4. Platform market share
 
@@ -49,7 +48,6 @@ is supported, but `bs` is not.
 - ✔ CI: built and tested on every change.
 - ✔ Built and tested outside of CI.
 - ● Expected to build: the toolchain supports it.
-- WIP: being added to CI.
 - No target: no documented build or CI for the platform.
 
 POWER, RISC-V and BSD are not shown. Compiler versions are those built in CI.

@@ -58,31 +58,28 @@ the tests (`--build-skip-tests`):
 | CMake (Linux, macOS) | `builds/cmake/install-cmake.sh` | `release`, `static`, with `--build-boost` |
 | Visual Studio (Windows) | `builds/msvc/build-msvc.cmd` | `StaticRelease`, toolset `v145`, `vs2026` |
 
-| Build | Runner | Compiler | Target | Options | Guix |
-| ----- | ------ | -------- | ------ | ------- | ---- |
-| `bs-linux-x64` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx2, sse41 | WIP |
-| `bs-linux-x64-shani` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | shani, avx2, sse41 | WIP |
-| `bs-linux-x64-avxifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avxifma, shani, avx2, sse41 | WIP |
-| `bs-linux-x64-avx512ifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx512ifma, shani, avx2, sse41 | WIP |
-| `bs-linux-arm64` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a` | | WIP |
-| `bs-linux-arm64-crypto` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a+crypto` | sha | WIP |
-| `bs-linux-arm64-sha3` | `ubuntu-24.04-arm` | gcc 14 | `armv8.2-a+crypto+sha3` | sha, sha3 | WIP |
-| `bs-musl-x64` | Alpine 3.22 | gcc | `x86-64-v3` | avx2, sse41 | WIP |
-| `bs-musl-x64-shani` | Alpine 3.22 | gcc | `x86-64-v3` | shani, avx2, sse41 | WIP |
-| `bs-musl-x64-avxifma` | Alpine 3.22 | gcc | `x86-64-v3` | avxifma, shani, avx2, sse41 | WIP |
-| `bs-musl-x64-avx512ifma` | Alpine 3.22 | gcc | `x86-64-v3` | avx512ifma, shani, avx2, sse41 | WIP |
-| `bs-macos-arm64` | `macos-latest` | Apple Clang | `apple-m1`, macOS 13.3 | sha3, sha, aes | WIP |
-| `bs-macos-x64` | `macos-26-intel` | Apple Clang | `x86-64-v3`, macOS 13.3 | avx2, sse41, aesni | WIP |
-| `bs-windows-x64` | `windows-latest` | MSVC | x64 | avx2, sse41 | WIP |
-| `bs-windows-x64-shani` | `windows-latest` | MSVC | x64 | shani, avx2, sse41 | WIP |
-| `bs-windows-x64-avxifma` | `windows-latest` | MSVC | x64 | avxifma, shani, avx2, sse41 | WIP |
-| `bs-windows-x64-avx512ifma` | `windows-latest` | MSVC | x64 | avx512ifma, shani, avx2, sse41 | WIP |
-| `bs-windows-arm64` | `windows-11-vs2026-arm` | MSVC | ARM64 | | WIP |
-| `bs-windows-arm64-crypto` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha | WIP |
-| `bs-windows-arm64-sha3` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha, sha3 | WIP |
-
-The Guix column marks the builds that Guix reproduces from the same tags
-([Deterministic builds](deterministic)).
+| Build | Runner | Compiler | Target | Options |
+| ----- | ------ | -------- | ------ | ------- |
+| `bs-linux-x64` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx2, sse41 |
+| `bs-linux-x64-shani` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | shani, avx2, sse41 |
+| `bs-linux-x64-avxifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avxifma, shani, avx2, sse41 |
+| `bs-linux-x64-avx512ifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
+| `bs-linux-arm64` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a` | |
+| `bs-linux-arm64-crypto` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a+crypto` | sha |
+| `bs-linux-arm64-sha3` | `ubuntu-24.04-arm` | gcc 14 | `armv8.2-a+crypto+sha3` | sha, sha3 |
+| `bs-musl-x64` | Alpine 3.22 | gcc | `x86-64-v3` | avx2, sse41 |
+| `bs-musl-x64-shani` | Alpine 3.22 | gcc | `x86-64-v3` | shani, avx2, sse41 |
+| `bs-musl-x64-avxifma` | Alpine 3.22 | gcc | `x86-64-v3` | avxifma, shani, avx2, sse41 |
+| `bs-musl-x64-avx512ifma` | Alpine 3.22 | gcc | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
+| `bs-macos-arm64` | `macos-latest` | Apple Clang | `apple-m1`, macOS 13.3 | sha3, sha, aes |
+| `bs-macos-x64` | `macos-26-intel` | Apple Clang | `x86-64-v3`, macOS 13.3 | avx2, sse41, aesni |
+| `bs-windows-x64` | `windows-latest` | MSVC | x64 | avx2, sse41 |
+| `bs-windows-x64-shani` | `windows-latest` | MSVC | x64 | shani, avx2, sse41 |
+| `bs-windows-x64-avxifma` | `windows-latest` | MSVC | x64 | avxifma, shani, avx2, sse41 |
+| `bs-windows-x64-avx512ifma` | `windows-latest` | MSVC | x64 | avx512ifma, shani, avx2, sse41 |
+| `bs-windows-arm64` | `windows-11-vs2026-arm` | MSVC | ARM64 | |
+| `bs-windows-arm64-crypto` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha |
+| `bs-windows-arm64-sha3` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha, sha3 |
 
 The same job also builds the `selector` of libbitcoin-system, which reports
 the processor's features, for the packages that choose a variant at install

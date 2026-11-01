@@ -263,6 +263,7 @@
         <a href="../../configuration/index.html">Configuration</a>
         <a href="../../configuration/reference.html">Settings Reference</a>
         <a href="../../building/platforms.html">Platform Coverage</a>
+        <a href="../../building/status.html">Build Status</a>
         <a href="../../building/index.html">Building</a>
         <a href="../../packages/index.html">Packages</a>
       </div></details>
@@ -321,8 +322,7 @@
     <a href="#3-one-thing-named">One thing, named</a>
     <a href="#4-reference-vectors">Reference vectors</a>
     <a href="#5-continuous-integration">Continuous integration</a>
-    <a href="#6-build-status">Build status</a>
-    <a href="#7-coverage">Coverage</a>
+    <a href="#6-coverage">Coverage</a>
   </nav>
 
   <article class="doc">
@@ -582,7 +582,8 @@ Each library repository runs the same matrix. The gate runs on push and
 pull request, and the expanded matrix, run on demand, covers every
 compiler in all combinations of debug or release and static or shared (see
 <a href="../build/index.html#6-continuous-integration">Continuous integration</a> and
-<a href="../../building/toolchains.html#3-compilers-tested-in-ci">Compilers tested in CI</a>).</p>
+<a href="../../building/toolchains.html#3-compilers-tested-in-ci">Compilers tested in CI</a>). The
+current status of each repository is on <a href="../../building/status.html">Build status</a>.</p>
 <p>Each CI job runs the same install script published for end-user builds
 (see <a href="../../building/index.html">Building</a>), so CI verifies the build scripts as
 well as the build. All build artifacts, for every build system and
@@ -682,55 +683,7 @@ configurable metadata (see <a href="../build/index.html">Build architecture</a>)
 </tr>
 </tbody>
 </table></div>
-<h2 id="6-build-status">6. Build status<a class="anchor" href="#6-build-status" aria-label="Link to this section">#</a></h2>
-<p>The current master of each repository:</p>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Repository</th>
-<th>CI</th>
-<th>Coverage</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-system?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-system/master" /></a></td>
-</tr>
-<tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-database">libbitcoin-database</a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-database?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-database/master" /></a></td>
-</tr>
-<tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-network">libbitcoin-network</a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-network?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-network/master" /></a></td>
-</tr>
-<tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-node">libbitcoin-node</a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-node?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-node/master" /></a></td>
-</tr>
-<tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-server">libbitcoin-server</a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-server?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-server/master" /></a></td>
-</tr>
-<tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer</a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-explorer?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-explorer/master" /></a></td>
-</tr>
-<tr>
-<td><a href="https://github.com/libbitcoin/libbitcoin-build">libbitcoin-build</a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td></td>
-</tr>
-</tbody>
-</table></div>
-<h2 id="7-coverage">7. Coverage<a class="anchor" href="#7-coverage" aria-label="Link to this section">#</a></h2>
+<h2 id="6-coverage">6. Coverage<a class="anchor" href="#6-coverage" aria-label="Link to this section">#</a></h2>
 <p><strong>Line coverage.</strong> A GCC debug job in each repository's CI (GitHub
 Actions) is built with <code>--coverage</code>, and its lcov output is reported to
 <a href="https://coveralls.io/github/libbitcoin/libbitcoin-system">Coveralls</a>,

@@ -89,7 +89,8 @@ Each library repository runs the same matrix. The gate runs on push and
 pull request, and the expanded matrix, run on demand, covers every
 compiler in all combinations of debug or release and static or shared (see
 [Continuous integration](../build/index#6-continuous-integration) and
-[Compilers tested in CI](../../building/toolchains#3-compilers-tested-in-ci)).
+[Compilers tested in CI](../../building/toolchains#3-compilers-tested-in-ci)). The
+current status of each repository is on [Build status](../../building/status).
 
 Each CI job runs the same install script published for end-user builds
 (see [Building](../../building/index)), so CI verifies the build scripts as
@@ -110,21 +111,7 @@ configurable metadata (see [Build architecture](../build/index)).
 | Windows | x86 (Win32) | 32 | little | MSVC v145 | Visual Studio |
 | Windows | arm64 | 64 | little | MSVC v145 | Visual Studio |
 
-## 6. Build status
-
-The current master of each repository:
-
-| Repository | CI | Coverage |
-|---|---|---|
-| [libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system) | [![CI](https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml) | [![Coverage](https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-system/master)](https://coveralls.io/github/libbitcoin/libbitcoin-system?branch=master) |
-| [libbitcoin-database](https://github.com/libbitcoin/libbitcoin-database) | [![CI](https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml) | [![Coverage](https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-database/master)](https://coveralls.io/github/libbitcoin/libbitcoin-database?branch=master) |
-| [libbitcoin-network](https://github.com/libbitcoin/libbitcoin-network) | [![CI](https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml) | [![Coverage](https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-network/master)](https://coveralls.io/github/libbitcoin/libbitcoin-network?branch=master) |
-| [libbitcoin-node](https://github.com/libbitcoin/libbitcoin-node) | [![CI](https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml) | [![Coverage](https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-node/master)](https://coveralls.io/github/libbitcoin/libbitcoin-node?branch=master) |
-| [libbitcoin-server](https://github.com/libbitcoin/libbitcoin-server) | [![CI](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml) | [![Coverage](https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-server/master)](https://coveralls.io/github/libbitcoin/libbitcoin-server?branch=master) |
-| [libbitcoin-explorer](https://github.com/libbitcoin/libbitcoin-explorer) | [![CI](https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml) | [![Coverage](https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-explorer/master)](https://coveralls.io/github/libbitcoin/libbitcoin-explorer?branch=master) |
-| [libbitcoin-build](https://github.com/libbitcoin/libbitcoin-build) | [![CI](https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml) | |
-
-## 7. Coverage
+## 6. Coverage
 
 **Line coverage.** A GCC debug job in each repository's CI (GitHub
 Actions) is built with `--coverage`, and its lcov output is reported to
