@@ -798,6 +798,8 @@ conflict.
 | Electrum | `[electrum]` | 8580 | 8543 |
 | Sparrow | `[sparrow]` | 8680 | 8643 |
 | Esplora | `[esplora]` | 8780 | 8743 |
+| Stratum v1 | `[stratum_v1]` | 8880 | 8843 |
+| Stratum v2 | `[stratum_v2]` | 8980 | – |
 
 P2P has no separate secure port. BIP324 encryption is negotiated on the
 same port, and offered when `node.provide_privacy` is set. ZMQ's secure
@@ -808,11 +810,11 @@ port follows its network's convention:
 
 | Chain | Service offset | Services | P2P |
 | ----- | -------------- | -------- | --- |
-| mainnet | 0 | 8043–8780 | 8333 |
-| testnet3 | +10000 | 18043–18780 | 18333 |
-| regtest | +20000 | 28043–28780 | 18444 |
-| signet | +30000 | 38043–38780 | 38333 |
-| testnet4 | +40000 | 48043–48780 | 48333 |
+| mainnet | 0 | 8043–8980 | 8333 |
+| testnet3 | +10000 | 18043–18980 | 18333 |
+| regtest | +20000 | 28043–28980 | 18444 |
+| signet | +30000 | 38043–38980 | 38333 |
+| testnet4 | +40000 | 48043–48980 | 48333 |
 
 To use a service as a drop-in replacement, bind it to the port its
 clients expect instead:

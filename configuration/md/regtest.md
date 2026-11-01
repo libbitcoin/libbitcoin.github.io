@@ -23,6 +23,7 @@ from that store, so they need neither `-n` nor a configuration file.
 path = regtest
 
 [bitcoin]
+network = regtest
 bip16_activation_time = 1329264000
 bip30_deactivate_checkpoint = 0000000000000000000000000000000000000000000000000000000000000000:0
 bip30_reactivate_height = 0
@@ -106,6 +107,8 @@ buckets = 10001
 # buckets = 10001
 ```
 
+- `bitcoin.network` selects the regtest defaults, including the service
+  ports ([Ports](#ports)).
 - `[bitcoin]` sets the regtest genesis block and difficulty limit, all
   soft forks active from genesis, and a 150 block subsidy interval.
   There are no checkpoints beyond genesis and no minimum work.
@@ -121,3 +124,22 @@ buckets = 10001
   preallocate for the mainnet chain.
 - `[table.scan]` is commented out because it enables silent payments
   ([§5.14](index#514-silent-payments)). Uncomment it to index them.
+
+## Ports
+
+With `bitcoin.network = regtest`, each service listens by default on its
+mainnet port plus 20,000 ([Ports](index#6-ports)):
+
+| Service | Section | Clear | Secure |
+| ------- | ------- | ----- | ------ |
+| P2P network | `[inbound]` | 18444 | 18444 |
+| Admin web | `[admin]` | 28080 | 28043 |
+| Native web and REST | `[native]` | 28180 | 28143 |
+| Bitcoind RPC and REST | `[bitcoind]` | 28280 | 28243 |
+| Bitcoind ZMQ | `[bitcoind_zmq]` | 28380 | 28343 |
+| BTCD RPC | `[btcd]` | 28480 | 28443 |
+| Electrum | `[electrum]` | 28580 | 28543 |
+| Sparrow | `[sparrow]` | 28680 | 28643 |
+| Esplora | `[esplora]` | 28780 | 28743 |
+| Stratum v1 | `[stratum_v1]` | 28880 | 28843 |
+| Stratum v2 | `[stratum_v2]` | 28980 | – |

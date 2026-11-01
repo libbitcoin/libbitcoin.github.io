@@ -338,6 +338,7 @@ from that store, so they need neither <code>-n</code> nor a configuration file.<
 path = testnet4
 
 <span class="section">[bitcoin]</span>
+network = testnet4
 bip16_activation_time = 1329264000
 bip30_deactivate_checkpoint = 0000000012982b6d5f621229286b880e909984df669c2afabb102ce311b13f28:1
 bip30_reactivate_height = 486000000
@@ -423,6 +424,8 @@ buckets = 150001
 <span class="comment"># buckets = 150001</span>
 </code></pre>
 <ul>
+<li><code>bitcoin.network</code> selects the testnet4 defaults, including the service
+  ports (<a href="#ports">Ports</a>).</li>
 <li><code>[bitcoin]</code> replaces the chain parameters, with soft forks active from
   block 1.</li>
 <li><code>forks.time_warp_patch</code> enables the testnet4 time warp rule.</li>
@@ -438,6 +441,87 @@ buckets = 150001
 <li><code>node.maximum_concurrency</code> raises the download window, since testnet
   blocks are small.</li>
 </ul>
+<h2 id="ports">Ports<a class="anchor" href="#ports" aria-label="Link to this section">#</a></h2>
+<p>With <code>bitcoin.network = testnet4</code>, each service listens by default on its
+mainnet port plus 40,000 (<a href="index.html#6-ports">Ports</a>):</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Section</th>
+<th>Clear</th>
+<th>Secure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P2P network</td>
+<td><code>[inbound]</code></td>
+<td>48333</td>
+<td>48333</td>
+</tr>
+<tr>
+<td>Admin web</td>
+<td><code>[admin]</code></td>
+<td>48080</td>
+<td>48043</td>
+</tr>
+<tr>
+<td>Native web and REST</td>
+<td><code>[native]</code></td>
+<td>48180</td>
+<td>48143</td>
+</tr>
+<tr>
+<td>Bitcoind RPC and REST</td>
+<td><code>[bitcoind]</code></td>
+<td>48280</td>
+<td>48243</td>
+</tr>
+<tr>
+<td>Bitcoind ZMQ</td>
+<td><code>[bitcoind_zmq]</code></td>
+<td>48380</td>
+<td>48343</td>
+</tr>
+<tr>
+<td>BTCD RPC</td>
+<td><code>[btcd]</code></td>
+<td>48480</td>
+<td>48443</td>
+</tr>
+<tr>
+<td>Electrum</td>
+<td><code>[electrum]</code></td>
+<td>48580</td>
+<td>48543</td>
+</tr>
+<tr>
+<td>Sparrow</td>
+<td><code>[sparrow]</code></td>
+<td>48680</td>
+<td>48643</td>
+</tr>
+<tr>
+<td>Esplora</td>
+<td><code>[esplora]</code></td>
+<td>48780</td>
+<td>48743</td>
+</tr>
+<tr>
+<td>Stratum v1</td>
+<td><code>[stratum_v1]</code></td>
+<td>48880</td>
+<td>48843</td>
+</tr>
+<tr>
+<td>Stratum v2</td>
+<td><code>[stratum_v2]</code></td>
+<td>48980</td>
+<td>–</td>
+</tr>
+</tbody>
+</table></div>
   </article>
 
   <nav class="pager"><a href="testnet3.html">&larr; Testnet3</a><a href="signet.html">Signet &rarr;</a></nav>

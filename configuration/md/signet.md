@@ -22,6 +22,7 @@ from that store, so they need neither `-n` nor a configuration file.
 path = signet
 
 [bitcoin]
+network = signet
 bip16_activation_time = 1329264000
 bip30_deactivate_checkpoint = 00000086d6b2636cb2a392d45edc4ec544a10024d30141c9adf4bfd9de533b53:1
 bip30_reactivate_height = 486000000
@@ -102,6 +103,8 @@ buckets = 330001
 # buckets = 330001
 ```
 
+- `bitcoin.network` selects the signet defaults, including the service
+  ports ([Ports](#ports)).
 - `[bitcoin]` replaces the chain parameters: genesis block, soft fork
   activations, checkpoint, milestone, minimum work and proof of work limit.
 - `bitcoin.signet_challenge` is the script that each block's signature must
@@ -115,3 +118,22 @@ buckets = 330001
   starts every table body empty.
 - `[table.scan]` is commented out because it enables silent payments
   ([§5.14](index#514-silent-payments)). Uncomment it to index them.
+
+## Ports
+
+With `bitcoin.network = signet`, each service listens by default on its
+mainnet port plus 30,000 ([Ports](index#6-ports)):
+
+| Service | Section | Clear | Secure |
+| ------- | ------- | ----- | ------ |
+| P2P network | `[inbound]` | 38333 | 38333 |
+| Admin web | `[admin]` | 38080 | 38043 |
+| Native web and REST | `[native]` | 38180 | 38143 |
+| Bitcoind RPC and REST | `[bitcoind]` | 38280 | 38243 |
+| Bitcoind ZMQ | `[bitcoind_zmq]` | 38380 | 38343 |
+| BTCD RPC | `[btcd]` | 38480 | 38443 |
+| Electrum | `[electrum]` | 38580 | 38543 |
+| Sparrow | `[sparrow]` | 38680 | 38643 |
+| Esplora | `[esplora]` | 38780 | 38743 |
+| Stratum v1 | `[stratum_v1]` | 38880 | 38843 |
+| Stratum v2 | `[stratum_v2]` | 38980 | – |

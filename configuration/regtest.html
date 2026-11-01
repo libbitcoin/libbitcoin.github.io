@@ -340,6 +340,7 @@ from that store, so they need neither <code>-n</code> nor a configuration file.<
 path = regtest
 
 <span class="section">[bitcoin]</span>
+network = regtest
 bip16_activation_time = 1329264000
 bip30_deactivate_checkpoint = 0000000000000000000000000000000000000000000000000000000000000000:0
 bip30_reactivate_height = 0
@@ -423,6 +424,8 @@ buckets = 10001
 <span class="comment"># buckets = 10001</span>
 </code></pre>
 <ul>
+<li><code>bitcoin.network</code> selects the regtest defaults, including the service
+  ports (<a href="#ports">Ports</a>).</li>
 <li><code>[bitcoin]</code> sets the regtest genesis block and difficulty limit, all
   soft forks active from genesis, and a 150 block subsidy interval.
   There are no checkpoints beyond genesis and no minimum work.</li>
@@ -439,6 +442,87 @@ buckets = 10001
 <li><code>[table.scan]</code> is commented out because it enables silent payments
   (<a href="index.html#514-silent-payments">§5.14</a>). Uncomment it to index them.</li>
 </ul>
+<h2 id="ports">Ports<a class="anchor" href="#ports" aria-label="Link to this section">#</a></h2>
+<p>With <code>bitcoin.network = regtest</code>, each service listens by default on its
+mainnet port plus 20,000 (<a href="index.html#6-ports">Ports</a>):</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Section</th>
+<th>Clear</th>
+<th>Secure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P2P network</td>
+<td><code>[inbound]</code></td>
+<td>18444</td>
+<td>18444</td>
+</tr>
+<tr>
+<td>Admin web</td>
+<td><code>[admin]</code></td>
+<td>28080</td>
+<td>28043</td>
+</tr>
+<tr>
+<td>Native web and REST</td>
+<td><code>[native]</code></td>
+<td>28180</td>
+<td>28143</td>
+</tr>
+<tr>
+<td>Bitcoind RPC and REST</td>
+<td><code>[bitcoind]</code></td>
+<td>28280</td>
+<td>28243</td>
+</tr>
+<tr>
+<td>Bitcoind ZMQ</td>
+<td><code>[bitcoind_zmq]</code></td>
+<td>28380</td>
+<td>28343</td>
+</tr>
+<tr>
+<td>BTCD RPC</td>
+<td><code>[btcd]</code></td>
+<td>28480</td>
+<td>28443</td>
+</tr>
+<tr>
+<td>Electrum</td>
+<td><code>[electrum]</code></td>
+<td>28580</td>
+<td>28543</td>
+</tr>
+<tr>
+<td>Sparrow</td>
+<td><code>[sparrow]</code></td>
+<td>28680</td>
+<td>28643</td>
+</tr>
+<tr>
+<td>Esplora</td>
+<td><code>[esplora]</code></td>
+<td>28780</td>
+<td>28743</td>
+</tr>
+<tr>
+<td>Stratum v1</td>
+<td><code>[stratum_v1]</code></td>
+<td>28880</td>
+<td>28843</td>
+</tr>
+<tr>
+<td>Stratum v2</td>
+<td><code>[stratum_v2]</code></td>
+<td>28980</td>
+<td>–</td>
+</tr>
+</tbody>
+</table></div>
   </article>
 
   <nav class="pager"><a href="signet.html">&larr; Signet</a><a href="reference.html">Settings Reference &rarr;</a></nav>

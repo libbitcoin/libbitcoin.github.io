@@ -21,6 +21,7 @@ from that store, so they need neither `-n` nor a configuration file.
 path = testnet3
 
 [bitcoin]
+network = testnet3
 bip16_activation_time = 1329264000
 bip30_deactivate_checkpoint = 0000000023b3a96d3484e5abb3755c413e7d41500f8e2a5c3f0dd01299cd8ef8:21111
 bip30_reactivate_height = 486000000
@@ -105,6 +106,8 @@ buckets = 5100001
 # buckets = 5100001
 ```
 
+- `bitcoin.network` selects the testnet3 defaults, including the service
+  ports ([Ports](#ports)).
 - `[bitcoin]` replaces the chain parameters: genesis block, soft fork
   activations, checkpoint, milestone and minimum work.
 - `forks.difficult = false` enables testnet's minimum difficulty blocks.
@@ -117,3 +120,22 @@ buckets = 5100001
   ([§5.14](index#514-silent-payments)). Uncomment it to index them.
 - `node.maximum_concurrency` raises the download window, since testnet
   blocks are small.
+
+## Ports
+
+With `bitcoin.network = testnet3`, each service listens by default on its
+mainnet port plus 10,000 ([Ports](index#6-ports)):
+
+| Service | Section | Clear | Secure |
+| ------- | ------- | ----- | ------ |
+| P2P network | `[inbound]` | 18333 | 18333 |
+| Admin web | `[admin]` | 18080 | 18043 |
+| Native web and REST | `[native]` | 18180 | 18143 |
+| Bitcoind RPC and REST | `[bitcoind]` | 18280 | 18243 |
+| Bitcoind ZMQ | `[bitcoind_zmq]` | 18380 | 18343 |
+| BTCD RPC | `[btcd]` | 18480 | 18443 |
+| Electrum | `[electrum]` | 18580 | 18543 |
+| Sparrow | `[sparrow]` | 18680 | 18643 |
+| Esplora | `[esplora]` | 18780 | 18743 |
+| Stratum v1 | `[stratum_v1]` | 18880 | 18843 |
+| Stratum v2 | `[stratum_v2]` | 18980 | – |
