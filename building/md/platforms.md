@@ -73,6 +73,6 @@ Bitcoin Core's experimental library is not released, or called by `bitcoind`.
 - ● Expected to build: the toolchain supports it.
 - No target: no documented build or CI for the platform.
 
-POWER, RISC-V and BSD are not shown. Compiler versions are those built in CI.
+POWER, RISC-V, s390x and BSD are not shown. Compiler versions are those built in CI.
 Bitcoin Core is shown from its build files and CI configuration at master
 (October 2026).
