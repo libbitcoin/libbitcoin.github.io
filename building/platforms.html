@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: Platform coverage</title>
-<meta name="description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/platforms.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/platforms.html">
 <meta property="og:title" content="Building: Platform coverage">
-<meta property="og:description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: Platform coverage">
-<meta name="twitter:description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -311,8 +311,9 @@
       <a href="../about.html">About</a>
     </nav>
     <p class="lede">
-      Building <strong>Bitcoin Server</strong> (bs), on Linux, macOS and Windows:
-      build systems, options, toolchains and libbitcoin-build.
+      Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
+      build options, build systems and toolchains, libbitcoin-build, platform
+      coverage and build status.
     </p>
   </header>
 
@@ -363,12 +364,6 @@
 <td>arm32</td>
 <td>✔ CI</td>
 <td>✔ CI</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>s390x (big-endian)</td>
-<td>✔ CI</td>
-<td>●</td>
 </tr>
 <tr>
 <td>macOS</td>
@@ -448,18 +443,145 @@ is supported, but <code>bs</code> is not.</p>
 <tr>
 <td>Windows</td>
 <td>MinGW-w64 GCC</td>
-<td>✔</td>
+<td>✔ CI (13)</td>
 <td>✔ CI (14)</td>
 </tr>
 <tr>
 <td>Windows</td>
 <td>MinGW-w64 Clang</td>
-<td>✔</td>
+<td>✔ CI (13)</td>
 <td>No target</td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="3-build-systems">3. Build systems<a class="anchor" href="#3-build-systems" aria-label="Link to this section">#</a></h2>
+<h2 id="3-executables">3. Executables<a class="anchor" href="#3-executables" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Linkage</th>
+<th>Libbitcoin</th>
+<th>Bitcoin Core</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Dynamic</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>Dynamic</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Dynamic</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="4-libraries">4. Libraries<a class="anchor" href="#4-libraries" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Library</th>
+<th>system</th>
+<th>database</th>
+<th>network</th>
+<th>node</th>
+<th>server</th>
+<th>Bitcoin Core</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>●</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Shared</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>●</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>Shared</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>DLL</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+</tbody>
+</table></div>
+<p>Bitcoin Core's experimental library is not released, or called by <code>bitcoind</code>.</p>
+<h2 id="5-build-systems">5. Build systems<a class="anchor" href="#5-build-systems" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -476,7 +598,7 @@ is supported, but <code>bs</code> is not.</p>
 </tr>
 <tr>
 <td>CMake</td>
-<td>✔ CI (Linux, macOS), ✔ (Windows)</td>
+<td>✔ CI (Linux, macOS, Windows)</td>
 <td>✔ CI (Linux, macOS, Windows)</td>
 </tr>
 <tr>
@@ -485,15 +607,15 @@ is supported, but <code>bs</code> is not.</p>
 <td>No target</td>
 </tr>
 <tr>
-<td>Install script</td>
+<td>Build script</td>
 <td>✔ CI (Linux, macOS, Windows)</td>
 <td>No target</td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="4-platform-market-share">4. Platform market share<a class="anchor" href="#4-platform-market-share" aria-label="Link to this section">#</a></h2>
+<h2 id="6-platform-market-share">6. Platform market share<a class="anchor" href="#6-platform-market-share" aria-label="Link to this section">#</a></h2>
 <p><img alt="Operating system share of desktops, laptops and servers, and architecture share" src="../performance/desktop-share.png" /></p>
-<h2 id="5-notes">5. Notes<a class="anchor" href="#5-notes" aria-label="Link to this section">#</a></h2>
+<h2 id="7-notes">7. Notes<a class="anchor" href="#7-notes" aria-label="Link to this section">#</a></h2>
 <ul>
 <li>✔ CI: built and tested on every change.</li>
 <li>✔ Built and tested outside of CI.</li>

@@ -8,7 +8,6 @@
 | Linux | x86 (32-bit) | ✔ CI | ✔ CI |
 | Linux | arm64 | ✔ CI | ✔ |
 | Linux | arm32 | ✔ CI | ✔ CI |
-| Linux | s390x (big-endian) | ✔ CI | ● |
 | macOS | x64 | ✔ CI | ✔ |
 | macOS | arm64 | ✔ CI | ✔ CI |
 | Windows | x64 | ✔ CI | ✔ CI |
@@ -27,23 +26,47 @@ is supported, but `bs` is not.
 | macOS | Apple Clang (Xcode) | ✔ CI (Xcode 26.6) | ✔ CI (Xcode 26.3) |
 | Windows | MSVC (Visual Studio 2026) | ✔ CI (v145) | ✔ CI (v145) |
 | Windows | Clang (clang-cl, with Visual Studio) | ✔ CI (18.11) | No target |
-| Windows | MinGW-w64 GCC | ✔ | ✔ CI (14) |
-| Windows | MinGW-w64 Clang | ✔ | No target |
+| Windows | MinGW-w64 GCC | ✔ CI (13) | ✔ CI (14) |
+| Windows | MinGW-w64 Clang | ✔ CI (13) | No target |
 
-## 3. Build systems
+## 3. Executables
+
+| Platform | Linkage | Libbitcoin | Bitcoin Core |
+| -------- | ------- | ---------- | ------------ |
+| Linux | Static | ✔ CI | ✔ CI |
+| Linux | Dynamic | ✔ CI | ✔ CI |
+| macOS | Static | ✔ CI | ✔ CI |
+| macOS | Dynamic | ✔ CI | ✔ CI |
+| Windows | Static | ✔ CI | ✔ CI |
+| Windows | Dynamic | ✔ CI | ✔ CI |
+
+## 4. Libraries
+
+| Platform | Library | system | database | network | node | server | Bitcoin Core |
+| -------- | ------- | ------ | -------- | ------- | ---- | ------ | ------------ |
+| Linux | Static | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ● |
+| Linux | Shared | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI |
+| macOS | Static | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ● |
+| macOS | Shared | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI |
+| Windows | Static | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI |
+| Windows | DLL | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI |
+
+Bitcoin Core's experimental library is not released, or called by `bitcoind`.
+
+## 5. Build systems
 
 | Build system | Libbitcoin | Bitcoin Core |
 | ------------ | ---------- | ------------ |
 | Autotools | ✔ CI (Linux, macOS) | No target |
-| CMake | ✔ CI (Linux, macOS), ✔ (Windows) | ✔ CI (Linux, macOS, Windows) |
+| CMake | ✔ CI (Linux, macOS, Windows) | ✔ CI (Linux, macOS, Windows) |
 | Visual Studio | ✔ CI (Windows) | No target |
-| Install script | ✔ CI (Linux, macOS, Windows) | No target |
+| Build script | ✔ CI (Linux, macOS, Windows) | No target |
 
-## 4. Platform market share
+## 6. Platform market share
 
 ![Operating system share of desktops, laptops and servers, and architecture share](../performance/desktop-share.png)
 
-## 5. Notes
+## 7. Notes
 
 - ✔ CI: built and tested on every change.
 - ✔ Built and tested outside of CI.

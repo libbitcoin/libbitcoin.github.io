@@ -280,8 +280,8 @@ SECTIONS = {
     "building": {
         "title": "Building",
         "h1": "Building",
-        "description": "Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.",
-        "lede": "Building <strong>Bitcoin Server</strong> (bs), on Linux, macOS and Windows:\n      build systems, options, toolchains and libbitcoin-build.",
+        "description": "Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.",
+        "lede": "Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:\n      build options, build systems and toolchains, libbitcoin-build, platform\n      coverage and build status.",
         "foot": "",
         "pages": [
             ("index", "Building"),
