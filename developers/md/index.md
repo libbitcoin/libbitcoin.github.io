@@ -67,3 +67,20 @@ A library and those it depends on are found with `pkg-config`:
 ```
 $ c++ -std=c++20 app.cpp $(pkg-config --cflags --libs libbitcoin-system)
 ```
+
+## 3. Versioning
+
+| Version | Change |
+| ------- | ------ |
+| Major | Breaks compatibility |
+| Minor | Adds compatible features |
+| Build | Text, comments, style, refactoring and minor enhancements |
+
+A version is `<major>.<minor>.<build>`, where the build is the number of
+commits in the repository's history, so it never resets. From `4.0.3372`:
+
+| Version | Change |
+| ------- | ------ |
+| `4.0.3380` | Build: eight more commits |
+| `4.1.3400` | Minor: a compatible change |
+| `5.0.3500` | Major: a compatibility break |

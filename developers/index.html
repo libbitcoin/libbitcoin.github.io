@@ -451,6 +451,53 @@ using namespace libbitcoin::system;
 <p>A library and those it depends on are found with <code>pkg-config</code>:</p>
 <pre class="console"><code>$ c++ -std=c++20 app.cpp $(pkg-config --cflags --libs libbitcoin-system)
 </code></pre>
+<h2 id="3-versioning">3. Versioning<a class="anchor" href="#3-versioning" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Major</td>
+<td>Breaks compatibility</td>
+</tr>
+<tr>
+<td>Minor</td>
+<td>Adds compatible features</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Text, comments, style, refactoring and minor enhancements</td>
+</tr>
+</tbody>
+</table></div>
+<p>A version is <code>&lt;major&gt;.&lt;minor&gt;.&lt;build&gt;</code>, where the build is the number of
+commits in the repository's history, so it never resets. From <code>4.0.3372</code>:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>4.0.3380</code></td>
+<td>Build: eight more commits</td>
+</tr>
+<tr>
+<td><code>4.1.3400</code></td>
+<td>Minor: a compatible change</td>
+</tr>
+<tr>
+<td><code>5.0.3500</code></td>
+<td>Major: a compatibility break</td>
+</tr>
+</tbody>
+</table></div>
   </article>
 
   <nav class="pager"><span></span><a href="contributing.html">Contributing &rarr;</a></nav>

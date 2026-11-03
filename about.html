@@ -81,7 +81,7 @@
     .wrap { padding: 0 14px 72px; }
   }
   .foot { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 8px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; display: flex; flex-direction: column; gap: 10px; }
-  .foot code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .foot code, .scope code { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .menu { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 28px; padding: 10px 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
@@ -101,6 +101,19 @@
   .history { max-width: 72ch; margin: 0 0 40px; color: var(--ink-2); font-size: 15px; }
   .history h2 { color: var(--heading); font-family: var(--mono); font-size: 22px; font-weight: 600; margin: 0 0 12px; }
   .history p { margin: 0 0 12px; }
+  .scope { margin: 0 0 40px; color: var(--ink-2); font-size: 15px; }
+  .scope h2 { color: var(--heading); font-family: var(--mono); font-size: 22px; font-weight: 600; margin: 0 0 12px; }
+  .scope p { max-width: 72ch; margin: 0 0 12px; }
+  .scope p.dim, .scope p.dim code { color: var(--ink-3); }
+  .scope .method > summary { cursor: pointer; color: var(--ink-3); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 12px; }
+  .scope .method > summary:hover, .scope .method[open] > summary { color: var(--ink-2); }
+  .scope .grid { overflow-x: auto; margin: 0 0 16px; }
+  .scope table { border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .scope th, .scope td { padding: 6px 12px; border-bottom: 1px solid var(--rule-soft); text-align: right; }
+  .scope th { color: var(--ink); font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .scope th:first-child, .scope td:first-child { text-align: left; padding-left: 0; }
+  .scope td:nth-child(10), .scope th:nth-child(10) { color: var(--ink); font-weight: 600; }
+  .scope td:last-child, .scope th:last-child { border-left: 1px solid var(--rule); color: var(--ink-3); }
   .video { position: relative; display: block; margin: 28px 0 40px; aspect-ratio: 16 / 9; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; }
   .video img, .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: cover; }
   .video .play { position: absolute; left: 50%; top: 50%; width: 76px; height: 54px; margin: -27px 0 0 -38px; border-radius: 14px; background: rgba(39,40,34,.82); border: 2px solid var(--accent); transition: background .15s; }
@@ -286,6 +299,70 @@
       the first major release since 2017, the result of a decade of R&amp;D by a small team
       of dedicated volunteers.
     </p>
+  </section>
+
+  <section class="scope">
+    <h2>Scope</h2>
+    <div class="grid">
+      <table>
+        <thead>
+          <tr><th></th><th>system</th><th>database</th><th>network</th><th>node</th><th>server</th><th>explorer</th><th>build</th><th>website</th><th>Total</th><th>bitcoind</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>First commit</td><td>2011</td><td>2014</td><td>2011</td><td>2014</td><td>2013</td><td>2013</td><td>2014</td><td>2014</td><td></td><td>2009</td></tr>
+          <tr><td>Contributors</td><td>63</td><td>17</td><td>38</td><td>19</td><td>23</td><td>37</td><td>10</td><td>11</td><td>98</td><td>821</td></tr>
+          <tr><td>Commits</td><td>10,395</td><td>4,789</td><td>4,152</td><td>4,317</td><td>3,464</td><td>2,745</td><td>1,693</td><td>290</td><td>31,845</td><td>31,480</td></tr>
+          <tr><td>Library lines</td><td>109,317</td><td>35,329</td><td>50,290</td><td>14,451</td><td>32,318</td><td>34,131</td><td></td><td></td><td>275,836</td><td>154,044</td></tr>
+          <tr><td>Test lines</td><td>121,795</td><td>28,621</td><td>44,758</td><td>9,642</td><td>25,020</td><td>7,743</td><td></td><td></td><td>237,579</td><td>89,539</td></tr>
+          <tr><td>Words</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>654,760</td><td>654,760</td><td>286,710</td></tr>
+          <tr><td>Runtime tests</td><td>7,911</td><td>1,341</td><td>2,815</td><td>528</td><td>1,935</td><td>679</td><td></td><td></td><td>15,209</td><td>903</td></tr>
+          <tr><td>Compile-time tests</td><td>7,552</td><td>111</td><td>279</td><td>6</td><td>54</td><td>0</td><td></td><td></td><td>8,002</td><td>41</td></tr>
+          <tr><td>Python tests</td><td></td><td></td><td></td><td></td><td>222</td><td></td><td></td><td></td><td>222</td><td>212</td></tr>
+          <tr><td>Classes</td><td>394</td><td>308</td><td>246</td><td>86</td><td>84</td><td>370</td><td></td><td></td><td>1,488</td><td>648</td></tr>
+          <tr><td>Public methods</td><td>2,795</td><td>1,480</td><td>1,427</td><td>225</td><td>145</td><td>2,018</td><td></td><td></td><td>8,090</td><td>3,635</td></tr>
+          <tr><td>Protected methods</td><td>971</td><td>139</td><td>377</td><td>292</td><td>573</td><td>2</td><td></td><td></td><td>2,354</td><td>101</td></tr>
+          <tr><td>Private methods</td><td>339</td><td>86</td><td>420</td><td>114</td><td>151</td><td>0</td><td></td><td></td><td>1,110</td><td>345</td></tr>
+          <tr><td>Public functions</td><td>1,032</td><td>69</td><td>143</td><td>4</td><td>76</td><td>17</td><td></td><td></td><td>1,341</td><td>1,105</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>bitcoind is included for context.</p>
+    <details class="method">
+      <summary>How these are counted</summary>
+    <p class="dim">
+      The six libraries and libbitcoin-build at their current master (November 2026). Each
+      commit is counted once, in the repository it first appears in: network shares 3,246
+      commits of early history with system. Contributors are distinct people, across names and
+      email addresses. The website column is this site and its public discussion forum, and its
+      words are their text.
+      History of the archived repositories (blockchain, protocol, client and consensus) is
+      included only where it was carried into a current repository.
+    </p>
+    <p class="dim">
+      bitcoind is Bitcoin Core at its master (October 2026) with its secp256k1, without its
+      wallet application, its GUI, its other executables or its other embedded dependencies
+      (leveldb, crc32c, minisketch, univalue, ctaes and libmultiprocess). Wallet functionality
+      that bitcoind itself uses, such as addresses, keys, descriptors and PSBT, is included, as
+      is libbitcoin's. Its contributors and commits are those that touch its code or its
+      functional tests, and those of secp256k1 (to August 2026). Its secp256k1 lines exclude
+      18,235 lines of precomputed tables, and its functions and structs are those of the
+      secp256k1 public headers. Its Python tests are the functional tests, excluding those of
+      the wallet application, and its words are those of the bitcoincore.org website, meeting
+      notes included.
+    </p>
+    <p class="dim">
+      Lines are non-blank lines of C++ in the library (<code>include</code> and
+      <code>src</code>) and in its tests (<code>test</code>). Library lines exclude 60,969 lines
+      of data tables in system (word lists, Unicode tables and the embedded GPU kernels). The
+      server's embedded web interface, which can be compiled out, is excluded, as is bitcoind's
+      GUI. Runtime
+      tests are C++ test cases, compile-time tests are
+      <code>static_assert</code> statements in the tests, and Python tests are the server's
+      endpoint tests (3,894 lines of Python, not in the test lines). Classes, methods and public functions are counted from the compiler's
+      view of the public headers: class and struct definitions, their member functions by
+      access, and free functions.
+    </p>
+    </details>
   </section>
 
   <p class="foot">
