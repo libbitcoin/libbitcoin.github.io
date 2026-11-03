@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: Windows</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) and Bitcoin Explorer (bx) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/windows.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/windows.html">
 <meta property="og:title" content="Building: Windows">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) and Bitcoin Explorer (bx) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: Windows">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) and Bitcoin Explorer (bx) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -311,7 +311,8 @@
       <a href="../about.html">About</a>
     </nav>
     <p class="lede">
-      Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
+      Building <strong>Bitcoin Server</strong> (bs) and <strong>Bitcoin Explorer</strong> (bx)
+      on Linux, macOS and Windows:
       build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
@@ -360,6 +361,16 @@ $ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --b
 libbitcoin-system, libbitcoin-database, libbitcoin-network,
 libbitcoin-node and libbitcoin-server in order, then runs the tests. The
 result is <code>bin\x64\Release\v145\static\bs.exe</code>.</p>
+<p><code>bx</code> needs only libbitcoin-system and libbitcoin-network beside
+libbitcoin-explorer:</p>
+<pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-system
+$ git clone https://github.com/libbitcoin/libbitcoin-network
+$ git clone https://github.com/libbitcoin/libbitcoin-explorer
+$ cd libbitcoin-explorer
+$ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-platform x64 --build-use-local-src
+</code></pre>
+<p>The result is <code>bin\x64\Release\v145\static\bx.exe</code>, and the options
+below apply to both.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -396,7 +407,9 @@ properties, for example <code>/p:Option-cuda=false</code> (see
 <h2 id="3-build-in-visual-studio">3. Build in Visual Studio<a class="anchor" href="#3-build-in-visual-studio" aria-label="Link to this section">#</a></h2>
 <p>Open <code>builds\msvc\vs2026\libbitcoin-server.sln</code>. It contains
 libbitcoin-server, its tests and <code>bs</code>, and references the other four
-libraries in their sibling directories. Select <code>StaticRelease</code> or
+libraries in their sibling directories. For <code>bx</code>, open
+<code>builds\msvc\vs2026\libbitcoin-explorer.sln</code>, which references
+libbitcoin-system and libbitcoin-network. Select <code>StaticRelease</code> or
 <code>StaticDebug</code> and build. NuGet packages are restored on the first build.</p>
 <p>Build options are on each project's property pages, under
 <em>Configuration Properties</em>.</p>

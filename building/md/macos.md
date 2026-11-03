@@ -26,6 +26,16 @@ The result is `$HOME/libbitcoin/bin/bs`. CMake works the same way with
 `./builds/cmake/install-cmake.sh` and the same options. The scripts use
 `clang` and `clang++` by default.
 
+`bx` is built the same way from libbitcoin-explorer:
+
+```
+$ git clone https://github.com/libbitcoin/libbitcoin-explorer
+$ cd libbitcoin-explorer
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static
+```
+
+The result is `$HOME/libbitcoin/bin/bx`.
+
 The notes in [Linux](linux) about the source directory, skipping tests
 and passing compiler flags apply on macOS too.
 

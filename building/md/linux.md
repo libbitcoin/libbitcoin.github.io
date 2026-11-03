@@ -28,6 +28,18 @@ libbitcoin-network and libbitcoin-node. It then builds, tests and installs
 each in order, ending with libbitcoin-server.
 The result is `$HOME/libbitcoin/bin/bs`.
 
+`bx` is built the same way from libbitcoin-explorer, whose script clones
+libbitcoin-system and libbitcoin-network:
+
+```
+$ git clone https://github.com/libbitcoin/libbitcoin-explorer
+$ cd libbitcoin-explorer
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static
+```
+
+The result is `$HOME/libbitcoin/bin/bx`. Every script and option on this
+page applies to both.
+
 The dependencies are cloned into the current directory. Add
 `--build-src-dir=<path>` to put them elsewhere, `--build-skip-tests`
 to skip the test suites, and `--build-skip-test-run` to build the test

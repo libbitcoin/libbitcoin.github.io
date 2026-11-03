@@ -40,6 +40,20 @@ libbitcoin-system, libbitcoin-database, libbitcoin-network,
 libbitcoin-node and libbitcoin-server in order, then runs the tests. The
 result is `bin\x64\Release\v145\static\bs.exe`.
 
+`bx` needs only libbitcoin-system and libbitcoin-network beside
+libbitcoin-explorer:
+
+```
+$ git clone https://github.com/libbitcoin/libbitcoin-system
+$ git clone https://github.com/libbitcoin/libbitcoin-network
+$ git clone https://github.com/libbitcoin/libbitcoin-explorer
+$ cd libbitcoin-explorer
+$ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-platform x64 --build-use-local-src
+```
+
+The result is `bin\x64\Release\v145\static\bx.exe`, and the options
+below apply to both.
+
 | Option | Values |
 | ------ | ------ |
 | `--build-config` | `StaticRelease` or `StaticDebug` (required) |
@@ -56,7 +70,9 @@ properties, for example `/p:Option-cuda=false` (see
 
 Open `builds\msvc\vs2026\libbitcoin-server.sln`. It contains
 libbitcoin-server, its tests and `bs`, and references the other four
-libraries in their sibling directories. Select `StaticRelease` or
+libraries in their sibling directories. For `bx`, open
+`builds\msvc\vs2026\libbitcoin-explorer.sln`, which references
+libbitcoin-system and libbitcoin-network. Select `StaticRelease` or
 `StaticDebug` and build. NuGet packages are restored on the first build.
 
 Build options are on each project's property pages, under

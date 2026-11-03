@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) and Bitcoin Explorer (bx) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/index.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/index.html">
 <meta property="og:title" content="Building">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) and Bitcoin Explorer (bx) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) and Bitcoin Explorer (bx) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -311,7 +311,8 @@
       <a href="../about.html">About</a>
     </nav>
     <p class="lede">
-      Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
+      Building <strong>Bitcoin Server</strong> (bs) and <strong>Bitcoin Explorer</strong> (bx)
+      on Linux, macOS and Windows:
       build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
@@ -330,10 +331,12 @@
   </nav>
 
   <article class="doc">
-<p><code>bs</code> is built from libbitcoin-server and the four libraries it depends on:
-libbitcoin-system, libbitcoin-database, libbitcoin-network and
-libbitcoin-node. An install script builds and installs all five in
-order.</p>
+<p>Bitcoin Server (<code>bs</code>) is built from libbitcoin-server and the four
+libraries it depends on: libbitcoin-system, libbitcoin-database,
+libbitcoin-network and libbitcoin-node. Bitcoin Explorer (<code>bx</code>) is built
+from libbitcoin-explorer and the two libraries it depends on:
+libbitcoin-system and libbitcoin-network. Each repository's install
+script builds and installs its libraries in order, ending with its own.</p>
 <h2 id="1-choosing-a-build">1. Choosing a build<a class="anchor" href="#1-choosing-a-build" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
@@ -365,7 +368,7 @@ order.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The three build systems produce the same <code>bs</code>. CMake and autotools are
+<p>The three build systems produce the same <code>bs</code> and <code>bx</code>. CMake and autotools are
 equivalent on Linux and macOS. CMake presets select a configuration by
 name.</p>
 <h2 id="2-supported-platforms">2. Supported platforms<a class="anchor" href="#2-supported-platforms" aria-label="Link to this section">#</a></h2>
@@ -412,7 +415,8 @@ name.</p>
 <li>Obsolete: no current toolchain targets it.</li>
 <li>N/A: the platform does not exist on that architecture.</li>
 </ul>
-<p>BSD, Cygwin, and MinGW are not tested.</p>
+<p><code>bx</code> and the libraries build on every platform above. <code>bs</code> requires
+64-bit. BSD and Cygwin are not tested.</p>
 <p><a href="platforms.html">Platform coverage</a> compares platforms, compilers and build
 systems with Bitcoin Core.</p>
 <h2 id="3-supported-compilers">3. Supported compilers<a class="anchor" href="#3-supported-compilers" aria-label="Link to this section">#</a></h2>
@@ -456,13 +460,19 @@ systems with Bitcoin Core.</p>
 $ cd libbitcoin-server
 $ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-optimized
 </code></pre>
-<p>The result is <code>~/libbitcoin/bin/bs</code>. On Windows, see <a href="windows.html">Windows</a>.</p>
+<p>The result is <code>~/libbitcoin/bin/bs</code>. <code>bx</code> is built the same way from
+libbitcoin-explorer:</p>
+<pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-explorer
+$ cd libbitcoin-explorer
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-optimized
+</code></pre>
+<p>The result is <code>~/libbitcoin/bin/bx</code>. On Windows, see <a href="windows.html">Windows</a>.</p>
 <h2 id="6-hardware-options">6. Hardware options<a class="anchor" href="#6-hardware-options" aria-label="Link to this section">#</a></h2>
-<p>By default <code>bs</code> is built for the baseline instruction set of its
-architecture (AVX2 by default on Windows, which can be lowered). Options such as <code>--enable-avx2</code> or <code>--enable-shani</code> make it
+<p>By default <code>bs</code> and <code>bx</code> are built for the baseline instruction set of its
+architecture (AVX2 by default on Windows, which can be lowered). Options such as <code>--enable-avx2</code> or <code>--enable-shani</code> make them
 faster on CPUs that have those instructions, and unable to run on CPUs
 that do not. <code>--hardware-optimized</code> enables all that the build machine
-supports, so its <code>bs</code> runs only on CPUs with the same extensions. Run
+supports, so its builds run only on CPUs with the same extensions. Run
 <code>bs --hardware</code> on the target machine to see what it supports, and see
 <a href="options.html">Build options</a>.</p>
 <h2 id="7-pages">7. Pages<a class="anchor" href="#7-pages" aria-label="Link to this section">#</a></h2>

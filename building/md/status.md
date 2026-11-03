@@ -18,11 +18,9 @@ See [Test Architecture](../architecture/test/index).
 
 ## 2. Releases
 
-| Stage | Workflow | Status |
-| ----- | -------- | ------ |
-| Guix Build | Guix Build (`guix-build.yml`) | |
-| Double Build | Double Build (`double-build.yml`) | |
-| Release Build | Release Build (`manual-release.yml`) | [![Release Build](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml/badge.svg)](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml) |
+| Workflow | Status |
+| -------- | ------ |
+| Release Build (`manual-release.yml`) | [![Release Build](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml/badge.svg)](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml) |
 
 See [Release builds](../architecture/build/release) and
 [Deterministic builds](../architecture/build/deterministic).

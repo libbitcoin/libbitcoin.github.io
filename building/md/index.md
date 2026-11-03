@@ -1,9 +1,11 @@
-# Building bs
+# Building bs and bx
 
-`bs` is built from libbitcoin-server and the four libraries it depends on:
-libbitcoin-system, libbitcoin-database, libbitcoin-network and
-libbitcoin-node. An install script builds and installs all five in
-order.
+Bitcoin Server (`bs`) is built from libbitcoin-server and the four
+libraries it depends on: libbitcoin-system, libbitcoin-database,
+libbitcoin-network and libbitcoin-node. Bitcoin Explorer (`bx`) is built
+from libbitcoin-explorer and the two libraries it depends on:
+libbitcoin-system and libbitcoin-network. Each repository's install
+script builds and installs its libraries in order, ending with its own.
 
 ## 1. Choosing a build
 
@@ -13,7 +15,7 @@ order.
 | macOS | Autotools or CMake | `install-gnu.sh`, `install-cmake.sh` | [macOS](macos) |
 | Windows | Visual Studio | `build-msvc.cmd` | [Windows](windows) |
 
-The three build systems produce the same `bs`. CMake and autotools are
+The three build systems produce the same `bs` and `bx`. CMake and autotools are
 equivalent on Linux and macOS. CMake presets select a configuration by
 name.
 
@@ -29,7 +31,8 @@ name.
 - Obsolete: no current toolchain targets it.
 - N/A: the platform does not exist on that architecture.
 
-BSD, Cygwin, and MinGW are not tested.
+`bx` and the libraries build on every platform above. `bs` requires
+64-bit. BSD and Cygwin are not tested.
 
 [Platform coverage](platforms) compares platforms, compilers and build
 systems with Bitcoin Core.
@@ -61,15 +64,24 @@ $ cd libbitcoin-server
 $ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-optimized
 ```
 
-The result is `~/libbitcoin/bin/bs`. On Windows, see [Windows](windows).
+The result is `~/libbitcoin/bin/bs`. `bx` is built the same way from
+libbitcoin-explorer:
+
+```
+$ git clone https://github.com/libbitcoin/libbitcoin-explorer
+$ cd libbitcoin-explorer
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-optimized
+```
+
+The result is `~/libbitcoin/bin/bx`. On Windows, see [Windows](windows).
 
 ## 6. Hardware options
 
-By default `bs` is built for the baseline instruction set of its
-architecture (AVX2 by default on Windows, which can be lowered). Options such as `--enable-avx2` or `--enable-shani` make it
+By default `bs` and `bx` are built for the baseline instruction set of its
+architecture (AVX2 by default on Windows, which can be lowered). Options such as `--enable-avx2` or `--enable-shani` make them
 faster on CPUs that have those instructions, and unable to run on CPUs
 that do not. `--hardware-optimized` enables all that the build machine
-supports, so its `bs` runs only on CPUs with the same extensions. Run
+supports, so its builds run only on CPUs with the same extensions. Run
 `bs --hardware` on the target machine to see what it supports, and see
 [Build options](options).
 
