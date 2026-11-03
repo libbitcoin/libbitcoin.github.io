@@ -60,7 +60,7 @@
     --paper: #272822; --surface: #1f211c;
     --ink: #ededed; --ink-2: #cfcfcf; --ink-3: #6a7282;
     --rule: #3a3c33; --rule-soft: #2e302a;
-    --accent: #c85637; --heading: #ffa022;
+    --accent: #c85637; --heading: #ffa022; --proposed: #66d9ef;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
@@ -145,6 +145,8 @@
   .doc th { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
+  .doc .dim { color: var(--ink-3); }
+  .doc .proposed, .doc .proposed code, .doc .proposed-line, .doc .proposed-line span { color: var(--proposed); }
   .doc td code { white-space: nowrap; }
   .doc .nw { white-space: nowrap; }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
@@ -338,10 +340,11 @@ output, script, operation and witness. Each implements the consensus rules
 that apply to it, and blocks and transactions delegate to their parts.</p>
 <p>Paths are relative to <code>include/bitcoin/system/</code> in
 <a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a>, at
-master <code>0cd57fcf</code> (2026-10-27).</p>
+master <code>0585b079</code> (2026-11-03).</p>
 <h2 id="1-consensus-rules">1. Consensus rules<a class="anchor" href="#1-consensus-rules" aria-label="Link to this section">#</a></h2>
 <p>The consensus rules are implemented by the chain types, divided into
-validation stages by what each needs:</p>
+validation stages by what each needs. The rules of BIP54, which is
+proposed, are shown in <span class="proposed">blue</span>.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -359,7 +362,7 @@ validation stages by what each needs:</p>
 <tr>
 <td><code>header::accept(context)</code></td>
 <td></td>
-<td>Version, median time past, work required, time warp (BIP94)</td>
+<td>Version, median time past, work required, time warp (BIP94, <span class="proposed">BIP54</span>), <span class="proposed">timespan (BIP54)</span></td>
 </tr>
 <tr>
 <td><code>block::check()</code></td>
@@ -369,12 +372,12 @@ validation stages by what each needs:</p>
 <tr>
 <td><code>block::check(context)</code></td>
 <td></td>
-<td>Weight (BIP141), coinbase height (BIP34), hash limit (BIP50), witness commitment (BIP141), signet solution, absolute locktime (BIP113)</td>
+<td>Weight (BIP141), coinbase height (BIP34), <span class="proposed">transaction size (BIP54)</span>, <span class="proposed">coinbase locktime (BIP54)</span>, witness commitment (BIP141), signet solution, absolute locktime (BIP113)</td>
 </tr>
 <tr>
 <td><code>block::accept(context)</code></td>
 <td>Prevout&nbsp;values</td>
-<td>Coinbase value against subsidy and fees, sigop limit, missing previous outputs, spends exceeding value</td>
+<td>Coinbase value against subsidy and fees, sigop limit, missing previous outputs, spends exceeding value, <span class="proposed">transaction sigop limit (BIP54)</span></td>
 </tr>
 <tr>
 <td><code>block::connect(context)</code></td>
@@ -432,6 +435,8 @@ sources below are from <code>src/chain/header.cpp</code>, <code>src/chain/block.
 
 code header::accept(const context&amp; ctx) const NOEXCEPT
 {
+    const auto bip54_timespan = ctx.is_enabled(bip54_timespan_rule);
+
     if (is_insufficient_version(ctx))
         return error::insufficient_block_version;
     if (is_anachronistic_timestamp(ctx))
@@ -440,6 +445,8 @@ code header::accept(const context&amp; ctx) const NOEXCEPT
         return error::incorrect_proof_of_work;
     if (is_early_timestamp(ctx))
         return error::early_timestamp;
+    if (bip54_timespan &amp;&amp; is_negative_timespan(ctx))
+        return error::negative_timespan;
 
     return error::block_success;
 }
@@ -487,15 +494,20 @@ previous outputs:</p>
 {
     const auto bip141 = ctx.is_enabled(bip141_rule);
     const auto bip34 = ctx.is_enabled(bip34_rule);
-    const auto bip50 = ctx.is_enabled(bip50_rule);
+    const auto bip54_txsize = ctx.is_enabled(bip54_txsize_rule);
+    const auto bip54_coinbase = ctx.is_enabled(bip54_coinbase_rule);
     const auto signet = ctx.is_enabled(signet_rule);
 
     if (bip141 &amp;&amp; is_overweight())
         return error::block_weight_limit;
     if (bip34 &amp;&amp; is_invalid_coinbase_script(ctx))
         return error::coinbase_height_mismatch;
-    if (bip50 &amp;&amp; is_hash_limit_exceeded())
-        return error::temporary_hash_limit;
+    if (bip54_txsize &amp;&amp; is_invalid_transaction_size())
+        return error::invalid_transaction_size;
+    if (bip54_coinbase &amp;&amp; is_invalid_coinbase_locktime(ctx))
+        return error::coinbase_locktime_mismatch;
+    if (bip54_coinbase &amp;&amp; is_final_coinbase_sequence())
+        return error::coinbase_sequence_final;
     if (bip141 &amp;&amp; is_invalid_witness_commitment())
         return error::invalid_witness_commitment;
     if (signet &amp;&amp; is_invalid_signet_solution())
@@ -531,14 +543,18 @@ code transaction::check(const context&amp; ctx) const NOEXCEPT
     return accept_transactions(ctx);
 }
 
-code transaction::accept(const context&amp;) const NOEXCEPT
+code transaction::accept(const context&amp; ctx) const NOEXCEPT
 {
+    const auto bip54 = ctx.is_enabled(bip54_sigops_rule);
+
     if (is_coinbase())
         return error::transaction_success;
     if (is_missing_prevouts())
         return error::missing_previous_output;
     if (is_overspent())
         return error::spend_exceeds_value;
+    if (bip54 &amp;&amp; is_prevout_signature_operations_limited())
+        return error::transaction_prevout_sigop_limit;
 
     return error::transaction_success;
 }
@@ -599,7 +615,6 @@ code transaction::confirm(const context&amp; ctx) const NOEXCEPT
         return error::transaction_success;
     if (bip68 &amp;&amp; is_relative_locked(ctx))
         return error::relative_time_locked;
-    // This must precede is_immature, which it subsumes.
     if (is_unconfirmed_spend(ctx))
         return error::unconfirmed_spend;
     if (is_immature(ctx))
@@ -613,7 +628,7 @@ code transaction::confirm(const context&amp; ctx) const NOEXCEPT
 <p>The node does not call <code>confirm</code>, as these rules are optimized as
 database queries.</p>
 <h3 id="17-rules">1.7 Rules<a class="anchor" href="#17-rules" aria-label="Link to this section">#</a></h3>
-<p>The stages above enumerate thirty-one consensus rules, and script evaluation.
+<p>The stages above enumerate thirty-five consensus rules, and script evaluation.
 <code>connect</code> applies the script rules to each input, through the
 <a href="machine.html">machine</a>, so they are not listed here.</p>
 <div class="scroller"><table>
@@ -673,11 +688,19 @@ database queries.</p>
 <td><code>early_timestamp</code></td>
 <td>Header accept</td>
 <td>Header</td>
-<td>At a retarget height, timestamp no earlier than the time warp allowance before its predecessor</td>
-<td>BIP94</td>
+<td>At a retarget height, timestamp no earlier than the time warp allowance before its predecessor (BIP94 600 seconds, <span class="proposed">BIP54 7,200 seconds</span>)</td>
+<td>BIP94, <span class="proposed">BIP54</span></td>
 </tr>
 <tr>
 <td style="text-align: right;">7</td>
+<td><span class="proposed"><code>negative_timespan</code></span></td>
+<td><span class="proposed">Header accept</span></td>
+<td><span class="proposed">Header</span></td>
+<td><span class="proposed">At the last height of a retarget period, timestamp no earlier than that of the period's first block</span></td>
+<td><span class="proposed">BIP54</span></td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
 <td><code>empty_block</code></td>
 <td>Check</td>
 <td>Block</td>
@@ -685,7 +708,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">8</td>
+<td style="text-align: right;">9</td>
 <td><code>block_size_limit</code></td>
 <td>Check</td>
 <td>Block</td>
@@ -693,7 +716,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">9</td>
+<td style="text-align: right;">10</td>
 <td><code>first_not_coinbase</code></td>
 <td>Check</td>
 <td>Block</td>
@@ -701,7 +724,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">10</td>
+<td style="text-align: right;">11</td>
 <td><code>extra_coinbases</code></td>
 <td>Check</td>
 <td>Block</td>
@@ -709,7 +732,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">11</td>
+<td style="text-align: right;">12</td>
 <td><code>forward_reference</code></td>
 <td>Check</td>
 <td>Block</td>
@@ -717,7 +740,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">12</td>
+<td style="text-align: right;">13</td>
 <td><code>block_internal_double_spend</code></td>
 <td>Check</td>
 <td>Block</td>
@@ -725,7 +748,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">13</td>
+<td style="text-align: right;">14</td>
 <td><code>invalid_transaction_commitment</code></td>
 <td>Check</td>
 <td>Block</td>
@@ -733,7 +756,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">14</td>
+<td style="text-align: right;">15</td>
 <td><code>empty_transaction</code></td>
 <td>Check</td>
 <td>Transaction</td>
@@ -741,7 +764,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">15</td>
+<td style="text-align: right;">16</td>
 <td><code>invalid_coinbase_script_size</code></td>
 <td>Check</td>
 <td>Transaction</td>
@@ -749,7 +772,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">16</td>
+<td style="text-align: right;">17</td>
 <td><code>previous_output_null</code></td>
 <td>Check</td>
 <td>Transaction</td>
@@ -757,7 +780,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">17</td>
+<td style="text-align: right;">18</td>
 <td><code>block_weight_limit</code></td>
 <td>Check in context</td>
 <td>Block</td>
@@ -765,7 +788,7 @@ database queries.</p>
 <td>BIP141</td>
 </tr>
 <tr>
-<td style="text-align: right;">18</td>
+<td style="text-align: right;">19</td>
 <td><code>coinbase_height_mismatch</code></td>
 <td>Check in context</td>
 <td>Block</td>
@@ -773,15 +796,31 @@ database queries.</p>
 <td>BIP34</td>
 </tr>
 <tr>
-<td style="text-align: right;">19</td>
-<td><code>temporary_hash_limit</code></td>
-<td>Check in context</td>
-<td>Block</td>
-<td>Hash count within the temporary limit</td>
-<td>BIP50</td>
+<td style="text-align: right;">20</td>
+<td><span class="proposed"><code>invalid_transaction_size</code></span></td>
+<td><span class="proposed">Check in context</span></td>
+<td><span class="proposed">Block</span></td>
+<td><span class="proposed">No transaction of 64 bytes, witness stripped</span></td>
+<td><span class="proposed">BIP54</span></td>
 </tr>
 <tr>
-<td style="text-align: right;">20</td>
+<td style="text-align: right;">21</td>
+<td><span class="proposed"><code>coinbase_locktime_mismatch</code></span></td>
+<td><span class="proposed">Check in context</span></td>
+<td><span class="proposed">Block</span></td>
+<td><span class="proposed">Coinbase locktime is the height of the parent</span></td>
+<td><span class="proposed">BIP54</span></td>
+</tr>
+<tr>
+<td style="text-align: right;">22</td>
+<td><span class="proposed"><code>coinbase_sequence_final</code></span></td>
+<td><span class="proposed">Check in context</span></td>
+<td><span class="proposed">Block</span></td>
+<td><span class="proposed">Coinbase input sequence is not final</span></td>
+<td><span class="proposed">BIP54</span></td>
+</tr>
+<tr>
+<td style="text-align: right;">23</td>
 <td><code>invalid_witness_commitment</code></td>
 <td>Check in context</td>
 <td>Block</td>
@@ -789,7 +828,7 @@ database queries.</p>
 <td>BIP141</td>
 </tr>
 <tr>
-<td style="text-align: right;">21</td>
+<td style="text-align: right;">24</td>
 <td><code>invalid_signet_solution</code></td>
 <td>Check in context</td>
 <td>Block</td>
@@ -797,7 +836,7 @@ database queries.</p>
 <td>Signet</td>
 </tr>
 <tr>
-<td style="text-align: right;">22</td>
+<td style="text-align: right;">25</td>
 <td><code>absolute_time_locked</code></td>
 <td>Check in context</td>
 <td>Transaction</td>
@@ -805,7 +844,7 @@ database queries.</p>
 <td>BIP113 (median time past)</td>
 </tr>
 <tr>
-<td style="text-align: right;">23</td>
+<td style="text-align: right;">26</td>
 <td><code>coinbase_value_limit</code></td>
 <td>Accept</td>
 <td>Block</td>
@@ -813,7 +852,7 @@ database queries.</p>
 <td>BIP42 (subsidy)</td>
 </tr>
 <tr>
-<td style="text-align: right;">24</td>
+<td style="text-align: right;">27</td>
 <td><code>block_sigop_limit</code></td>
 <td>Accept</td>
 <td>Block</td>
@@ -821,7 +860,7 @@ database queries.</p>
 <td>BIP16, BIP141</td>
 </tr>
 <tr>
-<td style="text-align: right;">25</td>
+<td style="text-align: right;">28</td>
 <td><code>missing_previous_output</code></td>
 <td>Accept</td>
 <td>Transaction</td>
@@ -829,7 +868,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">26</td>
+<td style="text-align: right;">29</td>
 <td><code>spend_exceeds_value</code></td>
 <td>Accept</td>
 <td>Transaction</td>
@@ -837,7 +876,15 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">27</td>
+<td style="text-align: right;">30</td>
+<td><span class="proposed"><code>transaction_prevout_sigop_limit</code></span></td>
+<td><span class="proposed">Accept</span></td>
+<td><span class="proposed">Transaction</span></td>
+<td><span class="proposed">Legacy signature operations of the inputs and their previous outputs, counted accurately, no more than 2,500</span></td>
+<td><span class="proposed">BIP54</span></td>
+</tr>
+<tr>
+<td style="text-align: right;">31</td>
 <td><code>unspent_coinbase_collision</code></td>
 <td>Confirm</td>
 <td>Block</td>
@@ -845,7 +892,7 @@ database queries.</p>
 <td>BIP30</td>
 </tr>
 <tr>
-<td style="text-align: right;">28</td>
+<td style="text-align: right;">32</td>
 <td><code>relative_time_locked</code></td>
 <td>Confirm</td>
 <td>Transaction</td>
@@ -853,7 +900,7 @@ database queries.</p>
 <td>BIP68</td>
 </tr>
 <tr>
-<td style="text-align: right;">29</td>
+<td style="text-align: right;">33</td>
 <td><code>unconfirmed_spend</code></td>
 <td>Confirm</td>
 <td>Transaction</td>
@@ -861,7 +908,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">30</td>
+<td style="text-align: right;">34</td>
 <td><code>coinbase_maturity</code></td>
 <td>Confirm</td>
 <td>Transaction</td>
@@ -869,7 +916,7 @@ database queries.</p>
 <td></td>
 </tr>
 <tr>
-<td style="text-align: right;">31</td>
+<td style="text-align: right;">35</td>
 <td><code>confirmed_double_spend</code></td>
 <td>Confirm</td>
 <td>Transaction</td>
@@ -879,7 +926,7 @@ database queries.</p>
 </tbody>
 </table></div>
 <p>Chain organization, the selection among valid chains by cumulative work, is
-outside the stages (see above). The node performs BIP30 (rule 27), with the
+outside the stages (see above). The node performs BIP30 (rule 31), with the
 other confirmation rules, by its queries in the store.</p>
 <h2 id="2-dos-guards">2. DoS guards<a class="anchor" href="#2-dos-guards" aria-label="Link to this section">#</a></h2>
 <p>The same sources contain guards. They protect against denial of service,
@@ -1001,8 +1048,10 @@ timestamp, median time past, required work, minimum block version and the
 fork flags active at its height. <code>chain_state</code> computes it from the
 preceding headers and the configured forks, and is the only use of the
 network settings, so the chain types depend on no configuration.</p>
-<p>Each soft or hard fork is one flag (<code>chain/enums/flags.hpp</code>), from BIP16
-through BIP341 and BIP342, along with the testnet4 and signet forks. A fork
+<p>Each <a href="../index.html#51-forks">soft or hard fork</a> is one flag
+(<code>chain/enums/flags.hpp</code>), from BIP16
+through BIP341 and BIP342, the five rules of BIP54, and the testnet4 and
+signet forks. A fork
 is applied where <code>context::is_enabled</code> reports its flag active, so the
 forks of every height and every network are those of one code base. Every
 fork can be disabled, by its member of <code>system::forks</code> (<code>forks.hpp</code>), held
@@ -1044,7 +1093,306 @@ settings, fork activation and difficulty logic are in one place, and the
 chain types depend on none of them.</p>
 <p>This also makes the logic testable without a chain or a store: a test
 constructs a state from given values and checks the context it computes
-(<code>test/chain/chain_state.cpp</code>, 95 cases).</p>
+(<code>test/chain/chain_state.cpp</code>, 132 cases).</p>
+<h3 id="43-activation">4.3 Activation<a class="anchor" href="#43-activation" aria-label="Link to this section">#</a></h3>
+<p><code>activation</code> sets the flag of each configured fork that is active at the
+state's height. Each fork activates by one method:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Forks</th>
+<th>Bit</th>
+<th>Active</th>
+<th>Mainnet</th>
+<th>Testnet3</th>
+<th>Testnet4</th>
+<th>Signet</th>
+<th>Regtest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Configuration</td>
+<td>BIP30, BIP42, BIP90</td>
+<td></td>
+<td>At every height, BIP30 except its two exception blocks</td>
+<td>genesis</td>
+<td>genesis</td>
+<td>genesis</td>
+<td>genesis</td>
+<td>genesis</td>
+</tr>
+<tr>
+<td>Flag day</td>
+<td>BIP16</td>
+<td></td>
+<td>By a coinbase vote of miners, read by manual inspection and later fixed as a block timestamp</td>
+<td>2012&#8209;04&#8209;01</td>
+<td>2012&#8209;02&#8209;15</td>
+<td>2012&#8209;02&#8209;15</td>
+<td>2012&#8209;02&#8209;15</td>
+<td>2012&#8209;02&#8209;15</td>
+</tr>
+<tr>
+<td>Version (BIP34)</td>
+<td>BIP34, BIP66, BIP65</td>
+<td></td>
+<td>When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3, testnet4 and signet)</td>
+<td>227,931, 363,725, 388,381</td>
+<td>21,111, 330,776, 581,885</td>
+<td>1, 1, 1</td>
+<td>1, 1, 1</td>
+<td>100,000,000, 1,251, 1,351</td>
+</tr>
+<tr>
+<td>Signaling (BIP9)</td>
+<td>BIP68, BIP112, BIP113</td>
+<td>0</td>
+<td>From the versions of the chain's own blocks: after the period in which its bit reaches the threshold and one locked-in period, and no earlier than its minimum activation height</td>
+<td>419,328</td>
+<td>770,112</td>
+<td>1</td>
+<td>1</td>
+<td>genesis</td>
+</tr>
+<tr>
+<td></td>
+<td>BIP141, BIP143, BIP147</td>
+<td>1</td>
+<td></td>
+<td>481,824</td>
+<td>834,624</td>
+<td>1</td>
+<td>1</td>
+<td>genesis</td>
+</tr>
+<tr>
+<td></td>
+<td>BIP341, BIP342</td>
+<td>2</td>
+<td></td>
+<td>709,632</td>
+<td>2,011,968</td>
+<td>1</td>
+<td>1</td>
+<td>genesis</td>
+</tr>
+<tr>
+<td></td>
+<td>BIP54 timewarp</td>
+<td>5</td>
+<td></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td>1</td>
+</tr>
+<tr>
+<td></td>
+<td>BIP54 timespan</td>
+<td>6</td>
+<td></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td>1</td>
+</tr>
+<tr>
+<td></td>
+<td>BIP54 sigops</td>
+<td>7</td>
+<td></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td>1</td>
+</tr>
+<tr>
+<td></td>
+<td>BIP54 txsize</td>
+<td>8</td>
+<td></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td>1</td>
+</tr>
+<tr>
+<td></td>
+<td>BIP54 coinbase</td>
+<td>9</td>
+<td></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td>1</td>
+</tr>
+</tbody>
+</table></div>
+<p>BIP90 is a rule of its own, active by configuration. It imposes the rules
+of BIP34, BIP66 and BIP65 above specified blocks. It does not change the
+activation of those forks, which remains as documented, but effectively
+supersedes them when active.</p>
+<p>BIP16 was coordinated, not activated: miners voted with <code>/P2SH/</code> in their
+coinbase scripts, the vote was read by inspection, and the result was fixed
+as a time. There is no activation logic. With <code>forks.bip16</code> the rule is
+enforced on every block whose timestamp is at or after
+<code>bip16_activation_time</code>, by the block's own timestamp, not median time past.</p>
+<p>BIP34 defined activation by block version, which BIP66 and BIP65 also use.
+A block activates its rule when its version is at least the rule's (2, 3
+and 4) and at least <code>bip34_activation_threshold</code> of the preceding
+<code>bip34_activation_sample</code> blocks are of that version: 750 of 1,000 on
+mainnet, 51 of 100 on testnet3, testnet4 and signet. The comparison is of
+signed versions, as in the original implementation. Activation is per
+block, so it follows each block's version until enforcement: at
+<code>bip34_enforcement_threshold</code> (950 of 1,000, 75 of 100) the version becomes
+the minimum block version, lower versions are rejected, and the rule holds
+from then on. The preceding versions are the chain state's version history,
+requested by <code>get_map</code> as <code>bip34_activation_sample</code> blocks below the
+height. The method is used only with <code>forks.bip90</code> off: BIP90 buries the
+three rules at their heights instead, and with it on no version history is
+collected. On regtest the thresholds are zero, so a block of the version
+activates the rule by itself.</p>
+<p>A BIP9 deployment (<code>chain_state::deployment</code>) has a version bit, a start and
+a timeout in median time past, a threshold of signaling blocks per period,
+a minimum activation height, and whether it is a speedy trial. A block
+signals when the top three bits of its version are <code>001</code> and its
+deployment's bit is set. The state of each deployment
+(<code>chain_state::deployment_state</code>) changes only at a period boundary, by the
+median time past at the boundary and the signaling blocks of the period
+that it closes:</p>
+<div class="mermaid">
+stateDiagram-v2
+    direction LR
+    [*] --&gt; defined
+    defined --&gt; started: start
+    started --&gt; locked_in: threshold
+    started --&gt; failed: timeout
+    locked_in --&gt; active: activation height
+    defined --&gt; failed: timeout (BIP9)
+</div>
+<p>Original BIP9, used by the bit0 and bit1 groups, fails a deployment at its
+timeout before counting its period. A speedy trial, used by the bit2 group
+(BIP341) and the BIP54 rules, counts the period first, so a deployment that
+reaches its threshold in the period of its timeout locks in. The minimum
+activation height is independent of the trial: any deployment holds in
+<code>locked_in</code> until the first boundary at or above its minimum height, and
+one with no minimum (bit0, bit1) activates at the boundary after lock in.
+The period is <code>bip9_activation_period</code> (2,016 on mainnet). The mainnet
+deployments of bits 0 to 2 are those of their release, and those of BIP54
+are not yet set:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th style="text-align: right;">Bit</th>
+<th>Start</th>
+<th>Timeout</th>
+<th style="text-align: right;">Threshold</th>
+<th style="text-align: right;">Minimum height</th>
+<th>Speedy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BIP68, BIP112, BIP113</td>
+<td style="text-align: right;">0</td>
+<td>2016-05-01</td>
+<td>2017-05-01</td>
+<td style="text-align: right;">1,916</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td>BIP141, BIP143, BIP147</td>
+<td style="text-align: right;">1</td>
+<td>2016-11-15</td>
+<td>2017-11-15</td>
+<td style="text-align: right;">1,916</td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td>BIP341, BIP342</td>
+<td style="text-align: right;">2</td>
+<td>2021-04-24</td>
+<td>2021-08-11</td>
+<td style="text-align: right;">1,815</td>
+<td style="text-align: right;">709,632</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>BIP54 timewarp</td>
+<td style="text-align: right;">5</td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td>✔</td>
+</tr>
+<tr>
+<td>BIP54 timespan</td>
+<td style="text-align: right;">6</td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td>✔</td>
+</tr>
+<tr>
+<td>BIP54 sigops</td>
+<td style="text-align: right;">7</td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td>✔</td>
+</tr>
+<tr>
+<td>BIP54 txsize</td>
+<td style="text-align: right;">8</td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td>✔</td>
+</tr>
+<tr>
+<td>BIP54 coinbase</td>
+<td style="text-align: right;">9</td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td style="text-align: right;"><span class="dim">TBD</span></td>
+<td>✔</td>
+</tr>
+</tbody>
+</table></div>
+<p>The chain state carries each deployment's state, and the count of
+signaling blocks in the current period, so rolling forward steps a state
+only at a boundary. Constructed from the store, <code>get_map</code> gives each
+signaled deployment's period boundary at or below the height, with its
+start and timeout. The store reads back one boundary at a time, by the
+median time past of each, to the first before the start, as every earlier
+period is <code>defined</code>, and counts versions only in the periods that can be
+<code>started</code>.</p>
+<p>BIP54 is implemented as five independent rules, each with its own fork
+switch and deployment: <code>bip54_timewarp</code>, <code>bip54_timespan</code>, <code>bip54_sigops</code>,
+<code>bip54_txsize</code> and <code>bip54_coinbase</code>. Each is a speedy trial. Their version
+bits, 5 through 9, are provisional, and their thresholds are zero on
+mainnet, testnet3, testnet4 and signet, so none is signaled or active
+there. On regtest each is active above genesis.</p>
+<p>A fork's flags are stored with each header once it is active. A fork
+enabled after its activation is therefore enforced only on the headers
+archived from then on, as is any soft fork adopted late: the node does not
+split from the chain, the archived range is not enforced, and a resync
+enforces it.</p>
 <h2 id="5-compact-number">5. Compact number<a class="anchor" href="#5-compact-number" aria-label="Link to this section">#</a></h2>
 <p>A header's <code>bits</code> field encodes its proof of work target, a 256 bit number,
 in 32 bits. The encoding is exponential in base 256: a mantissa of three
@@ -1202,6 +1550,10 @@ stage directly, with no chain to build and no store to query.</p>
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
+});
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  if (code.innerHTML.indexOf('\ue000') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

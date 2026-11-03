@@ -60,7 +60,7 @@
     --paper: #272822; --surface: #1f211c;
     --ink: #ededed; --ink-2: #cfcfcf; --ink-3: #6a7282;
     --rule: #3a3c33; --rule-soft: #2e302a;
-    --accent: #c85637; --heading: #ffa022;
+    --accent: #c85637; --heading: #ffa022; --proposed: #66d9ef;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
@@ -145,6 +145,8 @@
   .doc th { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
+  .doc .dim { color: var(--ink-3); }
+  .doc .proposed, .doc .proposed code, .doc .proposed-line, .doc .proposed-line span { color: var(--proposed); }
   .doc td code { white-space: nowrap; }
   .doc .nw { white-space: nowrap; }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
@@ -342,8 +344,6 @@ path = testnet3
 <span class="section">[bitcoin]</span>
 network = testnet3
 bip16_activation_time = 1329264000
-bip30_deactivate_checkpoint = 0000000023b3a96d3484e5abb3755c413e7d41500f8e2a5c3f0dd01299cd8ef8:21111
-bip30_reactivate_height = 486000000
 bip34_activation_sample = 100
 bip34_activation_threshold = 51
 bip34_enforcement_threshold = 75
@@ -351,8 +351,15 @@ bip34_freeze = 21111
 bip65_freeze = 581885
 bip66_freeze = 330776
 bip9_bit0_active_checkpoint = 00000000025e930139bac5c6c31a403776da130831ab85be56578f3fa75369bb:770112
+bip9_bit0_start = 1456790400
+bip9_bit0_threshold = 1512
 bip9_bit1_active_checkpoint = 00000000002b980fcd729daaa248fd9316a5200e9b367f4ff2c42453e84201ca:834624
+bip9_bit1_start = 1462060800
+bip9_bit1_threshold = 1512
+bip9_bit1_timeout = 1493596800
+bip9_bit2_activation_height = 0
 bip9_bit2_active_checkpoint = 000000000000eb906ab072652b86b05a1afeb95df53ed5c5a63aa3574e1f1b33:2011968
+bip9_bit2_threshold = 1512
 checkpoint = 000000002a936ca763904c3c35fce2f3556c559c0214345d31b1bcebf76acb70:546
 genesis_block = 0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff001d1aa4ae180101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000
 milestone = 0000000000010c0090875c05870eed86761b7cde2c03e69d04e5314f6ff59341:5100000
@@ -579,6 +586,10 @@ mainnet port plus 10,000 (<a href="index.html#6-ports">Ports</a>):</p>
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
+});
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  if (code.innerHTML.indexOf('\ue000') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

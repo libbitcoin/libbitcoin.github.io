@@ -252,10 +252,6 @@ Chain parameters: genesis block, soft fork activation, checkpoints, milestone an
 [bitcoin]
 # The activation time for bip16 in unix time, defaults to '1333238400'.
 bip16_activation_time = 1333238400
-# The hash:height checkpoint for bip30 deactivation, defaults to '000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8:227931'.
-bip30_deactivate_checkpoint = 000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8:227931
-# The height for bip30 reactivation, defaults to '1983702'.
-bip30_reactivate_height = 1983702
 # The number of blocks considered for bip34 style soft fork activation, defaults to '1000'.
 bip34_activation_sample = 1000
 # The number of new version blocks required for bip34 style soft fork activation, defaults to '750'.
@@ -264,16 +260,98 @@ bip34_activation_threshold = 750
 bip34_enforcement_threshold = 950
 # The block height to freeze the bip34 softfork for bip90, defaults to '227931'.
 bip34_freeze = 227931
+# The minimum bip54 coinbase activation height, defaults to '0'.
+bip54_coinbase_activation_height = 0
+# Check the bip54 coinbase threshold before timeout (speedy trial), defaults to 'true'.
+bip54_coinbase_speedy_trial = true
+# The median time past to start bip54 coinbase signaling, 4294967295 for always active, defaults to '0'.
+bip54_coinbase_start = 0
+# The signaling blocks per period to lock in bip54 coinbase, zero to disable, defaults to '0'.
+bip54_coinbase_threshold = 0
+# The median time past to time out bip54 coinbase signaling, defaults to '0'.
+bip54_coinbase_timeout = 0
+# The minimum bip54 sigops activation height, defaults to '0'.
+bip54_sigops_activation_height = 0
+# Check the bip54 sigops threshold before timeout (speedy trial), defaults to 'true'.
+bip54_sigops_speedy_trial = true
+# The median time past to start bip54 sigops signaling, 4294967295 for always active, defaults to '0'.
+bip54_sigops_start = 0
+# The signaling blocks per period to lock in bip54 sigops, zero to disable, defaults to '0'.
+bip54_sigops_threshold = 0
+# The median time past to time out bip54 sigops signaling, defaults to '0'.
+bip54_sigops_timeout = 0
+# The minimum bip54 timespan activation height, defaults to '0'.
+bip54_timespan_activation_height = 0
+# Check the bip54 timespan threshold before timeout (speedy trial), defaults to 'true'.
+bip54_timespan_speedy_trial = true
+# The median time past to start bip54 timespan signaling, 4294967295 for always active, defaults to '0'.
+bip54_timespan_start = 0
+# The signaling blocks per period to lock in bip54 timespan, zero to disable, defaults to '0'.
+bip54_timespan_threshold = 0
+# The median time past to time out bip54 timespan signaling, defaults to '0'.
+bip54_timespan_timeout = 0
+# The minimum bip54 timewarp activation height, defaults to '0'.
+bip54_timewarp_activation_height = 0
+# Check the bip54 timewarp threshold before timeout (speedy trial), defaults to 'true'.
+bip54_timewarp_speedy_trial = true
+# The median time past to start bip54 timewarp signaling, 4294967295 for always active, defaults to '0'.
+bip54_timewarp_start = 0
+# The signaling blocks per period to lock in bip54 timewarp, zero to disable, defaults to '0'.
+bip54_timewarp_threshold = 0
+# The median time past to time out bip54 timewarp signaling, defaults to '0'.
+bip54_timewarp_timeout = 0
+# The minimum bip54 txsize activation height, defaults to '0'.
+bip54_txsize_activation_height = 0
+# Check the bip54 txsize threshold before timeout (speedy trial), defaults to 'true'.
+bip54_txsize_speedy_trial = true
+# The median time past to start bip54 txsize signaling, 4294967295 for always active, defaults to '0'.
+bip54_txsize_start = 0
+# The signaling blocks per period to lock in bip54 txsize, zero to disable, defaults to '0'.
+bip54_txsize_threshold = 0
+# The median time past to time out bip54 txsize signaling, defaults to '0'.
+bip54_txsize_timeout = 0
 # The block height to freeze the bip65 softfork for bip90, defaults to '388381'.
 bip65_freeze = 388381
 # The block height to freeze the bip66 softfork for bip90, defaults to '363725'.
 bip66_freeze = 363725
+# The number of blocks in a bip9 signaling period, defaults to '2016'.
+bip9_activation_period = 2016
+# The minimum bip9 bit0 activation height, defaults to '0'.
+bip9_bit0_activation_height = 0
 # The hash:height checkpoint for bip9 bit0 activation, defaults to '000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328'.
 bip9_bit0_active_checkpoint = 000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328
+# Check the bip9 bit0 threshold before timeout (speedy trial), defaults to 'false'.
+bip9_bit0_speedy_trial = false
+# The median time past to start bip9 bit0 signaling, 4294967295 for always active, defaults to '1462060800'.
+bip9_bit0_start = 1462060800
+# The signaling blocks per period to lock in bip9 bit0, zero to disable, defaults to '1916'.
+bip9_bit0_threshold = 1916
+# The median time past to time out bip9 bit0 signaling, defaults to '1493596800'.
+bip9_bit0_timeout = 1493596800
+# The minimum bip9 bit1 activation height, defaults to '0'.
+bip9_bit1_activation_height = 0
 # The hash:height checkpoint for bip9 bit1 activation, defaults to '0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824'.
 bip9_bit1_active_checkpoint = 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824
+# Check the bip9 bit1 threshold before timeout (speedy trial), defaults to 'false'.
+bip9_bit1_speedy_trial = false
+# The median time past to start bip9 bit1 signaling, 4294967295 for always active, defaults to '1479168000'.
+bip9_bit1_start = 1479168000
+# The signaling blocks per period to lock in bip9 bit1, zero to disable, defaults to '1916'.
+bip9_bit1_threshold = 1916
+# The median time past to time out bip9 bit1 signaling, defaults to '1510704000'.
+bip9_bit1_timeout = 1510704000
+# The minimum bip9 bit2 activation height, defaults to '709632'.
+bip9_bit2_activation_height = 709632
 # The hash:height checkpoint for bip9 bit2 activation, defaults to '0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632'.
 bip9_bit2_active_checkpoint = 0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632
+# Check the bip9 bit2 threshold before timeout (speedy trial), defaults to 'true'.
+bip9_bit2_speedy_trial = true
+# The median time past to start bip9 bit2 signaling, 4294967295 for always active, defaults to '1619222400'.
+bip9_bit2_start = 1619222400
+# The signaling blocks per period to lock in bip9 bit2, zero to disable, defaults to '1815'.
+bip9_bit2_threshold = 1815
+# The median time past to time out bip9 bit2 signaling, defaults to '1628640000'.
+bip9_bit2_timeout = 1628640000
 # The target block period, defaults to '600'.
 block_spacing_seconds = 600
 # The blockchain checkpoints, defaults to the consensus set.
@@ -340,6 +418,16 @@ bip341 = true
 bip342 = true
 # Finite monetary supply, defaults to 'true' (soft fork).
 bip42 = true
+# Require coinbase locktime of parent height and non-final sequence, defaults to 'true' (soft fork).
+bip54_coinbase = true
+# Limit legacy signature operations per transaction, defaults to 'true' (soft fork).
+bip54_sigops = true
+# Require non-negative retarget timespans, defaults to 'true' (soft fork).
+bip54_timespan = true
+# Limit timestamp regression on retarget blocks, defaults to 'true' (soft fork).
+bip54_timewarp = true
+# Disallow 64 byte witness-stripped transactions, defaults to 'true' (soft fork).
+bip54_txsize = true
 # Add check-locktime-verify op code, defaults to 'true' (soft fork).
 bip65 = true
 # Require strict signature encoding, defaults to 'true' (soft fork).

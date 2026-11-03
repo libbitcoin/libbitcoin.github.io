@@ -60,7 +60,7 @@
     --paper: #272822; --surface: #1f211c;
     --ink: #ededed; --ink-2: #cfcfcf; --ink-3: #6a7282;
     --rule: #3a3c33; --rule-soft: #2e302a;
-    --accent: #c85637; --heading: #ffa022;
+    --accent: #c85637; --heading: #ffa022; --proposed: #66d9ef;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
@@ -145,6 +145,8 @@
   .doc th { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
+  .doc .dim { color: var(--ink-3); }
+  .doc .proposed, .doc .proposed code, .doc .proposed-line, .doc .proposed-line span { color: var(--proposed); }
   .doc td code { white-space: nowrap; }
   .doc .nw { white-space: nowrap; }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
@@ -321,7 +323,8 @@
     <a href="#2-node">Node</a>
     <a href="#3-store">Store</a>
     <a href="#4-server">Server</a>
-    <a href="#5-design-documents">Design documents</a>
+    <a href="#5-protocol-evolution">Protocol evolution</a>
+    <a href="#6-design-documents">Design documents</a>
   </nav>
 
   <article class="doc">
@@ -409,7 +412,169 @@ it was; one that does not is restored from its last snapshot.</p>
 <h2 id="4-server">4. Server<a class="anchor" href="#4-server" aria-label="Link to this section">#</a></h2>
 <p>Bitcoin Server adds client interfaces to the node, on the services of
 libbitcoin-network, serving from the node's store. The interfaces are listed in <a href="../interfaces.html">BS Interfaces</a>.</p>
-<h2 id="5-design-documents">5. Design documents<a class="anchor" href="#5-design-documents" aria-label="Link to this section">#</a></h2>
+<h2 id="5-protocol-evolution">5. Protocol evolution<a class="anchor" href="#5-protocol-evolution" aria-label="Link to this section">#</a></h2>
+<p>The protocol evolves by addition: new consensus rules and new P2P
+protocol versions. None is hardwired. Each is implemented on its own and
+selected by configuration, so each is developed and tested in isolation,
+read and verified as one unit of code, and enabled or disabled on its own.
+The full stack runs with any individual rule or protocol version disabled.</p>
+<p>Old rules and versions are never dropped, in consensus or in P2P: a node
+validates the whole chain under the rules of each height, and serves a
+peer at any version it implements, within the configured bounds. There is
+no way to know which rules miners enforce or which versions peers run, so
+none can be assumed unused. It also lets the node be operated at any
+historical level, back to its minimums: the rules of the satoshi client
+v0.3.0 in consensus (before BIP16, forks were implemented on an ad hoc
+basis, without coordination), and
+version 31402 in P2P.</p>
+<p>Some rules and versions are not implemented, which is often a judgement
+call, such as the forks made by <code>bitcoind</code> without prior specification,
+listed in <code>chain/enums/flags.hpp</code>, and Erlay (BIP330) in P2P.</p>
+<h3 id="51-forks">5.1 Forks<a class="anchor" href="#51-forks" aria-label="Link to this section">#</a></h3>
+<p>The consensus rules define which blocks are valid. A fork is a new rule.
+Rules only accumulate: a rule that disables part of an earlier one is
+itself a new rule, applied with the earlier rule, which remains. A fork
+(in fact the coin itself) is classified by the rules alone, by the validity
+of blocks without the rule and with it:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Fork</th>
+<th>Without the rule and with it</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Soft</td>
+<td>A block valid without the rule is invalid with it</td>
+<td>BIP66 requires strict signature encoding</td>
+</tr>
+<tr>
+<td>Hard</td>
+<td>A block invalid without the rule is valid with it</td>
+<td>BIP90 imposes the rule of BIP34 above a fixed block</td>
+</tr>
+</tbody>
+</table></div>
+<p>A rule that makes any block valid that is invalid without it is a hard
+fork, whatever else it does. A rule that leaves the validity of every block
+as it is without it is not a fork.</p>
+<p>The classification is independent of how a fork is deployed, and of
+whether any chain is observed to split because of it. A split is an event:
+nodes enforcing different rules diverge only when a block is mined that is
+valid under one set and not the other. A hard fork that no block exercises
+splits nothing, and remains a hard fork: BIP90 has not split the chain,
+because no block in its history is valid under one and not the other. A
+soft fork can split the chain: in July 2015, after BIP66 activated, miners
+that did not validate extended a block invalid under it. Whether a split is
+likely or unlikely is an estimate of how miners and nodes will behave, not
+a property of the rule.</p>
+<p>A soft fork is not backward compatible. Nodes that do not adopt the rule
+accept blocks that are invalid under it, as the BIP66 split shows. The
+chain without the rule does not survive only because majority hash power
+enforces the rule, by not extending blocks that are invalid under it, and
+that enforcement is indistinguishable from censorship. Under a hard fork,
+nodes that do not adopt the rule reject blocks that the nodes that adopt
+it accept.</p>
+<p>Each flag in <code>chain/enums/flags.hpp</code> is labeled with its type, and with
+its purpose: feature, security, determinism, inflation, deflation or
+arbitrary.</p>
+<h3 id="52-consensus">5.2 Consensus<a class="anchor" href="#52-consensus" aria-label="Link to this section">#</a></h3>
+<p>Each fork is one flag (<code>chain::flags</code>), enabled by
+its own member of the configured forks (<code>[forks]</code>), and activated by its
+own deployment. The chain state computes the flags active at each height
+from the configured forks and the chain, and each rule is a predicate of
+the chain types applied only under its flag.</p>
+<p>Activation is configured as well: activation times, version thresholds,
+burial heights, checkpoints and BIP9 deployments are all settings of
+<code>[bitcoin]</code>. BIP54 (proposed) is implemented as five forks, one per rule, each
+switched and deployed independently. See
+<a href="system/chain.html#43-activation">Activation</a>, and the
+<a href="../configuration/reference.html#5-forks"><code>[forks]</code></a> and
+<a href="../configuration/reference.html#4-bitcoin"><code>[bitcoin]</code></a> settings.</p>
+<h3 id="53-p2p">5.3 P2P<a class="anchor" href="#53-p2p" aria-label="Link to this section">#</a></h3>
+<p>Each P2P protocol is a class, and each protocol version that extends it
+is a class derived from that of the previous version, named by the version
+that introduced it. A derived class adds only what its version adds, and
+overrides only the handlers that it extends: <code>protocol_ping_60001</code> derives
+from <code>protocol_ping_106</code> and adds the nonce and <code>pong</code> of BIP31. The
+earlier class remains, for peers at the earlier version.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Library</th>
+<th>Versions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Version handshake</td>
+<td>network</td>
+<td>106 → 70001 → 70002 → 70014 → 70016</td>
+</tr>
+<tr>
+<td>Ping</td>
+<td>network</td>
+<td>106 → 60001</td>
+</tr>
+<tr>
+<td>Address in, address out, seed</td>
+<td>network</td>
+<td>209 → 70016</td>
+</tr>
+<tr>
+<td>Alert</td>
+<td>network</td>
+<td>311</td>
+</tr>
+<tr>
+<td>Reject</td>
+<td>network</td>
+<td>70002</td>
+</tr>
+<tr>
+<td>Header in, header out</td>
+<td>node</td>
+<td>31800 → 70012 → 70014</td>
+</tr>
+<tr>
+<td>Block in</td>
+<td>node</td>
+<td>31800</td>
+</tr>
+<tr>
+<td>Block out</td>
+<td>node</td>
+<td>106 → 70001 → 70012 → 70014</td>
+</tr>
+<tr>
+<td>Transaction in</td>
+<td>node</td>
+<td>106 → 70001 → 70013 → 70016</td>
+</tr>
+<tr>
+<td>Transaction out</td>
+<td>node</td>
+<td>106 → 60002 → 70001 → 70013 → 70016</td>
+</tr>
+<tr>
+<td>Client filters out</td>
+<td>node</td>
+<td>70015</td>
+</tr>
+</tbody>
+</table></div>
+<p>A session attaches to each channel the most derived class of each
+protocol that the negotiated version and the configuration allow. The
+version is bounded by <code>protocol_maximum</code> and <code>protocol_minimum</code>, and each
+optional feature has its own switch, such as <code>enable_compact</code>,
+<code>enable_address_v2</code> and <code>enable_witness_tx</code>, so a channel can run any
+version with any of its features disabled. See
+<a href="../configuration/reference.html#9-peer"><code>[peer]</code></a> and
+<a href="node/sessions-and-protocols.html">Sessions and protocols</a>.</p>
+<h2 id="6-design-documents">6. Design documents<a class="anchor" href="#6-design-documents" aria-label="Link to this section">#</a></h2>
 <p>The architecture follows the 2021 design documents for version 4:</p>
 <div class="scroller"><table>
 <thead>
@@ -487,6 +652,10 @@ libbitcoin-network, serving from the node's store. The interfaces are listed in 
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
+});
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  if (code.innerHTML.indexOf('\ue000') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

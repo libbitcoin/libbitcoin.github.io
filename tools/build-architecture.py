@@ -325,7 +325,7 @@ STYLE = """
     --paper: #272822; --surface: #1f211c;
     --ink: #ededed; --ink-2: #cfcfcf; --ink-3: #6a7282;
     --rule: #3a3c33; --rule-soft: #2e302a;
-    --accent: #c85637; --heading: #ffa022;
+    --accent: #c85637; --heading: #ffa022; --proposed: #66d9ef;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
@@ -410,6 +410,8 @@ STYLE = """
   .doc th { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
   .doc td { padding: 7px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
   .doc tr:last-child td { border-bottom: none; }
+  .doc .dim { color: var(--ink-3); }
+  .doc .proposed, .doc .proposed code, .doc .proposed-line, .doc .proposed-line span { color: var(--proposed); }
   .doc td code { white-space: nowrap; }
   .doc .nw { white-space: nowrap; }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
@@ -549,6 +551,17 @@ def loosen_lists(md):
     return "\n".join(out)
 
 
+def mark_proposed(md):
+    out, fenced = [], None
+    for line in md.split("\n"):
+        if line.startswith("```"):
+            fenced = None if fenced is not None else line[3:].strip()
+        elif fenced == "cpp" and line.startswith("+"):
+            line = "\ue000" + line[1:] + "\ue001"
+        out.append(line)
+    return "\n".join(out)
+
+
 def split_title(md):
     m = re.match(r"# (.*)\n", md)
     title = m.group(1).strip()
@@ -609,7 +622,7 @@ def render(key, name, md, guard, logo, mermaid_src):
     section = SECTIONS[key]
     pages = section["pages"]
     title, body_md = split_title(md)
-    body_md, blocks = extract_mermaid(loosen_lists(body_md))
+    body_md, blocks = extract_mermaid(loosen_lists(mark_proposed(body_md)))
     converter = markdown.Markdown(extensions=["tables", "fenced_code"])
     body = converter.convert(body_md)
     body = restore_mermaid(body, blocks)
@@ -732,6 +745,10 @@ def render(key, name, md, guard, logo, mermaid_src):
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
   hljs.highlightElement(code);
+});
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  if (code.innerHTML.indexOf('\\ue000') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\\ue000/g, '<span class="proposed-line">').replace(/\\ue001/g, '</span>');
 });
 </script>
 <script src="%(mermaid)s"%(mermaid_sri)s></script>

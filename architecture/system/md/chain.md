@@ -6,20 +6,21 @@ that apply to it, and blocks and transactions delegate to their parts.
 
 Paths are relative to `include/bitcoin/system/` in
 [libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system), at
-master `0cd57fcf` (2026-10-27).
+master `0585b079` (2026-11-03).
 
 ## 1. Consensus rules
 
 The consensus rules are implemented by the chain types, divided into
-validation stages by what each needs:
+validation stages by what each needs. The rules of BIP54, which is
+proposed, are shown in <span class="proposed">blue</span>.
 
 | Stage | Requires | Rules |
 | ----- | -------- | ----- |
 | `header::check()` |  | Proof of work, future timestamp |
-| `header::accept(context)` |  | Version, median time past, work required, time warp (BIP94) |
+| `header::accept(context)` |  | Version, median time past, work required, time warp (BIP94, <span class="proposed">BIP54</span>), <span class="proposed">timespan (BIP54)</span> |
 | `block::check()` |  | Empty block, size, coinbase position and count, forward references, internal double spends, merkle root, empty transactions, coinbase script size, null previous outputs |
-| `block::check(context)` |  | Weight (BIP141), coinbase height (BIP34), hash limit (BIP50), witness commitment (BIP141), signet solution, absolute locktime (BIP113) |
-| `block::accept(context)` | Prevout&nbsp;values | Coinbase value against subsidy and fees, sigop limit, missing previous outputs, spends exceeding value |
+| `block::check(context)` |  | Weight (BIP141), coinbase height (BIP34), <span class="proposed">transaction size (BIP54)</span>, <span class="proposed">coinbase locktime (BIP54)</span>, witness commitment (BIP141), signet solution, absolute locktime (BIP113) |
+| `block::accept(context)` | Prevout&nbsp;values | Coinbase value against subsidy and fees, sigop limit, missing previous outputs, spends exceeding value, <span class="proposed">transaction sigop limit (BIP54)</span> |
 | `block::connect(context)` | Prevout&nbsp;scripts | Script execution of each input, including signatures |
 | `block::confirm(context)` | Prevout&nbsp;metadata | Coinbase collision (BIP30), relative locktime (BIP68), unconfirmed spends, coinbase maturity, confirmed double spends |
 
@@ -75,6 +76,8 @@ code header::check() const NOEXCEPT
 
 code header::accept(const context& ctx) const NOEXCEPT
 {
++    const auto bip54_timespan = ctx.is_enabled(bip54_timespan_rule);
++
     if (is_insufficient_version(ctx))
         return error::insufficient_block_version;
     if (is_anachronistic_timestamp(ctx))
@@ -83,6 +86,8 @@ code header::accept(const context& ctx) const NOEXCEPT
         return error::incorrect_proof_of_work;
     if (is_early_timestamp(ctx))
         return error::early_timestamp;
++    if (bip54_timespan && is_negative_timespan(ctx))
++        return error::negative_timespan;
 
     return error::block_success;
 }
@@ -138,15 +143,20 @@ code block::check(const context& ctx) const NOEXCEPT
 {
     const auto bip141 = ctx.is_enabled(bip141_rule);
     const auto bip34 = ctx.is_enabled(bip34_rule);
-    const auto bip50 = ctx.is_enabled(bip50_rule);
++    const auto bip54_txsize = ctx.is_enabled(bip54_txsize_rule);
++    const auto bip54_coinbase = ctx.is_enabled(bip54_coinbase_rule);
     const auto signet = ctx.is_enabled(signet_rule);
 
     if (bip141 && is_overweight())
         return error::block_weight_limit;
     if (bip34 && is_invalid_coinbase_script(ctx))
         return error::coinbase_height_mismatch;
-    if (bip50 && is_hash_limit_exceeded())
-        return error::temporary_hash_limit;
++    if (bip54_txsize && is_invalid_transaction_size())
++        return error::invalid_transaction_size;
++    if (bip54_coinbase && is_invalid_coinbase_locktime(ctx))
++        return error::coinbase_locktime_mismatch;
++    if (bip54_coinbase && is_final_coinbase_sequence())
++        return error::coinbase_sequence_final;
     if (bip141 && is_invalid_witness_commitment())
         return error::invalid_witness_commitment;
     if (signet && is_invalid_signet_solution())
@@ -186,14 +196,18 @@ code block::accept(const context& ctx) const NOEXCEPT
     return accept_transactions(ctx);
 }
 
-code transaction::accept(const context&) const NOEXCEPT
+code transaction::accept(const context& ctx) const NOEXCEPT
 {
++    const auto bip54 = ctx.is_enabled(bip54_sigops_rule);
+
     if (is_coinbase())
         return error::transaction_success;
     if (is_missing_prevouts())
         return error::missing_previous_output;
     if (is_overspent())
         return error::spend_exceeds_value;
++    if (bip54 && is_prevout_signature_operations_limited())
++        return error::transaction_prevout_sigop_limit;
 
     return error::transaction_success;
 }
@@ -265,7 +279,6 @@ code transaction::confirm(const context& ctx) const NOEXCEPT
         return error::transaction_success;
     if (bip68 && is_relative_locked(ctx))
         return error::relative_time_locked;
-    // This must precede is_immature, which it subsumes.
     if (is_unconfirmed_spend(ctx))
         return error::unconfirmed_spend;
     if (is_immature(ctx))
@@ -282,7 +295,7 @@ database queries.
 
 ### 1.7 Rules
 
-The stages above enumerate thirty-one consensus rules, and script evaluation.
+The stages above enumerate thirty-five consensus rules, and script evaluation.
 `connect` applies the script rules to each input, through the
 [machine](machine), so they are not listed here.
 
@@ -293,35 +306,39 @@ The stages above enumerate thirty-one consensus rules, and script evaluation.
 | 3 | `insufficient_block_version` | Header accept | Header | Version at least the minimum required at its height | BIP34, BIP66, BIP65 |
 | 4 | `anachronistic_timestamp` | Header accept | Header | Timestamp after the median time past |  |
 | 5 | `incorrect_proof_of_work` | Header accept | Header | Bits equal to the work required |  |
-| 6 | `early_timestamp` | Header accept | Header | At a retarget height, timestamp no earlier than the time warp allowance before its predecessor | BIP94 |
-| 7 | `empty_block` | Check | Block | At least one transaction |  |
-| 8 | `block_size_limit` | Check | Block | Serialized size within the limit |  |
-| 9 | `first_not_coinbase` | Check | Block | First transaction is a coinbase |  |
-| 10 | `extra_coinbases` | Check | Block | No other coinbase |  |
-| 11 | `forward_reference` | Check | Block | No spend of a later transaction in the block |  |
-| 12 | `block_internal_double_spend` | Check | Block | No output spent twice within the block |  |
-| 13 | `invalid_transaction_commitment` | Check | Block | Merkle root commits to the transactions |  |
-| 14 | `empty_transaction` | Check | Transaction | At least one input and one output |  |
-| 15 | `invalid_coinbase_script_size` | Check | Transaction | Coinbase script size within bounds |  |
-| 16 | `previous_output_null` | Check | Transaction | No null previous output outside the coinbase |  |
-| 17 | `block_weight_limit` | Check in context | Block | Weight within the limit | BIP141 |
-| 18 | `coinbase_height_mismatch` | Check in context | Block | Coinbase script begins with the height | BIP34 |
-| 19 | `temporary_hash_limit` | Check in context | Block | Hash count within the temporary limit | BIP50 |
-| 20 | `invalid_witness_commitment` | Check in context | Block | Witness commitment matches the witnesses | BIP141 |
-| 21 | `invalid_signet_solution` | Check in context | Block | Signet solution satisfies the challenge | Signet |
-| 22 | `absolute_time_locked` | Check in context | Transaction | Absolute locktime satisfied | BIP113 (median time past) |
-| 23 | `coinbase_value_limit` | Accept | Block | Coinbase claims no more than subsidy plus fees | BIP42 (subsidy) |
-| 24 | `block_sigop_limit` | Accept | Block | Signature operations within the limit | BIP16, BIP141 |
-| 25 | `missing_previous_output` | Accept | Transaction | Every previous output present |  |
-| 26 | `spend_exceeds_value` | Accept | Transaction | Outputs spend no more than inputs |  |
-| 27 | `unspent_coinbase_collision` | Confirm | Block | Coinbase does not duplicate an unspent coinbase, except the two mainnet exception blocks | BIP30 |
-| 28 | `relative_time_locked` | Confirm | Transaction | Relative locktime satisfied | BIP68 |
-| 29 | `unconfirmed_spend` | Confirm | Transaction | No spend of an unconfirmed output |  |
-| 30 | `coinbase_maturity` | Confirm | Transaction | Coinbase outputs spent only after maturity |  |
-| 31 | `confirmed_double_spend` | Confirm | Transaction | No spend of an already spent output |  |
+| 6 | `early_timestamp` | Header accept | Header | At a retarget height, timestamp no earlier than the time warp allowance before its predecessor (BIP94 600 seconds, <span class="proposed">BIP54 7,200 seconds</span>) | BIP94, <span class="proposed">BIP54</span> |
+| 7 | <span class="proposed">`negative_timespan`</span> | <span class="proposed">Header accept</span> | <span class="proposed">Header</span> | <span class="proposed">At the last height of a retarget period, timestamp no earlier than that of the period's first block</span> | <span class="proposed">BIP54</span> |
+| 8 | `empty_block` | Check | Block | At least one transaction |  |
+| 9 | `block_size_limit` | Check | Block | Serialized size within the limit |  |
+| 10 | `first_not_coinbase` | Check | Block | First transaction is a coinbase |  |
+| 11 | `extra_coinbases` | Check | Block | No other coinbase |  |
+| 12 | `forward_reference` | Check | Block | No spend of a later transaction in the block |  |
+| 13 | `block_internal_double_spend` | Check | Block | No output spent twice within the block |  |
+| 14 | `invalid_transaction_commitment` | Check | Block | Merkle root commits to the transactions |  |
+| 15 | `empty_transaction` | Check | Transaction | At least one input and one output |  |
+| 16 | `invalid_coinbase_script_size` | Check | Transaction | Coinbase script size within bounds |  |
+| 17 | `previous_output_null` | Check | Transaction | No null previous output outside the coinbase |  |
+| 18 | `block_weight_limit` | Check in context | Block | Weight within the limit | BIP141 |
+| 19 | `coinbase_height_mismatch` | Check in context | Block | Coinbase script begins with the height | BIP34 |
+| 20 | <span class="proposed">`invalid_transaction_size`</span> | <span class="proposed">Check in context</span> | <span class="proposed">Block</span> | <span class="proposed">No transaction of 64 bytes, witness stripped</span> | <span class="proposed">BIP54</span> |
+| 21 | <span class="proposed">`coinbase_locktime_mismatch`</span> | <span class="proposed">Check in context</span> | <span class="proposed">Block</span> | <span class="proposed">Coinbase locktime is the height of the parent</span> | <span class="proposed">BIP54</span> |
+| 22 | <span class="proposed">`coinbase_sequence_final`</span> | <span class="proposed">Check in context</span> | <span class="proposed">Block</span> | <span class="proposed">Coinbase input sequence is not final</span> | <span class="proposed">BIP54</span> |
+| 23 | `invalid_witness_commitment` | Check in context | Block | Witness commitment matches the witnesses | BIP141 |
+| 24 | `invalid_signet_solution` | Check in context | Block | Signet solution satisfies the challenge | Signet |
+| 25 | `absolute_time_locked` | Check in context | Transaction | Absolute locktime satisfied | BIP113 (median time past) |
+| 26 | `coinbase_value_limit` | Accept | Block | Coinbase claims no more than subsidy plus fees | BIP42 (subsidy) |
+| 27 | `block_sigop_limit` | Accept | Block | Signature operations within the limit | BIP16, BIP141 |
+| 28 | `missing_previous_output` | Accept | Transaction | Every previous output present |  |
+| 29 | `spend_exceeds_value` | Accept | Transaction | Outputs spend no more than inputs |  |
+| 30 | <span class="proposed">`transaction_prevout_sigop_limit`</span> | <span class="proposed">Accept</span> | <span class="proposed">Transaction</span> | <span class="proposed">Legacy signature operations of the inputs and their previous outputs, counted accurately, no more than 2,500</span> | <span class="proposed">BIP54</span> |
+| 31 | `unspent_coinbase_collision` | Confirm | Block | Coinbase does not duplicate an unspent coinbase, except the two mainnet exception blocks | BIP30 |
+| 32 | `relative_time_locked` | Confirm | Transaction | Relative locktime satisfied | BIP68 |
+| 33 | `unconfirmed_spend` | Confirm | Transaction | No spend of an unconfirmed output |  |
+| 34 | `coinbase_maturity` | Confirm | Transaction | Coinbase outputs spent only after maturity |  |
+| 35 | `confirmed_double_spend` | Confirm | Transaction | No spend of an already spent output |  |
 
 Chain organization, the selection among valid chains by cumulative work, is
-outside the stages (see above). The node performs BIP30 (rule 27), with the
+outside the stages (see above). The node performs BIP30 (rule 31), with the
 other confirmation rules, by its queries in the store.
 
 ## 2. DoS guards
@@ -458,8 +475,10 @@ fork flags active at its height. `chain_state` computes it from the
 preceding headers and the configured forks, and is the only use of the
 network settings, so the chain types depend on no configuration.
 
-Each soft or hard fork is one flag (`chain/enums/flags.hpp`), from BIP16
-through BIP341 and BIP342, along with the testnet4 and signet forks. A fork
+Each [soft or hard fork](../index#51-forks) is one flag
+(`chain/enums/flags.hpp`), from BIP16
+through BIP341 and BIP342, the five rules of BIP54, and the testnet4 and
+signet forks. A fork
 is applied where `context::is_enabled` reports its flag active, so the
 forks of every height and every network are those of one code base. Every
 fork can be disabled, by its member of `system::forks` (`forks.hpp`), held
@@ -514,7 +533,117 @@ chain types depend on none of them.
 
 This also makes the logic testable without a chain or a store: a test
 constructs a state from given values and checks the context it computes
-(`test/chain/chain_state.cpp`, 95 cases).
+(`test/chain/chain_state.cpp`, 132 cases).
+
+### 4.3 Activation
+
+`activation` sets the flag of each configured fork that is active at the
+state's height. Each fork activates by one method:
+
+| Method | Forks | Bit | Active | Mainnet | Testnet3 | Testnet4 | Signet | Regtest |
+| ------ | ----- | --- | ------ | ------- | -------- | -------- | ------ | ------- |
+| Configuration | BIP30, BIP42, BIP90 |  | At every height, BIP30 except its two exception blocks | genesis | genesis | genesis | genesis | genesis |
+| Flag day | BIP16 |  | By a coinbase vote of miners, read by manual inspection and later fixed as a block timestamp | 2012&#8209;04&#8209;01 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 |
+| Version (BIP34) | BIP34, BIP66, BIP65 |  | When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3, testnet4 and signet) | 227,931, 363,725, 388,381 | 21,111, 330,776, 581,885 | 1, 1, 1 | 1, 1, 1 | 100,000,000, 1,251, 1,351 |
+| Signaling (BIP9) | BIP68, BIP112, BIP113 | 0 | From the versions of the chain's own blocks: after the period in which its bit reaches the threshold and one locked-in period, and no earlier than its minimum activation height | 419,328 | 770,112 | 1 | 1 | genesis |
+|  | BIP141, BIP143, BIP147 | 1 |  | 481,824 | 834,624 | 1 | 1 | genesis |
+|  | BIP341, BIP342 | 2 |  | 709,632 | 2,011,968 | 1 | 1 | genesis |
+|  | BIP54 timewarp | 5 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
+|  | BIP54 timespan | 6 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
+|  | BIP54 sigops | 7 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
+|  | BIP54 txsize | 8 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
+|  | BIP54 coinbase | 9 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
+
+BIP90 is a rule of its own, active by configuration. It imposes the rules
+of BIP34, BIP66 and BIP65 above specified blocks. It does not change the
+activation of those forks, which remains as documented, but effectively
+supersedes them when active.
+
+BIP16 was coordinated, not activated: miners voted with `/P2SH/` in their
+coinbase scripts, the vote was read by inspection, and the result was fixed
+as a time. There is no activation logic. With `forks.bip16` the rule is
+enforced on every block whose timestamp is at or after
+`bip16_activation_time`, by the block's own timestamp, not median time past.
+
+BIP34 defined activation by block version, which BIP66 and BIP65 also use.
+A block activates its rule when its version is at least the rule's (2, 3
+and 4) and at least `bip34_activation_threshold` of the preceding
+`bip34_activation_sample` blocks are of that version: 750 of 1,000 on
+mainnet, 51 of 100 on testnet3, testnet4 and signet. The comparison is of
+signed versions, as in the original implementation. Activation is per
+block, so it follows each block's version until enforcement: at
+`bip34_enforcement_threshold` (950 of 1,000, 75 of 100) the version becomes
+the minimum block version, lower versions are rejected, and the rule holds
+from then on. The preceding versions are the chain state's version history,
+requested by `get_map` as `bip34_activation_sample` blocks below the
+height. The method is used only with `forks.bip90` off: BIP90 buries the
+three rules at their heights instead, and with it on no version history is
+collected. On regtest the thresholds are zero, so a block of the version
+activates the rule by itself.
+
+A BIP9 deployment (`chain_state::deployment`) has a version bit, a start and
+a timeout in median time past, a threshold of signaling blocks per period,
+a minimum activation height, and whether it is a speedy trial. A block
+signals when the top three bits of its version are `001` and its
+deployment's bit is set. The state of each deployment
+(`chain_state::deployment_state`) changes only at a period boundary, by the
+median time past at the boundary and the signaling blocks of the period
+that it closes:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> defined
+    defined --> started: start
+    started --> locked_in: threshold
+    started --> failed: timeout
+    locked_in --> active: activation height
+    defined --> failed: timeout (BIP9)
+```
+
+Original BIP9, used by the bit0 and bit1 groups, fails a deployment at its
+timeout before counting its period. A speedy trial, used by the bit2 group
+(BIP341) and the BIP54 rules, counts the period first, so a deployment that
+reaches its threshold in the period of its timeout locks in. The minimum
+activation height is independent of the trial: any deployment holds in
+`locked_in` until the first boundary at or above its minimum height, and
+one with no minimum (bit0, bit1) activates at the boundary after lock in.
+The period is `bip9_activation_period` (2,016 on mainnet). The mainnet
+deployments of bits 0 to 2 are those of their release, and those of BIP54
+are not yet set:
+
+| Group | Bit | Start | Timeout | Threshold | Minimum height | Speedy |
+| ----- | --: | ----- | ------- | --------: | -------------: | ------ |
+| BIP68, BIP112, BIP113 | 0 | 2016-05-01 | 2017-05-01 | 1,916 | | |
+| BIP141, BIP143, BIP147 | 1 | 2016-11-15 | 2017-11-15 | 1,916 | | |
+| BIP341, BIP342 | 2 | 2021-04-24 | 2021-08-11 | 1,815 | 709,632 | ✔ |
+| BIP54 timewarp | 5 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
+| BIP54 timespan | 6 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
+| BIP54 sigops | 7 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
+| BIP54 txsize | 8 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
+| BIP54 coinbase | 9 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
+
+The chain state carries each deployment's state, and the count of
+signaling blocks in the current period, so rolling forward steps a state
+only at a boundary. Constructed from the store, `get_map` gives each
+signaled deployment's period boundary at or below the height, with its
+start and timeout. The store reads back one boundary at a time, by the
+median time past of each, to the first before the start, as every earlier
+period is `defined`, and counts versions only in the periods that can be
+`started`.
+
+BIP54 is implemented as five independent rules, each with its own fork
+switch and deployment: `bip54_timewarp`, `bip54_timespan`, `bip54_sigops`,
+`bip54_txsize` and `bip54_coinbase`. Each is a speedy trial. Their version
+bits, 5 through 9, are provisional, and their thresholds are zero on
+mainnet, testnet3, testnet4 and signet, so none is signaled or active
+there. On regtest each is active above genesis.
+
+A fork's flags are stored with each header once it is active. A fork
+enabled after its activation is therefore enforced only on the headers
+archived from then on, as is any soft fork adopted late: the node does not
+split from the chain, the archived range is not enforced, and a resync
+enforces it.
 
 ## 5. Compact number
 
