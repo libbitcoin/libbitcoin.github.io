@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: Linux</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/linux.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/linux.html">
 <meta property="og:title" content="Building: Linux">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: Linux">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -312,7 +312,7 @@
     </nav>
     <p class="lede">
       Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
-      build options, build systems and toolchains, libbitcoin-build, platform
+      build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
   </header>
@@ -323,7 +323,7 @@
     <a href="macos.html">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html">Build options</a>
-    <a href="toolchains.html">Build systems and toolchains</a>
+    <a href="toolchains.html">Toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
     <a href="platforms.html">Platform Coverage</a>
     <a href="status.html">Build Status</a>
@@ -332,7 +332,7 @@
   <article class="doc">
 <p>Ubuntu 24.04 is the reference platform. CI builds and tests on it with
 GCC 13 through 16 and Clang 18 and 19 (see
-<a href="toolchains.html">Build systems and toolchains</a>). Other distributions work
+<a href="toolchains.html">Toolchains</a>). Other distributions work
 with the equivalent packages.</p>
 <h2 id="1-prerequisites">1. Prerequisites<a class="anchor" href="#1-prerequisites" aria-label="Link to this section">#</a></h2>
 <pre class="console"><code>$ sudo apt install build-essential git autoconf automake libtool pkg-config curl
@@ -343,11 +343,11 @@ older version, so install a current one from
 <h2 id="2-autotools">2. Autotools<a class="anchor" href="#2-autotools" aria-label="Link to this section">#</a></h2>
 <pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static
 </code></pre>
-<p>The script downloads Boost 1.86.0 and clones libbitcoin-system,
-libbitcoin-database, libbitcoin-network and libbitcoin-node. It then
-builds, tests and installs each in order, ending with libbitcoin-server.
+<p>The script clones libbitcoin-system, libbitcoin-database,
+libbitcoin-network and libbitcoin-node. It then builds, tests and installs
+each in order, ending with libbitcoin-server.
 The result is <code>$HOME/libbitcoin/bin/bs</code>.</p>
 <p>The dependencies are cloned into the current directory. Add
 <code>--build-src-dir=&lt;path&gt;</code> to put them elsewhere, <code>--build-skip-tests</code>
@@ -357,23 +357,24 @@ suites without running them.</p>
 A prefix in the home directory does not.</p>
 <h2 id="3-cmake">3. CMake<a class="anchor" href="#3-cmake" aria-label="Link to this section">#</a></h2>
 <p>The CMake script takes the same options:</p>
-<pre class="console"><code>$ ./builds/cmake/install-cmake.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+<pre class="console"><code>$ ./builds/cmake/install-cmake.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static
 </code></pre>
 <h2 id="4-cmake-presets">4. CMake presets<a class="anchor" href="#4-cmake-presets" aria-label="Link to this section">#</a></h2>
 <p>A preset selects the configuration and link by name:
 <code>nix-gnu-debug-static</code>, <code>nix-gnu-debug-shared</code>, <code>nix-gnu-release-static</code>
 or <code>nix-gnu-release-shared</code>.</p>
-<pre class="console"><code>$ ./builds/cmake/install-presets.sh --build-preset=nix-gnu-release-static --build-boost
+<pre class="console"><code>$ ./builds/cmake/install-presets.sh --build-preset=nix-gnu-release-static
 </code></pre>
 <p>The presets script chooses the install location itself, and the result
 is <code>prefix/&lt;preset&gt;/bin/bs</code> under the source directory.</p>
 <h2 id="5-compiler-and-flags">5. Compiler and flags<a class="anchor" href="#5-compiler-and-flags" aria-label="Link to this section">#</a></h2>
 <p>The scripts use the compilers named by <code>CC</code> and <code>CXX</code>:</p>
-<pre class="console"><code>$ CC=clang-19 CXX=clang++-19 ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+<pre class="console"><code>$ CC=clang-19 CXX=clang++-19 ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static
 </code></pre>
-<p><code>CFLAGS</code> and <code>CXXFLAGS</code> are kept and passed to every library. This is
-how to target a specific CPU, for example a Raspberry Pi 5:</p>
-<pre class="console"><code>$ CFLAGS=&quot;-mcpu=cortex-a76+crypto&quot; CXXFLAGS=&quot;-mcpu=cortex-a76+crypto&quot; ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+<p><code>CFLAGS</code> and <code>CXXFLAGS</code> are kept and passed to every library.</p>
+<p>Hardware extensions are enabled with the hardware options, for example
+the ARM crypto extensions of a Raspberry Pi 5:</p>
+<pre class="console"><code>$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --enable-sha2 --enable-aes
 </code></pre>
 <p>See <a href="options.html">Build options</a> for the hardware options.</p>
   </article>

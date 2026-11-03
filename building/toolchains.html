@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Building: Build systems and toolchains</title>
-<meta name="description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
+<title>Building: Toolchains</title>
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/toolchains.html">
 <script>
@@ -41,8 +41,8 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/toolchains.html">
-<meta property="og:title" content="Building: Build systems and toolchains">
-<meta property="og:description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
+<meta property="og:title" content="Building: Toolchains">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -50,8 +50,8 @@
 <meta property="og:image:height" content="1260">
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Building: Build systems and toolchains">
-<meta name="twitter:description" content="Building Bitcoin Server (bs), on Linux, macOS and Windows: build systems, options, toolchains and libbitcoin-build.">
+<meta name="twitter:title" content="Building: Toolchains">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -254,7 +254,7 @@
 </svg>
     </a>
     <div class="eyebrow">Full stack Bitcoin software</div>
-    <h1>Build systems and toolchains</h1>
+    <h1>Toolchains</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
@@ -311,8 +311,9 @@
       <a href="../about.html">About</a>
     </nav>
     <p class="lede">
-      Building <strong>Bitcoin Server</strong> (bs), on Linux, macOS and Windows:
-      build systems, options, toolchains and libbitcoin-build.
+      Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
+      build options, toolchains, libbitcoin-build, platform
+      coverage and build status.
     </p>
   </header>
 
@@ -322,7 +323,7 @@
     <a href="macos.html">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html">Build options</a>
-    <a href="toolchains.html" class="here">Build systems and toolchains</a>
+    <a href="toolchains.html" class="here">Toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
     <a href="platforms.html">Platform Coverage</a>
     <a href="status.html">Build Status</a>
@@ -406,6 +407,17 @@ was built with.</p>
 <code>StaticDebug</code> and <code>StaticRelease</code> configurations for x64, Win32 and
 ARM64. Dependencies are NuGet packages, restored into <code>.nuget\packages</code>
 in the source directory.</p>
+<h3 id="mingw-w64">MinGW-w64<a class="anchor" href="#mingw-w64" aria-label="Link to this section">#</a></h3>
+<p>Windows x64 binaries can also be built on Linux with MinGW-w64 and
+autotools. <code>install-gnu.sh</code> cross-compiles when <code>CC</code> and <code>CXX</code> name the
+MinGW compilers and <code>--host=x86_64-w64-mingw32</code> is given. With GCC:</p>
+<pre class="console"><code>$ CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix ./builds/gnu/install-gnu.sh --prefix=$HOME/mingw --build-config=release --build-link=static --host=x86_64-w64-mingw32
+</code></pre>
+<p>With Clang (llvm-mingw):</p>
+<pre class="console"><code>$ CC=x86_64-w64-mingw32-clang CXX=x86_64-w64-mingw32-clang++ ./builds/gnu/install-gnu.sh --prefix=$HOME/mingw --build-config=release --build-link=static --host=x86_64-w64-mingw32
+</code></pre>
+<p>The tests are built for Windows, so they run on Windows, not on the build
+machine.</p>
 <h2 id="2-language">2. Language<a class="anchor" href="#2-language" aria-label="Link to this section">#</a></h2>
 <p>All libraries are C++20, with no compiler extensions.</p>
 <h2 id="3-compilers-tested-in-ci">3. Compilers tested in CI<a class="anchor" href="#3-compilers-tested-in-ci" aria-label="Link to this section">#</a></h2>
@@ -477,38 +489,26 @@ build systems.</p>
 <td>Windows x64</td>
 <td>Visual Studio</td>
 </tr>
+<tr>
+<td>MinGW-w64 GCC</td>
+<td>13</td>
+<td>Ubuntu 26.04 x64, for Windows x64</td>
+<td>Autotools</td>
+</tr>
+<tr>
+<td>MinGW-w64 Clang</td>
+<td>13</td>
+<td>Ubuntu 26.04 x64, for Windows x64</td>
+<td>Autotools</td>
+</tr>
 </tbody>
 </table></div>
 <p>GCC 15 and 16 come from the Ubuntu toolchain PPA. The macOS and Windows
 runners use the current GitHub images, so their exact compiler versions
 follow those images.</p>
-<h2 id="4-boost">4. Boost<a class="anchor" href="#4-boost" aria-label="Link to this section">#</a></h2>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Build system</th>
-<th>Boost</th>
-<th>Source</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Autotools, CMake</td>
-<td>1.86.0 (minimum)</td>
-<td>Downloaded and installed by <code>--build-boost</code></td>
-</tr>
-<tr>
-<td>Visual Studio</td>
-<td>1.91.0</td>
-<td>NuGet package <code>libbitcoin-boost</code></td>
-</tr>
-</tbody>
-</table></div>
-<p>libbitcoin uses only Boost's header libraries, so <code>--build-boost</code> builds
-no Boost binaries.</p>
-<h2 id="5-release-builds">5. Release builds<a class="anchor" href="#5-release-builds" aria-label="Link to this section">#</a></h2>
+<h2 id="4-release-builds">4. Release builds<a class="anchor" href="#4-release-builds" aria-label="Link to this section">#</a></h2>
 <p>Release binaries are built with CMake on Linux and macOS and with Visual
-Studio on Windows, statically linked to libbitcoin and Boost, in
+Studio on Windows, statically linked to libbitcoin, in
 variants for each set of hardware options, for example:</p>
 <div class="scroller"><table>
 <thead>
@@ -558,6 +558,35 @@ variants for each set of hardware options, for example:</p>
 </table></div>
 <p>On Linux glibc builds, the C library remains dynamic. The musl builds
 have no dynamic dependencies.</p>
+<h2 id="5-deterministic-builds">5. Deterministic builds<a class="anchor" href="#5-deterministic-builds" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Toolchain</th>
+<th>Builds</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Guix</td>
+<td>The release builds, in a Guix environment</td>
+<td><a href="status.html#2-releases">Build Status</a></td>
+</tr>
+<tr>
+<td>Double Build</td>
+<td>A release build, built twice on separate runners and compared by hash</td>
+<td><a href="../architecture/build/deterministic.html">Deterministic builds</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="6-cuda">6. CUDA<a class="anchor" href="#6-cuda" aria-label="Link to this section">#</a></h2>
+<p>No CUDA toolchain is required. The GPU verification kernels are part of
+the source, as compressed PTX (<code>src/crypto/secp256k1/cuda/ptx.cpp</code> in
+libbitcoin-system). At run time <code>bs</code> loads the NVIDIA driver library
+(<code>nvcuda.dll</code> on Windows, <code>libcuda.so.1</code> on Linux), which compiles the
+PTX for the installed GPU. <code>--enable-cuda</code> is on by default, and applies
+on x64 and arm64, except on macOS.</p>
   </article>
 
   <nav class="pager"><a href="options.html">&larr; Build options</a><a href="libbitcoin-build.html">libbitcoin-build &rarr;</a></nav>

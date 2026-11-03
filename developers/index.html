@@ -330,8 +330,7 @@ libbitcoin-server, and Bitcoin Explorer (<code>bx</code>) on libbitcoin-explorer
 Each library can be used on its own, by any application.</p>
 <h2 id="1-the-stack">1. The stack<a class="anchor" href="#1-the-stack" aria-label="Link to this section">#</a></h2>
 <p>Both executables rest on libbitcoin-system: Bitcoin Server through the
-node's libraries, and Bitcoin Explorer directly. The only other dependency
-is Boost (headers only).</p>
+node's libraries, and Bitcoin Explorer directly.</p>
 <div class="mermaid">
 flowchart BT
     sys["libbitcoin-system"]
@@ -365,7 +364,7 @@ flowchart BT
 <tr>
 <td><span class="nw"><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></span></td>
 <td><code>libbitcoin::system</code></td>
-<td><span class="nw">boost</span></td>
+<td><span class="nw">none</span></td>
 <td>Bitcoin primitives: blocks, transactions, scripts and their execution, hashes and cryptography, keys, addresses and wallets, encodings and serialization</td>
 </tr>
 <tr>

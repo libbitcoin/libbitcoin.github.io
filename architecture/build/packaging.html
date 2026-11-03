@@ -324,8 +324,6 @@
   </nav>
 
   <article class="doc">
-<div class="banner"><strong>Packaging is a work in progress.</strong></div>
-
 <p>How release builds of Bitcoin Server (<code>bs</code>) are packaged for package
 managers, as a container image, and as apps for node platforms. Packages
 contain the signed builds of a release (<a href="release.html">Release builds</a>).</p>
@@ -416,8 +414,8 @@ image; the install or start fails if neither is supported.</p>
 <td>arm64</td>
 <td><code>bs-linux-arm64</code></td>
 <td>neon</td>
-<td><code>bs-linux-arm64-crypto</code></td>
-<td>neon, aes, sha</td>
+<td><code>bs-linux-arm64-sha2</code></td>
+<td>neon, aes, sha2</td>
 </tr>
 <tr>
 <td>Windows</td>
@@ -432,8 +430,8 @@ image; the install or start fails if neither is supported.</p>
 <td>arm64</td>
 <td><code>bs-windows-arm64.exe</code></td>
 <td>neon</td>
-<td><code>bs-windows-arm64-crypto.exe</code></td>
-<td>neon, aes, sha</td>
+<td><code>bs-windows-arm64-sha2.exe</code></td>
+<td>neon, aes, sha2</td>
 </tr>
 <tr>
 <td>macOS</td>
@@ -447,7 +445,7 @@ image; the install or start fails if neither is supported.</p>
 <td>macOS</td>
 <td>arm64</td>
 <td><code>bs-macos-arm64</code></td>
-<td>neon, aes, sha, sha3</td>
+<td>neon, aes, sha2, sha3</td>
 <td></td>
 <td></td>
 </tr>

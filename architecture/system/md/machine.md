@@ -383,15 +383,15 @@ stack, calls one handler, and checks the stack and the error, with no
 script, iteration or dispatch involved:
 
 ```cpp
-BOOST_AUTO_TEST_CASE(interpreter__op_add1__value__incremented)
+BC_AUTO_TEST_CASE(interpreter__op_add1__value__incremented)
 {
     machine_accessor<contiguous_stack> machine{ {}, flags::all_rules };
     machine->push_signed64(41);
-    BOOST_REQUIRE_EQUAL(code{ machine->op_add1() }, error::op_success);
+    BC_REQUIRE_EQUAL(code{ machine->op_add1() }, error::op_success);
 
     int32_t value{};
-    BOOST_REQUIRE(machine->pop_signed32(value));
-    BOOST_REQUIRE_EQUAL(value, 42);
+    BC_REQUIRE(machine->pop_signed32(value));
+    BC_REQUIRE_EQUAL(value, 42);
 }
 ```
 

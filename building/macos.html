@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: macOS</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/macos.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/macos.html">
 <meta property="og:title" content="Building: macOS">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: macOS">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -312,7 +312,7 @@
     </nav>
     <p class="lede">
       Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
-      build options, build systems and toolchains, libbitcoin-build, platform
+      build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
   </header>
@@ -323,7 +323,7 @@
     <a href="macos.html" class="here">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html">Build options</a>
-    <a href="toolchains.html">Build systems and toolchains</a>
+    <a href="toolchains.html">Toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
     <a href="platforms.html">Platform Coverage</a>
     <a href="status.html">Build Status</a>
@@ -332,7 +332,7 @@
   <article class="doc">
 <p>macOS builds use the same scripts as Linux, with Apple clang from Xcode.
 CI builds and tests with the current Xcode on Apple silicon (see
-<a href="toolchains.html">Build systems and toolchains</a>).</p>
+<a href="toolchains.html">Toolchains</a>).</p>
 <h2 id="1-prerequisites">1. Prerequisites<a class="anchor" href="#1-prerequisites" aria-label="Link to this section">#</a></h2>
 <p>Install the Xcode command line tools, then the build tools from
 <a href="https://brew.sh">Homebrew</a>:</p>
@@ -342,7 +342,7 @@ $ brew install autoconf automake libtool pkg-config cmake
 <h2 id="2-build">2. Build<a class="anchor" href="#2-build" aria-label="Link to this section">#</a></h2>
 <pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static
 </code></pre>
 <p>The result is <code>$HOME/libbitcoin/bin/bs</code>. CMake works the same way with
 <code>./builds/cmake/install-cmake.sh</code> and the same options. The scripts use
@@ -350,7 +350,7 @@ $ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-co
 <p>The notes in <a href="linux.html">Linux</a> about the source directory, skipping tests
 and passing compiler flags apply on macOS too.</p>
 <h2 id="3-hardware-options">3. Hardware options<a class="anchor" href="#3-hardware-options" aria-label="Link to this section">#</a></h2>
-<p>On Apple silicon, <code>--enable-sha</code>, <code>--enable-sha3</code> and <code>--enable-aes</code>
+<p>On Apple silicon, <code>--enable-sha2</code>, <code>--enable-sha3</code> and <code>--enable-aes</code>
 enable the ARM crypto instructions, which every M-series CPU has. On
 Intel Macs, use the x86 options (see <a href="options.html">Build options</a>).</p>
 <p>GPU acceleration is not available on macOS.</p>

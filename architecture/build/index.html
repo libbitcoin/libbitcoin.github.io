@@ -354,7 +354,6 @@ libbitcoin-system:</p>
     &lt;sources path=&quot;src&quot; recursive=&quot;true&quot; /&gt;
     &lt;headers path=&quot;include&quot; recursive=&quot;true&quot; root=&quot;true&quot; /&gt;
     &lt;option name=&quot;avx2&quot; type=&quot;enable&quot; default=&quot;no&quot; msvc=&quot;/p:Option-avx2=true&quot; /&gt;
-    &lt;dependency name=&quot;boost&quot; version=&quot;1.86.0&quot; /&gt;
     &lt;compiler standard=&quot;20&quot;&gt;
       &lt;flag option=&quot;avx2&quot; environmental=&quot;true&quot; type=&quot;public&quot;&gt;
         &lt;symbol value=&quot;-mavx&quot; /&gt;
@@ -367,7 +366,7 @@ libbitcoin-system:</p>
 </code></pre>
 <p>The library dependencies form the chain that every install script and CI
 job follows. libbitcoin-server adds the <code>bs</code> binary and libbitcoin-explorer
-the <code>bx</code> binary; tests depend on their library and Boost. Other
+the <code>bx</code> binary; tests depend on their library. Other
 libraries can optionally be linked, each in place of the library's own
 implementation, which is the default:</p>
 <div class="scroller"><table>
@@ -384,17 +383,11 @@ implementation, which is the default:</p>
 <td>libsecp256k1, UltrafastSecp256k1 (compatibility layer)</td>
 <td>Replaces the internal secp256k1 compatibility header (<code>src/crypto/secp256k1/interface.hpp</code>)</td>
 </tr>
-<tr>
-<td>libbitcoin-network</td>
-<td>OpenSSL, wolfSSL (compatibility layer)</td>
-<td>Replaces the internal OpenSSL compatibility headers (<code>ssl/openssl/</code>)</td>
-</tr>
 </tbody>
 </table></div>
 <div class="mermaid">
 flowchart LR
-    boost["Boost"] --&gt; system["libbitcoin-system"]
-    system --&gt; database["libbitcoin-database"] --&gt; node["libbitcoin-node"]
+    system["libbitcoin-system"] --&gt; database["libbitcoin-database"] --&gt; node["libbitcoin-node"]
     system --&gt; network["libbitcoin-network"] --&gt; node
     node --&gt; server["libbitcoin-server&lt;br/&gt;bs"]
     system --&gt; explorer["libbitcoin-explorer&lt;br/&gt;bx"]
@@ -413,7 +406,7 @@ generator resolves it against the registrar.</p>
 <tbody>
 <tr>
 <td><code>dependency</code></td>
-<td>For each library and external dependency: its source (GitHub owner and tag, archive URL, NuGet package), its build methods (<code>gnu</code>, <code>cmake</code>, <code>preset</code>, <code>msbuild</code>, <code>boost_build</code>, <code>nuget</code>), the options used when it is built as a dependency, and its CMake package and target (<code>bitcoin::system</code>, <code>Boost::headers</code>)</td>
+<td>For each library and external dependency: its source (GitHub owner and tag, archive URL, NuGet package), its build methods (<code>gnu</code>, <code>cmake</code>, <code>preset</code>, <code>msbuild</code>, <code>nuget</code>), the options used when it is built as a dependency, and its CMake package and target (<code>bitcoin::system</code>)</td>
 </tr>
 <tr>
 <td><code>build-options</code></td>
@@ -429,9 +422,7 @@ generator resolves it against the registrar.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Boost is defined once, as version <code>1.86.0</code> for source builds and as the
-<code>libbitcoin-boost</code> NuGet package <code>1.91.0.1</code> for Visual Studio. A
-<code>toolchain</code> element defines the Visual Studio toolset (<code>v145</code>), the
+<p>A <code>toolchain</code> element defines the Visual Studio toolset (<code>v145</code>), the
 solution configurations (<code>StaticDebug</code>, <code>StaticRelease</code>, and hidden
 dynamic and LTCG variants) and the platforms (<code>Win32</code>, <code>x64</code>, <code>ARM64</code>).</p>
 <h2 id="2-the-generator">2. The generator<a class="anchor" href="#2-the-generator" aria-label="Link to this section">#</a></h2>
@@ -622,7 +613,7 @@ and, through its <code>msvc</code> attribute, a <code>build-msvc.cmd</code> argu
 MSBuild property (<code>/p:Option-avx2=true</code>). Its <code>define</code> elements become
 preprocessor definitions and its <code>flag</code> elements compiler flags.</p>
 <h3 id="41-intrinsics">4.1 Intrinsics<a class="anchor" href="#41-intrinsics" aria-label="Link to this section">#</a></h3>
-<p>The x86 intrinsics options of libbitcoin-system add compiler flags. Each
+<p>The intrinsics options of libbitcoin-system add compiler flags. Each
 flag in the model carries a short test program, which the generated
 <code>configure.ac</code> and <code>CMakeLists.txt</code> compile with the flags to verify that
 the compiler supports them.</p>
@@ -663,7 +654,7 @@ the compiler supports them.</p>
 <tr>
 <td><code>shani</code></td>
 <td><code>-msse4 -msha</code></td>
-<td><code>WITH_SHA</code></td>
+<td><code>WITH_SHANI</code></td>
 </tr>
 <tr>
 <td><code>sha512</code></td>
@@ -680,6 +671,21 @@ the compiler supports them.</p>
 <td><code>-mavx2 -maes -mpclmul -mvaes -mvpclmulqdq</code></td>
 <td><code>/arch:AVX2</code>, <code>WITH_VAES</code></td>
 </tr>
+<tr>
+<td><code>sha2</code></td>
+<td><code>+sha2</code></td>
+<td><code>WITH_SHA2</code></td>
+</tr>
+<tr>
+<td><code>sha3</code></td>
+<td><code>+sha3</code> (with <code>armv8.2-a</code>)</td>
+<td><code>WITH_SHA3</code></td>
+</tr>
+<tr>
+<td><code>aes</code></td>
+<td><code>+aes</code></td>
+<td><code>WITH_AES</code></td>
+</tr>
 </tbody>
 </table></div>
 <p>The flags are public. <code>configure.ac</code> substitutes them into the pkg-config
@@ -688,12 +694,14 @@ the compiler supports them.</p>
 In Visual Studio the width options raise an <code>Option-arch</code> property (highest
 wins), which <code>x64.props</code> and <code>Win32.props</code> map to
 <code>EnableEnhancedInstructionSet</code>, defaulting to <code>AdvancedVectorExtensions2</code>.</p>
-<p>When an x86 option is off, the build still compiles its test program
+<p>The ARM options combine into one flag, <code>-march=armv8-a+&lt;extensions&gt;</code>
+(<code>armv8.2-a</code> when <code>sha3</code> is on), since ARM extensions are suffixes of a
+single <code>-march</code> or <code>-mcpu</code> value. The build fails if an ARM option is on
+and <code>CFLAGS</code> or <code>CXXFLAGS</code> already hold <code>-march</code> or <code>-mcpu</code>. Clang-cl on
+ARM64 takes the same flag.</p>
+<p>When an option is off, the build still compiles its test program
 without the flags, and reports an environmental override if it compiles
-(as when <code>CFLAGS</code> already enables the instruction set). The ARM options
-(<code>sha</code>, <code>sha3</code>, <code>aes</code>) add no flags: the build tests whether the compiler
-environment provides the intrinsics, and fails if an option is enabled and
-they are not available.</p>
+(as when <code>CFLAGS</code> already enables the instruction set).</p>
 <h3 id="42-other-options">4.2 Other options<a class="anchor" href="#42-other-options" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>
@@ -713,11 +721,6 @@ they are not available.</p>
 <td><code>--enable-cuda</code></td>
 <td>libbitcoin-system</td>
 <td>defines <code>WITH_CUDA</code> (default on)</td>
-</tr>
-<tr>
-<td><code>--with-ssl</code></td>
-<td>libbitcoin-network</td>
-<td>defines <code>WITH_SSL</code> and adds the <code>src/ssl</code> sources (default on)</td>
 </tr>
 <tr>
 <td><code>--with-embedded</code></td>
@@ -746,8 +749,7 @@ filter under valgrind after the normal test run.</p>
 <p>An install script builds its repository together with everything below it
 in the dependency chain, in order. For libbitcoin-server, <code>install-gnu.sh</code>
 runs:</p>
-<pre><code class="language-sh">build_boost &quot;boost&quot; ...                  # with --build-boost
-build_gnu &quot;libbitcoin-system&quot;   ... --without-tests --without-examples
+<pre><code class="language-sh">build_gnu &quot;libbitcoin-system&quot;   ... --without-tests --without-examples
 build_gnu &quot;libbitcoin-database&quot; ... --without-tests --without-tools
 build_gnu &quot;libbitcoin-network&quot;  ... --without-tests
 build_gnu &quot;libbitcoin-node&quot;     ... --without-tests
@@ -763,10 +765,7 @@ dependencies, or builds the target alone. The libraries find each other
 through pkg-config (<code>PKG_CHECK_MODULES</code>) or through <code>find_package</code> and the
 exported CMake targets. <code>install-cmake.sh</code> and <code>install-presets.sh</code> follow
 the same sequence with CMake.</p>
-<p>Boost is built only when requested. The script downloads the source
-archive named in the registrar, bootstraps <code>b2</code>, and installs Boost with
-<code>cxxstd=20</code> and the link mode of the build. <code>build-msvc.cmd</code> instead
-restores each solution's NuGet packages, Boost among them, and builds the
+<p><code>build-msvc.cmd</code> restores each solution's NuGet packages and builds the
 library projects of the chain in order, then the target's binaries and
 tests. The test project runs its tests as a post-build step in release
 configurations.</p>
@@ -812,8 +811,8 @@ libbitcoin-system:</p>
 </tbody>
 </table></div>
 <p>Each job checks out the repository and runs its install script with
-<code>--build-use-local-src</code>, the job's <code>--build-config</code> and <code>--build-link</code>, and
-<code>--build-boost</code>. The script builds the dependency chain, the repository and
+<code>--build-use-local-src</code> and the job's <code>--build-config</code> and <code>--build-link</code>.
+The script builds the dependency chain, the repository and
 its tests, and prints the test logs.</p>
 <p>Two workflows are generated from the same entries. Jobs marked
 <code>gate="true"</code> in the model form <code>ci.yml</code>, which runs on push and pull

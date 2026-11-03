@@ -400,18 +400,18 @@ extension level it is built for, if any. Windows builds end in <code>.exe</code>
 <td></td>
 </tr>
 <tr>
-<td><code>arm64-crypto</code></td>
-<td>ARMv8 SHA</td>
+<td><code>arm64-sha2</code></td>
+<td>ARMv8 SHA-2, AES</td>
 </tr>
 <tr>
 <td><code>arm64-sha3</code></td>
-<td>ARMv8 SHA, ARMv8.2 SHA-3</td>
+<td>ARMv8 SHA-2, AES, ARMv8.2 SHA-3</td>
 </tr>
 </tbody>
 </table></div>
 <p>Linux and Windows have every build above, and musl has the <code>x64</code>
 builds. macOS has one build for each architecture: <code>arm64</code>, which uses
-ARMv8 SHA, SHA-3 and AES, and <code>x64</code>, which uses AES-NI.</p>
+ARMv8 SHA-2, SHA-3 and AES, and <code>x64</code>, which uses AES-NI.</p>
 <p>A build runs only on a CPU that has every extension it uses, and is
 faster for using them. To select one, run the build without an extension
 level, which runs on any CPU of its architecture, with <code>--hardware</code>:</p>

@@ -104,7 +104,7 @@ silent-eligible) is completed on the strand without posting
 ```cpp
 // chaser_validate.hpp:163-166, chaser_validate.cpp:39-41, :393-401
 network::threadpool        validation_threadpool_;   // node.threads, node.thread_priority
-network::asio::strand      validation_strand_;       // on validation_threadpool_
+network::io::strand        validation_strand_;       // on validation_threadpool_
 strand()    → validation_strand_     // overrides base
 stranded()  → validation_strand_.running_in_this_thread()
 ```

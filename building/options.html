@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: Build options</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/options.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/options.html">
 <meta property="og:title" content="Building: Build options">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: Build options">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -312,7 +312,7 @@
     </nav>
     <p class="lede">
       Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
-      build options, build systems and toolchains, libbitcoin-build, platform
+      build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
   </header>
@@ -323,7 +323,7 @@
     <a href="macos.html">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html" class="here">Build options</a>
-    <a href="toolchains.html">Build systems and toolchains</a>
+    <a href="toolchains.html">Toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
     <a href="platforms.html">Platform Coverage</a>
     <a href="status.html">Build Status</a>
@@ -359,10 +359,6 @@ the <code>Option-&lt;name&gt;</code> property.</p>
 <tr>
 <td><code>--build-link=&lt;dynamic\|static&gt;</code></td>
 <td>Build shared or static libraries (default both).</td>
-</tr>
-<tr>
-<td><code>--build-boost</code></td>
-<td>Download and install Boost 1.86.0. Only its headers are used, so its build step compiles nothing.</td>
 </tr>
 <tr>
 <td><code>--build-src-dir=&lt;path&gt;</code></td>
@@ -482,7 +478,7 @@ extensions they all have.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>--enable-sha</code></td>
+<td><code>--enable-sha2</code></td>
 <td>ARMv8 SHA-1 and SHA-256</td>
 </tr>
 <tr>
@@ -495,9 +491,12 @@ extensions they all have.</p>
 </tr>
 </tbody>
 </table></div>
-<p>On ARM, a CPU flag in <code>CFLAGS</code> and <code>CXXFLAGS</code>, such as
-<code>-mcpu=cortex-a76+crypto</code>, enables the same code as these options (see
-<a href="linux.html">Linux</a>).</p>
+<p>The ARM options combine into one target flag, <code>-march=armv8-a+&lt;extensions&gt;</code>
+(<code>armv8.2-a</code> with <code>--enable-sha3</code>). For example, <code>--enable-sha2
+--enable-aes --enable-sha3</code> builds with <code>-march=armv8.2-a+sha2+aes+sha3</code>.
+An ARM option cannot be combined with <code>-march</code> or <code>-mcpu</code> in <code>CFLAGS</code> or
+<code>CXXFLAGS</code>, and the build fails if both are given. Use either the options
+or your own <code>-march</code> or <code>-mcpu</code>. <code>-mtune</code> can be used with either.</p>
 <h3 id="gpu">GPU<a class="anchor" href="#gpu" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>
@@ -545,11 +544,6 @@ it with <code>--disable-cuda</code> in any build script, including <code>build-m
 <td>Embed the web interfaces in <code>bs</code>.</td>
 </tr>
 <tr>
-<td><code>--with-ssl</code></td>
-<td>on</td>
-<td>Build the embedded TLS library, used by secure service endpoints.</td>
-</tr>
-<tr>
 <td><code>--enable-ndebug</code></td>
 <td>on</td>
 <td>Compile assertions out. <code>--build-config</code> sets it.</td>
@@ -557,14 +551,13 @@ it with <code>--disable-cuda</code> in any build script, including <code>build-m
 <tr>
 <td><code>--enable-isystem</code></td>
 <td>off</td>
-<td>Treat Boost headers as system headers, which silences their warnings.</td>
+<td>Include the headers of libbitcoin dependencies with <code>-isystem</code> in place of <code>-I</code>, which silences their warnings.</td>
 </tr>
 </tbody>
 </table></div>
 <h2 id="4-visual-studio">4. Visual Studio<a class="anchor" href="#4-visual-studio" aria-label="Link to this section">#</a></h2>
-<p>The instruction set, GPU, <code>--with-embedded</code>, <code>--with-ssl</code> and
-<code>--with-secp256k1</code> options are
-<code>Option-&lt;name&gt;</code> properties on the project property pages, or
+<p>The instruction set, GPU, <code>--with-embedded</code> and <code>--with-secp256k1</code>
+options are <code>Option-&lt;name&gt;</code> properties on the project property pages, or
 <code>/p:Option-&lt;name&gt;=true</code> on the <code>build-msvc.cmd</code> or <code>msbuild</code> command line.
 The others have no property: the tests and <code>bs</code> are projects in the
 solution, and the Release configurations define <code>NDEBUG</code>. For example, an
@@ -574,9 +567,9 @@ AVX-512 build:</p>
 <p>Windows x64 and Win32 builds target AVX2 by default, which can be
 lowered (see <a href="windows.html#4-instruction-set">Windows</a>).</p>
 <h2 id="5-external-libraries">5. External libraries<a class="anchor" href="#5-external-libraries" aria-label="Link to this section">#</a></h2>
-<p>The Boost headers are the only required external dependency. libbitcoin implements
-secp256k1 and TLS itself, and either can be replaced by an external
-library.</p>
+<p>There is no required external dependency. libbitcoin implements
+secp256k1 and TLS itself, although secp256k1 can be replaced by an
+external library with the same public interface.</p>
 <h3 id="secp256k1">secp256k1<a class="anchor" href="#secp256k1" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>
@@ -604,39 +597,75 @@ Batch verification remains internal.</p>
   installed where the build can find it (<code>-Dwith-secp256k1=ON</code> for
   CMake).</li>
 <li><strong>Visual Studio.</strong> <code>/p:Option-secp256k1=true</code> links the
-  <code>secp256k1_vc145</code> NuGet package, which is restored with the Boost
-  package.</li>
+  <code>secp256k1_vc145</code> NuGet package.</li>
 </ul>
-<h3 id="openssl">OpenSSL<a class="anchor" href="#openssl" aria-label="Link to this section">#</a></h3>
-<p>The embedded TLS library (<code>--with-ssl</code>, on by default) is used only for
-TLS, by the secure service endpoints. <code>--without-ssl</code>
-(<code>-Dwith-ssl=OFF</code>, <code>/p:Option-ssl=false</code>) omits it, and TLS then
-requires an external OpenSSL, which Boost.Asio uses in its place.</p>
-<p>The build scripts and project files have no option for OpenSSL, and no
-package of it is maintained, so its paths must be added to the build by
-hand: OpenSSL's include directory must be on the include path of every
-library and executable built, and <code>libssl</code> and <code>libcrypto</code> must be linked
-into every executable.</p>
-<p><strong>Autotools.</strong> Set <code>CPPFLAGS</code>, <code>LDFLAGS</code> and <code>LIBS</code> for the install
-script, for example:</p>
-<pre class="console"><code>$ CPPFLAGS=&quot;-I/opt/openssl/include&quot; LDFLAGS=&quot;-L/opt/openssl/lib&quot; LIBS=&quot;-lssl -lcrypto&quot; ./install-gnu.sh --without-ssl ...
-</code></pre>
-<p><strong>Visual Studio.</strong> An OpenSSL NuGet package may work, though none is
-maintained or tested with libbitcoin. Alternatively add the paths in a
-<code>Directory.Build.props</code> file (see <a href="windows.html#5-machine-options">Windows</a>):</p>
-<pre><code class="language-xml">&lt;ItemDefinitionGroup&gt;
-  &lt;ClCompile&gt;
-    &lt;AdditionalIncludeDirectories&gt;C:\openssl\include;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
-  &lt;/ClCompile&gt;
-  &lt;Link&gt;
-    &lt;AdditionalLibraryDirectories&gt;C:\openssl\lib;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;
-    &lt;AdditionalDependencies&gt;libssl.lib;libcrypto.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
-  &lt;/Link&gt;
-&lt;/ItemDefinitionGroup&gt;
-</code></pre>
+<h2 id="6-link-time-optimization">6. Link-time optimization<a class="anchor" href="#6-link-time-optimization" aria-label="Link to this section">#</a></h2>
+<p>No build system enables link-time optimization (LTO), and it is not
+recommended with any toolchain. In measurements of the libbitcoin-system
+performance tests (November 2026), no form of LTO made secp256k1
+signature verification faster, and verification dominates the time <code>bs</code>
+spends validating blocks. With MSVC, LTO made <code>bs</code> substantially slower.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Compiler</th>
+<th>LTO flags</th>
+<th>secp256k1 verify time</th>
+<th>Other effects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MSVC v145</td>
+<td><code>/GL</code> <code>/LTCG</code></td>
+<td>+19%</td>
+<td>SHA-256 and SHA-512 hashing 10-85x slower (SHA-NI unchanged), ChaCha20-Poly1305 17x slower. <code>bs.exe</code> 7% larger, and each <code>bs.exe</code> link takes about 3 minutes instead of 1.</td>
+</tr>
+<tr>
+<td>MSVC v145</td>
+<td><code>/GL</code> <code>/LTCG</code> <code>/Ob3</code></td>
+<td>-2%</td>
+<td>The same result as <code>/Ob3</code> without LTO. <code>bs.exe</code> 9% larger.</td>
+</tr>
+<tr>
+<td>Clang 18</td>
+<td><code>-flto=thin</code></td>
+<td>no change</td>
+<td>Hashing of small inputs 3-16% faster, SHA-1 of 1 MB 10-12% slower. 13% more code, 11% longer test build.</td>
+</tr>
+<tr>
+<td>Clang 18</td>
+<td><code>-flto</code></td>
+<td>no change</td>
+<td>AES and the secp256r1 and secp384r1 curves 4-7% faster. Test build takes twice as long.</td>
+</tr>
+<tr>
+<td>GCC 15</td>
+<td><code>-flto=auto</code></td>
+<td>no change</td>
+<td>secp256r1 signing and verification, used by TLS, 20% slower. 21% less code.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each time is relative to a build by the same compiler without LTO:
+<code>StaticRelease</code> for MSVC, and a static <code>-O3</code> release build for Clang and
+GCC. A positive change is slower. MSVC was measured on an AMD
+Threadripper PRO 9985WX, and Clang and GCC on an AMD Ryzen 7 7735HS.</p>
+<h3 id="msvc">MSVC<a class="anchor" href="#msvc" aria-label="Link to this section">#</a></h3>
+<p>The Visual Studio projects define <code>ReleaseLTCG</code>, <code>ReleaseLEXE</code> and
+<code>DebugLTCG</code> configurations, but no solution configuration selects them.
+With <code>/GL</code>, MSVC inlines functions only during the final link. By then
+the functions that libbitcoin forces inline have already been expanded
+into their callers, and MSVC no longer inlines even functions of one or
+two instructions, such as array element access and integer casts, which
+compilation without <code>/GL</code> inlines. In <code>bs.exe</code>, calls to such functions
+increase from about 3,000 to about 57,500. Adding <code>/Ob3</code> (aggressive
+inlining) to an LTO build removes most of these calls. That restores
+<code>StaticRelease</code> performance but does not improve on it, and <code>/Ob3</code>
+without LTO performs the same.</p>
   </article>
 
-  <nav class="pager"><a href="windows.html">&larr; Windows</a><a href="toolchains.html">Build systems and toolchains &rarr;</a></nav>
+  <nav class="pager"><a href="windows.html">&larr; Windows</a><a href="toolchains.html">Toolchains &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 

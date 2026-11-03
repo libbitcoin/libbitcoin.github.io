@@ -2,7 +2,7 @@
 
 macOS builds use the same scripts as Linux, with Apple clang from Xcode.
 CI builds and tests with the current Xcode on Apple silicon (see
-[Build systems and toolchains](toolchains)).
+[Toolchains](toolchains)).
 
 ## 1. Prerequisites
 
@@ -19,7 +19,7 @@ $ brew install autoconf automake libtool pkg-config cmake
 ```
 $ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static
 ```
 
 The result is `$HOME/libbitcoin/bin/bs`. CMake works the same way with
@@ -31,7 +31,7 @@ and passing compiler flags apply on macOS too.
 
 ## 3. Hardware options
 
-On Apple silicon, `--enable-sha`, `--enable-sha3` and `--enable-aes`
+On Apple silicon, `--enable-sha2`, `--enable-sha3` and `--enable-aes`
 enable the ARM crypto instructions, which every M-series CPU has. On
 Intel Macs, use the x86 options (see [Build options](options)).
 

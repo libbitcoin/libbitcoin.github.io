@@ -324,8 +324,6 @@
   </nav>
 
   <article class="doc">
-<div class="banner"><strong>Release builds are a work in progress.</strong></div>
-
 <p>The published builds of <code>bs</code> are made by two GitHub Actions workflows,
 both run by hand: one tags each repository with a version, and one
 builds, signs and publishes the server from those tags.</p>
@@ -394,7 +392,7 @@ the tests (<code>--build-skip-tests</code>):</p>
 <tr>
 <td>CMake (Linux, macOS)</td>
 <td><code>builds/cmake/install-cmake.sh</code></td>
-<td><code>release</code>, <code>static</code>, with <code>--build-boost</code></td>
+<td><code>release</code>, <code>static</code></td>
 </tr>
 <tr>
 <td>Visual Studio (Windows)</td>
@@ -450,18 +448,18 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td></td>
 </tr>
 <tr>
-<td><code>bs-linux-arm64-crypto</code></td>
+<td><code>bs-linux-arm64-sha2</code></td>
 <td><code>ubuntu-24.04-arm</code></td>
 <td>gcc 14</td>
-<td><code>armv8-a+crypto</code></td>
-<td>sha</td>
+<td><code>armv8-a+sha2+aes</code></td>
+<td>sha2, aes</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64-sha3</code></td>
 <td><code>ubuntu-24.04-arm</code></td>
 <td>gcc 14</td>
-<td><code>armv8.2-a+crypto+sha3</code></td>
-<td>sha, sha3</td>
+<td><code>armv8.2-a+sha2+aes+sha3</code></td>
+<td>sha2, sha3, aes</td>
 </tr>
 <tr>
 <td><code>bs-musl-x64</code></td>
@@ -495,8 +493,8 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td><code>bs-macos-arm64</code></td>
 <td><code>macos-latest</code></td>
 <td>Apple Clang</td>
-<td><code>apple-m1</code>, macOS 13.3</td>
-<td>sha3, sha, aes</td>
+<td><code>armv8.2-a+sha2+aes+sha3</code>, macOS 13.3</td>
+<td>sha2, sha3, aes</td>
 </tr>
 <tr>
 <td><code>bs-macos-x64</code></td>
@@ -541,18 +539,18 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td></td>
 </tr>
 <tr>
-<td><code>bs-windows-arm64-crypto</code></td>
+<td><code>bs-windows-arm64-sha2</code></td>
 <td><code>windows-11-vs2026-arm</code></td>
 <td>MSVC</td>
 <td>ARM64</td>
-<td>sha</td>
+<td>sha2, aes</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64-sha3</code></td>
 <td><code>windows-11-vs2026-arm</code></td>
 <td>MSVC</td>
 <td>ARM64</td>
-<td>sha, sha3</td>
+<td>sha2, sha3, aes</td>
 </tr>
 </tbody>
 </table></div>

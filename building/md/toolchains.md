@@ -1,4 +1,4 @@
-# Build systems and toolchains
+# Toolchains
 
 ## 1. Build systems
 
@@ -37,6 +37,25 @@ Requires Visual Studio 2026 (MSVC toolset v145). The solution exposes the
 ARM64. Dependencies are NuGet packages, restored into `.nuget\packages`
 in the source directory.
 
+### MinGW-w64
+
+Windows x64 binaries can also be built on Linux with MinGW-w64 and
+autotools. `install-gnu.sh` cross-compiles when `CC` and `CXX` name the
+MinGW compilers and `--host=x86_64-w64-mingw32` is given. With GCC:
+
+```
+$ CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix ./builds/gnu/install-gnu.sh --prefix=$HOME/mingw --build-config=release --build-link=static --host=x86_64-w64-mingw32
+```
+
+With Clang (llvm-mingw):
+
+```
+$ CC=x86_64-w64-mingw32-clang CXX=x86_64-w64-mingw32-clang++ ./builds/gnu/install-gnu.sh --prefix=$HOME/mingw --build-config=release --build-link=static --host=x86_64-w64-mingw32
+```
+
+The tests are built for Windows, so they run on Windows, not on the build
+machine.
+
 ## 2. Language
 
 All libraries are C++20, with no compiler extensions.
@@ -59,25 +78,17 @@ build systems.
 | Apple clang | current Xcode | macOS, Apple silicon | Autotools, CMake |
 | MSVC | v145 (Visual Studio 2026) | Windows x64 | Visual Studio |
 | Clang (clang-cl) | Included with Visual Studio 2026 | Windows x64 | Visual Studio |
+| MinGW-w64 GCC | 13 | Ubuntu 26.04 x64, for Windows x64 | Autotools |
+| MinGW-w64 Clang | 13 | Ubuntu 26.04 x64, for Windows x64 | Autotools |
 
 GCC 15 and 16 come from the Ubuntu toolchain PPA. The macOS and Windows
 runners use the current GitHub images, so their exact compiler versions
 follow those images.
 
-## 4. Boost
-
-| Build system | Boost | Source |
-| ------------ | ----- | ------ |
-| Autotools, CMake | 1.86.0 (minimum) | Downloaded and installed by `--build-boost` |
-| Visual Studio | 1.91.0 | NuGet package `libbitcoin-boost` |
-
-libbitcoin uses only Boost's header libraries, so `--build-boost` builds
-no Boost binaries.
-
-## 5. Release builds
+## 4. Release builds
 
 Release binaries are built with CMake on Linux and macOS and with Visual
-Studio on Windows, statically linked to libbitcoin and Boost, in
+Studio on Windows, statically linked to libbitcoin, in
 variants for each set of hardware options, for example:
 
 | Platform | Compiler | Variants |
@@ -92,3 +103,19 @@ variants for each set of hardware options, for example:
 
 On Linux glibc builds, the C library remains dynamic. The musl builds
 have no dynamic dependencies.
+
+## 5. Deterministic builds
+
+| Toolchain | Builds | Reference |
+| --------- | ------ | --------- |
+| Guix | The release builds, in a Guix environment | [Build Status](status#2-releases) |
+| Double Build | A release build, built twice on separate runners and compared by hash | [Deterministic builds](../architecture/build/deterministic) |
+
+## 6. CUDA
+
+No CUDA toolchain is required. The GPU verification kernels are part of
+the source, as compressed PTX (`src/crypto/secp256k1/cuda/ptx.cpp` in
+libbitcoin-system). At run time `bs` loads the NVIDIA driver library
+(`nvcuda.dll` on Windows, `libcuda.so.1` on Linux), which compiles the
+PTX for the installed GPU. `--enable-cuda` is on by default, and applies
+on x64 and arm64, except on macOS.

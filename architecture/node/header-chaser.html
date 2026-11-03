@@ -509,7 +509,7 @@ checkpoint conflict.</p>
 <p><strong>Invariant (Organize-Iface-1).</strong> No <code>do_organize</code> ever runs
 concurrently with another <code>do_organize</code>, <code>do_prioritize</code> or
 <code>do_disorganize</code> on this chaser: all go through <code>POST(...)</code> to the
-chaser's strand and asio strand semantics serialise them.</p>
+chaser's strand, and <code>network::io::strand</code> serialises them.</p>
 <p><strong>Invariant (Organize-Iface-2).</strong> The disorganize handlers are gated on
 <code>database.mark_unconfirmable</code> (<code>:152</code>, <code>:161</code>, <code>:170</code>). With that setting
 off, invalid blocks are not marked and the candidate chain is not rolled

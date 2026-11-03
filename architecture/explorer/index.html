@@ -625,7 +625,7 @@ if (option_version.defaulted() &amp;&amp; !option_version_config.defaulted())
     option_.version = option_version_config.as&lt;explorer::config::byte&gt;();
 }
 </code></pre>
-<p>A <code>program_options</code> error is returned as the error text and reported by
+<p>A parse error is returned as the error text and reported by
 <code>display_invalid_parameter</code>.</p>
 <h3 id="42-standard-input-and-files">4.2 Standard input and files<a class="anchor" href="#42-standard-input-and-files" aria-label="Link to this section">#</a></h3>
 <p><code>utility.hpp</code> provides the fallback readers. <code>load_input</code> deserializes a

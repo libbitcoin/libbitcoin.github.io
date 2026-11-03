@@ -8,8 +8,7 @@ Each library can be used on its own, by any application.
 ## 1. The stack
 
 Both executables rest on libbitcoin-system: Bitcoin Server through the
-node's libraries, and Bitcoin Explorer directly. The only other dependency
-is Boost (headers only).
+node's libraries, and Bitcoin Explorer directly.
 
 ```mermaid
 flowchart BT
@@ -34,7 +33,7 @@ flowchart BT
 
 | Library | Namespace | Dependencies | Provides |
 | ------- | --------- | ------------ | -------- |
-| <span class="nw">[libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system)</span> | `libbitcoin::system` | <span class="nw">boost</span> | Bitcoin primitives: blocks, transactions, scripts and their execution, hashes and cryptography, keys, addresses and wallets, encodings and serialization |
+| <span class="nw">[libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system)</span> | `libbitcoin::system` | <span class="nw">none</span> | Bitcoin primitives: blocks, transactions, scripts and their execution, hashes and cryptography, keys, addresses and wallets, encodings and serialization |
 | <span class="nw">[libbitcoin-database](https://github.com/libbitcoin/libbitcoin-database)</span> | `libbitcoin::database` | <span class="nw">system</span> | The store: memory-mapped tables, and the queries over them |
 | <span class="nw">[libbitcoin-network](https://github.com/libbitcoin/libbitcoin-network)</span> | `libbitcoin::network` | <span class="nw">system</span> | Connections and protocols: the P2P network, and HTTP, websocket, JSON-RPC, TLS and ZMQ services |
 | <span class="nw">[libbitcoin-node](https://github.com/libbitcoin/libbitcoin-node)</span> | `libbitcoin::node` | <span class="nw">database, network</span> | The full node: sync, validation and confirmation, and the transaction pool |

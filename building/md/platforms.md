@@ -14,8 +14,8 @@
 | Windows | x86 (32-bit) | ✔ CI | No target |
 | Windows | arm64 | ✔ CI | No target |
 
-On 32-bit platforms the full stack builds and passes its tests, and `bx`
-is supported, but `bs` is not.
+All libraries and Bitcoin Explorer (`bx`) are supported on 32-bit
+platforms, however Bitcoin Server (`bs`) requires 64-bit.
 
 ## 2. Compilers
 
@@ -29,18 +29,24 @@ is supported, but `bs` is not.
 | Windows | MinGW-w64 GCC | ✔ CI (13) | ✔ CI (14) |
 | Windows | MinGW-w64 Clang | ✔ CI (13) | No target |
 
-## 3. Executables
+## 3. Build systems
 
-| Platform | Linkage | Libbitcoin | Bitcoin Core |
-| -------- | ------- | ---------- | ------------ |
-| Linux | Static | ✔ CI | ✔ CI |
-| Linux | Dynamic | ✔ CI | ✔ CI |
-| macOS | Static | ✔ CI | ✔ CI |
-| macOS | Dynamic | ✔ CI | ✔ CI |
-| Windows | Static | ✔ CI | ✔ CI |
-| Windows | Dynamic | ✔ CI | ✔ CI |
+| Build system | Libbitcoin | Bitcoin Core |
+| ------------ | ---------- | ------------ |
+| Autotools | ✔ CI (Linux, macOS) | No target |
+| CMake | ✔ CI (Linux, macOS, Windows) | ✔ CI (Linux, macOS, Windows) |
+| Visual Studio | ✔ CI (Windows) | No target |
 
-## 4. Libraries
+## 4. Build scripts
+
+| Build script | Libbitcoin | Bitcoin Core |
+| ------------ | ---------- | ------------ |
+| `install-gnu.sh` | ✔ CI (Linux, macOS) | No target |
+| `install-cmake.sh` | ✔ CI (Linux, macOS) | No target |
+| `install-presets.sh` | ✔ CI (Linux, Windows) | No target |
+| `build-msvc.cmd` | ✔ CI (Windows) | No target |
+
+## 5. Developer libraries
 
 | Platform | Library | system | database | network | node | server | Bitcoin Core |
 | -------- | ------- | ------ | -------- | ------- | ---- | ------ | ------------ |
@@ -51,28 +57,38 @@ is supported, but `bs` is not.
 | Windows | Static | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI |
 | Windows | DLL | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI | ✔ CI |
 
-Bitcoin Core's experimental library is not released, or called by `bitcoind`.
+Bitcoin Core's experimental validation library is not released, or called by `bitcoind`.
 
-## 5. Build systems
+## 6. Executables
 
-| Build system | Libbitcoin | Bitcoin Core |
-| ------------ | ---------- | ------------ |
-| Autotools | ✔ CI (Linux, macOS) | No target |
-| CMake | ✔ CI (Linux, macOS, Windows) | ✔ CI (Linux, macOS, Windows) |
-| Visual Studio | ✔ CI (Windows) | No target |
-| Build script | ✔ CI (Linux, macOS, Windows) | No target |
+| Platform | Linkage | Libbitcoin | Bitcoin Core |
+| -------- | ------- | ---------- | ------------ |
+| Linux | Static | ✔ CI | ✔ CI |
+| Linux | Dynamic | ✔ CI | ✔ CI |
+| macOS | Static | ✔ CI | ✔ CI |
+| macOS | Dynamic | ✔ CI | ✔ CI |
+| Windows | Static | ✔ CI | ✔ CI |
+| Windows | Dynamic | ✔ CI | ✔ CI |
 
-## 6. Platform market share
+## 7. Installers
+
+| Platform | Libbitcoin | Bitcoin Core |
+| -------- | ---------- | ------------ |
+| Linux | single file executable | tar (22 files) |
+| macOS | single file executable | tar (20 files) |
+| Windows | single file executable | zip (19 files), NSIS installer (13 files, 5 shortcuts, 15 registry values) |
+
+## 8. Platform market share
 
 ![Operating system share of desktops, laptops and servers, and architecture share](../performance/desktop-share.png)
 
-## 7. Notes
+## 9. Notes
 
 - ✔ CI: built and tested on every change.
 - ✔ Built and tested outside of CI.
 - ● Expected to build: the toolchain supports it.
 - No target: no documented build or CI for the platform.
 
-POWER, RISC-V, s390x and BSD are not shown. Compiler versions are those built in CI.
+Compiler versions are those built in CI.
 Bitcoin Core is shown from its build files and CI configuration at master
 (October 2026).

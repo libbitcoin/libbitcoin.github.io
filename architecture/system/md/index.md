@@ -1,11 +1,11 @@
 # System Architecture
 
 libbitcoin-system is the base of the stack. It has no dependency other than
-Boost (headers only), and every other library builds on it. It implements
-Bitcoin's primitives and rules: its own hash functions and cryptography,
-the script machine, the consensus rules of the chain, and the encodings,
-serialization and wallet types that applications need. These pages
-describe the design of its major modules. Paths are relative to
+the C++20 standard library, and every other library builds on it. It
+implements Bitcoin's primitives and rules: its own hash functions and
+cryptography, the script machine, the consensus rules of the chain, and the
+encodings, serialization and wallet types that applications need. These
+pages describe the design of its major modules. Paths are relative to
 `include/bitcoin/system/` in
 [libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system), at
 master `0cd57fcf` (2026-10-27).

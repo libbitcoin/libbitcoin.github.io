@@ -238,7 +238,7 @@ if (option_version.defaulted() && !option_version_config.defaulted())
 }
 ```
 
-A `program_options` error is returned as the error text and reported by
+A parse error is returned as the error text and reported by
 `display_invalid_parameter`.
 
 ### 4.2 Standard input and files

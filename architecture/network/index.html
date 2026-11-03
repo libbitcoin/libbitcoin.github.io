@@ -328,7 +328,7 @@
   </nav>
 
   <article class="doc">
-<p>The network library (libbitcoin-network) is asio-based networking for the
+<p>The network library (libbitcoin-network) is asynchronous networking for the
 Bitcoin peer-to-peer protocol and for client-facing services: HTTP,
 WebSocket, JSON-RPC, TLS and ZeroMQ (ZMTP). It provides the connection
 lifecycle, the wire encodings and the threading model, and leaves the
@@ -520,9 +520,10 @@ typename Protocol::ptr attach(const SessionPtr&amp; session,
 }
 </code></pre>
 <p><code>socket</code> (<code>net/socket.hpp</code>) holds the transport as a variant of
-<code>asio::socket</code>, <code>asio::ssl::socket</code>, <code>ws::socket</code>, <code>ws::ssl::socket</code>,
-<code>p2ps::stream</code> and <code>zmtp::stream</code>. The <code>transport</code> setting carries the
-context that selects the TLS, P2PS or ZMTP upgrade.</p>
+<code>io::socket</code>, <code>tls::stream</code>, <code>p2ps::stream</code> and <code>zmtp::stream</code>. WebSocket
+is a framing mode of the clear or TLS socket, entered by upgrade. The
+<code>transport</code> setting carries the context that selects the TLS, P2PS or ZMTP
+upgrade.</p>
 <h3 id="15-protocols">1.5 Protocols<a class="anchor" href="#15-protocols" aria-label="Link to this section">#</a></h3>
 <p>Peer protocols are named for the protocol version level at which they apply
 (<code>messages/peer/enums/level.hpp</code>), such as <code>protocol_ping_106</code> and
@@ -674,8 +675,15 @@ notification sends. Both are bases for service protocols.</p>
 <h2 id="2-threading-and-concurrency">2. Threading and concurrency<a class="anchor" href="#2-threading-and-concurrency" aria-label="Link to this section">#</a></h2>
 <h3 id="21-threadpool-and-strands">2.1 Threadpool and strands<a class="anchor" href="#21-threadpool-and-strands" aria-label="Link to this section">#</a></h3>
 <p><code>net</code> constructs one <code>threadpool</code> (<code>async/threadpool.hpp</code>) of
-<code>settings::threads_()</code> threads sharing one asio context. Objects that share
-state are confined to a strand of that context:</p>
+<code>settings::threads_()</code> threads sharing one <code>io::context</code>
+(<code>io/context.hpp</code>), each thread calling its <code>run()</code>. The context runs
+posted handlers, timer expirations (<code>io::steady_timer</code>) and socket
+completions (<code>io::socket</code>, <code>io::acceptor</code>, <code>io/socket.hpp</code>), waiting on an
+I/O completion port on Windows, kqueue on Apple and epoll otherwise
+(<code>src/io/</code>). Host names are resolved (<code>io::resolver</code>) by <code>getaddrinfo</code> on
+a resolver thread of the context. Objects that share state are confined to
+a strand (<code>io::strand</code>, <code>io/strand.hpp</code>) of that context, an executor whose
+handlers run in post order and never concurrently:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -1006,7 +1014,7 @@ the join fails), and then saves the hosts file.</p>
 <tbody>
 <tr>
 <td><code>threadpool</code></td>
-<td>Threads sharing one asio context, kept alive until <code>stop()</code></td>
+<td>Threads sharing one <code>io::context</code>, kept alive until <code>stop()</code></td>
 </tr>
 <tr>
 <td><code>subscriber&lt;Args...&gt;</code></td>
@@ -1053,8 +1061,8 @@ the join fails), and then saves the hosts file.</p>
 <p>The subscribers are not thread safe: every method is called on the owner's
 strand and every handler is invoked there. <code>handlers.hpp</code> defines the common
 handler types <code>result_handler</code>, <code>count_handler</code> and <code>notify_handler</code>.
-<code>net/deadline.hpp</code> wraps a restartable asio timer, which completes with
-success on expiration and with <code>operation_canceled</code> on stop.</p>
+<code>net/deadline.hpp</code> wraps a restartable <code>io::steady_timer</code>, which completes
+with success on expiration and with <code>operation_canceled</code> on stop.</p>
 <h2 id="4-dispatch-and-broadcast">4. Dispatch and broadcast<a class="anchor" href="#4-dispatch-and-broadcast" aria-label="Link to this section">#</a></h2>
 <p>An interface (<code>interfaces/</code>) is a compile-time list of methods, each a name
 and its argument types, and the subscriber type for its handlers. The peer
@@ -1167,7 +1175,7 @@ for them (<code>demand_wire_tx()</code>, <code>demand_wire_block()</code>).</p>
 <tr>
 <td>HTTP</td>
 <td><code>messages/http/</code>, <code>http_body.hpp</code>, <code>json_body.hpp</code></td>
-<td><code>boost::beast</code> bodies selected by content type, fields, status and media type enums</td>
+<td>HTTP/1.1 messages, the incremental parser and serializer, the flat buffer, bodies selected by content type, fields, status and media type enums</td>
 </tr>
 </tbody>
 </table></div>
@@ -1178,16 +1186,19 @@ reads v1 frames and v2 packets into the same frame type, and the registry
 (<code>messages/peer/registry.hpp</code>) indexes the messages for per-message byte
 counts.</p>
 <h3 id="52-bodies">5.2 Bodies<a class="anchor" href="#52-bodies" aria-label="Link to this section">#</a></h3>
-<p>HTTP and WebSocket are implemented with <code>boost::beast</code>, the Boost library
-for HTTP and WebSocket protocols built on <code>boost::asio</code>. Every message is
-read and written through a body: a <code>boost::beast</code> body type, with
-a <code>reader</code> that parses incrementally as bytes arrive and a <code>writer</code> that
-serializes incrementally into buffers. The library defines its own bodies
-for JSON, JSON-RPC and P2P messages, and a variant body that holds any of
-them. Since a body does not depend on HTTP framing, the same bodies serve
-HTTP, WebSocket, raw TCP and ZMTP: the socket's <code>rpc_*</code>, <code>peer_*</code> and
-<code>body_*</code> operations drive a body directly, without an HTTP message around
-it.</p>
+<p>Every message is read and written through a body
+(<code>messages/http/message.hpp</code>): a type with a <code>value_type</code>, a <code>reader</code> that
+parses incrementally as bytes arrive (<code>init</code>, <code>put</code>, <code>finish</code>) and a
+<code>writer</code> that serializes incrementally into buffers (<code>init</code>, <code>get</code>). An
+<code>http::parser</code> drives a body's reader from received bytes and an
+<code>http::serializer</code> drives its writer (<code>messages/http/parser.hpp</code>,
+<code>messages/http/serializer.hpp</code>). <code>messages/http/bodies.hpp</code> defines the
+empty, data (<code>chunk_body</code>), string, span, buffer and file bodies, and the
+library defines bodies for JSON, JSON-RPC and P2P messages, and a variant
+body that holds any of them. Since a body does not depend on HTTP framing,
+the same bodies serve HTTP, WebSocket, raw TCP and ZMTP: the socket's
+<code>rpc_*</code>, <code>peer_*</code> and <code>body_*</code> operations drive a body directly, without
+an HTTP message around it (<code>http::body_parser</code>, <code>http::body_serializer</code>).</p>
 <div class="mermaid">
 flowchart TB
     variant["http::body&lt;br/&gt;variant body"]
@@ -1240,14 +1251,14 @@ flowchart TB
 </tr>
 <tr>
 <td><code>http::file_body</code></td>
-<td><code>messages/http/file_body.hpp</code></td>
-<td>An open file</td>
-<td>File responses, with a smaller buffer than <code>boost::beast</code>'s</td>
+<td><code>messages/http/bodies.hpp</code></td>
+<td>An open file (<code>http::file</code>, <code>messages/http/file.hpp</code>)</td>
+<td>File responses, read from the file 4 KiB at a time (<code>read_size</code>)</td>
 </tr>
 <tr>
 <td><code>http::body</code></td>
 <td><code>messages/http_body.hpp</code></td>
-<td>A variant of all of the above and the <code>boost::beast</code> string, data, span, buffer and empty bodies</td>
+<td>A variant of all of the above and the <code>http::</code> string, data, span, buffer and empty bodies</td>
 <td>Any message</td>
 </tr>
 </tbody>
@@ -1329,7 +1340,7 @@ empty body if none:</p>
 </tr>
 <tr>
 <td>String, data, file, span, buffer</td>
-<td>The corresponding <code>boost::beast</code> writer</td>
+<td>The corresponding <code>messages/http/bodies.hpp</code> writer</td>
 </tr>
 <tr>
 <td>None</td>
@@ -1346,11 +1357,12 @@ variant message is chunked.</p>
 <h2 id="6-transports">6. Transports<a class="anchor" href="#6-transports" aria-label="Link to this section">#</a></h2>
 <h3 id="61-overview">6.1 Overview<a class="anchor" href="#61-overview" aria-label="Link to this section">#</a></h3>
 <p>A <code>socket</code> (<code>net/socket.hpp</code>) carries every transport. Its transport is
-selected by a context (<code>settings::transport</code>), a variant of none (clear),
-an <code>asio::ssl::context</code>, a <code>p2ps::context</code> or a <code>zmtp::context</code>, and
-<code>upgrade()</code> applies it on accept and on a non-proxied connect. HTTP and
-WebSocket are layered over the clear or TLS socket, and <code>detect()</code>
-distinguishes HTTP from raw TCP on the same port from the first bytes.</p>
+selected by a context (<code>settings::transport</code>), a variant of
+<code>std::monostate</code> (clear), a <code>tls::context</code>, a <code>p2ps::context</code> or a
+<code>zmtp::context</code>, and <code>do_upgrade()</code> applies it on accept and on a
+non-proxied connect. HTTP and WebSocket are layered over the clear or TLS
+socket, and <code>detect()</code> distinguishes HTTP from raw TCP on the same port
+from the first bytes.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -1364,25 +1376,25 @@ distinguishes HTTP from raw TCP on the same port from the first bytes.</p>
 <tr>
 <td>TCP</td>
 <td></td>
-<td><code>asio::socket</code></td>
+<td><code>io::socket</code></td>
 <td>Bitcoin P2P (v1), JSON-RPC over TCP (Electrum, Stratum v1)</td>
 </tr>
 <tr>
 <td>TCP/S</td>
 <td>TLS 1.3</td>
-<td><code>asio::ssl::socket</code> over <code>tls::server</code></td>
+<td><code>tls::stream</code> over <code>tls::server</code></td>
 <td>The same, encrypted</td>
 </tr>
 <tr>
 <td>HTTP, HTTP/S</td>
 <td>TCP, TLS</td>
-<td><code>boost::beast</code> HTTP over the socket</td>
+<td><code>http::parser</code> and <code>http::serializer</code> over the socket</td>
 <td>REST, JSON-RPC over HTTP</td>
 </tr>
 <tr>
 <td>WS, WS/S</td>
 <td>HTTP upgrade</td>
-<td><code>ws::socket</code>, <code>ws::ssl::socket</code></td>
+<td><code>ws::reader</code> and <code>ws::serialize_header</code> framing over the socket</td>
 <td>JSON-RPC over WebSocket</td>
 </tr>
 <tr>
@@ -1417,15 +1429,15 @@ responses and notifications, <code>http_*</code> HTTP messages (including progre
 reads for batched JSON-RPC bodies), <code>ws_*</code> WebSocket frames, and <code>body_*</code>
 non-HTTP bodies.</p>
 <h3 id="62-tcp">6.2 TCP<a class="anchor" href="#62-tcp" aria-label="Link to this section">#</a></h3>
-<p>Every transport begins as an <code>asio::socket</code> (<code>boost::asio::ip::tcp::socket</code>,
-<code>asio.hpp</code>), held as the first alternative of the socket's variant
-(<code>socket_t</code> in <code>net/socket.hpp</code>). Upgrades move the TCP socket into a
-wrapping stream, and <code>get_base()</code> recovers it from any alternative through
-<code>boost::beast::get_lowest_layer</code>, so shutdown, close and peer liveness
-always act on the TCP layer.</p>
+<p>Every transport begins as an <code>io::socket</code> (<code>io/socket.hpp</code>), held as the
+first alternative of the socket's variant (<code>socket_t</code> in
+<code>net/socket.hpp</code>). Upgrades move the TCP socket into a wrapping stream, and
+<code>get_base()</code> recovers it from any alternative through the stream's
+<code>next_layer()</code>, so shutdown, close and peer liveness always act on the TCP
+layer.</p>
 <p>Each socket owns a strand of the network context. Every public operation
 dispatches its work to that strand, and every completion handler runs on
-it, so one socket's asio calls are never concurrent. The exception is
+it, so one socket's I/O calls are never concurrent. The exception is
 <code>accept()</code>, which runs on the acceptor's (network) strand until its handler
 is invoked (<code>src/net/socket_connect.cpp</code>).</p>
 <div class="scroller"><table>
@@ -1438,11 +1450,11 @@ is invoked (<code>src/net/socket_connect.cpp</code>).</p>
 <tbody>
 <tr>
 <td>Accept</td>
-<td><code>acceptor.async_accept</code>, then <code>do_handshake()</code> unless the acceptor is proxied</td>
+<td><code>io::acceptor::async_accept</code> into the socket's <code>io::socket</code>, then <code>do_handshake()</code> unless the acceptor is proxied</td>
 </tr>
 <tr>
 <td>Connect</td>
-<td><code>boost::asio::async_connect</code> over the resolved range, or per endpoint of the bound address family when a binding is configured</td>
+<td><code>io::async_connect</code> over the resolved range, trying each endpoint in sequence, or <code>io::socket::async_connect</code> per endpoint of the bound address family when a binding is configured</td>
 </tr>
 <tr>
 <td>Handshake</td>
@@ -1450,25 +1462,29 @@ is invoked (<code>src/net/socket_connect.cpp</code>).</p>
 </tr>
 <tr>
 <td>Stop</td>
-<td><code>shutdown(shutdown_both)</code> and <code>close()</code> on the strand</td>
+<td><code>shutdown(shutdown_type::both)</code> and <code>close()</code> on the strand</td>
 </tr>
 </tbody>
 </table></div>
 <p>The <code>tcp_*</code> operations move fixed buffers. <code>tcp_read</code> completes only when
-the buffer is filled (<code>boost::asio::async_read</code>), and <code>tcp_write</code> writes the
-whole buffer (<code>boost::asio::async_write</code>) (<code>src/net/socket_tcp.cpp</code>). The
-SOCKS5 and SAM negotiations are written entirely with these operations.</p>
-<p>Body reads over TCP (<code>body_*</code>, <code>rpc_*</code>) use <code>async_read_some</code> into a
-<code>http::flat_buffer</code>, preparing whatever capacity remains below the buffer's
-<code>max_size()</code> (<code>buffer_overflow</code> if none). The body reader consumes what it
-parses and the residue stays in the buffer for the next read. A read whose
-total exceeds <code>maximum_request</code> fails with <code>message_overflow</code>
-(<code>src/net/socket_body.cpp</code>). JSON-RPC over TCP (Electrum, Stratum v1) is
-newline terminated: <code>rpc_write</code> and <code>rpc_notify</code> set <code>terminate</code> on the
-message before writing it (<code>src/net/socket_rpc.cpp</code>).</p>
+the buffer is filled (<code>io::async_read</code>), and <code>tcp_write</code> writes the whole
+buffer (<code>io::async_write</code>) (<code>io/operations.hpp</code>, <code>src/net/socket_tcp.cpp</code>).
+The SOCKS5 and SAM negotiations are written entirely with these
+operations.</p>
+<p>Body reads over TCP (<code>body_*</code>, <code>rpc_*</code>) parse the bytes already in a
+<code>http::flat_buffer</code> (<code>messages/http/flat_buffer.hpp</code>) and then read more
+with <code>async_read_some</code>, preparing the larger of the buffer's free capacity
+and the header limit, bounded by the buffer's <code>max_size()</code>
+(<code>buffer_overflow</code> if nothing remains) (<code>src/net/socket_http.cpp</code>). The
+body reader consumes what it parses and the residue stays in the buffer for
+the next read. A read whose total exceeds <code>maximum_request</code> fails with
+<code>body_limit</code> (<code>src/net/socket_body.cpp</code>). JSON-RPC over TCP (Electrum,
+Stratum v1) is newline terminated: <code>rpc_write</code> and <code>rpc_notify</code> set
+<code>terminate</code> on the message before writing it (<code>src/net/socket_rpc.cpp</code>).</p>
 <p><code>watch()</code> and <code>poll()</code> share a 10 ms timer that checks the TCP layer for a
-received FIN (<code>asio::half_closed</code>), reporting <code>peer_disconnect</code>. Asio
-cancellation is reported to the caller as <code>channel_stopped</code>.</p>
+received FIN (<code>io::socket::half_closed()</code>), reporting <code>peer_disconnect</code>.
+Cancellation of a socket operation (<code>operation_canceled</code>) is reported to
+the caller as <code>channel_stopped</code>.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -1511,37 +1527,40 @@ verification policy shared by a server's connections, <code>tls::schedule</code>
 <code>tls::transcript</code> the key schedule and handshake hash, <code>tls::record</code> the
 protection of one direction, and <code>tls/codec.hpp</code> the presentation language
 reader and writer.</p>
-<p><code>ssl/openssl/</code> provides the <code>&lt;openssl/*.h&gt;</code> headers that <code>boost::asio::ssl</code>
-includes, implemented over <code>tls::server</code> (<code>ssl/openssl/openssl.h</code>), so
-<code>asio::ssl::socket</code> (<code>boost::asio::ssl::stream&lt;asio::socket&gt;</code>) runs on this
-implementation. <code>SSL_accept</code> creates one <code>tls::server</code> per connection from
-the context. Asio's stream engine moves socket bytes through a memory BIO
-pair (17 KiB per direction by default), and each call pumps the pair: queued
-input is passed to <code>receive()</code>, and as much of <code>output()</code> as the BIO holds
-is queued for sending, the remainder reported as <code>SSL_ERROR_WANT_WRITE</code>
-(<code>src/ssl/openssl.cpp</code>). <code>SSL_connect</code> fails with a <code>handshake_failure</code>
-alert, so TLS is a server transport only.</p>
-<p><code>settings::tls_server::initialize_context()</code> creates the
-<code>asio::ssl::context</code> as <code>tlsv13_server</code> with SSLv2, SSLv3, TLS 1.0 and TLS
-1.1 disabled, loads the certificate chain (<code>cert_path</code>) and PEM private key
-(<code>key_path</code>, with <code>key_pass</code> if set), and, when <code>cert_auth</code> is set, requires
-a verified client certificate from that directory (<code>verify_peer</code> and
-<code>verify_fail_if_no_peer_cert</code>). The context is applied to the secured
-bindings (<code>safes</code>, <code>safe_port</code>). On accept, <code>do_upgrade()</code> moves the TCP
-socket into an <code>asio::ssl::socket</code> and runs <code>async_handshake</code> as server.</p>
+<p><code>tls::stream</code> (<code>tls/stream.hpp</code>) is the TLS socket. It takes ownership of
+the connected <code>io::socket</code> and holds one <code>tls::server</code> per connection,
+constructed from the context. A read receives socket bytes into an input
+buffer of one record (<code>record_header_size</code> plus <code>maximum_ciphertext</code>),
+passes them to <code>receive()</code>, and returns the readable application bytes. A
+write protects at most one record (<code>maximum_plaintext</code>, 16 KiB) and sends
+<code>output()</code>. Records produced by reads (alerts and key updates) are sent in
+order with written records, and a closure of the transport without
+<code>close_notify</code> is reported as <code>tls_stream_truncated</code> (<code>src/tls/stream.cpp</code>).
+The client role is not implemented: <code>do_upgrade()</code> fails an outbound TLS
+socket with <code>tls_alert_handshake_failure</code>, so TLS is a server transport
+only.</p>
+<p><code>settings::tls_server::initialize_context()</code> creates the <code>tls::context</code>,
+loads the certificate chain (<code>cert_path</code>, a P-256 or P-384 leaf) and PEM
+private key (<code>key_path</code>, with <code>key_pass</code> if set), and, when <code>cert_auth</code> is
+set, requires a verified client certificate (<code>set_verify(true, true)</code>),
+adding each certificate file of that directory as a verification anchor
+(<code>add_anchors()</code>). The context is applied to the secured bindings
+(<code>safes</code>, <code>safe_port</code>). On accept, <code>do_upgrade()</code> moves the TCP socket into
+a <code>tls::stream</code> and runs its server <code>async_handshake()</code>.</p>
 <p>Since <code>get_tcp()</code> returns either the clear or the TLS socket, the <code>tcp_*</code>,
 <code>body_*</code>, <code>rpc_*</code> and <code>http_*</code> operations run unchanged over TLS. A lazy
-stop sends <code>close_notify</code> (<code>async_shutdown</code>) before closing the TCP layer
+stop sends <code>close_notify</code> (<code>async_shutdown()</code>) before closing the TCP layer
 (<code>src/net/socket_stop.cpp</code>).</p>
 <h3 id="64-http">6.4 HTTP<a class="anchor" href="#64-http" aria-label="Link to this section">#</a></h3>
-<p>HTTP is the <code>boost::beast</code> HTTP/1.1 implementation over the clear or TLS socket. A
-request is read with a <code>boost::beast::http::request_parser&lt;http::body&gt;</code>, so
-the variant body of section 5.2 selects its reader from the
-<code>Content-Type</code> header, and a response is written with
-<code>boost::beast::http::async_write</code> or a <code>response_serializer&lt;http::body&gt;</code>.
-Reads use a caller-owned <code>http::flat_buffer</code>
-(<code>boost::beast::flat_buffer</code>) whose residue carries pipelined bytes to the
-next read (<code>src/net/socket_http.cpp</code>).</p>
+<p>HTTP is the HTTP/1.1 implementation of <code>messages/http/</code> over the clear or
+TLS socket. A request is read with an <code>http::parser&lt;true, http::body&gt;</code>,
+which consumes the start line, each field, each chunk line and each trailer
+field once complete, and body data as it arrives, so the variant body of
+section 5.2 selects its reader from the <code>Content-Type</code> header. A response
+is written with an <code>http::serializer&lt;false, http::body&gt;</code>, each of whose
+buffer sets is written with <code>io::async_write</code>. Reads use a caller-owned
+<code>http::flat_buffer</code> whose residue carries pipelined bytes to the next read
+(<code>src/net/socket_http.cpp</code>).</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -1552,11 +1571,11 @@ next read (<code>src/net/socket_http.cpp</code>).</p>
 <tbody>
 <tr>
 <td>Body</td>
-<td><code>maximum_request</code> (<code>parser.body_limit</code>)</td>
+<td><code>maximum_request</code> (<code>parser.body_limit()</code>)</td>
 </tr>
 <tr>
 <td>Header</td>
-<td>The lesser of <code>maximum_request</code> and <code>maximum_http_header</code> (16 KiB) (<code>parser.header_limit</code>)</td>
+<td>The lesser of <code>maximum_request</code> and <code>maximum_http_header</code> (16 KiB) (<code>parser.header_limit()</code>)</td>
 </tr>
 </tbody>
 </table></div>
@@ -1585,23 +1604,23 @@ progressively instead, without materializing the batch:</p>
 <tbody>
 <tr>
 <td><code>http_read_header</code></td>
-<td><code>beast::http::async_read_header</code> into a caller-owned parser</td>
+<td>Parse into a caller-owned parser, completing when <code>is_header_done()</code></td>
 </tr>
 <tr>
 <td><code>http_read_body</code></td>
-<td><code>beast::http::async_read</code>, completing when the body is done or the parse pauses</td>
+<td>Parse, completing when the body is done or the parse pauses</td>
 </tr>
 <tr>
 <td><code>http_read_some</code></td>
-<td><code>beast::http::async_read_some</code>, continuing a paused parse</td>
+<td>Parse, continuing a paused parse and completing once it progresses</td>
 </tr>
 <tr>
 <td><code>http_write_header</code></td>
-<td><code>beast::http::async_write_header</code>, once per message (chunked, no content length)</td>
+<td><code>http::serialize_header()</code> written with <code>io::async_write</code>, once per message (chunked, no content length)</td>
 </tr>
 <tr>
 <td><code>rpc_write_chunk</code></td>
-<td>Each response part as <code>make_chunk</code> data, followed by <code>0\r\n\r\n</code> after the part that closes the batch</td>
+<td>Each response part as chunk data (<code>http::chunk_header()</code>, the part, <code>http::chunk_end</code>), followed by <code>http::last_chunk</code> (<code>0\r\n\r\n</code>) after the part that closes the batch</td>
 </tr>
 </tbody>
 </table></div>
@@ -1613,27 +1632,39 @@ batch state (<code>src/net/proxy_actions.cpp</code>). HTTP settings
 (<code>settings::http_server</code>) add the server name, permitted hosts and origins,
 and basic authorization credentials.</p>
 <h3 id="65-websocket">6.5 WebSocket<a class="anchor" href="#65-websocket" aria-label="Link to this section">#</a></h3>
-<p><code>ws::socket</code> and <code>ws::ssl::socket</code> (<code>beast.hpp</code>) are
-<code>boost::beast::websocket::stream</code> over <code>asio::socket</code> and over
-<code>asio::ssl::socket</code>. A socket becomes a WebSocket only by upgrade: <code>http_read</code>
-returns <code>error::upgrade</code> with the request, and the channel accepts it with
-<code>accept_websocket(request)</code> on the strand (<code>src/net/socket_ws.cpp</code>).</p>
-<pre><code class="language-cpp">auto tcp = std::move(get_base());
-socket_.emplace&lt;ws::socket&gt;(std::move(tcp));
+<p><code>ws/</code> implements the server side of WebSocket (RFC 6455) over the clear or
+TLS socket, which remains the socket's transport. A socket becomes a
+WebSocket only by upgrade: <code>http_read</code> returns <code>error::upgrade</code> with the
+request, and the channel accepts it with <code>accept_websocket(request)</code> on the
+strand, which writes the handshake response and switches the socket to
+WebSocket framing (<code>websocket()</code>) (<code>src/net/socket_ws.cpp</code>, simplified):</p>
+<pre><code class="language-cpp">ws::response response{};
+const auto ec = ws::accept(response, request.base());
+response.set(http::field::server, BC_HTTP_SERVER_NAME);
 
-auto&amp; sock = std::get&lt;ws::socket&gt;(socket_);
-sock.read_message_max(maximum_);
-sock.auto_fragment(false);
-sock.control_callback(...);
-sock.text(true);
-sock.accept(request);
+// bytes: the response, serialized.
+VARIANT_DISPATCH_FUNCTION(io::write, get_tcp(), io::buffer(bytes), error);
+if (error || ec)
+    return error::operation_failed;
+
+ws_reader_.emplace(maximum_, true);
+websocket_.store(true);
+return error::success;
 </code></pre>
-<p>The TLS case moves the <code>asio::ssl::socket</code> into a <code>ws::ssl::socket</code> the same
-way. The handshake response carries a <code>Server</code> header of
-<code>BC_HTTP_SERVER_NAME</code>. If the accept throws, the stream is moved back to its
-prior alternative and the refusal is an HTTP response. Ping, pong and close
-control frames are answered by <code>boost::beast</code> during reads and reported to the
-control callback, which logs them.</p>
+<p><code>ws::accept()</code> (<code>ws/handshake.hpp</code>) validates a version 13 upgrade request
+and sets the response to switching protocols, or to an error status, so a
+refusal is an HTTP response and the socket remains HTTP. The handshake
+response carries a <code>Server</code> header of <code>BC_HTTP_SERVER_NAME</code>.</p>
+<p><code>ws::reader</code> (<code>ws/reader.hpp</code>) assembles each data message from received
+frames, unmasking the payload into the caller's flat buffer as it arrives,
+validating text as UTF-8 and rejecting a message above <code>maximum_request</code>
+(<code>message_too_big</code>). It surfaces each ping, pong and close control frame
+once complete, and the socket logs each. A ping is answered with a pong (an
+unsent pong answers only the most recent ping), and a close from the peer is
+answered with its close code, after which the socket shuts down its send
+side and the read completes with <code>websocket_closed</code>. Frames are written
+unmasked with a header from <code>ws::serialize_header()</code> (<code>ws/frame.hpp</code>), from
+a queue in order, so control frames queue behind data frames.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -1644,11 +1675,11 @@ control callback, which logs them.</p>
 <tbody>
 <tr>
 <td><code>ws_read</code></td>
-<td><code>async_read</code> of one whole message into the flat buffer, in any number of frames, up to <code>maximum_request</code></td>
+<td>One whole message into the flat buffer, in any number of frames, up to <code>maximum_request</code></td>
 </tr>
 <tr>
 <td><code>ws_write</code></td>
-<td>One whole buffer as one message (<code>async_write_some</code> with finish set), text or binary</td>
+<td>One whole buffer as one message (a single frame with FIN set), text or binary</td>
 </tr>
 <tr>
 <td><code>http_read</code>, <code>rpc_read</code>, <code>body_read</code></td>
@@ -1672,10 +1703,10 @@ control callback, which logs them.</p>
 multi-frame message. Text is the default, and <code>body_write</code> takes the
 binary setting from the body's writer. JSON-RPC over WebSocket (btcd) is
 framed by the message and not newline terminated. A lazy stop sends a
-normal close frame (<code>async_close</code>), then closes TLS if present, then the
-TCP layer.</p>
+normal close frame (<code>ws::close_code::normal</code>), unless a close was already
+sent in answer to the peer, then closes TLS if present, then the TCP layer.</p>
 <h3 id="66-p2p-v1">6.6 P2P (v1)<a class="anchor" href="#66-p2p-v1" aria-label="Link to this section">#</a></h3>
-<p>The v1 peer transport is the clear <code>asio::socket</code>, read and written with the
+<p>The v1 peer transport is the clear <code>io::socket</code>, read and written with the
 <code>peer_*</code> operations (<code>src/net/socket_peer.cpp</code>). Each message is a 24 byte
 heading (<code>messages/peer/heading.hpp</code>) followed by its payload:</p>
 <div class="scroller"><table>
@@ -1706,7 +1737,7 @@ heading (<code>messages/peer/heading.hpp</code>) followed by its payload:</p>
 </table></div>
 <p><code>peer_read</code> makes exact reads into caller memory: first <code>heading::size()</code>
 bytes into a fixed array, then <code>payload_size</code> bytes into the channel's
-payload buffer, each with <code>boost::asio::async_read</code>. Between the two, the
+payload buffer, each with <code>io::async_read</code>. Between the two, the
 <code>peer::body</code> reader (<code>src/messages/peer/body.cpp</code>) parses the heading and
 rejects it with <code>invalid_magic</code> if the magic is not the network identifier,
 and with <code>oversized_payload</code> if the size exceeds the frame's maximum. Once
@@ -2034,7 +2065,7 @@ struct per peer session. The option structs form a hierarchy:</p>
 </tr>
 <tr>
 <td><code>tls_server</code></td>
-<td>Key and certificate paths, and the <code>asio::ssl::context</code></td>
+<td>Key and certificate paths, and the <code>tls::context</code></td>
 </tr>
 <tr>
 <td><code>zmtp_server</code></td>

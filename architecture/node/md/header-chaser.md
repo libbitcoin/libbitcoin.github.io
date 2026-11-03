@@ -119,7 +119,7 @@ checkpoint conflict.
 > **Invariant (Organize-Iface-1).** No `do_organize` ever runs
 > concurrently with another `do_organize`, `do_prioritize` or
 > `do_disorganize` on this chaser: all go through `POST(...)` to the
-> chaser's strand and asio strand semantics serialise them.
+> chaser's strand, and `network::io::strand` serialises them.
 
 > **Invariant (Organize-Iface-2).** The disorganize handlers are gated on
 > `database.mark_unconfirmable` (`:152`, `:161`, `:170`). With that setting

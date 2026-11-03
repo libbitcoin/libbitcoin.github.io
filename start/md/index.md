@@ -15,7 +15,7 @@ optimized for this machine:
 ```
 $ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static --hardware-optimized
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-optimized
 ```
 
 The result is `~/libbitcoin/bin/bs`. On Windows, see

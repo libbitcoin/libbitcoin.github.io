@@ -1,12 +1,15 @@
 # Config
 
-The `config` module provides the text forms of libbitcoin values and the
-machinery that reads them from a command line, environment variables and a
-configuration file. Each value type converts to and from a string through
-stream operators, which is the interface `boost::program_options` uses to parse
-and display option values. The parser, setting and printer classes build on
-`boost::program_options` to load, describe and print the options of an application
-such as `bs` or `bx`. Paths are relative to `include/bitcoin/system/` in
+The `config` module provides the text forms of libbitcoin values, and the
+`options` module (`options/`) the machinery that reads them from a command
+line, environment variables and a configuration file. Each value type
+converts to and from a string through stream operators, which is the
+interface `options::typed_value<Type>` (`options/value.hpp`) uses to parse
+and display option values: a token is extracted with `operator>>` in the
+classic locale and must be consumed whole, and a default is displayed with
+`operator<<`. The parser, setting and printer classes of `options/` load,
+describe and print the options of an application such as `bs` or `bx`.
+Paths are relative to `include/bitcoin/system/` in
 [libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system), at
 master `0cd57fcf` (2026-10-27).
 
@@ -120,16 +123,16 @@ config::hash256 minimum_work{};
 
 ### 2.2 Bound settings
 
-`config/setting.hpp` declares option values that are bound to a member of a
-settings object and take that member's value at declaration as their
-default. `setting_value<Type>` is a `program_options` `typed_value<Type>` that
+`options/setting.hpp` declares option values that are bound to a member of
+a settings object and take that member's value at declaration as their
+default. `setting_value<Type>` is an `options::typed_value<Type>` that
 also implements `printable`, so the current and default values of an option
 can be reported as text:
 
 ```cpp
 template <typename Type>
 class setting_value
-  : public boost::program_options::typed_value<Type>,
+  : public typed_value<Type>,
     public printable
 {
 public:
@@ -139,21 +142,21 @@ public:
 
     std::string default_text() const NOEXCEPT override;
 
-    void xparse(boost::any& value_store,
-        const string_list& new_tokens) const THROWS override;
+    void parse(std::any& value, const string_list& tokens,
+        const std::string& option) const THROWS override;
 ```
 
 The factory `setting(&store)` declares a displayed setting and
 `secret(&store)` one whose value is withheld: a secret reports one empty
-value and empty default text. For integral types, `xparse` accepts comma
+value and empty default text. For integral types, `parse` accepts comma
 digit grouping (`1,000,000`) through `ungroup`. `is_configured` is true when
 a variable was set by the command line, environment or configuration file,
 and false when it is unset or holds its declared default.
 
-`path` and `base85` provide a `program_options` `validate` overload that
-assigns the token directly, since stream extraction cannot produce an empty
-token. `path` extraction also reads the full line, so paths may contain
-spaces.
+`path` and `base85` specialize `options::is_whole_token_t` as true, so
+`typed_value` constructs them from the whole token rather than by stream
+extraction, which cannot produce an empty token. `path` extraction also
+reads the full line, so paths may contain spaces.
 
 ## 3. Parsing and help
 

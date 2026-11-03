@@ -36,7 +36,6 @@ libbitcoin-system:
     <sources path="src" recursive="true" />
     <headers path="include" recursive="true" root="true" />
     <option name="avx2" type="enable" default="no" msvc="/p:Option-avx2=true" />
-    <dependency name="boost" version="1.86.0" />
     <compiler standard="20">
       <flag option="avx2" environmental="true" type="public">
         <symbol value="-mavx" />
@@ -50,19 +49,17 @@ libbitcoin-system:
 
 The library dependencies form the chain that every install script and CI
 job follows. libbitcoin-server adds the `bs` binary and libbitcoin-explorer
-the `bx` binary; tests depend on their library and Boost. Other
+the `bx` binary; tests depend on their library. Other
 libraries can optionally be linked, each in place of the library's own
 implementation, which is the default:
 
 | Library | Can link | Effect |
 | ------- | -------- | ----------- |
 | libbitcoin-system | libsecp256k1, UltrafastSecp256k1 (compatibility layer) | Replaces the internal secp256k1 compatibility header (`src/crypto/secp256k1/interface.hpp`) |
-| libbitcoin-network | OpenSSL, wolfSSL (compatibility layer) | Replaces the internal OpenSSL compatibility headers (`ssl/openssl/`) |
 
 ```mermaid
 flowchart LR
-    boost["Boost"] --> system["libbitcoin-system"]
-    system --> database["libbitcoin-database"] --> node["libbitcoin-node"]
+    system["libbitcoin-system"] --> database["libbitcoin-database"] --> node["libbitcoin-node"]
     system --> network["libbitcoin-network"] --> node
     node --> server["libbitcoin-server\nbs"]
     system --> explorer["libbitcoin-explorer\nbx"]
@@ -76,14 +73,12 @@ generator resolves it against the registrar.
 
 | Registrar | Contents |
 | --------- | -------- |
-| `dependency` | For each library and external dependency: its source (GitHub owner and tag, archive URL, NuGet package), its build methods (`gnu`, `cmake`, `preset`, `msbuild`, `boost_build`, `nuget`), the options used when it is built as a dependency, and its CMake package and target (`bitcoin::system`, `Boost::headers`) |
+| `dependency` | For each library and external dependency: its source (GitHub owner and tag, archive URL, NuGet package), its build methods (`gnu`, `cmake`, `preset`, `msbuild`, `nuget`), the options used when it is built as a dependency, and its CMake package and target (`bitcoin::system`) |
 | `build-options` | The install script options (`--build-config`, `--build-link`, `--prefix`, `--build-limit`, `--hardware-optimized` and others), with variable names, types and help text |
 | `presets` | The CMake presets (`nix-gnu-debug-static` and so on), composed from base, debug, release, static and shared settings |
 | `actions` | The GitHub actions used by the workflows, pinned by commit hash |
 
-Boost is defined once, as version `1.86.0` for source builds and as the
-`libbitcoin-boost` NuGet package `1.91.0.1` for Visual Studio. A
-`toolchain` element defines the Visual Studio toolset (`v145`), the
+A `toolchain` element defines the Visual Studio toolset (`v145`), the
 solution configurations (`StaticDebug`, `StaticRelease`, and hidden
 dynamic and LTCG variants) and the platforms (`Win32`, `x64`, `ARM64`).
 
@@ -186,7 +181,7 @@ preprocessor definitions and its `flag` elements compiler flags.
 
 ### 4.1 Intrinsics
 
-The x86 intrinsics options of libbitcoin-system add compiler flags. Each
+The intrinsics options of libbitcoin-system add compiler flags. Each
 flag in the model carries a short test program, which the generated
 `configure.ac` and `CMakeLists.txt` compile with the flags to verify that
 the compiler supports them.
@@ -198,10 +193,13 @@ the compiler supports them.
 | `avx512` | `-mavx512f -mavx512bw -mavx512vl` | `/arch:AVX512` |
 | `avx512ifma` | `-mavx512ifma -mavx512vl` | `WITH_AVX512IFMA` |
 | `avxifma` | `-mavxifma` | `/arch:AVX2`, `WITH_AVXIFMA` |
-| `shani` | `-msse4 -msha` | `WITH_SHA` |
+| `shani` | `-msse4 -msha` | `WITH_SHANI` |
 | `sha512` | `-mavx2 -msha512` | `/arch:AVX2`, `WITH_SHA512` |
 | `aesni` | `-msse4.1 -maes -mpclmul` | `WITH_AESNI` |
 | `vaes` | `-mavx2 -maes -mpclmul -mvaes -mvpclmulqdq` | `/arch:AVX2`, `WITH_VAES` |
+| `sha2` | `+sha2` | `WITH_SHA2` |
+| `sha3` | `+sha3` (with `armv8.2-a`) | `WITH_SHA3` |
+| `aes` | `+aes` | `WITH_AES` |
 
 The flags are public. `configure.ac` substitutes them into the pkg-config
 `Cflags`, and `CMakeLists.txt` attaches them to the library target with
@@ -210,12 +208,15 @@ In Visual Studio the width options raise an `Option-arch` property (highest
 wins), which `x64.props` and `Win32.props` map to
 `EnableEnhancedInstructionSet`, defaulting to `AdvancedVectorExtensions2`.
 
-When an x86 option is off, the build still compiles its test program
+The ARM options combine into one flag, `-march=armv8-a+<extensions>`
+(`armv8.2-a` when `sha3` is on), since ARM extensions are suffixes of a
+single `-march` or `-mcpu` value. The build fails if an ARM option is on
+and `CFLAGS` or `CXXFLAGS` already hold `-march` or `-mcpu`. Clang-cl on
+ARM64 takes the same flag.
+
+When an option is off, the build still compiles its test program
 without the flags, and reports an environmental override if it compiles
-(as when `CFLAGS` already enables the instruction set). The ARM options
-(`sha`, `sha3`, `aes`) add no flags: the build tests whether the compiler
-environment provides the intrinsics, and fails if an option is enabled and
-they are not available.
+(as when `CFLAGS` already enables the instruction set).
 
 ### 4.2 Other options
 
@@ -223,7 +224,6 @@ they are not available.
 | ------ | ----- | ------ |
 | `--with-valgrind` | libbitcoin-system | defines `WITH_VALGRIND` (valgrind memcheck client requests) |
 | `--enable-cuda` | libbitcoin-system | defines `WITH_CUDA` (default on) |
-| `--with-ssl` | libbitcoin-network | defines `WITH_SSL` and adds the `src/ssl` sources (default on) |
 | `--with-embedded` | `bs` | defines `WITH_EMBEDDED`, compiling web pages into the console application |
 | `--enable-ndebug`, `--enable-isystem` | autotools | define `NDEBUG` (default on); use `-isystem` for dependency includes |
 | `--with-tests`, `--with-examples`, `--with-console`, `--with-tools` | per target | whether the target is built |
@@ -242,7 +242,6 @@ in the dependency chain, in order. For libbitcoin-server, `install-gnu.sh`
 runs:
 
 ```sh
-build_boost "boost" ...                  # with --build-boost
 build_gnu "libbitcoin-system"   ... --without-tests --without-examples
 build_gnu "libbitcoin-database" ... --without-tests --without-tools
 build_gnu "libbitcoin-network"  ... --without-tests
@@ -261,10 +260,7 @@ through pkg-config (`PKG_CHECK_MODULES`) or through `find_package` and the
 exported CMake targets. `install-cmake.sh` and `install-presets.sh` follow
 the same sequence with CMake.
 
-Boost is built only when requested. The script downloads the source
-archive named in the registrar, bootstraps `b2`, and installs Boost with
-`cxxstd=20` and the link mode of the build. `build-msvc.cmd` instead
-restores each solution's NuGet packages, Boost among them, and builds the
+`build-msvc.cmd` restores each solution's NuGet packages and builds the
 library projects of the chain in order, then the target's binaries and
 tests. The test project runs its tests as a post-build step in release
 configurations.
@@ -285,8 +281,8 @@ libbitcoin-system:
 | `ubuntu-24.04` | GCC 14 with valgrind | gnu debug static, `--with-valgrind --build-valgrind=secp256k1_ctime_tests` |
 
 Each job checks out the repository and runs its install script with
-`--build-use-local-src`, the job's `--build-config` and `--build-link`, and
-`--build-boost`. The script builds the dependency chain, the repository and
+`--build-use-local-src` and the job's `--build-config` and `--build-link`.
+The script builds the dependency chain, the repository and
 its tests, and prints the test logs.
 
 Two workflows are generated from the same entries. Jobs marked

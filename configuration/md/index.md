@@ -96,7 +96,6 @@ Display version information:
 ```
 $ bs --version
 Version Information...
-boost................ 1.91.0
 secp256k1............ internal
 openssl (tls)........ internal tls 1.3
 libbitcoin-system.... 4.0.10255 63f7b348
@@ -130,7 +129,7 @@ whether this build uses it. A build does not have to be compiled for the
 hardware it runs on, though in many cases doing so significantly
 improves performance. Do not compile options that the hardware does not
 support, as the build will not run. The largest gains in initial block
-download come from `shani` (or `crypto` on Arm), and otherwise from
+download come from `shani` (or `sha2` on Arm), and otherwise from
 `avx`.
 
 CUDA (GPU) support is compiled by default, except on macOS. `cuda ecc`

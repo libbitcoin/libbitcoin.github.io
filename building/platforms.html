@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: Platform coverage</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/platforms.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/platforms.html">
 <meta property="og:title" content="Building: Platform coverage">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: Platform coverage">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -312,7 +312,7 @@
     </nav>
     <p class="lede">
       Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
-      build options, build systems and toolchains, libbitcoin-build, platform
+      build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
   </header>
@@ -323,7 +323,7 @@
     <a href="macos.html">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html">Build options</a>
-    <a href="toolchains.html">Build systems and toolchains</a>
+    <a href="toolchains.html">Toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
     <a href="platforms.html" class="here">Platform Coverage</a>
     <a href="status.html">Build Status</a>
@@ -397,8 +397,8 @@
 </tr>
 </tbody>
 </table></div>
-<p>On 32-bit platforms the full stack builds and passes its tests, and <code>bx</code>
-is supported, but <code>bs</code> is not.</p>
+<p>All libraries and Bitcoin Explorer (<code>bx</code>) are supported on 32-bit
+platforms, however Bitcoin Server (<code>bs</code>) requires 64-bit.</p>
 <h2 id="2-compilers">2. Compilers<a class="anchor" href="#2-compilers" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
@@ -454,56 +454,66 @@ is supported, but <code>bs</code> is not.</p>
 </tr>
 </tbody>
 </table></div>
-<h2 id="3-executables">3. Executables<a class="anchor" href="#3-executables" aria-label="Link to this section">#</a></h2>
+<h2 id="3-build-systems">3. Build systems<a class="anchor" href="#3-build-systems" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>Platform</th>
-<th>Linkage</th>
+<th>Build system</th>
 <th>Libbitcoin</th>
 <th>Bitcoin Core</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Linux</td>
-<td>Static</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
+<td>Autotools</td>
+<td>✔ CI (Linux, macOS)</td>
+<td>No target</td>
 </tr>
 <tr>
-<td>Linux</td>
-<td>Dynamic</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
+<td>CMake</td>
+<td>✔ CI (Linux, macOS, Windows)</td>
+<td>✔ CI (Linux, macOS, Windows)</td>
 </tr>
 <tr>
-<td>macOS</td>
-<td>Static</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
-</tr>
-<tr>
-<td>macOS</td>
-<td>Dynamic</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
-</tr>
-<tr>
-<td>Windows</td>
-<td>Static</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
-</tr>
-<tr>
-<td>Windows</td>
-<td>Dynamic</td>
-<td>✔ CI</td>
-<td>✔ CI</td>
+<td>Visual Studio</td>
+<td>✔ CI (Windows)</td>
+<td>No target</td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="4-libraries">4. Libraries<a class="anchor" href="#4-libraries" aria-label="Link to this section">#</a></h2>
+<h2 id="4-build-scripts">4. Build scripts<a class="anchor" href="#4-build-scripts" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Build script</th>
+<th>Libbitcoin</th>
+<th>Bitcoin Core</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>install-gnu.sh</code></td>
+<td>✔ CI (Linux, macOS)</td>
+<td>No target</td>
+</tr>
+<tr>
+<td><code>install-cmake.sh</code></td>
+<td>✔ CI (Linux, macOS)</td>
+<td>No target</td>
+</tr>
+<tr>
+<td><code>install-presets.sh</code></td>
+<td>✔ CI (Linux, Windows)</td>
+<td>No target</td>
+</tr>
+<tr>
+<td><code>build-msvc.cmd</code></td>
+<td>✔ CI (Windows)</td>
+<td>No target</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="5-developer-libraries">5. Developer libraries<a class="anchor" href="#5-developer-libraries" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -580,49 +590,93 @@ is supported, but <code>bs</code> is not.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Bitcoin Core's experimental library is not released, or called by <code>bitcoind</code>.</p>
-<h2 id="5-build-systems">5. Build systems<a class="anchor" href="#5-build-systems" aria-label="Link to this section">#</a></h2>
+<p>Bitcoin Core's experimental validation library is not released, or called by <code>bitcoind</code>.</p>
+<h2 id="6-executables">6. Executables<a class="anchor" href="#6-executables" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>Build system</th>
+<th>Platform</th>
+<th>Linkage</th>
 <th>Libbitcoin</th>
 <th>Bitcoin Core</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Autotools</td>
-<td>✔ CI (Linux, macOS)</td>
-<td>No target</td>
+<td>Linux</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
 </tr>
 <tr>
-<td>CMake</td>
-<td>✔ CI (Linux, macOS, Windows)</td>
-<td>✔ CI (Linux, macOS, Windows)</td>
+<td>Linux</td>
+<td>Dynamic</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
 </tr>
 <tr>
-<td>Visual Studio</td>
-<td>✔ CI (Windows)</td>
-<td>No target</td>
+<td>macOS</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
 </tr>
 <tr>
-<td>Build script</td>
-<td>✔ CI (Linux, macOS, Windows)</td>
-<td>No target</td>
+<td>macOS</td>
+<td>Dynamic</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Static</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Dynamic</td>
+<td>✔ CI</td>
+<td>✔ CI</td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="6-platform-market-share">6. Platform market share<a class="anchor" href="#6-platform-market-share" aria-label="Link to this section">#</a></h2>
+<h2 id="7-installers">7. Installers<a class="anchor" href="#7-installers" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Libbitcoin</th>
+<th>Bitcoin Core</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux</td>
+<td>single file executable</td>
+<td>tar (22 files)</td>
+</tr>
+<tr>
+<td>macOS</td>
+<td>single file executable</td>
+<td>tar (20 files)</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>single file executable</td>
+<td>zip (19 files), NSIS installer (13 files, 5 shortcuts, 15 registry values)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="8-platform-market-share">8. Platform market share<a class="anchor" href="#8-platform-market-share" aria-label="Link to this section">#</a></h2>
 <p><img alt="Operating system share of desktops, laptops and servers, and architecture share" src="../performance/desktop-share.png" /></p>
-<h2 id="7-notes">7. Notes<a class="anchor" href="#7-notes" aria-label="Link to this section">#</a></h2>
+<h2 id="9-notes">9. Notes<a class="anchor" href="#9-notes" aria-label="Link to this section">#</a></h2>
 <ul>
 <li>✔ CI: built and tested on every change.</li>
 <li>✔ Built and tested outside of CI.</li>
 <li>● Expected to build: the toolchain supports it.</li>
 <li>No target: no documented build or CI for the platform.</li>
 </ul>
-<p>POWER, RISC-V, s390x and BSD are not shown. Compiler versions are those built in CI.
+<p>Compiler versions are those built in CI.
 Bitcoin Core is shown from its build files and CI configuration at master
 (October 2026).</p>
   </article>

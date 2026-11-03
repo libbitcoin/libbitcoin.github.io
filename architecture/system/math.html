@@ -556,10 +556,11 @@ defaulted <code>bool</code> template parameters that remove an overload when the
 does not qualify. The distinctions are drawn in <code>typelets.hpp</code>: an
 <em>integral</em> is a native signed or unsigned integer other than <code>bool</code>, and an
 <em>integer</em> is any type whose <code>std::numeric_limits</code> reports <code>is_integer</code>, which
-includes the Boost multiprecision <code>uintx</code> and <code>uintx_t&lt;Bits&gt;</code> types of
-<code>types.hpp</code>. Functions that need domain bounds take <code>if_integral_integer</code>;
-<code>power2</code>, <code>ceilinged_log2</code> and others have a separate
-<code>if_non_integral_integer</code> overload for <code>uintx</code>. Signed and unsigned operands
+includes the fixed-width unsigned <code>uintx_t&lt;Bits&gt;</code> (<code>uintx/uintx_t.hpp</code>) and
+its <code>types.hpp</code> aliases, such as <code>uint256_t</code>. Functions that need domain
+bounds take <code>if_integral_integer</code>; <code>power2</code>, <code>ceilinged_log2</code> and others
+have a separate <code>if_non_integral_integer</code> overload for <code>uintx_t</code>. Signed
+and unsigned operands
 usually select different overloads, as in <code>is_add_overflow</code>
 (<code>impl/math/overflow.ipp</code>):</p>
 <pre><code class="language-cpp">template &lt;typename Signed, if_signed_integer&lt;Signed&gt;&gt;

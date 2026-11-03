@@ -22,7 +22,7 @@ across many threads.
 flowchart BT
     sys["libbitcoin-system\n(consensus primitives, hashing, script, chain types)"]
     db["libbitcoin-database\n(memory-mapped store, query API, batch tables)"]
-    net["libbitcoin-network\n(P2P channels, sessions, asio strands)"]
+    net["libbitcoin-network\n(P2P channels, sessions, strands)"]
     node["libbitcoin-node\n(chasers + node-level protocols)"]
     server["libbitcoin-server\n(executable; not in this repo)"]
 
@@ -272,7 +272,7 @@ handler exists in source but has no live issuer.
 > **Note for the spec.** Treat this table as the **interface boundary**
 > between chasers. A formal model can represent each chaser as a process
 > with a single inbox typed `(code, event_value)`; the C++ implementation
-> just happens to use asio strands.
+> just happens to use strands (`network::io::strand`).
 
 There is also a parallel, lower-volume `events` enum
 (`include/bitcoin/node/events.hpp:28-71`) — these are *reporting* events
@@ -588,7 +588,7 @@ the architecture docs refer to:
   of blocks at or under it when it is on the candidate branch.
 - **Bypass**: a block under the top checkpoint or the active milestone;
   identified and archived but not script-validated.
-- **Strand**: an asio primitive that serializes execution of posted
+- **Strand**: a `network::io::strand`, which serializes execution of posted
   callbacks; the node uses one per chaser and one per channel.
 - **Event bus**: `event_subscriber_` on `full_node`; carries typed
   `chases::*` payloads between chasers and protocols.

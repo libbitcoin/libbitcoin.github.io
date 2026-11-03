@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/index.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/index.html">
 <meta property="og:title" content="Building">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -312,7 +312,7 @@
     </nav>
     <p class="lede">
       Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
-      build options, build systems and toolchains, libbitcoin-build, platform
+      build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
   </header>
@@ -323,7 +323,7 @@
     <a href="macos.html">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html">Build options</a>
-    <a href="toolchains.html">Build systems and toolchains</a>
+    <a href="toolchains.html">Toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
     <a href="platforms.html">Platform Coverage</a>
     <a href="status.html">Build Status</a>
@@ -333,7 +333,7 @@
 <p><code>bs</code> is built from libbitcoin-server and the four libraries it depends on:
 libbitcoin-system, libbitcoin-database, libbitcoin-network and
 libbitcoin-node. An install script builds and installs all five in
-order, along with Boost where needed.</p>
+order.</p>
 <h2 id="1-choosing-a-build">1. Choosing a build<a class="anchor" href="#1-choosing-a-build" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
@@ -427,7 +427,7 @@ systems with Bitcoin Core.</p>
 <tbody>
 <tr>
 <td>Linux</td>
-<td>GCC 13 to 16, Clang 18 and 19</td>
+<td>GCC, Clang</td>
 <td>Autotools, CMake, CMake presets</td>
 </tr>
 <tr>
@@ -445,9 +445,7 @@ systems with Bitcoin Core.</p>
 <h2 id="4-what-every-build-needs">4. What every build needs<a class="anchor" href="#4-what-every-build-needs" aria-label="Link to this section">#</a></h2>
 <ul>
 <li>A C++20 compiler. The versions tested in CI are listed in
-  <a href="toolchains.html">Build systems and toolchains</a>.</li>
-<li>Boost 1.86.0 or later. The Linux and macOS scripts download and install
-  it with <code>--build-boost</code>. Visual Studio restores it as a NuGet package.</li>
+  <a href="toolchains.html">Toolchains</a>.</li>
 <li>Git, to fetch the libbitcoin sources.</li>
 </ul>
 <p>Nothing else is required (see <a href="options.html">Build options</a>).</p>
@@ -456,7 +454,7 @@ systems with Bitcoin Core.</p>
 <code>~/libbitcoin</code>, optimized for the build machine:</p>
 <pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-boost --build-config=release --build-link=static --hardware-optimized
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-optimized
 </code></pre>
 <p>The result is <code>~/libbitcoin/bin/bs</code>. On Windows, see <a href="windows.html">Windows</a>.</p>
 <h2 id="6-hardware-options">6. Hardware options<a class="anchor" href="#6-hardware-options" aria-label="Link to this section">#</a></h2>
@@ -473,8 +471,8 @@ supports, so its <code>bs</code> runs only on CPUs with the same extensions. Run
   and steps for each platform.</li>
 <li><a href="options.html">Build options</a>: the install script options and the build
   options shared by all three build systems.</li>
-<li><a href="toolchains.html">Build systems and toolchains</a>: autotools, CMake and
-  Visual Studio, and the compilers and Boost versions tested in CI.</li>
+<li><a href="toolchains.html">Toolchains</a>: autotools, CMake and
+  Visual Studio, and the compilers tested in CI.</li>
 <li><a href="platforms.html">Platform coverage</a>: platforms, compilers and build systems
   compared with Bitcoin Core.</li>
 <li><a href="libbitcoin-build.html">libbitcoin-build</a>: the generator behind the build

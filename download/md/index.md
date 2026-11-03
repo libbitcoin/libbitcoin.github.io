@@ -42,12 +42,12 @@ extension level it is built for, if any. Windows builds end in `.exe`.
 | `x64-avxifma` | SHA extensions, AVX-IFMA |
 | `x64-avx512ifma` | SHA extensions, AVX-512 IFMA |
 | `arm64` | |
-| `arm64-crypto` | ARMv8 SHA |
-| `arm64-sha3` | ARMv8 SHA, ARMv8.2 SHA-3 |
+| `arm64-sha2` | ARMv8 SHA-2, AES |
+| `arm64-sha3` | ARMv8 SHA-2, AES, ARMv8.2 SHA-3 |
 
 Linux and Windows have every build above, and musl has the `x64`
 builds. macOS has one build for each architecture: `arm64`, which uses
-ARMv8 SHA, SHA-3 and AES, and `x64`, which uses AES-NI.
+ARMv8 SHA-2, SHA-3 and AES, and `x64`, which uses AES-NI.
 
 A build runs only on a CPU that has every extension it uses, and is
 faster for using them. To select one, run the build without an extension

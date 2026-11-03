@@ -1,7 +1,5 @@
 # Packaging
 
-<div class="banner"><strong>Packaging is a work in progress.</strong></div>
-
 How release builds of Bitcoin Server (`bs`) are packaged for package
 managers, as a container image, and as apps for node platforms. Packages
 contain the signed builds of a release ([Release builds](release)).
@@ -28,11 +26,11 @@ image; the install or start fails if neither is supported.
 | Platform | Architecture | Baseline | Requires | Optimized | Requires |
 | -------- | ------------ | -------- | -------- | --------- | -------- |
 | Linux, Docker | x64 | `bs-linux-x64` | avx2 | `bs-linux-x64-shani` | shani, avx2, sse41 |
-| Linux, Docker | arm64 | `bs-linux-arm64` | neon | `bs-linux-arm64-crypto` | neon, aes, sha |
+| Linux, Docker | arm64 | `bs-linux-arm64` | neon | `bs-linux-arm64-sha2` | neon, aes, sha2 |
 | Windows | x64 | `bs-windows-x64.exe` | avx2 | `bs-windows-x64-shani.exe` | shani, avx2, sse41 |
-| Windows | arm64 | `bs-windows-arm64.exe` | neon | `bs-windows-arm64-crypto.exe` | neon, aes, sha |
+| Windows | arm64 | `bs-windows-arm64.exe` | neon | `bs-windows-arm64-sha2.exe` | neon, aes, sha2 |
 | macOS | x64 | `bs-macos-x64` | aesni, avx2, sse41 | | |
-| macOS | arm64 | `bs-macos-arm64` | neon, aes, sha, sha3 | | |
+| macOS | arm64 | `bs-macos-arm64` | neon, aes, sha2, sha3 | | |
 
 Every arm64 processor has NEON (Advanced SIMD is required by
 ARMv8-A), so the arm64 baseline is not checked.

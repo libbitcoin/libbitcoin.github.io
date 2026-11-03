@@ -366,15 +366,15 @@ makes it harder to scan, or that would itself need testing, is excluded.</p>
 </code></pre>
 <ul>
 <li>The suite is named for the file, with a <code>_tests</code> suffix:
-  <code>BOOST_AUTO_TEST_SUITE(hashmap_tests)</code>, or
-  <code>BOOST_FIXTURE_TEST_SUITE(query_address_tests, test::directory_setup_fixture)</code>.</li>
+  <code>BC_AUTO_TEST_SUITE(hashmap_tests)</code>, or
+  <code>BC_FIXTURE_TEST_SUITE(query_address_tests, test::directory_setup_fixture)</code>.</li>
 <li>Group cases by method under an implementation-style banner:</li>
 </ul>
 <pre><code class="language-cpp">// record hashmap
 // ----------------------------------------------------------------------------
 </code></pre>
 <ul>
-<li><strong>Leave a blank line before <code>BOOST_AUTO_TEST_SUITE_END()</code>.</strong></li>
+<li><strong>Leave a blank line before <code>BC_AUTO_TEST_SUITE_END()</code>.</strong></li>
 <li>Put shared helpers in <code>test/mocks</code> or a fixture, in namespace <code>test</code>.
   File-local helpers are <code>static</code> free functions, not anonymous namespaces.</li>
 <li>Reach protected members through an accessor subclass (for example
@@ -387,8 +387,8 @@ makes it harder to scan, or that would itself need testing, is excluded.</p>
 <h2 id="3-test-names">3. Test names<a class="anchor" href="#3-test-names" aria-label="Link to this section">#</a></h2>
 <p>Name a case <code>subject__method__condition__expectation</code>, joining the parts
 with double underscores:</p>
-<pre><code class="language-cpp">BOOST_AUTO_TEST_CASE(hashmap__enabled__empty_slab_one_bucket__true)
-BOOST_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirmed_blocks__expected)
+<pre><code class="language-cpp">BC_AUTO_TEST_CASE(hashmap__enabled__empty_slab_one_bucket__true)
+BC_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirmed_blocks__expected)
 </code></pre>
 <ul>
 <li>Where an error code applies, the expectation is that code
@@ -400,7 +400,7 @@ BOOST_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirme
 <h2 id="4-lines-never-wrap-inside-a-test-case">4. Lines: never wrap inside a test case<a class="anchor" href="#4-lines-never-wrap-inside-a-test-case" aria-label="Link to this section">#</a></h2>
 <p><strong>This is the main difference from production code.</strong></p>
 <ul>
-<li>Inside a <code>BOOST_AUTO_TEST_CASE</code> body, <strong>never wrap a line</strong>, however
+<li>Inside a <code>BC_AUTO_TEST_CASE</code> body, <strong>never wrap a line</strong>, however
   long. Each assertion and each call is one line.</li>
 <li>Shorten lines with named locals. Each nested call inside an assertion
   becomes a local, and the assertion collapses to one line:</li>
@@ -408,10 +408,10 @@ BOOST_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirme
 <pre><code class="language-cpp">// Right.
 const auto hash = bitcoin_hash(data);
 const auto fingerprint = to_fingerprint(hash);
-BOOST_REQUIRE_EQUAL(fingerprint, expected);
+BC_REQUIRE_EQUAL(fingerprint, expected);
 
 // Wrong.
-BOOST_REQUIRE_EQUAL(to_fingerprint(bitcoin_hash(
+BC_REQUIRE_EQUAL(to_fingerprint(bitcoin_hash(
     data)), expected);
 </code></pre>
 <ul>
@@ -444,7 +444,7 @@ own.</p>
   (<code>value1</code> through <code>value12</code>), never as a loop.</li>
 <li>Where iteration is unavoidable, use standard algorithms: <code>std::generate</code>
   for pattern buffers, <code>std::copy_n</code> for fills,
-  <code>BOOST_REQUIRE_EQUAL_COLLECTIONS</code> for verification, and <code>std::for_each</code>
+  <code>BC_REQUIRE_EQUAL_COLLECTIONS</code> for verification, and <code>std::for_each</code>
   over <code>std::iota</code> ids to spawn and join threads. Worker threads only
   record results; the assertions run after the join.</li>
 <li>Count conditions arithmetically, not with a branch:
@@ -454,18 +454,18 @@ own.</p>
 </ul>
 <h2 id="6-assertions">6. Assertions<a class="anchor" href="#6-assertions" aria-label="Link to this section">#</a></h2>
 <ul>
-<li><code>BOOST_REQUIRE*</code> is the default: the first failure stops the case.
-  <code>BOOST_CHECK*</code> appears in files that are dense lists of independent facts
+<li><code>BC_REQUIRE*</code> is the default: the first failure stops the case.
+  <code>BC_CHECK*</code> appears in files that are dense lists of independent facts
   (for example system's <code>filter/bloom.cpp</code> and database's
   <code>query/merkle.cpp</code>), where reporting every failure at once helps. Match
   the file you are editing.</li>
-<li>Use <code>BOOST_REQUIRE_EQUAL</code> for anything streamable, including
+<li>Use <code>BC_REQUIRE_EQUAL</code> for anything streamable, including
   <code>hash_digest</code>, <code>data_chunk</code> and <code>data_array</code>. <code>test.hpp</code> supplies
   <code>operator&lt;&lt;</code> for <code>data_slice</code>, <code>std::vector</code> and <code>std_array</code>, so a
-  failure prints both values. Reserve <code>BOOST_REQUIRE(a == b)</code> for types
+  failure prints both values. Reserve <code>BC_REQUIRE(a == b)</code> for types
   with no stream operator (<code>script</code>, <code>enum class</code> values).</li>
-<li>Success is <code>BOOST_REQUIRE(!ec)</code>. Failure is <code>BOOST_REQUIRE(ec)</code>, or
-  <code>BOOST_REQUIRE_EQUAL(ec, error::query_canceled)</code> where the test proves a
+<li>Success is <code>BC_REQUIRE(!ec)</code>. Failure is <code>BC_REQUIRE(ec)</code>, or
+  <code>BC_REQUIRE_EQUAL(ec, error::query_canceled)</code> where the test proves a
   specific error.</li>
 <li>Keep each statement with its assertions. For longer tests, separate
   setup, action and verification groups with blank lines, and do not
@@ -484,16 +484,16 @@ documentation.</p>
 </ul>
 <h2 id="8-pre-commit-checklist-for-agents">8. Pre-commit checklist for agents<a class="anchor" href="#8-pre-commit-checklist-for-agents" aria-label="Link to this section">#</a></h2>
 <ol>
-<li><strong>No wraps</strong> in any <code>BOOST_AUTO_TEST_CASE</code> body. This flags
+<li><strong>No wraps</strong> in any <code>BC_AUTO_TEST_CASE</code> body. This flags
    continuation lines for review:
-   <code>git diff -U0 -- test | grep -E '^\+\s{8,}\S' | grep -vE '^\+\s*(BOOST_|//|")'</code>.</li>
+   <code>git diff -U0 -- test | grep -E '^\+\s{8,}\S' | grep -vE '^\+\s*(BC_|//|")'</code>.</li>
 <li><strong>No control flow.</strong> This should print nothing:
    <code>git diff -U0 -- test | grep -nE '^\+.*\b(if|for|while|else)\b|\?.*:'</code>.</li>
 <li><strong>Names</strong> follow <code>subject__method__condition__expectation</code>, at sibling
    length.</li>
-<li><strong><code>BOOST_REQUIRE_EQUAL</code></strong> is used wherever the operands are streamable.</li>
+<li><strong><code>BC_REQUIRE_EQUAL</code></strong> is used wherever the operands are streamable.</li>
 <li><strong>Comments.</strong> A few at most, none narrative.</li>
-<li>A blank line precedes <code>BOOST_AUTO_TEST_SUITE_END()</code>.</li>
+<li>A blank line precedes <code>BC_AUTO_TEST_SUITE_END()</code>.</li>
 <li>The suite passes.</li>
 </ol>
   </article>

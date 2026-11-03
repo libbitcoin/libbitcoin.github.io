@@ -33,9 +33,8 @@ For each repository it generates:
 | Repository | `.gitignore` and `CODEOWNERS` |
 
 It also fixes the versions every build uses. These include the C++
-standard, Boost for autotools and CMake, the Boost NuGet package for
-Visual Studio, the MSVC toolset, and the compilers and runner images of
-the CI matrix (see [Build systems and toolchains](toolchains)).
+standard, the MSVC toolset, and the compilers and runner images of
+the CI matrix (see [Toolchains](toolchains)).
 
 README build instructions are not generated.
 

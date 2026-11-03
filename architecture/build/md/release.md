@@ -1,7 +1,5 @@
 # Release builds
 
-<div class="banner"><strong>Release builds are a work in progress.</strong></div>
-
 The published builds of `bs` are made by two GitHub Actions workflows,
 both run by hand: one tags each repository with a version, and one
 builds, signs and publishes the server from those tags.
@@ -55,7 +53,7 @@ the tests (`--build-skip-tests`):
 
 | Toolchain | Script | Configuration |
 | --------- | ------ | ------------- |
-| CMake (Linux, macOS) | `builds/cmake/install-cmake.sh` | `release`, `static`, with `--build-boost` |
+| CMake (Linux, macOS) | `builds/cmake/install-cmake.sh` | `release`, `static` |
 | Visual Studio (Windows) | `builds/msvc/build-msvc.cmd` | `StaticRelease`, toolset `v145`, `vs2026` |
 
 | Build | Runner | Compiler | Target | Options |
@@ -65,21 +63,21 @@ the tests (`--build-skip-tests`):
 | `bs-linux-x64-avxifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avxifma, shani, avx2, sse41 |
 | `bs-linux-x64-avx512ifma` | `ubuntu-24.04` | clang 18 | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
 | `bs-linux-arm64` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a` | |
-| `bs-linux-arm64-crypto` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a+crypto` | sha |
-| `bs-linux-arm64-sha3` | `ubuntu-24.04-arm` | gcc 14 | `armv8.2-a+crypto+sha3` | sha, sha3 |
+| `bs-linux-arm64-sha2` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a+sha2+aes` | sha2, aes |
+| `bs-linux-arm64-sha3` | `ubuntu-24.04-arm` | gcc 14 | `armv8.2-a+sha2+aes+sha3` | sha2, sha3, aes |
 | `bs-musl-x64` | Alpine 3.22 | gcc | `x86-64-v3` | avx2, sse41 |
 | `bs-musl-x64-shani` | Alpine 3.22 | gcc | `x86-64-v3` | shani, avx2, sse41 |
 | `bs-musl-x64-avxifma` | Alpine 3.22 | gcc | `x86-64-v3` | avxifma, shani, avx2, sse41 |
 | `bs-musl-x64-avx512ifma` | Alpine 3.22 | gcc | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
-| `bs-macos-arm64` | `macos-latest` | Apple Clang | `apple-m1`, macOS 13.3 | sha3, sha, aes |
+| `bs-macos-arm64` | `macos-latest` | Apple Clang | `armv8.2-a+sha2+aes+sha3`, macOS 13.3 | sha2, sha3, aes |
 | `bs-macos-x64` | `macos-26-intel` | Apple Clang | `x86-64-v3`, macOS 13.3 | avx2, sse41, aesni |
 | `bs-windows-x64` | `windows-latest` | MSVC | x64 | avx2, sse41 |
 | `bs-windows-x64-shani` | `windows-latest` | MSVC | x64 | shani, avx2, sse41 |
 | `bs-windows-x64-avxifma` | `windows-latest` | MSVC | x64 | avxifma, shani, avx2, sse41 |
 | `bs-windows-x64-avx512ifma` | `windows-latest` | MSVC | x64 | avx512ifma, shani, avx2, sse41 |
 | `bs-windows-arm64` | `windows-11-vs2026-arm` | MSVC | ARM64 | |
-| `bs-windows-arm64-crypto` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha |
-| `bs-windows-arm64-sha3` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha, sha3 |
+| `bs-windows-arm64-sha2` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha2, aes |
+| `bs-windows-arm64-sha3` | `windows-11-vs2026-arm` | MSVC | ARM64 | sha2, sha3, aes |
 
 The same job also builds the `selector` of libbitcoin-system, which reports
 the processor's features, for the packages that choose a variant at install

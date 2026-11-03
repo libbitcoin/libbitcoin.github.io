@@ -15,7 +15,6 @@ the `Option-<name>` property.
 | `--build-preset=<name>` | CMake preset (presets script only, required). |
 | `--build-config=<debug\|release>` | Debug (`-Og -g1`, assertions on) or release (`-O3`, assertions off). |
 | `--build-link=<dynamic\|static>` | Build shared or static libraries (default both). |
-| `--build-boost` | Download and install Boost 1.86.0. Only its headers are used, so its build step compiles nothing. |
 | `--build-src-dir=<path>` | Where sources are cloned (default the current directory). |
 | `--build-obj-dir=<path>` | Where objects are built (default `obj` in the current directory). |
 | `--build-use-local-src` | Use existing source directories instead of cloning. |
@@ -64,13 +63,16 @@ extension of the build machine's CPU instead.
 
 | Option | Instructions |
 | ------ | ------------ |
-| `--enable-sha` | ARMv8 SHA-1 and SHA-256 |
+| `--enable-sha2` | ARMv8 SHA-1 and SHA-256 |
 | `--enable-sha3` | ARMv8.2 SHA-3, used for SHA-512 |
 | `--enable-aes` | ARMv8 AES and PMULL |
 
-On ARM, a CPU flag in `CFLAGS` and `CXXFLAGS`, such as
-`-mcpu=cortex-a76+crypto`, enables the same code as these options (see
-[Linux](linux)).
+The ARM options combine into one target flag, `-march=armv8-a+<extensions>`
+(`armv8.2-a` with `--enable-sha3`). For example, `--enable-sha2
+--enable-aes --enable-sha3` builds with `-march=armv8.2-a+sha2+aes+sha3`.
+An ARM option cannot be combined with `-march` or `-mcpu` in `CFLAGS` or
+`CXXFLAGS`, and the build fails if both are given. Use either the options
+or your own `-march` or `-mcpu`. `-mtune` can be used with either.
 
 ### GPU
 
@@ -90,15 +92,13 @@ it with `--disable-cuda` in any build script, including `build-msvc.cmd`
 | `--with-tests` | on | Build the test suites. |
 | `--with-console` | on | Build `bs`. |
 | `--with-embedded` | on | Embed the web interfaces in `bs`. |
-| `--with-ssl` | on | Build the embedded TLS library, used by secure service endpoints. |
 | `--enable-ndebug` | on | Compile assertions out. `--build-config` sets it. |
-| `--enable-isystem` | off | Treat Boost headers as system headers, which silences their warnings. |
+| `--enable-isystem` | off | Include the headers of libbitcoin dependencies with `-isystem` in place of `-I`, which silences their warnings. |
 
 ## 4. Visual Studio
 
-The instruction set, GPU, `--with-embedded`, `--with-ssl` and
-`--with-secp256k1` options are
-`Option-<name>` properties on the project property pages, or
+The instruction set, GPU, `--with-embedded` and `--with-secp256k1`
+options are `Option-<name>` properties on the project property pages, or
 `/p:Option-<name>=true` on the `build-msvc.cmd` or `msbuild` command line.
 The others have no property: the tests and `bs` are projects in the
 solution, and the Release configurations define `NDEBUG`. For example, an
@@ -113,9 +113,9 @@ lowered (see [Windows](windows#4-instruction-set)).
 
 ## 5. External libraries
 
-The Boost headers are the only required external dependency. libbitcoin implements
-secp256k1 and TLS itself, and either can be replaced by an external
-library.
+There is no required external dependency. libbitcoin implements
+secp256k1 and TLS itself, although secp256k1 can be replaced by an
+external library with the same public interface.
 
 ### secp256k1
 
@@ -133,41 +133,39 @@ Batch verification remains internal.
   installed where the build can find it (`-Dwith-secp256k1=ON` for
   CMake).
 - **Visual Studio.** `/p:Option-secp256k1=true` links the
-  `secp256k1_vc145` NuGet package, which is restored with the Boost
-  package.
+  `secp256k1_vc145` NuGet package.
 
-### OpenSSL
+## 6. Link-time optimization
 
-The embedded TLS library (`--with-ssl`, on by default) is used only for
-TLS, by the secure service endpoints. `--without-ssl`
-(`-Dwith-ssl=OFF`, `/p:Option-ssl=false`) omits it, and TLS then
-requires an external OpenSSL, which Boost.Asio uses in its place.
+No build system enables link-time optimization (LTO), and it is not
+recommended with any toolchain. In measurements of the libbitcoin-system
+performance tests (November 2026), no form of LTO made secp256k1
+signature verification faster, and verification dominates the time `bs`
+spends validating blocks. With MSVC, LTO made `bs` substantially slower.
 
-The build scripts and project files have no option for OpenSSL, and no
-package of it is maintained, so its paths must be added to the build by
-hand: OpenSSL's include directory must be on the include path of every
-library and executable built, and `libssl` and `libcrypto` must be linked
-into every executable.
+| Compiler | LTO flags | secp256k1 verify time | Other effects |
+| -------- | --------- | --------------------- | ------------- |
+| MSVC v145 | `/GL` `/LTCG` | +19% | SHA-256 and SHA-512 hashing 10-85x slower (SHA-NI unchanged), ChaCha20-Poly1305 17x slower. `bs.exe` 7% larger, and each `bs.exe` link takes about 3 minutes instead of 1. |
+| MSVC v145 | `/GL` `/LTCG` `/Ob3` | -2% | The same result as `/Ob3` without LTO. `bs.exe` 9% larger. |
+| Clang 18 | `-flto=thin` | no change | Hashing of small inputs 3-16% faster, SHA-1 of 1 MB 10-12% slower. 13% more code, 11% longer test build. |
+| Clang 18 | `-flto` | no change | AES and the secp256r1 and secp384r1 curves 4-7% faster. Test build takes twice as long. |
+| GCC 15 | `-flto=auto` | no change | secp256r1 signing and verification, used by TLS, 20% slower. 21% less code. |
 
-**Autotools.** Set `CPPFLAGS`, `LDFLAGS` and `LIBS` for the install
-script, for example:
+Each time is relative to a build by the same compiler without LTO:
+`StaticRelease` for MSVC, and a static `-O3` release build for Clang and
+GCC. A positive change is slower. MSVC was measured on an AMD
+Threadripper PRO 9985WX, and Clang and GCC on an AMD Ryzen 7 7735HS.
 
-```
-$ CPPFLAGS="-I/opt/openssl/include" LDFLAGS="-L/opt/openssl/lib" LIBS="-lssl -lcrypto" ./install-gnu.sh --without-ssl ...
-```
+### MSVC
 
-**Visual Studio.** An OpenSSL NuGet package may work, though none is
-maintained or tested with libbitcoin. Alternatively add the paths in a
-`Directory.Build.props` file (see [Windows](windows#5-machine-options)):
-
-```xml
-<ItemDefinitionGroup>
-  <ClCompile>
-    <AdditionalIncludeDirectories>C:\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-  </ClCompile>
-  <Link>
-    <AdditionalLibraryDirectories>C:\openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    <AdditionalDependencies>libssl.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
-  </Link>
-</ItemDefinitionGroup>
-```
+The Visual Studio projects define `ReleaseLTCG`, `ReleaseLEXE` and
+`DebugLTCG` configurations, but no solution configuration selects them.
+With `/GL`, MSVC inlines functions only during the final link. By then
+the functions that libbitcoin forces inline have already been expanded
+into their callers, and MSVC no longer inlines even functions of one or
+two instructions, such as array element access and integer casts, which
+compilation without `/GL` inlines. In `bs.exe`, calls to such functions
+increase from about 3,000 to about 57,500. Adding `/Ob3` (aggressive
+inlining) to an LTO build removes most of these calls. That restores
+`StaticRelease` performance but does not improve on it, and `/Ob3`
+without LTO performs the same.

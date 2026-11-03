@@ -353,7 +353,7 @@ across many threads.</p>
 flowchart BT
     sys["libbitcoin-system&lt;br/&gt;(consensus primitives, hashing, script, chain types)"]
     db["libbitcoin-database&lt;br/&gt;(memory-mapped store, query API, batch tables)"]
-    net["libbitcoin-network&lt;br/&gt;(P2P channels, sessions, asio strands)"]
+    net["libbitcoin-network&lt;br/&gt;(P2P channels, sessions, strands)"]
     node["libbitcoin-node&lt;br/&gt;(chasers + node-level protocols)"]
     server["libbitcoin-server&lt;br/&gt;(executable; not in this repo)"]
 
@@ -817,7 +817,7 @@ handler exists in source but has no live issuer.</p>
 <p><strong>Note for the spec.</strong> Treat this table as the <strong>interface boundary</strong>
 between chasers. A formal model can represent each chaser as a process
 with a single inbox typed <code>(code, event_value)</code>; the C++ implementation
-just happens to use asio strands.</p>
+just happens to use strands (<code>network::io::strand</code>).</p>
 </blockquote>
 <p>There is also a parallel, lower-volume <code>events</code> enum
 (<code>include/bitcoin/node/events.hpp:28-71</code>) — these are <em>reporting</em> events
@@ -1225,7 +1225,7 @@ the architecture docs refer to:</p>
   of blocks at or under it when it is on the candidate branch.</li>
 <li><strong>Bypass</strong>: a block under the top checkpoint or the active milestone;
   identified and archived but not script-validated.</li>
-<li><strong>Strand</strong>: an asio primitive that serializes execution of posted
+<li><strong>Strand</strong>: a <code>network::io::strand</code>, which serializes execution of posted
   callbacks; the node uses one per chaser and one per channel.</li>
 <li><strong>Event bus</strong>: <code>event_subscriber_</code> on <code>full_node</code>; carries typed
   <code>chases::*</code> payloads between chasers and protocols.</li>

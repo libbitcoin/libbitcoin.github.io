@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: Build status</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/status.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/status.html">
 <meta property="og:title" content="Building: Build status">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: Build status">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -312,7 +312,7 @@
     </nav>
     <p class="lede">
       Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
-      build options, build systems and toolchains, libbitcoin-build, platform
+      build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
   </header>
@@ -323,7 +323,7 @@
     <a href="macos.html">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html">Build options</a>
-    <a href="toolchains.html">Build systems and toolchains</a>
+    <a href="toolchains.html">Toolchains</a>
     <a href="libbitcoin-build.html">libbitcoin-build</a>
     <a href="platforms.html">Platform Coverage</a>
     <a href="status.html" class="here">Build Status</a>
@@ -332,9 +332,6 @@
   <article class="doc">
 <p>The current status of the libbitcoin builds, tests, releases and packages.</p>
 <h2 id="1-continuous-integration">1. Continuous integration<a class="anchor" href="#1-continuous-integration" aria-label="Link to this section">#</a></h2>
-<p>The current master of each repository: the check-in gate (<code>ci.yml</code>), the
-expanded matrix (<code>ci-expanded.yml</code>) and line coverage
-(<a href="../architecture/test/index.html">Test Architecture</a>).</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -389,81 +386,37 @@ expanded matrix (<code>ci-expanded.yml</code>) and line coverage
 </tr>
 </tbody>
 </table></div>
-<h2 id="2-release-builds">2. Release builds<a class="anchor" href="#2-release-builds" aria-label="Link to this section">#</a></h2>
+<p>See <a href="../architecture/test/index.html">Test Architecture</a>.</p>
+<h2 id="2-releases">2. Releases<a class="anchor" href="#2-releases" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
+<th>Stage</th>
 <th>Workflow</th>
 <th>Status</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>Guix Build</td>
+<td>Guix Build (<code>guix-build.yml</code>)</td>
+<td></td>
+</tr>
+<tr>
+<td>Double Build</td>
+<td>Double Build (<code>double-build.yml</code>)</td>
+<td></td>
+</tr>
+<tr>
+<td>Release Build</td>
 <td>Release Build (<code>manual-release.yml</code>)</td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml"><img alt="Release Build" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml/badge.svg" /></a></td>
 </tr>
-<tr>
-<td>Latest release</td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-server/releases"><img alt="Release" src="https://img.shields.io/github/v/release/libbitcoin/libbitcoin-server?include_prereleases" /></a></td>
-</tr>
 </tbody>
 </table></div>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Platform</th>
-<th>Architecture</th>
-<th>Builds</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Linux</td>
-<td>x64</td>
-<td>baseline, shani, avxifma, avx512ifma</td>
-<td>✔</td>
-</tr>
-<tr>
-<td>Linux</td>
-<td>arm64</td>
-<td>baseline, crypto, sha3</td>
-<td>✔</td>
-</tr>
-<tr>
-<td>Linux (musl)</td>
-<td>x64</td>
-<td>baseline, shani, avxifma, avx512ifma</td>
-<td>✔</td>
-</tr>
-<tr>
-<td>Linux (musl)</td>
-<td>arm64</td>
-<td>baseline, crypto, sha3</td>
-<td>WIP</td>
-</tr>
-<tr>
-<td>macOS</td>
-<td>x64, arm64</td>
-<td>one per architecture</td>
-<td>✔</td>
-</tr>
-<tr>
-<td>Windows</td>
-<td>x64</td>
-<td>baseline, shani, avxifma, avx512ifma</td>
-<td>✔</td>
-</tr>
-<tr>
-<td>Windows</td>
-<td>arm64</td>
-<td>baseline, crypto, sha3</td>
-<td>✔</td>
-</tr>
-</tbody>
-</table></div>
-<p>See <a href="../architecture/build/release.html">Release builds</a>.</p>
-<h2 id="3-packages">3. Packages<a class="anchor" href="#3-packages" aria-label="Link to this section">#</a></h2>
+<p>See <a href="../architecture/build/release.html">Release builds</a> and
+<a href="../architecture/build/deterministic.html">Deterministic builds</a>.</p>
+<h2 id="3-packaging">3. Packaging<a class="anchor" href="#3-packaging" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -482,74 +435,44 @@ expanded matrix (<code>ci-expanded.yml</code>) and line coverage
 <thead>
 <tr>
 <th>Package</th>
-<th>Built</th>
 <th>Distribution</th>
+<th>Latest</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>deb</td>
-<td>✔</td>
-<td>WIP (apt repository)</td>
+<td>apt repository</td>
+<td></td>
 </tr>
 <tr>
 <td>Homebrew formula</td>
-<td>✔</td>
-<td>WIP (tap)</td>
+<td>tap</td>
+<td><a href="https://github.com/libbitcoin/homebrew-tap"><img alt="Homebrew" src="https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Flibbitcoin%2Fhomebrew-tap%2Fmain%2FFormula%2Flibbitcoin-server.rb&amp;search=version%20%22%28%5B%5E%22%5D%2B%29%22&amp;replace=%241&amp;label=tap" /></a></td>
 </tr>
 <tr>
 <td>winget</td>
-<td>✔</td>
-<td>WIP (<code>winget-pkgs</code>)</td>
+<td><code>winget-pkgs</code></td>
+<td><a href="https://github.com/microsoft/winget-pkgs/tree/master/manifests/l/Libbitcoin/Server"><img alt="winget" src="https://img.shields.io/winget/v/Libbitcoin.Server" /></a></td>
 </tr>
 <tr>
 <td>Docker image</td>
-<td>✔</td>
-<td>✔ (<code>ghcr.io</code>)</td>
+<td><code>ghcr.io</code></td>
+<td></td>
 </tr>
 <tr>
 <td>Umbrel app</td>
-<td>✔</td>
-<td>WIP (app store)</td>
+<td>app store</td>
+<td><a href="https://github.com/getumbrel/umbrel-apps/tree/master/bitcoin-server"><img alt="Umbrel" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fgetumbrel%2Fumbrel-apps%2Fmaster%2Fbitcoin-server%2Fumbrel-app.yml&amp;query=%24.version&amp;label=umbrel" /></a></td>
 </tr>
 <tr>
 <td>StartOS package</td>
-<td>✔</td>
-<td>WIP (registry)</td>
+<td>registry</td>
+<td></td>
 </tr>
 </tbody>
 </table></div>
 <p>See <a href="../architecture/build/packaging.html">Packaging</a>.</p>
-<h2 id="4-reproducible-builds">4. Reproducible builds<a class="anchor" href="#4-reproducible-builds" aria-label="Link to this section">#</a></h2>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Libbitcoin</th>
-<th>Bitcoin Core</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Double Build (two independent builders)</td>
-<td>WIP (<code>bs-linux-x64</code>, <code>selector-linux-x64</code>)</td>
-<td>No target</td>
-</tr>
-<tr>
-<td>Guix</td>
-<td>WIP (Linux, macOS, Windows)</td>
-<td>✔ (Linux, macOS, Windows)</td>
-</tr>
-</tbody>
-</table></div>
-<p>See <a href="../architecture/build/deterministic.html">Deterministic builds</a>.</p>
-<h2 id="5-notes">5. Notes<a class="anchor" href="#5-notes" aria-label="Link to this section">#</a></h2>
-<ul>
-<li>✔: in place and working.</li>
-<li>WIP: being added.</li>
-<li>No target: no documented process.</li>
-</ul>
-<p>Badges show the most recent run of each workflow.</p>
   </article>
 
   <nav class="pager"><a href="platforms.html">&larr; Platform Coverage</a><span></span></nav>

@@ -333,13 +333,16 @@
   </nav>
 
   <article class="doc">
-<p>The <code>config</code> module provides the text forms of libbitcoin values and the
-machinery that reads them from a command line, environment variables and a
-configuration file. Each value type converts to and from a string through
-stream operators, which is the interface <code>boost::program_options</code> uses to parse
-and display option values. The parser, setting and printer classes build on
-<code>boost::program_options</code> to load, describe and print the options of an application
-such as <code>bs</code> or <code>bx</code>. Paths are relative to <code>include/bitcoin/system/</code> in
+<p>The <code>config</code> module provides the text forms of libbitcoin values, and the
+<code>options</code> module (<code>options/</code>) the machinery that reads them from a command
+line, environment variables and a configuration file. Each value type
+converts to and from a string through stream operators, which is the
+interface <code>options::typed_value&lt;Type&gt;</code> (<code>options/value.hpp</code>) uses to parse
+and display option values: a token is extracted with <code>operator&gt;&gt;</code> in the
+classic locale and must be consumed whole, and a default is displayed with
+<code>operator&lt;&lt;</code>. The parser, setting and printer classes of <code>options/</code> load,
+describe and print the options of an application such as <code>bs</code> or <code>bx</code>.
+Paths are relative to <code>include/bitcoin/system/</code> in
 <a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a>, at
 master <code>0cd57fcf</code> (2026-10-27).</p>
 <h2 id="1-value-types">1. Value types<a class="anchor" href="#1-value-types" aria-label="Link to this section">#</a></h2>
@@ -447,14 +450,14 @@ config::script signet_challenge{};
 <pre><code class="language-cpp">config::hash256 minimum_work{};
 </code></pre>
 <h3 id="22-bound-settings">2.2 Bound settings<a class="anchor" href="#22-bound-settings" aria-label="Link to this section">#</a></h3>
-<p><code>config/setting.hpp</code> declares option values that are bound to a member of a
-settings object and take that member's value at declaration as their
-default. <code>setting_value&lt;Type&gt;</code> is a <code>program_options</code> <code>typed_value&lt;Type&gt;</code> that
+<p><code>options/setting.hpp</code> declares option values that are bound to a member of
+a settings object and take that member's value at declaration as their
+default. <code>setting_value&lt;Type&gt;</code> is an <code>options::typed_value&lt;Type&gt;</code> that
 also implements <code>printable</code>, so the current and default values of an option
 can be reported as text:</p>
 <pre><code class="language-cpp">template &lt;typename Type&gt;
 class setting_value
-  : public boost::program_options::typed_value&lt;Type&gt;,
+  : public typed_value&lt;Type&gt;,
     public printable
 {
 public:
@@ -464,19 +467,19 @@ public:
 
     std::string default_text() const NOEXCEPT override;
 
-    void xparse(boost::any&amp; value_store,
-        const string_list&amp; new_tokens) const THROWS override;
+    void parse(std::any&amp; value, const string_list&amp; tokens,
+        const std::string&amp; option) const THROWS override;
 </code></pre>
 <p>The factory <code>setting(&amp;store)</code> declares a displayed setting and
 <code>secret(&amp;store)</code> one whose value is withheld: a secret reports one empty
-value and empty default text. For integral types, <code>xparse</code> accepts comma
+value and empty default text. For integral types, <code>parse</code> accepts comma
 digit grouping (<code>1,000,000</code>) through <code>ungroup</code>. <code>is_configured</code> is true when
 a variable was set by the command line, environment or configuration file,
 and false when it is unset or holds its declared default.</p>
-<p><code>path</code> and <code>base85</code> provide a <code>program_options</code> <code>validate</code> overload that
-assigns the token directly, since stream extraction cannot produce an empty
-token. <code>path</code> extraction also reads the full line, so paths may contain
-spaces.</p>
+<p><code>path</code> and <code>base85</code> specialize <code>options::is_whole_token_t</code> as true, so
+<code>typed_value</code> constructs them from the whole token rather than by stream
+extraction, which cannot produce an empty token. <code>path</code> extraction also
+reads the full line, so paths may contain spaces.</p>
 <h2 id="3-parsing-and-help">3. Parsing and help<a class="anchor" href="#3-parsing-and-help" aria-label="Link to this section">#</a></h2>
 <p><code>parser</code> is an abstract base for an application's option parser. A derived
 class supplies four sets of metadata, and the base loads each source into

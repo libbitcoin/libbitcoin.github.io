@@ -24,13 +24,13 @@ are injected to alter and detect behavior:
 
 | Kind | Scope | Suite |
 |---|---|---|
-| unit | A method or function, isolated to the extent practical. | Boost, in each repository's `test/` |
-| component | A group of units, such as a class. | Boost, in each repository's `test/` |
-| functional | A feature group, such as client-server communication. | Boost, in each repository's `test/` |
-| performance | The speed of a unit or component. | Boost, in each repository's `test/`, disabled by default |
+| unit | A method or function, isolated to the extent practical. | C++, in each repository's `test/` |
+| component | A group of units, such as a class. | C++, in each repository's `test/` |
+| functional | A feature group, such as client-server communication. | C++, in each repository's `test/` |
+| performance | The speed of a unit or component. | C++, in each repository's `test/`, disabled by default |
 | acceptance | Each server interface, as a client uses it. | Python, in libbitcoin-server's `endpoints/`, against a live node |
 
-The Boost suites run in every CI job, except the performance tests, which
+The C++ suites run in every CI job, except the performance tests, which
 are compiled only when `HAVE_PERFORMANCE_TESTS` is defined. The acceptance
 suite is customer acceptance: it exercises each interface of a running `bs`
 as its clients do, over its own protocols.

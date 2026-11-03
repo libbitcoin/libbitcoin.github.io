@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building: libbitcoin-build</title>
-<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.info/building/libbitcoin-build.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.info/building/libbitcoin-build.html">
 <meta property="og:title" content="Building: libbitcoin-build">
-<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta property="og:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta property="og:image" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.info/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Building: libbitcoin-build">
-<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, build systems and toolchains, libbitcoin-build, platform coverage and build status.">
+<meta name="twitter:description" content="Building Bitcoin Server (bs) on Linux, macOS and Windows: build options, toolchains, libbitcoin-build, platform coverage and build status.">
 <meta name="twitter:image" content="https://libbitcoin.info/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -312,7 +312,7 @@
     </nav>
     <p class="lede">
       Building <strong>Bitcoin Server</strong> (bs) on Linux, macOS and Windows:
-      build options, build systems and toolchains, libbitcoin-build, platform
+      build options, toolchains, libbitcoin-build, platform
       coverage and build status.
     </p>
   </header>
@@ -323,7 +323,7 @@
     <a href="macos.html">macOS</a>
     <a href="windows.html">Windows</a>
     <a href="options.html">Build options</a>
-    <a href="toolchains.html">Build systems and toolchains</a>
+    <a href="toolchains.html">Toolchains</a>
     <a href="libbitcoin-build.html" class="here">libbitcoin-build</a>
     <a href="platforms.html">Platform Coverage</a>
     <a href="status.html">Build Status</a>
@@ -388,9 +388,8 @@ libbitcoin-explorer.</p>
 </tbody>
 </table></div>
 <p>It also fixes the versions every build uses. These include the C++
-standard, Boost for autotools and CMake, the Boost NuGet package for
-Visual Studio, the MSVC toolset, and the compilers and runner images of
-the CI matrix (see <a href="toolchains.html">Build systems and toolchains</a>).</p>
+standard, the MSVC toolset, and the compilers and runner images of
+the CI matrix (see <a href="toolchains.html">Toolchains</a>).</p>
 <p>README build instructions are not generated.</p>
 <h2 id="operation">Operation<a class="anchor" href="#operation" aria-label="Link to this section">#</a></h2>
 <p>The description is a single XML manifest, <code>version4.xml</code>. It declares each
@@ -434,7 +433,7 @@ the sibling checkouts on disk, scanning each target's source roots. So:</p>
 </ul>
   </article>
 
-  <nav class="pager"><a href="toolchains.html">&larr; Build systems and toolchains</a><a href="platforms.html">Platform Coverage &rarr;</a></nav>
+  <nav class="pager"><a href="toolchains.html">&larr; Toolchains</a><a href="platforms.html">Platform Coverage &rarr;</a></nav>
 
   <div class="lightbox" id="lightbox" hidden></div>
 

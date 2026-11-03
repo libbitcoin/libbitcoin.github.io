@@ -134,10 +134,11 @@ defaulted `bool` template parameters that remove an overload when the type
 does not qualify. The distinctions are drawn in `typelets.hpp`: an
 *integral* is a native signed or unsigned integer other than `bool`, and an
 *integer* is any type whose `std::numeric_limits` reports `is_integer`, which
-includes the Boost multiprecision `uintx` and `uintx_t<Bits>` types of
-`types.hpp`. Functions that need domain bounds take `if_integral_integer`;
-`power2`, `ceilinged_log2` and others have a separate
-`if_non_integral_integer` overload for `uintx`. Signed and unsigned operands
+includes the fixed-width unsigned `uintx_t<Bits>` (`uintx/uintx_t.hpp`) and
+its `types.hpp` aliases, such as `uint256_t`. Functions that need domain
+bounds take `if_integral_integer`; `power2`, `ceilinged_log2` and others
+have a separate `if_non_integral_integer` overload for `uintx_t`. Signed
+and unsigned operands
 usually select different overloads, as in `is_add_overflow`
 (`impl/math/overflow.ipp`):
 

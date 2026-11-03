@@ -35,7 +35,7 @@ $ cd libbitcoin-server
 $ builds\msvc\build-msvc.cmd --build-src-dir .. --build-config StaticRelease --build-platform x64 --build-use-local-src
 ```
 
-The script restores the NuGet packages, including Boost, and builds
+The script restores the NuGet packages and builds
 libbitcoin-system, libbitcoin-database, libbitcoin-network,
 libbitcoin-node and libbitcoin-server in order, then runs the tests. The
 result is `bin\x64\Release\v145\static\bs.exe`.
@@ -107,7 +107,7 @@ extensions:
     <Option-avxifma>false</Option-avxifma>
     <Option-aesni>true</Option-aesni>
     <Option-vaes>true</Option-vaes>
-    <Option-sha>true</Option-sha>
+    <Option-shani>true</Option-shani>
     <Option-cuda>true</Option-cuda>
   </PropertyGroup>
 </Project>

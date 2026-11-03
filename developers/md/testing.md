@@ -28,8 +28,8 @@ makes it harder to scan, or that would itself need testing, is excluded.
 ```
 
 - The suite is named for the file, with a `_tests` suffix:
-  `BOOST_AUTO_TEST_SUITE(hashmap_tests)`, or
-  `BOOST_FIXTURE_TEST_SUITE(query_address_tests, test::directory_setup_fixture)`.
+  `BC_AUTO_TEST_SUITE(hashmap_tests)`, or
+  `BC_FIXTURE_TEST_SUITE(query_address_tests, test::directory_setup_fixture)`.
 - Group cases by method under an implementation-style banner:
 
 ```cpp
@@ -37,7 +37,7 @@ makes it harder to scan, or that would itself need testing, is excluded.
 // ----------------------------------------------------------------------------
 ```
 
-- **Leave a blank line before `BOOST_AUTO_TEST_SUITE_END()`.**
+- **Leave a blank line before `BC_AUTO_TEST_SUITE_END()`.**
 - Put shared helpers in `test/mocks` or a fixture, in namespace `test`.
   File-local helpers are `static` free functions, not anonymous namespaces.
 - Reach protected members through an accessor subclass (for example
@@ -53,8 +53,8 @@ Name a case `subject__method__condition__expectation`, joining the parts
 with double underscores:
 
 ```cpp
-BOOST_AUTO_TEST_CASE(hashmap__enabled__empty_slab_one_bucket__true)
-BOOST_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirmed_blocks__expected)
+BC_AUTO_TEST_CASE(hashmap__enabled__empty_slab_one_bucket__true)
+BC_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirmed_blocks__expected)
 ```
 
 - Where an error code applies, the expectation is that code
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirme
 
 **This is the main difference from production code.**
 
-- Inside a `BOOST_AUTO_TEST_CASE` body, **never wrap a line**, however
+- Inside a `BC_AUTO_TEST_CASE` body, **never wrap a line**, however
   long. Each assertion and each call is one line.
 - Shorten lines with named locals. Each nested call inside an assertion
   becomes a local, and the assertion collapses to one line:
@@ -76,10 +76,10 @@ BOOST_AUTO_TEST_CASE(query_address__get_balance__turbo_block1a_address0_confirme
 // Right.
 const auto hash = bitcoin_hash(data);
 const auto fingerprint = to_fingerprint(hash);
-BOOST_REQUIRE_EQUAL(fingerprint, expected);
+BC_REQUIRE_EQUAL(fingerprint, expected);
 
 // Wrong.
-BOOST_REQUIRE_EQUAL(to_fingerprint(bitcoin_hash(
+BC_REQUIRE_EQUAL(to_fingerprint(bitcoin_hash(
     data)), expected);
 ```
 
@@ -114,7 +114,7 @@ own.
   (`value1` through `value12`), never as a loop.
 - Where iteration is unavoidable, use standard algorithms: `std::generate`
   for pattern buffers, `std::copy_n` for fills,
-  `BOOST_REQUIRE_EQUAL_COLLECTIONS` for verification, and `std::for_each`
+  `BC_REQUIRE_EQUAL_COLLECTIONS` for verification, and `std::for_each`
   over `std::iota` ids to spawn and join threads. Worker threads only
   record results; the assertions run after the join.
 - Count conditions arithmetically, not with a branch:
@@ -124,18 +124,18 @@ own.
 
 ## 6. Assertions
 
-- `BOOST_REQUIRE*` is the default: the first failure stops the case.
-  `BOOST_CHECK*` appears in files that are dense lists of independent facts
+- `BC_REQUIRE*` is the default: the first failure stops the case.
+  `BC_CHECK*` appears in files that are dense lists of independent facts
   (for example system's `filter/bloom.cpp` and database's
   `query/merkle.cpp`), where reporting every failure at once helps. Match
   the file you are editing.
-- Use `BOOST_REQUIRE_EQUAL` for anything streamable, including
+- Use `BC_REQUIRE_EQUAL` for anything streamable, including
   `hash_digest`, `data_chunk` and `data_array`. `test.hpp` supplies
   `operator<<` for `data_slice`, `std::vector` and `std_array`, so a
-  failure prints both values. Reserve `BOOST_REQUIRE(a == b)` for types
+  failure prints both values. Reserve `BC_REQUIRE(a == b)` for types
   with no stream operator (`script`, `enum class` values).
-- Success is `BOOST_REQUIRE(!ec)`. Failure is `BOOST_REQUIRE(ec)`, or
-  `BOOST_REQUIRE_EQUAL(ec, error::query_canceled)` where the test proves a
+- Success is `BC_REQUIRE(!ec)`. Failure is `BC_REQUIRE(ec)`, or
+  `BC_REQUIRE_EQUAL(ec, error::query_canceled)` where the test proves a
   specific error.
 - Keep each statement with its assertions. For longer tests, separate
   setup, action and verification groups with blank lines, and do not
@@ -155,14 +155,14 @@ documentation.
 
 ## 8. Pre-commit checklist for agents
 
-1. **No wraps** in any `BOOST_AUTO_TEST_CASE` body. This flags
+1. **No wraps** in any `BC_AUTO_TEST_CASE` body. This flags
    continuation lines for review:
-   `git diff -U0 -- test | grep -E '^\+\s{8,}\S' | grep -vE '^\+\s*(BOOST_|//|")'`.
+   `git diff -U0 -- test | grep -E '^\+\s{8,}\S' | grep -vE '^\+\s*(BC_|//|")'`.
 2. **No control flow.** This should print nothing:
    `git diff -U0 -- test | grep -nE '^\+.*\b(if|for|while|else)\b|\?.*:'`.
 3. **Names** follow `subject__method__condition__expectation`, at sibling
    length.
-4. **`BOOST_REQUIRE_EQUAL`** is used wherever the operands are streamable.
+4. **`BC_REQUIRE_EQUAL`** is used wherever the operands are streamable.
 5. **Comments.** A few at most, none narrative.
-6. A blank line precedes `BOOST_AUTO_TEST_SUITE_END()`.
+6. A blank line precedes `BC_AUTO_TEST_SUITE_END()`.
 7. The suite passes.
