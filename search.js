@@ -19,7 +19,8 @@
     'text-transform: none; letter-spacing: normal; }' +
     '.menu .search .results a { display: block; padding: 10px 14px; border-bottom: 1px solid var(--rule-soft); }' +
     '.menu .search .results a:last-child { border-bottom: 0; }' +
-    '.menu .search .results a.on { background: var(--rule-soft); }' +
+    '.menu .search .results a:hover, .menu .search .results a:focus, .menu .search .results a.on { ' +
+    'color: inherit; background: color-mix(in srgb, var(--ink) 8%, transparent); }' +
     '.menu .search .results b { display: block; color: var(--heading); font-weight: 600; }' +
     '.menu .search .results span { display: block; margin-top: 3px; color: var(--ink-2); ' +
     'font-family: var(--sans); font-size: 13px; line-height: 1.45; }' +
