@@ -544,15 +544,15 @@ state's height. Each fork activates by one method:
 | ------ | ----- | --- | ------ | ------- | -------- | -------- | ------ | ------- |
 | Configuration | BIP30, BIP42, BIP90 |  | At every height, BIP30 except its two exception blocks | genesis | genesis | genesis | genesis | genesis |
 | Flag day | BIP16 |  | By a coinbase vote of miners, read by manual inspection and later fixed as a block timestamp | 2012&#8209;04&#8209;01 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 |
-| Version (BIP34) | BIP34, BIP66, BIP65 |  | When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3, testnet4 and signet) | 227,931, 363,725, 388,381 | 21,111, 330,776, 581,885 | 1, 1, 1 | 1, 1, 1 | 100,000,000, 1,251, 1,351 |
-| Signaling (BIP9) | BIP68, BIP112, BIP113 | 0 | From the versions of the chain's own blocks: after the period in which its bit reaches the threshold and one locked-in period, and no earlier than its minimum activation height | 419,328 | 770,112 | 1 | 1 | genesis |
-|  | BIP141, BIP143, BIP147 | 1 |  | 481,824 | 834,624 | 1 | 1 | genesis |
-|  | BIP341, BIP342 | 2 |  | 709,632 | 2,011,968 | 1 | 1 | genesis |
-|  | BIP54 timewarp | 5 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
-|  | BIP54 timespan | 6 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
-|  | BIP54 sigops | 7 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
-|  | BIP54 txsize | 8 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
-|  | BIP54 coinbase | 9 |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | 1 |
+| Version (BIP34) | BIP34, BIP66, BIP65 |  | When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3; zero on testnet4, signet and regtest, so every block above genesis) | 227,931, 363,725, 388,381 | 21,111, 330,776, 581,885 | 1 | 1 | 1 |
+| Signaling (BIP9) | BIP68, BIP112, BIP113 | 0 | From the versions of the chain's own blocks: after the period in which its bit reaches the threshold and one locked-in period, and no earlier than its minimum activation height | 419,328 | 770,112 | 1 | 1 | 1 |
+|  | BIP141, BIP143, BIP147 | 1 |  | 481,824 | 834,624 | 1 | 1 | 1 |
+|  | BIP341, BIP342 | 2 |  | 709,632 | 2,011,968 | 1 | 1 | 1 |
+|  | <span class="proposed">BIP54 timewarp</span> | <span class="proposed">5</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 timespan</span> | <span class="proposed">6</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 sigops</span> | <span class="proposed">7</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 txsize</span> | <span class="proposed">8</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 coinbase</span> | <span class="proposed">9</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
 
 BIP90 is a rule of its own, active by configuration. It imposes the rules
 of BIP34, BIP66 and BIP65 above specified blocks. It does not change the
@@ -617,11 +617,11 @@ are not yet set:
 | BIP68, BIP112, BIP113 | 0 | 2016-05-01 | 2017-05-01 | 1,916 | | |
 | BIP141, BIP143, BIP147 | 1 | 2016-11-15 | 2017-11-15 | 1,916 | | |
 | BIP341, BIP342 | 2 | 2021-04-24 | 2021-08-11 | 1,815 | 709,632 | ✔ |
-| BIP54 timewarp | 5 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
-| BIP54 timespan | 6 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
-| BIP54 sigops | 7 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
-| BIP54 txsize | 8 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
-| BIP54 coinbase | 9 | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | ✔ |
+| <span class="proposed">BIP54 timewarp</span> | <span class="proposed">5</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">✔</span> |
+| <span class="proposed">BIP54 timespan</span> | <span class="proposed">6</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">✔</span> |
+| <span class="proposed">BIP54 sigops</span> | <span class="proposed">7</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">✔</span> |
+| <span class="proposed">BIP54 txsize</span> | <span class="proposed">8</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">✔</span> |
+| <span class="proposed">BIP54 coinbase</span> | <span class="proposed">9</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">✔</span> |
 
 The chain state carries each deployment's state, and the count of
 signaling blocks in the current period, so rolling forward steps a state

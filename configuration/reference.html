@@ -170,6 +170,7 @@
   }
 </style>
 <script src="../skins/skins.js"></script>
+<script src="../search.js"></script>
 </head>
 <body>
 
@@ -311,6 +312,7 @@
         <a href="../developers/testing.html">Test Practices</a>
       </div></details>
       <a href="../about.html">About</a>
+      <span class="search"><input type="search" placeholder="Search" aria-label="Search the site"></span>
     </nav>
     <p class="lede">
       Configuring <strong>Bitcoin Server</strong> (bs):
@@ -630,8 +632,6 @@ bip66_freeze = 363725
 bip9_activation_period = 2016
 <span class="comment"># The minimum bip9 bit0 activation height, defaults to '0'.</span>
 bip9_bit0_activation_height = 0
-<span class="comment"># The hash:height checkpoint for bip9 bit0 activation, defaults to '000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328'.</span>
-bip9_bit0_active_checkpoint = 000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328
 <span class="comment"># Check the bip9 bit0 threshold before timeout (speedy trial), defaults to 'false'.</span>
 bip9_bit0_speedy_trial = false
 <span class="comment"># The median time past to start bip9 bit0 signaling, 4294967295 for always active, defaults to '1462060800'.</span>
@@ -642,8 +642,6 @@ bip9_bit0_threshold = 1916
 bip9_bit0_timeout = 1493596800
 <span class="comment"># The minimum bip9 bit1 activation height, defaults to '0'.</span>
 bip9_bit1_activation_height = 0
-<span class="comment"># The hash:height checkpoint for bip9 bit1 activation, defaults to '0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824'.</span>
-bip9_bit1_active_checkpoint = 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824
 <span class="comment"># Check the bip9 bit1 threshold before timeout (speedy trial), defaults to 'false'.</span>
 bip9_bit1_speedy_trial = false
 <span class="comment"># The median time past to start bip9 bit1 signaling, 4294967295 for always active, defaults to '1479168000'.</span>
@@ -654,8 +652,6 @@ bip9_bit1_threshold = 1916
 bip9_bit1_timeout = 1510704000
 <span class="comment"># The minimum bip9 bit2 activation height, defaults to '709632'.</span>
 bip9_bit2_activation_height = 709632
-<span class="comment"># The hash:height checkpoint for bip9 bit2 activation, defaults to '0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632'.</span>
-bip9_bit2_active_checkpoint = 0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632
 <span class="comment"># Check the bip9 bit2 threshold before timeout (speedy trial), defaults to 'true'.</span>
 bip9_bit2_speedy_trial = true
 <span class="comment"># The median time past to start bip9 bit2 signaling, 4294967295 for always active, defaults to '1619222400'.</span>
@@ -742,8 +738,8 @@ bip65 = true
 bip66 = true
 <span class="comment"># Add relative locktime enforcement, defaults to 'true' (soft fork).</span>
 bip68 = true
-<span class="comment"># Assume bip34, bip65, and bip66 activation if enabled, defaults to 'true' (hard fork).</span>
-bip90 = true
+<span class="comment"># Freeze bip34, bip65, and bip66 activation at the bip90 heights, defaults to 'false' (hard fork).</span>
+bip90 = false
 <span class="comment"># Assume block_storm_patch activation if enabled, defaults to 'false' (testnet4).</span>
 block_storm_patch = false
 <span class="comment"># Require difficult blocks, defaults to 'true' (use false for testnet).</span>
@@ -1456,8 +1452,8 @@ document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.lang
   hljs.highlightElement(code);
 });
 document.querySelectorAll('.doc pre > code').forEach(function (code) {
-  if (code.innerHTML.indexOf('\ue000') < 0) return;
-  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
+  if (code.innerHTML.indexOf('\u2063') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\u2063/g, '<span class="proposed-line">').replace(/\u2064/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

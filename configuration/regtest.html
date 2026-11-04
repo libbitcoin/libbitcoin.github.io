@@ -170,6 +170,7 @@
   }
 </style>
 <script src="../skins/skins.js"></script>
+<script src="../search.js"></script>
 </head>
 <body>
 
@@ -311,6 +312,7 @@
         <a href="../developers/testing.html">Test Practices</a>
       </div></details>
       <a href="../about.html">About</a>
+      <span class="search"><input type="search" placeholder="Search" aria-label="Search the site"></span>
     </nav>
     <p class="lede">
       Configuring <strong>Bitcoin Server</strong> (bs):
@@ -357,18 +359,15 @@ bip54_txsize_start = 4294967295
 bip65_freeze = 1351
 bip66_freeze = 1251
 bip9_activation_period = 0
-bip9_bit0_active_checkpoint = 0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206:0
-bip9_bit0_start = 0
+bip9_bit0_start = 4294967295
 bip9_bit0_threshold = 0
 bip9_bit0_timeout = 0
-bip9_bit1_active_checkpoint = 0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206:0
-bip9_bit1_start = 0
+bip9_bit1_start = 4294967295
 bip9_bit1_threshold = 0
 bip9_bit1_timeout = 0
 bip9_bit2_activation_height = 0
-bip9_bit2_active_checkpoint = 0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206:0
 bip9_bit2_speedy_trial = false
-bip9_bit2_start = 0
+bip9_bit2_start = 4294967295
 bip9_bit2_threshold = 0
 bip9_bit2_timeout = 0
 checkpoint = 0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206:0
@@ -602,8 +601,8 @@ document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.lang
   hljs.highlightElement(code);
 });
 document.querySelectorAll('.doc pre > code').forEach(function (code) {
-  if (code.innerHTML.indexOf('\ue000') < 0) return;
-  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
+  if (code.innerHTML.indexOf('\u2063') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\u2063/g, '<span class="proposed-line">').replace(/\u2064/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

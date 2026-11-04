@@ -170,6 +170,7 @@
   }
 </style>
 <script src="../../skins/skins.js"></script>
+<script src="../../search.js"></script>
 </head>
 <body>
 
@@ -311,6 +312,7 @@
         <a href="../../developers/testing.html">Test Practices</a>
       </div></details>
       <a href="../../about.html">About</a>
+      <span class="search"><input type="search" placeholder="Search" aria-label="Search the site"></span>
     </nav>
     <p class="lede">
       Architecture of <strong>libbitcoin-system</strong>:
@@ -435,8 +437,8 @@ sources below are from <code>src/chain/header.cpp</code>, <code>src/chain/block.
 
 code header::accept(const context&amp; ctx) const NOEXCEPT
 {
-    const auto bip54_timespan = ctx.is_enabled(bip54_timespan_rule);
-
+⁣    const auto bip54_timespan = ctx.is_enabled(bip54_timespan_rule);⁤
+⁣⁤
     if (is_insufficient_version(ctx))
         return error::insufficient_block_version;
     if (is_anachronistic_timestamp(ctx))
@@ -445,8 +447,8 @@ code header::accept(const context&amp; ctx) const NOEXCEPT
         return error::incorrect_proof_of_work;
     if (is_early_timestamp(ctx))
         return error::early_timestamp;
-    if (bip54_timespan &amp;&amp; is_negative_timespan(ctx))
-        return error::negative_timespan;
+⁣    if (bip54_timespan &amp;&amp; is_negative_timespan(ctx))⁤
+⁣        return error::negative_timespan;⁤
 
     return error::block_success;
 }
@@ -494,20 +496,20 @@ previous outputs:</p>
 {
     const auto bip141 = ctx.is_enabled(bip141_rule);
     const auto bip34 = ctx.is_enabled(bip34_rule);
-    const auto bip54_txsize = ctx.is_enabled(bip54_txsize_rule);
-    const auto bip54_coinbase = ctx.is_enabled(bip54_coinbase_rule);
+⁣    const auto bip54_txsize = ctx.is_enabled(bip54_txsize_rule);⁤
+⁣    const auto bip54_coinbase = ctx.is_enabled(bip54_coinbase_rule);⁤
     const auto signet = ctx.is_enabled(signet_rule);
 
     if (bip141 &amp;&amp; is_overweight())
         return error::block_weight_limit;
     if (bip34 &amp;&amp; is_invalid_coinbase_script(ctx))
         return error::coinbase_height_mismatch;
-    if (bip54_txsize &amp;&amp; is_invalid_transaction_size())
-        return error::invalid_transaction_size;
-    if (bip54_coinbase &amp;&amp; is_invalid_coinbase_locktime(ctx))
-        return error::coinbase_locktime_mismatch;
-    if (bip54_coinbase &amp;&amp; is_final_coinbase_sequence())
-        return error::coinbase_sequence_final;
+⁣    if (bip54_txsize &amp;&amp; is_invalid_transaction_size())⁤
+⁣        return error::invalid_transaction_size;⁤
+⁣    if (bip54_coinbase &amp;&amp; is_invalid_coinbase_locktime(ctx))⁤
+⁣        return error::coinbase_locktime_mismatch;⁤
+⁣    if (bip54_coinbase &amp;&amp; is_final_coinbase_sequence())⁤
+⁣        return error::coinbase_sequence_final;⁤
     if (bip141 &amp;&amp; is_invalid_witness_commitment())
         return error::invalid_witness_commitment;
     if (signet &amp;&amp; is_invalid_signet_solution())
@@ -545,7 +547,7 @@ code transaction::check(const context&amp; ctx) const NOEXCEPT
 
 code transaction::accept(const context&amp; ctx) const NOEXCEPT
 {
-    const auto bip54 = ctx.is_enabled(bip54_sigops_rule);
+⁣    const auto bip54 = ctx.is_enabled(bip54_sigops_rule);⁤
 
     if (is_coinbase())
         return error::transaction_success;
@@ -553,8 +555,8 @@ code transaction::accept(const context&amp; ctx) const NOEXCEPT
         return error::missing_previous_output;
     if (is_overspent())
         return error::spend_exceeds_value;
-    if (bip54 &amp;&amp; is_prevout_signature_operations_limited())
-        return error::transaction_prevout_sigop_limit;
+⁣    if (bip54 &amp;&amp; is_prevout_signature_operations_limited())⁤
+⁣        return error::transaction_prevout_sigop_limit;⁤
 
     return error::transaction_success;
 }
@@ -1138,12 +1140,12 @@ state's height. Each fork activates by one method:</p>
 <td>Version (BIP34)</td>
 <td>BIP34, BIP66, BIP65</td>
 <td></td>
-<td>When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3, testnet4 and signet)</td>
+<td>When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3; zero on testnet4, signet and regtest, so every block above genesis)</td>
 <td>227,931, 363,725, 388,381</td>
 <td>21,111, 330,776, 581,885</td>
-<td>1, 1, 1</td>
-<td>1, 1, 1</td>
-<td>100,000,000, 1,251, 1,351</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
 </tr>
 <tr>
 <td>Signaling (BIP9)</td>
@@ -1154,7 +1156,7 @@ state's height. Each fork activates by one method:</p>
 <td>770,112</td>
 <td>1</td>
 <td>1</td>
-<td>genesis</td>
+<td>1</td>
 </tr>
 <tr>
 <td></td>
@@ -1165,7 +1167,7 @@ state's height. Each fork activates by one method:</p>
 <td>834,624</td>
 <td>1</td>
 <td>1</td>
-<td>genesis</td>
+<td>1</td>
 </tr>
 <tr>
 <td></td>
@@ -1176,62 +1178,62 @@ state's height. Each fork activates by one method:</p>
 <td>2,011,968</td>
 <td>1</td>
 <td>1</td>
-<td>genesis</td>
-</tr>
-<tr>
-<td></td>
-<td>BIP54 timewarp</td>
-<td>5</td>
-<td></td>
-<td><span class="dim">TBD</span></td>
-<td><span class="dim">TBD</span></td>
-<td><span class="dim">TBD</span></td>
-<td><span class="dim">TBD</span></td>
 <td>1</td>
 </tr>
 <tr>
 <td></td>
-<td>BIP54 timespan</td>
-<td>6</td>
+<td><span class="proposed">BIP54 timewarp</span></td>
+<td><span class="proposed">5</span></td>
 <td></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
-<td>1</td>
+<td><span class="proposed">1</span></td>
 </tr>
 <tr>
 <td></td>
-<td>BIP54 sigops</td>
-<td>7</td>
+<td><span class="proposed">BIP54 timespan</span></td>
+<td><span class="proposed">6</span></td>
 <td></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
-<td>1</td>
+<td><span class="proposed">1</span></td>
 </tr>
 <tr>
 <td></td>
-<td>BIP54 txsize</td>
-<td>8</td>
+<td><span class="proposed">BIP54 sigops</span></td>
+<td><span class="proposed">7</span></td>
 <td></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
-<td>1</td>
+<td><span class="proposed">1</span></td>
 </tr>
 <tr>
 <td></td>
-<td>BIP54 coinbase</td>
-<td>9</td>
+<td><span class="proposed">BIP54 txsize</span></td>
+<td><span class="proposed">8</span></td>
 <td></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
-<td>1</td>
+<td><span class="proposed">1</span></td>
+</tr>
+<tr>
+<td></td>
+<td><span class="proposed">BIP54 coinbase</span></td>
+<td><span class="proposed">9</span></td>
+<td></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="dim">TBD</span></td>
+<td><span class="proposed">1</span></td>
 </tr>
 </tbody>
 </table></div>
@@ -1328,49 +1330,49 @@ are not yet set:</p>
 <td>✔</td>
 </tr>
 <tr>
-<td>BIP54 timewarp</td>
-<td style="text-align: right;">5</td>
+<td><span class="proposed">BIP54 timewarp</span></td>
+<td style="text-align: right;"><span class="proposed">5</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
-<td>✔</td>
+<td><span class="proposed">✔</span></td>
 </tr>
 <tr>
-<td>BIP54 timespan</td>
-<td style="text-align: right;">6</td>
+<td><span class="proposed">BIP54 timespan</span></td>
+<td style="text-align: right;"><span class="proposed">6</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
-<td>✔</td>
+<td><span class="proposed">✔</span></td>
 </tr>
 <tr>
-<td>BIP54 sigops</td>
-<td style="text-align: right;">7</td>
+<td><span class="proposed">BIP54 sigops</span></td>
+<td style="text-align: right;"><span class="proposed">7</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
-<td>✔</td>
+<td><span class="proposed">✔</span></td>
 </tr>
 <tr>
-<td>BIP54 txsize</td>
-<td style="text-align: right;">8</td>
+<td><span class="proposed">BIP54 txsize</span></td>
+<td style="text-align: right;"><span class="proposed">8</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
-<td>✔</td>
+<td><span class="proposed">✔</span></td>
 </tr>
 <tr>
-<td>BIP54 coinbase</td>
-<td style="text-align: right;">9</td>
+<td><span class="proposed">BIP54 coinbase</span></td>
+<td style="text-align: right;"><span class="proposed">9</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
 <td style="text-align: right;"><span class="dim">TBD</span></td>
-<td>✔</td>
+<td><span class="proposed">✔</span></td>
 </tr>
 </tbody>
 </table></div>
@@ -1552,8 +1554,8 @@ document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.lang
   hljs.highlightElement(code);
 });
 document.querySelectorAll('.doc pre > code').forEach(function (code) {
-  if (code.innerHTML.indexOf('\ue000') < 0) return;
-  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
+  if (code.innerHTML.indexOf('\u2063') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\u2063/g, '<span class="proposed-line">').replace(/\u2064/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

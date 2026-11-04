@@ -318,8 +318,6 @@ bip66_freeze = 363725
 bip9_activation_period = 2016
 # The minimum bip9 bit0 activation height, defaults to '0'.
 bip9_bit0_activation_height = 0
-# The hash:height checkpoint for bip9 bit0 activation, defaults to '000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328'.
-bip9_bit0_active_checkpoint = 000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5:419328
 # Check the bip9 bit0 threshold before timeout (speedy trial), defaults to 'false'.
 bip9_bit0_speedy_trial = false
 # The median time past to start bip9 bit0 signaling, 4294967295 for always active, defaults to '1462060800'.
@@ -330,8 +328,6 @@ bip9_bit0_threshold = 1916
 bip9_bit0_timeout = 1493596800
 # The minimum bip9 bit1 activation height, defaults to '0'.
 bip9_bit1_activation_height = 0
-# The hash:height checkpoint for bip9 bit1 activation, defaults to '0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824'.
-bip9_bit1_active_checkpoint = 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893:481824
 # Check the bip9 bit1 threshold before timeout (speedy trial), defaults to 'false'.
 bip9_bit1_speedy_trial = false
 # The median time past to start bip9 bit1 signaling, 4294967295 for always active, defaults to '1479168000'.
@@ -342,8 +338,6 @@ bip9_bit1_threshold = 1916
 bip9_bit1_timeout = 1510704000
 # The minimum bip9 bit2 activation height, defaults to '709632'.
 bip9_bit2_activation_height = 709632
-# The hash:height checkpoint for bip9 bit2 activation, defaults to '0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632'.
-bip9_bit2_active_checkpoint = 0000000000000000000687bca986194dc2c1f949318629b44bb54ec0a94d8244:709632
 # Check the bip9 bit2 threshold before timeout (speedy trial), defaults to 'true'.
 bip9_bit2_speedy_trial = true
 # The median time past to start bip9 bit2 signaling, 4294967295 for always active, defaults to '1619222400'.
@@ -434,8 +428,8 @@ bip65 = true
 bip66 = true
 # Add relative locktime enforcement, defaults to 'true' (soft fork).
 bip68 = true
-# Assume bip34, bip65, and bip66 activation if enabled, defaults to 'true' (hard fork).
-bip90 = true
+# Freeze bip34, bip65, and bip66 activation at the bip90 heights, defaults to 'false' (hard fork).
+bip90 = false
 # Assume block_storm_patch activation if enabled, defaults to 'false' (testnet4).
 block_storm_patch = false
 # Require difficult blocks, defaults to 'true' (use false for testnet).
