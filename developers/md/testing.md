@@ -122,7 +122,26 @@ own.
 - The one sanctioned loop is over an embedded table of reference vectors.
 - Write generated test data out literally.
 
-## 6. Assertions
+## 6. No races
+
+**A test never depends on winning a race to pass**, however easy it may
+seem the race is to win. The process does not control scheduling, so a
+delay of any length is possible, and a test that a delay can fail is
+wrong.
+
+- Find every path by which the code under test acts on a timer or
+  asynchronously (channel drops, heartbeats, samplers, prunes,
+  subscriptions). Disable each one in the fixture, or show from message
+  or strand order that the test cannot observe it. Check what zero means
+  for each setting, since some zeros mean immediately.
+- Waiting for an event that must occur is not a race. A bound on that
+  wait detects a failure. It does not decide a pass.
+- A fixture peer behaves honestly (it answers pings), so that no liveness
+  policy fires against a correct test.
+- Find races by reading the code. Repeating a test to find a race is
+  itself a race.
+
+## 7. Assertions
 
 - `BC_REQUIRE*` is the default: the first failure stops the case.
   `BC_CHECK*` appears in files that are dense lists of independent facts
@@ -141,7 +160,7 @@ own.
   setup, action and verification groups with blank lines, and do not
   interleave them.
 
-## 7. Comments
+## 8. Comments
 
 **Comment almost nothing.** The test name and the code are the
 documentation.
@@ -153,7 +172,7 @@ documentation.
 - The source of a set of reference vectors is worth a comment. Narrative
   blocks are not.
 
-## 8. Pre-commit checklist for agents
+## 9. Pre-commit checklist for agents
 
 1. **No wraps** in any `BC_AUTO_TEST_CASE` body. This flags
    continuation lines for review:
@@ -165,4 +184,5 @@ documentation.
 4. **`BC_REQUIRE_EQUAL`** is used wherever the operands are streamable.
 5. **Comments.** A few at most, none narrative.
 6. A blank line precedes `BC_AUTO_TEST_SUITE_END()`.
-7. The suite passes.
+7. **No races.** No pass depends on scheduling.
+8. The suite passes.

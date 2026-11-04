@@ -170,6 +170,7 @@
   }
 </style>
 <script src="../../skins/skins.js"></script>
+<script src="../../search.js"></script>
 </head>
 <body>
 
@@ -311,6 +312,7 @@
         <a href="../../developers/testing.html">Test Practices</a>
       </div></details>
       <a href="../../about.html">About</a>
+      <span class="search"><input type="search" placeholder="Search" aria-label="Search the site"></span>
     </nav>
     <p class="lede">
       Source-anchored architecture documentation for <strong>libbitcoin-node</strong>:
@@ -1297,8 +1299,8 @@ document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.lang
   hljs.highlightElement(code);
 });
 document.querySelectorAll('.doc pre > code').forEach(function (code) {
-  if (code.innerHTML.indexOf('\ue000') < 0) return;
-  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
+  if (code.innerHTML.indexOf('\u2063') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\u2063/g, '<span class="proposed-line">').replace(/\u2064/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

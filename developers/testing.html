@@ -170,6 +170,7 @@
   }
 </style>
 <script src="../skins/skins.js"></script>
+<script src="../search.js"></script>
 </head>
 <body>
 
@@ -311,6 +312,7 @@
         <a href="../developers/testing.html" class="here">Test Practices</a>
       </div></details>
       <a href="../about.html">About</a>
+      <span class="search"><input type="search" placeholder="Search" aria-label="Search the site"></span>
     </nav>
     <p class="lede">
       The libbitcoin C++ libraries, from Bitcoin primitives
@@ -454,7 +456,25 @@ own.</p>
 <li>The one sanctioned loop is over an embedded table of reference vectors.</li>
 <li>Write generated test data out literally.</li>
 </ul>
-<h2 id="6-assertions">6. Assertions<a class="anchor" href="#6-assertions" aria-label="Link to this section">#</a></h2>
+<h2 id="6-no-races">6. No races<a class="anchor" href="#6-no-races" aria-label="Link to this section">#</a></h2>
+<p><strong>A test never depends on winning a race to pass</strong>, however easy it may
+seem the race is to win. The process does not control scheduling, so a
+delay of any length is possible, and a test that a delay can fail is
+wrong.</p>
+<ul>
+<li>Find every path by which the code under test acts on a timer or
+  asynchronously (channel drops, heartbeats, samplers, prunes,
+  subscriptions). Disable each one in the fixture, or show from message
+  or strand order that the test cannot observe it. Check what zero means
+  for each setting, since some zeros mean immediately.</li>
+<li>Waiting for an event that must occur is not a race. A bound on that
+  wait detects a failure. It does not decide a pass.</li>
+<li>A fixture peer behaves honestly (it answers pings), so that no liveness
+  policy fires against a correct test.</li>
+<li>Find races by reading the code. Repeating a test to find a race is
+  itself a race.</li>
+</ul>
+<h2 id="7-assertions">7. Assertions<a class="anchor" href="#7-assertions" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><code>BC_REQUIRE*</code> is the default: the first failure stops the case.
   <code>BC_CHECK*</code> appears in files that are dense lists of independent facts
@@ -473,7 +493,7 @@ own.</p>
   setup, action and verification groups with blank lines, and do not
   interleave them.</li>
 </ul>
-<h2 id="7-comments">7. Comments<a class="anchor" href="#7-comments" aria-label="Link to this section">#</a></h2>
+<h2 id="8-comments">8. Comments<a class="anchor" href="#8-comments" aria-label="Link to this section">#</a></h2>
 <p><strong>Comment almost nothing.</strong> The test name and the code are the
 documentation.</p>
 <ul>
@@ -484,7 +504,7 @@ documentation.</p>
 <li>The source of a set of reference vectors is worth a comment. Narrative
   blocks are not.</li>
 </ul>
-<h2 id="8-pre-commit-checklist-for-agents">8. Pre-commit checklist for agents<a class="anchor" href="#8-pre-commit-checklist-for-agents" aria-label="Link to this section">#</a></h2>
+<h2 id="9-pre-commit-checklist-for-agents">9. Pre-commit checklist for agents<a class="anchor" href="#9-pre-commit-checklist-for-agents" aria-label="Link to this section">#</a></h2>
 <ol>
 <li><strong>No wraps</strong> in any <code>BC_AUTO_TEST_CASE</code> body. This flags
    continuation lines for review:
@@ -496,6 +516,7 @@ documentation.</p>
 <li><strong><code>BC_REQUIRE_EQUAL</code></strong> is used wherever the operands are streamable.</li>
 <li><strong>Comments.</strong> A few at most, none narrative.</li>
 <li>A blank line precedes <code>BC_AUTO_TEST_SUITE_END()</code>.</li>
+<li><strong>No races.</strong> No pass depends on scheduling.</li>
 <li>The suite passes.</li>
 </ol>
   </article>
@@ -558,8 +579,8 @@ document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.lang
   hljs.highlightElement(code);
 });
 document.querySelectorAll('.doc pre > code').forEach(function (code) {
-  if (code.innerHTML.indexOf('\ue000') < 0) return;
-  code.innerHTML = code.innerHTML.replace(/\ue000/g, '<span class="proposed-line">').replace(/\ue001/g, '</span>');
+  if (code.innerHTML.indexOf('\u2063') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\u2063/g, '<span class="proposed-line">').replace(/\u2064/g, '</span>');
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>

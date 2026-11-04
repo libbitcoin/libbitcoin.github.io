@@ -7,10 +7,12 @@ the pages share one copy of each. Mermaid diagrams are emitted as
 <div class="mermaid"> and rendered client-side by mermaid.min.js.
 """
 import html
+import json
 import os
 import posixpath
 import re
 import sys
+from html.parser import HTMLParser
 
 import markdown
 
@@ -557,7 +559,7 @@ def mark_proposed(md):
         if line.startswith("```"):
             fenced = None if fenced is not None else line[3:].strip()
         elif fenced == "cpp" and line.startswith("+"):
-            line = "\ue000" + line[1:] + "\ue001"
+            line = "\u2063" + line[1:] + "\u2064"
         out.append(line)
     return "\n".join(out)
 
@@ -591,6 +593,7 @@ def site_menu(key, name):
         else:
             here_cls = ' class="here"' if label == current else ""
             items.append('      <a href="%s%s"%s>%s</a>' % (root(key), label, here_cls, html.escape(target)))
+    items.append('      <span class="search"><input type="search" placeholder="Search" aria-label="Search the site"></span>')
     return "\n".join(items)
 
 
@@ -663,6 +666,7 @@ def render(key, name, md, guard, logo, mermaid_src):
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>%(style)s</style>
 <script src="%(root)sskins/skins.js"></script>
+<script src="%(root)ssearch.js"></script>
 </head>
 <body>
 
@@ -747,8 +751,8 @@ document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.lang
   hljs.highlightElement(code);
 });
 document.querySelectorAll('.doc pre > code').forEach(function (code) {
-  if (code.innerHTML.indexOf('\\ue000') < 0) return;
-  code.innerHTML = code.innerHTML.replace(/\\ue000/g, '<span class="proposed-line">').replace(/\\ue001/g, '</span>');
+  if (code.innerHTML.indexOf('\\u2063') < 0) return;
+  code.innerHTML = code.innerHTML.replace(/\\u2063/g, '<span class="proposed-line">').replace(/\\u2064/g, '</span>');
 });
 </script>
 <script src="%(mermaid)s"%(mermaid_sri)s></script>
@@ -873,6 +877,78 @@ def check_links(key, pages):
     return bad
 
 
+class Indexer(HTMLParser):
+    VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+    INLINE = {"a", "abbr", "b", "code", "em", "i", "kbd", "mark", "small", "span", "strong", "sub", "sup"}
+    SKIP_TAGS = {"script", "style", "nav", "svg", "template", "title"}
+    SKIP_CLASSES = {"eyebrow", "pager", "foot", "lightbox", "anchor", "mermaid"}
+
+    def __init__(self, lede):
+        super().__init__(convert_charrefs=True)
+        self.skip_classes = self.SKIP_CLASSES if lede else self.SKIP_CLASSES | {"lede"}
+        self.stack = []
+        self.title = []
+        self.sections = [["", [], []]]
+        self.heading = None
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag in ("h1", "h2", "h3") and (tag == "h1" or attrs.get("id")) and not self.skipping():
+            if tag != "h1":
+                self.sections.append([attrs["id"], [], []])
+            self.heading = tag
+        if tag in self.VOID:
+            return
+        classes = set((attrs.get("class") or "").split())
+        self.stack.append((tag, tag in self.SKIP_TAGS or bool(classes & self.skip_classes)))
+        if tag not in self.INLINE:
+            self.text(" ")
+
+    def handle_endtag(self, tag):
+        tags = [t for t, _ in self.stack]
+        if tag in tags:
+            del self.stack[len(tags) - 1 - tags[::-1].index(tag):]
+        if tag == self.heading:
+            self.heading = None
+        if tag not in self.INLINE:
+            self.text(" ")
+
+    def skipping(self):
+        return any(skip for _, skip in self.stack)
+
+    def handle_data(self, data):
+        if self.stack and self.stack[-1][0] == "title":
+            self.title.append(data)
+        elif not self.skipping():
+            self.text(data)
+
+    def text(self, data):
+        section = self.sections[-1]
+        (section[1] if self.heading else section[2]).append(data)
+
+
+def squash(parts):
+    return " ".join("".join(parts).split())
+
+
+def index_site():
+    entries = []
+    for directory, dirs, files in os.walk(ROOT):
+        dirs[:] = sorted(d for d in dirs if not d.startswith(".") and d != "tools")
+        for file in sorted(files):
+            if not file.endswith(".html"):
+                continue
+            page = read(os.path.join(directory, file))
+            if 'http-equiv="refresh"' in page:
+                continue
+            url = posixpath.relpath(os.path.join(directory, file).replace(os.sep, "/"), ROOT.replace(os.sep, "/"))
+            indexer = Indexer(file == "index.html" or "/" not in url)
+            indexer.feed(page)
+            sections = [[ident, squash(head), squash(body)] for ident, head, body in indexer.sections]
+            entries.append({"u": url, "t": squash(indexer.title), "s": [s for s in sections if s[1] or s[2]]})
+    write(os.path.join(ROOT, "search.json"), json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
+
+
 def main():
     mermaid_src = MERMAID
     if "--mermaid" in sys.argv:
@@ -890,6 +966,7 @@ def main():
             print("wrote", key + "/" + name + ".html")
         for name, href in check_links(key, pages):
             print("BROKEN LINK in %s/%s: %s" % (key, name, href))
+    index_site()
 
 
 if __name__ == "__main__":
