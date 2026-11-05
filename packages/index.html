@@ -380,7 +380,7 @@
 <tr>
 <td>Docker</td>
 <td>Linux x64, arm64</td>
-<td><code>docker run -v &lt;data directory&gt;:/data -p 8333:8333 -p 8080:8080 -p 8180:8180 ghcr.io/libbitcoin/libbitcoin-server:&lt;version&gt;</code></td>
+<td><code>docker run --stop-timeout 600 -v &lt;data directory&gt;:/data -p 8333:8333 -p 8080:8080 -p 8180:8180 ghcr.io/libbitcoin/libbitcoin-server:&lt;version&gt;</code></td>
 </tr>
 <tr>
 <td>Umbrel</td>

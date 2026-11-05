@@ -130,7 +130,9 @@ connections = 10
 | 8080 | Admin (management console) |
 | 8180 | Native (block explorer, REST and WebSocket) |
 
-`docker stop` sends SIGTERM, which closes the store.
+`docker stop` sends SIGTERM, which starts closing the store. A syncing node can
+take longer to close than the 10-second default timeout, after which Docker
+kills the node, so run the container with `--stop-timeout 600`.
 
 ### 5.2 Umbrel
 
