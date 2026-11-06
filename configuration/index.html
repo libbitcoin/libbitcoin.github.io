@@ -1096,21 +1096,55 @@ enable_witness_tx = true    # in/out wtxid for tx announcements
 enable_memory_pool = true   # respond to mempool message with full pool
 enable_not_found = true     # send not_found messages (vs. dropping peer for requesting what we don't have)
 </code></pre>
-<h3 id="519-outbound-bindings">5.19 Outbound bindings<a class="anchor" href="#519-outbound-bindings" aria-label="Link to this section">#</a></h3>
-<p>By default the operating system chooses the network adapter of each
-outbound connection from its routing table, and with several adapters it
-normally uses only one. Binding outbound connections to adapter addresses
-restricts them to those adapters, and spreads them across the adapters
-to combine their bandwidth:</p>
+<h3 id="519-outbound-load-balancing">5.19 Outbound load balancing<a class="anchor" href="#519-outbound-load-balancing" aria-label="Link to this section">#</a></h3>
+<p><code>outbound.bind</code> balances outbound peer connections across network
+adapters. Each binding is the address of an adapter, and each outbound
+connection slot is assigned one binding in turn.</p>
+<h4 id="without-bindings">Without bindings<a class="anchor" href="#without-bindings" aria-label="Link to this section">#</a></h4>
+<p><code>outbound.bind</code> is empty by default, and the operating system chooses the
+adapter of each connection from its routing table. With several adapters
+that is the adapter of the preferred default route, so every outbound
+connection uses one adapter and the others carry none. On a machine with
+two 2.5 GbE adapters, one on a fiber provider and one on a cable provider,
+all 98 peer connections used the fiber adapter, and download was limited
+to that one adapter and provider.</p>
+<h4 id="balancing">Balancing<a class="anchor" href="#balancing" aria-label="Link to this section">#</a></h4>
+<p>One binding per adapter splits the connections evenly:</p>
 <pre><code class="language-ini"><span class="section">[outbound]</span>
 bind = 192.168.0.20
 bind = 192.168.0.21
 connections = 100
 </code></pre>
+<p>Each adapter carries 50 connections. A slot always reconnects on its own
+adapter, so the split holds for as long as the node runs.</p>
+<h4 id="shaping">Shaping<a class="anchor" href="#shaping" aria-label="Link to this section">#</a></h4>
+<p>The split follows the list, so an address listed more than once gets a
+proportionally larger share. Two bindings of the first adapter and one of
+the second give the first twice the connections of the second:</p>
+<pre><code class="language-ini"><span class="section">[outbound]</span>
+bind = 192.168.0.20
+bind = 192.168.0.20
+bind = 192.168.0.21
+connections = 99
+</code></pre>
+<p>The first adapter carries 66 connections and the second 33, for example
+to match a 2 Gbps connection and a 1 Gbps connection. Connections are
+spread by count, not by bandwidth, so the weights are set by the list.</p>
+<h4 id="restricting-adapters">Restricting adapters<a class="anchor" href="#restricting-adapters" aria-label="Link to this section">#</a></h4>
+<p>The bindings are also a whitelist. Outbound connections use only the
+listed adapters, so an adapter left out of the list carries no peer
+connections. On a machine with a wired adapter and WiFi, binding only the
+wired address keeps peers off WiFi, even when WiFi holds the preferred
+default route:</p>
+<pre><code class="language-ini"><span class="section">[outbound]</span>
+bind = 192.168.0.20
+</code></pre>
+<p>On Linux this also needs the routing rule for the wired address
+(below), or connections bound to it still leave through the default
+route. The whitelist applies to the outbound connections of <code>bs</code>, not to
+other traffic on the machine, and not to inbound connections (below).</p>
+<h4 id="notes">Notes<a class="anchor" href="#notes" aria-label="Link to this section">#</a></h4>
 <ul>
-<li>Each outbound connection slot is assigned one binding in turn, so here
-  each adapter carries 50 connections. A slot always reconnects on its
-  own adapter, so the split holds for as long as the node runs.</li>
 <li>Give the address without a port. The operating system assigns the
   source port.</li>
 <li>An IPv4 binding connects only to IPv4 peers, and an IPv6 binding only
@@ -1162,6 +1196,55 @@ rules to the distribution's network configuration (netplan,
 systemd-networkd or NetworkManager).</p>
 <p>Adapters on one subnet share its gateway, so their combined bandwidth is
 also limited by the gateway's uplink.</p>
+<h4 id="two-internet-connections">Two internet connections<a class="anchor" href="#two-internet-connections" aria-label="Link to this section">#</a></h4>
+<p>Adapters on separate networks, each with its own gateway and internet
+provider, add their providers' bandwidth. For <code>enp11s0</code> at 192.168.0.219
+(gateway 192.168.0.1) and <code>enp12s0</code> at 192.168.1.67 (gateway
+192.168.1.1):</p>
+<pre><code class="language-ini"><span class="section">[outbound]</span>
+bind = 192.168.0.219
+bind = 192.168.1.67
+</code></pre>
+<pre class="console"><code>$ sudo ip route add default via 192.168.0.1 dev enp11s0 table 100
+$ sudo ip rule add from 192.168.0.0/24 table 100 priority 100
+$ sudo ip route add default via 192.168.1.1 dev enp12s0 table 101
+$ sudo ip rule add from 192.168.1.0/24 table 101 priority 101
+</code></pre>
+<p>Without the rules, connections from the second address leave through the
+first gateway, whose NAT drops them. Rules that match the subnet, rather
+than the address, remain valid when a DHCP lease changes the address.
+With NetworkManager the same tables and rules persist, set once per
+connection:</p>
+<pre class="console"><code>$ sudo nmcli connection modify &quot;&lt;connection 1&gt;&quot; ipv4.routes &quot;0.0.0.0/0 192.168.0.1 table=100&quot; ipv4.routing-rules &quot;priority 100 from 192.168.0.0/24 table 100&quot;
+$ sudo nmcli connection modify &quot;&lt;connection 2&gt;&quot; ipv4.routes &quot;0.0.0.0/0 192.168.1.1 table=101&quot; ipv4.routing-rules &quot;priority 101 from 192.168.1.0/24 table 101&quot;
+$ sudo nmcli device reapply enp11s0
+$ sudo nmcli device reapply enp12s0
+</code></pre>
+<p>Each bound address should then reach the internet through its own
+provider, and report that provider's public address:</p>
+<pre class="console"><code>$ curl --interface 192.168.0.219 https://api.ipify.org
+$ curl --interface 192.168.1.67 https://api.ipify.org
+</code></pre>
+<p>Reverse-path filtering must be loose (<code>net.ipv4.conf.*.rp_filter = 2</code>,
+the Ubuntu default), since strict filtering (<code>1</code>) can drop replies on a
+host with several adapters. Windows and macOS need no routing changes.</p>
+<p>On the fiber and cable machine above (Ubuntu 26.04), with both bindings
+the peers split 40 and 35, and one minute of download measured 191 MB/s
+on fiber and 250 MB/s on cable, about 3.5 Gbps in all, more than one
+2.5 GbE adapter carries.</p>
+<ul>
+<li>A change to the bindings or routing applies only to new connections.
+  Restart <code>bs</code> to rebalance.</li>
+<li>A multipath default route (kernel ECMP) is not a substitute. It hashes
+  each new connection to a route, so the split depends on the hash
+  rather than on the bindings.</li>
+<li>A host with several adapters can end up with a global IPv6 address on
+  one adapter and its IPv6 default route on another, which leaves IPv6
+  unusable. Seed names resolve to IPv6 first, so seeding then times out
+  ("seeding unsuccessful"). Correct the adapter configuration, or prefer
+  IPv4 in name resolution with <code>precedence ::ffff:0:0/96 100</code> in
+  <code>/etc/gai.conf</code>.</li>
+</ul>
 <hr />
 <h2 id="6-ports">6. Ports<a class="anchor" href="#6-ports" aria-label="Link to this section">#</a></h2>
 <p>Every service has an assigned port on each chain, clear and secure. A

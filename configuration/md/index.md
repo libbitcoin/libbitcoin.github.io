@@ -692,13 +692,25 @@ enable_memory_pool = true   # respond to mempool message with full pool
 enable_not_found = true     # send not_found messages (vs. dropping peer for requesting what we don't have)
 ```
 
-### 5.19 Outbound bindings
+### 5.19 Outbound load balancing
 
-By default the operating system chooses the network adapter of each
-outbound connection from its routing table, and with several adapters it
-normally uses only one. Binding outbound connections to adapter addresses
-restricts them to those adapters, and spreads them across the adapters
-to combine their bandwidth:
+`outbound.bind` balances outbound peer connections across network
+adapters. Each binding is the address of an adapter, and each outbound
+connection slot is assigned one binding in turn.
+
+#### Without bindings
+
+`outbound.bind` is empty by default, and the operating system chooses the
+adapter of each connection from its routing table. With several adapters
+that is the adapter of the preferred default route, so every outbound
+connection uses one adapter and the others carry none. On a machine with
+two 2.5 GbE adapters, one on a fiber provider and one on a cable provider,
+all 98 peer connections used the fiber adapter, and download was limited
+to that one adapter and provider.
+
+#### Balancing
+
+One binding per adapter splits the connections evenly:
 
 ```ini
 [outbound]
@@ -707,9 +719,47 @@ bind = 192.168.0.21
 connections = 100
 ```
 
-- Each outbound connection slot is assigned one binding in turn, so here
-  each adapter carries 50 connections. A slot always reconnects on its
-  own adapter, so the split holds for as long as the node runs.
+Each adapter carries 50 connections. A slot always reconnects on its own
+adapter, so the split holds for as long as the node runs.
+
+#### Shaping
+
+The split follows the list, so an address listed more than once gets a
+proportionally larger share. Two bindings of the first adapter and one of
+the second give the first twice the connections of the second:
+
+```ini
+[outbound]
+bind = 192.168.0.20
+bind = 192.168.0.20
+bind = 192.168.0.21
+connections = 99
+```
+
+The first adapter carries 66 connections and the second 33, for example
+to match a 2 Gbps connection and a 1 Gbps connection. Connections are
+spread by count, not by bandwidth, so the weights are set by the list.
+
+#### Restricting adapters
+
+The bindings are also a whitelist. Outbound connections use only the
+listed adapters, so an adapter left out of the list carries no peer
+connections. On a machine with a wired adapter and WiFi, binding only the
+wired address keeps peers off WiFi, even when WiFi holds the preferred
+default route:
+
+```ini
+[outbound]
+bind = 192.168.0.20
+```
+
+On Linux this also needs the routing rule for the wired address
+(below), or connections bound to it still leave through the default
+route. The whitelist applies to the outbound connections of `bs`, not to
+other traffic on the machine, and not to inbound connections (below).
+
+#### Notes
+
 - Give the address without a port. The operating system assigns the
   source port.
 - An IPv4 binding connects only to IPv4 peers, and an IPv6 binding only
@@ -771,6 +821,68 @@ systemd-networkd or NetworkManager).
 
 Adapters on one subnet share its gateway, so their combined bandwidth is
 also limited by the gateway's uplink.
+
+#### Two internet connections
+
+Adapters on separate networks, each with its own gateway and internet
+provider, add their providers' bandwidth. For `enp11s0` at 192.168.0.219
+(gateway 192.168.0.1) and `enp12s0` at 192.168.1.67 (gateway
+192.168.1.1):
+
+```ini
+[outbound]
+bind = 192.168.0.219
+bind = 192.168.1.67
+```
+
+```
+$ sudo ip route add default via 192.168.0.1 dev enp11s0 table 100
+$ sudo ip rule add from 192.168.0.0/24 table 100 priority 100
+$ sudo ip route add default via 192.168.1.1 dev enp12s0 table 101
+$ sudo ip rule add from 192.168.1.0/24 table 101 priority 101
+```
+
+Without the rules, connections from the second address leave through the
+first gateway, whose NAT drops them. Rules that match the subnet, rather
+than the address, remain valid when a DHCP lease changes the address.
+With NetworkManager the same tables and rules persist, set once per
+connection:
+
+```
+$ sudo nmcli connection modify "<connection 1>" ipv4.routes "0.0.0.0/0 192.168.0.1 table=100" ipv4.routing-rules "priority 100 from 192.168.0.0/24 table 100"
+$ sudo nmcli connection modify "<connection 2>" ipv4.routes "0.0.0.0/0 192.168.1.1 table=101" ipv4.routing-rules "priority 101 from 192.168.1.0/24 table 101"
+$ sudo nmcli device reapply enp11s0
+$ sudo nmcli device reapply enp12s0
+```
+
+Each bound address should then reach the internet through its own
+provider, and report that provider's public address:
+
+```
+$ curl --interface 192.168.0.219 https://api.ipify.org
+$ curl --interface 192.168.1.67 https://api.ipify.org
+```
+
+Reverse-path filtering must be loose (`net.ipv4.conf.*.rp_filter = 2`,
+the Ubuntu default), since strict filtering (`1`) can drop replies on a
+host with several adapters. Windows and macOS need no routing changes.
+
+On the fiber and cable machine above (Ubuntu 26.04), with both bindings
+the peers split 40 and 35, and one minute of download measured 191 MB/s
+on fiber and 250 MB/s on cable, about 3.5 Gbps in all, more than one
+2.5 GbE adapter carries.
+
+- A change to the bindings or routing applies only to new connections.
+  Restart `bs` to rebalance.
+- A multipath default route (kernel ECMP) is not a substitute. It hashes
+  each new connection to a route, so the split depends on the hash
+  rather than on the bindings.
+- A host with several adapters can end up with a global IPv6 address on
+  one adapter and its IPv6 default route on another, which leaves IPv6
+  unusable. Seed names resolve to IPv6 first, so seeding then times out
+  ("seeding unsuccessful"). Correct the adapter configuration, or prefer
+  IPv4 in name resolution with `precedence ::ffff:0:0/96 100` in
+  `/etc/gai.conf`.
 
 ---
 
