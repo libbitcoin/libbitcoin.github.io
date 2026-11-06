@@ -410,8 +410,7 @@ was built with.</p>
 <h3 id="visual-studio">Visual Studio<a class="anchor" href="#visual-studio" aria-label="Link to this section">#</a></h3>
 <p>Requires Visual Studio 2026 (MSVC toolset v145). The solution exposes the
 <code>StaticDebug</code> and <code>StaticRelease</code> configurations for x64, Win32 and
-ARM64. Dependencies are NuGet packages, restored into <code>.nuget\packages</code>
-in the source directory.</p>
+ARM64. There are no package dependencies.</p>
 <h3 id="mingw-w64">MinGW-w64<a class="anchor" href="#mingw-w64" aria-label="Link to this section">#</a></h3>
 <p>Windows x64 binaries can also be built on Linux with MinGW-w64 and
 autotools. <code>install-gnu.sh</code> cross-compiles when <code>CC</code> and <code>CXX</code> name the
@@ -590,7 +589,7 @@ have no dynamic dependencies.</p>
 the source, as compressed PTX (<code>src/crypto/secp256k1/cuda/ptx.cpp</code> in
 libbitcoin-system). At run time <code>bs</code> loads the NVIDIA driver library
 (<code>nvcuda.dll</code> on Windows, <code>libcuda.so.1</code> on Linux), which compiles the
-PTX for the installed GPU. <code>--enable-cuda</code> is on by default, and applies
+PTX for the installed GPU. <code>--with-cuda</code> is on by default, and applies
 on x64 and arm64, except on macOS.</p>
   </article>
 

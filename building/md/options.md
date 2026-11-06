@@ -22,8 +22,8 @@ the `Option-<name>` property.
 | `--build-skip-tests` | Do not build or run the tests. |
 | `--build-skip-test-run` | Build the tests without running them. |
 | `--build-parallel=<n>` | Number of parallel jobs (default the number of CPUs). |
-| `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). |
 | `--build-post-install-clean` | Remove dependency build files after installing. |
+| `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). |
 | `--noninteractive` | Do not prompt. |
 | `--verbose` | Display the commands run. |
 
@@ -78,12 +78,14 @@ or your own `-march` or `-mcpu`. `-mtune` can be used with either.
 
 | Option | Default | Purpose |
 | ------ | ------- | ------- |
-| `--enable-cuda` | on | NVIDIA GPU batch signature verification |
+| `--with-cuda` | on | NVIDIA GPU batch signature verification |
 
 GPU support needs no CUDA toolkit to build. `bs` loads the NVIDIA driver
-when it starts, and uses the CPU when there is no driver or GPU. Disable
-it with `--disable-cuda` in any build script, including `build-msvc.cmd`
-(`-Denable-cuda=OFF`, `/p:Option-cuda=false`).
+when it starts, and uses the CPU when there is no driver or GPU. Only
+the libbitcoin-system scripts accept `--without-cuda` (`-Dwith-cuda=OFF`),
+including its `build-msvc.cmd`. The scripts of the other repositories
+build libbitcoin-system with GPU support. In Visual Studio,
+`/p:Option-cuda=false` disables it in any build.
 
 ## 3. Feature options
 
@@ -91,17 +93,23 @@ it with `--disable-cuda` in any build script, including `build-msvc.cmd`
 | ------ | ------- | ------- |
 | `--with-tests` | on | Build the test suites. |
 | `--with-console` | on | Build `bs`. |
-| `--with-embedded` | on | Embed the web interfaces in `bs`. |
+| `--with-web` | on | Compile the web pages into `bs`. Without it, `bs` serves pages only from a configured path. |
+| `--with-self-tests` | off | Compile the built-in store tests into `bs`, which enable its `-g`/`--get` and `-p`/`--put` options and the `[t]est built-in case` console menu entry. |
+| `--with-verbose` | off | Compile in verbose logging (`LOGV`), in libbitcoin-network and every library and binary built on it. Debug builds enable it by default. |
+| `--with-performance-tests` | off | Compile the libbitcoin-system performance tests. |
+| `--with-slow-tests` | off | Compile the slow libbitcoin-system tests: scrypt, PBKDF2, the encrypted key tests, the bloom and sieve filter tests and a 1 GiB SHA vector. |
 | `--enable-ndebug` | on | Compile assertions out. `--build-config` sets it. |
 | `--enable-isystem` | off | Include the headers of libbitcoin dependencies with `-isystem` in place of `-I`, which silences their warnings. |
 
 ## 4. Visual Studio
 
-The instruction set, GPU, `--with-embedded` and `--with-secp256k1`
-options are `Option-<name>` properties on the project property pages, or
-`/p:Option-<name>=true` on the `build-msvc.cmd` or `msbuild` command line.
-The others have no property: the tests and `bs` are projects in the
-solution, and the Release configurations define `NDEBUG`. For example, an
+The instruction set, GPU, `--with-web`, `--with-self-tests`,
+`--with-verbose`, `--with-performance-tests`, `--with-slow-tests` and
+`--with-secp256k1` options are `Option-<name>` properties on the project
+property pages, or `/p:Option-<name>=true` (or `false`) on the
+`build-msvc.cmd` or `msbuild` command line. The others have no property:
+the tests and `bs` are projects in the solution, and the Release
+configurations define `NDEBUG`. For example, an
 AVX-512 build:
 
 ```
@@ -113,27 +121,30 @@ lowered (see [Windows](windows#4-instruction-set)).
 
 ## 5. External libraries
 
-There is no required external dependency. libbitcoin implements
-secp256k1 and TLS itself, although secp256k1 can be replaced by an
-external library with the same public interface.
+There is no required external dependency, and the Visual Studio
+projects use no NuGet package. libbitcoin implements secp256k1 and TLS
+itself, although secp256k1 can be replaced by an external library with the
+same public interface.
 
 ### secp256k1
 
 | Option | Default | Purpose |
 | ------ | ------- | ------- |
-| `--with-secp256k1` | off | Use [bitcoin-core/secp256k1](https://github.com/bitcoin-core/secp256k1) 0.8.0 or later. |
+| `--with-secp256k1` | on | Use libbitcoin's native secp256k1 interface. |
 
-The option replaces the calls made through the libsecp256k1 interface, so
-any other implementation of that interface can be linked in its place.
-Batch verification remains internal.
+`--without-secp256k1` (`-Dwith-secp256k1=OFF`) compiles out the native
+interface and links an installed library with the libsecp256k1 interface
+in its place, such as
+[bitcoin-core/secp256k1](https://github.com/bitcoin-core/secp256k1) 0.8.0
+or later, or UltrafastSecp256k1. Batch verification remains internal.
 
-- **Autotools and CMake.** `--build-secp256k1` makes the install script
-  build it from source, with its ellswift, recovery and schnorrsig
-  modules, along with the other dependencies. Otherwise it must be
-  installed where the build can find it (`-Dwith-secp256k1=ON` for
-  CMake).
-- **Visual Studio.** `/p:Option-secp256k1=true` links the
-  `secp256k1_vc145` NuGet package.
+- **Autotools and CMake.** The library is found through pkg-config or
+  CMake. `--build-libsecp256k1` makes the install script build
+  bitcoin-core/secp256k1 from source, with its ellswift, recovery and
+  schnorrsig modules, along with the other dependencies. It is used only
+  with `--without-secp256k1`.
+- **Visual Studio.** `/p:Option-secp256k1=false` compiles out the native
+  interface, and the library must be added to the link.
 
 ## 6. Link-time optimization
 

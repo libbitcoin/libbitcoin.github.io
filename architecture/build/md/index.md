@@ -223,8 +223,12 @@ without the flags, and reports an environmental override if it compiles
 | Option | Scope | Effect |
 | ------ | ----- | ------ |
 | `--with-valgrind` | libbitcoin-system | defines `WITH_VALGRIND` (valgrind memcheck client requests) |
-| `--enable-cuda` | libbitcoin-system | defines `WITH_CUDA` (default on) |
-| `--with-embedded` | `bs` | defines `WITH_EMBEDDED`, compiling web pages into the console application |
+| `--with-cuda` | libbitcoin-system | defines `WITH_CUDA` (default on) |
+| `--with-secp256k1` | libbitcoin-system | defines `WITH_SECP256K1`, the native secp256k1 interface (default on); off, adds the external secp256k1 dependency |
+| `--with-performance-tests`, `--with-slow-tests` | libbitcoin-system tests | define `WITH_PERFORMANCE_TESTS`, `WITH_SLOW_TESTS` |
+| `--with-verbose` | libbitcoin-network | defines `WITH_LOGV` (public), compiling verbose logging |
+| `--with-self-tests` | libbitcoin-server | defines `WITH_SELF_TESTS` (public), compiling the built-in store tests |
+| `--with-web` | `bs` | defines `WITH_WEB`, compiling web pages into the console application |
 | `--enable-ndebug`, `--enable-isystem` | autotools | define `NDEBUG` (default on); use `-isystem` for dependency includes |
 | `--with-tests`, `--with-examples`, `--with-console`, `--with-tools` | per target | whether the target is built |
 

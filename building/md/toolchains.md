@@ -34,8 +34,7 @@ Requires CMake 3.30 or later. The presets are:
 
 Requires Visual Studio 2026 (MSVC toolset v145). The solution exposes the
 `StaticDebug` and `StaticRelease` configurations for x64, Win32 and
-ARM64. Dependencies are NuGet packages, restored into `.nuget\packages`
-in the source directory.
+ARM64. There are no package dependencies.
 
 ### MinGW-w64
 
@@ -117,5 +116,5 @@ No CUDA toolchain is required. The GPU verification kernels are part of
 the source, as compressed PTX (`src/crypto/secp256k1/cuda/ptx.cpp` in
 libbitcoin-system). At run time `bs` loads the NVIDIA driver library
 (`nvcuda.dll` on Windows, `libcuda.so.1` on Linux), which compiles the
-PTX for the installed GPU. `--enable-cuda` is on by default, and applies
+PTX for the installed GPU. `--with-cuda` is on by default, and applies
 on x64 and arm64, except on macOS.

@@ -722,14 +722,34 @@ without the flags, and reports an environmental override if it compiles
 <td>defines <code>WITH_VALGRIND</code> (valgrind memcheck client requests)</td>
 </tr>
 <tr>
-<td><code>--enable-cuda</code></td>
+<td><code>--with-cuda</code></td>
 <td>libbitcoin-system</td>
 <td>defines <code>WITH_CUDA</code> (default on)</td>
 </tr>
 <tr>
-<td><code>--with-embedded</code></td>
+<td><code>--with-secp256k1</code></td>
+<td>libbitcoin-system</td>
+<td>defines <code>WITH_SECP256K1</code>, the native secp256k1 interface (default on); off, adds the external secp256k1 dependency</td>
+</tr>
+<tr>
+<td><code>--with-performance-tests</code>, <code>--with-slow-tests</code></td>
+<td>libbitcoin-system tests</td>
+<td>define <code>WITH_PERFORMANCE_TESTS</code>, <code>WITH_SLOW_TESTS</code></td>
+</tr>
+<tr>
+<td><code>--with-verbose</code></td>
+<td>libbitcoin-network</td>
+<td>defines <code>WITH_LOGV</code> (public), compiling verbose logging</td>
+</tr>
+<tr>
+<td><code>--with-self-tests</code></td>
+<td>libbitcoin-server</td>
+<td>defines <code>WITH_SELF_TESTS</code> (public), compiling the built-in store tests</td>
+</tr>
+<tr>
+<td><code>--with-web</code></td>
 <td><code>bs</code></td>
-<td>defines <code>WITH_EMBEDDED</code>, compiling web pages into the console application</td>
+<td>defines <code>WITH_WEB</code>, compiling web pages into the console application</td>
 </tr>
 <tr>
 <td><code>--enable-ndebug</code>, <code>--enable-isystem</code></td>

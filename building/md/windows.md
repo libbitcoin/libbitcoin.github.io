@@ -59,7 +59,6 @@ below apply to both.
 | `--build-config` | `StaticRelease` or `StaticDebug` (required) |
 | `--build-platform` | `x64` (default), `ARM64` or `Win32` |
 | `--build-skip-tests` | Do not build or run the tests |
-| `--disable-cuda` | Build without GPU support (`/p:Option-cuda=false`) |
 | `--build-symbols` | `default`, `disabled` or `public-only` |
 
 Other arguments are passed to `msbuild`. Build options are set as
@@ -73,7 +72,7 @@ libbitcoin-server, its tests and `bs`, and references the other four
 libraries in their sibling directories. For `bx`, open
 `builds\msvc\vs2026\libbitcoin-explorer.sln`, which references
 libbitcoin-system and libbitcoin-network. Select `StaticRelease` or
-`StaticDebug` and build. NuGet packages are restored on the first build.
+`StaticDebug` and build.
 
 Build options are on each project's property pages, under
 *Configuration Properties*.
