@@ -692,11 +692,14 @@ enable_memory_pool = true   # respond to mempool message with full pool
 enable_not_found = true     # send not_found messages (vs. dropping peer for requesting what we don't have)
 ```
 
-### 5.19 Outbound load balancing
+### 5.19 Integrated load balancing
 
 `outbound.bind` balances outbound peer connections across network
 adapters. Each binding is the address of an adapter, and each outbound
-connection slot is assigned one binding in turn.
+connection slot is assigned one binding in turn. With this integrated load
+balancing, combining several adapters or internet connections needs no
+dedicated load balancer: no multi-WAN router, link aggregation or
+balancing appliance.
 
 #### Without bindings
 
@@ -704,7 +707,7 @@ connection slot is assigned one binding in turn.
 adapter of each connection from its routing table. With several adapters
 that is the adapter of the preferred default route, so every outbound
 connection uses one adapter and the others carry none. On a machine with
-two 2.5 GbE adapters, one on a fiber provider and one on a cable provider,
+two 2.5 Gbps adapters, one on a fiber provider and one on a cable provider,
 all 98 peer connections used the fiber adapter, and download was limited
 to that one adapter and provider.
 
@@ -870,7 +873,18 @@ host with several adapters. Windows and macOS need no routing changes.
 On the fiber and cable machine above (Ubuntu 26.04), with both bindings
 the peers split 40 and 35, and one minute of download measured 191 MB/s
 on fiber and 250 MB/s on cable, about 3.5 Gbps in all, more than one
-2.5 GbE adapter carries.
+2.5 Gbps adapter carries.
+
+![Download rate of one 50,000-block download batch, before and after load balancing](../performance/load-balance-overlay.png)
+
+The chart overlays one 50,000-block download batch from each of two full
+validation runs, which download in bursts, aligned at the start of the
+batch. Without bindings (fiber only, blocks 550,000
+to 600,000) the batch took 4.6 minutes at a mean of 206 MB/s, below the
+312.5 MB/s of one 2.5 Gbps link. With both bindings (fiber and cable,
+blocks 750,000 to 800,000) it took 3.6 minutes at a mean of 368 MB/s,
+about 1.8 times the rate: about 40% more data in about 20% less time. The
+block ranges differ, and the later blocks are larger.
 
 - A change to the bindings or routing applies only to new connections.
   Restart `bs` to rebalance.
@@ -883,6 +897,27 @@ on fiber and 250 MB/s on cable, about 3.5 Gbps in all, more than one
   ("seeding unsuccessful"). Correct the adapter configuration, or prefer
   IPv4 in name resolution with `precedence ::ffff:0:0/96 100` in
   `/etc/gai.conf`.
+
+#### Inbound
+
+Inbound connections are not balanced by `bs`, since the remote peer
+chooses which address to connect to. `bs` can make each connection
+reachable and advertise it:
+
+```ini
+[inbound]
+self = 203.0.113.10:8333
+self = 198.51.100.20:8333
+```
+
+- Each provider's router forwards port 8333 to its adapter's address.
+- Each `inbound.self` is a provider's public address. Every one is sent
+  in address messages, and the first in the version message. Peers relay
+  them, and each peer chooses one to connect to.
+- The split follows the peers' choices and cannot be shaped. Listing an
+  address twice does not change it.
+- On Linux the same routing tables and rules are required, since replies
+  leave from the address the connection arrived on.
 
 ---
 
