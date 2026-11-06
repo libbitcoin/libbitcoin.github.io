@@ -997,7 +997,10 @@ value is used in place of the configured value, and a configured
 value that differs from it is logged. Changing it requires a new
 store (<a href="#10-settings-fixed-at-store-creation">§10</a>).</p>
 </blockquote>
-<h3 id="515-tor">5.15 Tor<a class="anchor" href="#515-tor" aria-label="Link to this section">#</a></h3>
+<h3 id="515-anonymizing-networks">5.15 Anonymizing networks<a class="anchor" href="#515-anonymizing-networks" aria-label="Link to this section">#</a></h3>
+<p><code>bs</code> connects to peers over Tor and I2P as well as the clear network, and
+can bridge between them.</p>
+<h4 id="tor">Tor<a class="anchor" href="#tor" aria-label="Link to this section">#</a></h4>
 <p>Outbound through Tor's SOCKS5 proxy, inbound through a Tor hidden service
 (<code>HiddenServiceDir</code> and <code>HiddenServicePort</code> in <code>torrc</code>) pointing at the node's
 listening port, and onion address gossip:</p>
@@ -1016,9 +1019,9 @@ gossip_tor = true
 connect to the node over Tor. Seeds are connected through the proxy, so the default seeds work where Tor
 can reach them. An onion-only node lists onion seeds.</p>
 <p><code>outbound.socks</code> proxies the outbound session and its seeds. Manual peers
-(<a href="#517-fixed-peers">5.17</a>) use their own <code>manual.socks</code>. Each takes an optional
+(<a href="#516-fixed-peers">5.16</a>) use their own <code>manual.socks</code>. Each takes an optional
 <code>username</code> and <code>password</code>.</p>
-<h3 id="516-i2p">5.16 I2P<a class="anchor" href="#516-i2p" aria-label="Link to this section">#</a></h3>
+<h4 id="i2p">I2P<a class="anchor" href="#i2p" aria-label="Link to this section">#</a></h4>
 <p>Outbound through the SOCKS5 proxy pointed at an I2P router's SOCKS port,
 inbound through the router's SAM bridge, and I2P address gossip. The
 destination key file is created if it does not exist, and the I2P address
@@ -1038,9 +1041,135 @@ gossip_i2p = true
 <p>Seeds are connected through the proxy, which reaches only I2P destinations,
 so an I2P node lists I2P seeds. I2P has no ports, so none is given.</p>
 <p><code>outbound.socks</code> proxies the outbound session and its seeds. Manual peers
-(<a href="#517-fixed-peers">5.17</a>) use their own <code>manual.socks</code>. Each takes an optional
+(<a href="#516-fixed-peers">5.16</a>) use their own <code>manual.socks</code>. Each takes an optional
 <code>username</code> and <code>password</code>.</p>
-<h3 id="517-fixed-peers">5.17 Fixed peers<a class="anchor" href="#517-fixed-peers" aria-label="Link to this section">#</a></h3>
+<h4 id="bridging">Bridging<a class="anchor" href="#bridging" aria-label="Link to this section">#</a></h4>
+<p><code>bs</code> can reach peers on the clear network (IPv4 and IPv6), Tor and I2P. A
+node on more than one of them is a bridge: it relays blocks, transactions
+and addresses between them. Three things place a node on a network:</p>
+<ul>
+<li><strong>Gossip.</strong> The <code>peer.gossip_*</code> settings select the address types the
+  node accepts, keeps, connects to and relays. An address of a network
+  that is not gossiped is dropped when it is received or loaded.</li>
+<li><strong>Outbound.</strong> With <code>outbound.socks</code>, every outbound connection goes
+  through the proxy, clear addresses included (for Tor, through exit
+  relays). Without it, outbound connects directly, and only to IP
+  addresses. An onion or I2P address that is gossiped but cannot be
+  connected to is still kept and relayed. Manual peers use their own
+  <code>manual.socks</code>.</li>
+<li><strong>Inbound.</strong> The node accepts on each <code>inbound.bind</code> (by default
+  <code>0.0.0.0:8333</code>, every IPv4 adapter), on a Tor hidden service that
+  forwards to a binding, and on the I2P SAM bridge when <code>inbound.sam</code> is
+  set.</li>
+</ul>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Addresses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gossip_ipv4</code></td>
+<td>true</td>
+<td>IPv4</td>
+</tr>
+<tr>
+<td><code>gossip_ipv6</code></td>
+<td>false</td>
+<td>IPv6 and CJDNS</td>
+</tr>
+<tr>
+<td><code>gossip_tor</code></td>
+<td>false</td>
+<td>Tor v3 onion</td>
+</tr>
+<tr>
+<td><code>gossip_i2p</code></td>
+<td>false</td>
+<td>I2P</td>
+</tr>
+</tbody>
+</table></div>
+<p>Onion and I2P addresses are relayed only in address v2 messages (BIP155,
+<code>peer.enable_address_v2</code>, on by default).</p>
+<p>Every gossiped <code>inbound.self</code>, and the I2P address derived from
+<code>inbound.key_path</code>, is sent to every peer in address messages, on every
+network. The first <code>inbound.self</code> is also sent in each version message
+when it is an IP address. A node that advertises a clear address and an
+onion address therefore tells every peer, onion peers included, that both
+are the same node.</p>
+<p><strong>Bridging, desired.</strong></p>
+<p>Bridges are necessary to the network. Without them, Tor-only and I2P-only
+nodes would form separate networks, each with its own blocks and
+transactions, unable to reach the rest of Bitcoin. Tor and I2P nodes
+reach blocks and transactions from the clear network through bridges,
+and their addresses reach clear nodes. A bridge suits a node whose IP address is already public,
+such as a server, since bridging gives up the anonymity of its onion or
+I2P address. Clear outbound and inbound, with Tor peers accepted through a
+hidden service:</p>
+<pre><code class="language-ini"><span class="section">[inbound]</span>
+bind = 0.0.0.0:8333
+self = &lt;public IP address&gt;:8333
+self = &lt;hidden service onion address&gt;.onion:8333
+
+<span class="section">[peer]</span>
+gossip_ipv4 = true
+gossip_tor = true
+</code></pre>
+<p>Outbound connections go directly to clear peers, without Tor's latency.
+Onion peers connect in through the hidden service, and onion addresses
+are relayed to clear peers. Adding <code>outbound.socks</code> would also connect
+out to onion peers, but would send every clear outbound connection
+through Tor exit relays.</p>
+<p><strong>Bridging, avoided.</strong></p>
+<p>A node run for privacy stays on one anonymity network:</p>
+<ul>
+<li>Advertising a clear address beside an onion or I2P address links them,
+  as above.</li>
+<li>Clear connections expose the node's IP address, and a node seen on
+  both networks can be linked by what and when it relays.</li>
+<li>Clear peers reached through Tor exit relays depend on those relays,
+  which can observe, delay or filter the traffic. Onion peers are reached
+  without exit relays.</li>
+</ul>
+<p>A Tor-only node:</p>
+<pre><code class="language-ini"><span class="section">[outbound]</span>
+socks = 127.0.0.1:9050
+seed = &lt;first seed onion address&gt;.onion:8333
+seed = &lt;second seed onion address&gt;.onion:8333
+
+<span class="section">[inbound]</span>
+bind = 127.0.0.1:8333
+self = &lt;hidden service onion address&gt;.onion:8333
+
+<span class="section">[peer]</span>
+gossip_ipv4 = false
+gossip_tor = true
+</code></pre>
+<ul>
+<li><code>gossip_ipv4 = false</code> keeps clear addresses out of the address pool,
+  so no connection goes through an exit relay and no clear address is
+  relayed.</li>
+<li>The loopback binding accepts only connections from the hidden service
+  (<code>HiddenServicePort 8333 127.0.0.1:8333</code> in <code>torrc</code>), not from the clear
+  network.</li>
+<li>Only the onion address is advertised.</li>
+<li>Manual peers connect directly unless <code>manual.socks</code> is set.</li>
+</ul>
+<p>An I2P-only node is the same with the I2P proxy and seeds
+(above), <code>gossip_i2p = true</code> in place of <code>gossip_tor</code>, and the
+loopback binding, since inbound I2P connections arrive through the SAM
+bridge.</p>
+<p><strong>Tor and I2P together.</strong></p>
+<p>A node can accept on both, through a hidden service and the SAM bridge,
+but its one outbound proxy reaches only one network. With gossip of the
+other network on, its addresses are relayed, and outbound attempts to
+them through the proxy fail. Advertising both addresses links them, as
+with a clear address.</p>
+<h3 id="516-fixed-peers">5.16 Fixed peers<a class="anchor" href="#516-fixed-peers" aria-label="Link to this section">#</a></h3>
 <pre><code class="language-ini"><span class="section">[manual]</span>
 peer = 192.168.0.10:8333
 peer = 192.168.0.11:8333
@@ -1057,7 +1186,7 @@ connections = 0
 connects to peers from the address pool, and <code>inbound.connections = 0</code>
 disables the inbound session, which otherwise accepts peers that connect to
 the node. The node then exchanges only with the peers listed.</p>
-<h3 id="518-peer-services-and-policy">5.18 Peer services and policy<a class="anchor" href="#518-peer-services-and-policy" aria-label="Link to this section">#</a></h3>
+<h3 id="517-peer-services-and-policy">5.17 Peer services and policy<a class="anchor" href="#517-peer-services-and-policy" aria-label="Link to this section">#</a></h3>
 <p>What the node provides to and requires of its peers, and its transaction
 policy:</p>
 <pre><code class="language-ini"><span class="section">[node]</span>
@@ -1096,7 +1225,7 @@ enable_witness_tx = true    # in/out wtxid for tx announcements
 enable_memory_pool = true   # respond to mempool message with full pool
 enable_not_found = true     # send not_found messages (vs. dropping peer for requesting what we don't have)
 </code></pre>
-<h3 id="519-integrated-load-balancing">5.19 Integrated load balancing<a class="anchor" href="#519-integrated-load-balancing" aria-label="Link to this section">#</a></h3>
+<h3 id="518-integrated-load-balancing">5.18 Integrated load balancing<a class="anchor" href="#518-integrated-load-balancing" aria-label="Link to this section">#</a></h3>
 <p><code>outbound.bind</code> balances outbound peer connections across network
 adapters. Each binding is the address of an adapter, and each outbound
 connection slot is assigned one binding in turn. With this integrated load

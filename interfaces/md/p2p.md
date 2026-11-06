@@ -4,7 +4,7 @@ The Bitcoin P2P interface is Bitcoin's wire protocol, on which `bs` both
 syncs the chain and serves it. It is configured by the `[network]`,
 `[peer]`, `[inbound]`, `[outbound]` and `[manual]` sections (see
 [Configuration
-§5.18](../configuration/index#518-peer-services-and-policy)).
+§5.17](../configuration/index#517-peer-services-and-policy)).
 
 P2P and P2PS (BIP324) are reached on the same port:
 
