@@ -530,8 +530,8 @@
         <img src="performance/server-dispatch-zmq.png" alt="Transaction notification dispatch rate: comparative (log scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-dispatch-zmq-block.png" tabindex="0">
-        <h3>Block notification dispatch rate: comparative (log scale)</h3>
-        <img src="performance/server-dispatch-zmq-block.png" alt="Block notification dispatch rate: comparative (log scale)" loading="lazy">
+        <h3>Block notification fan-out time: comparative (log scale)</h3>
+        <img src="performance/server-dispatch-zmq-block.png" alt="Block notification fan-out time: comparative (log scale)" loading="lazy">
       </figure>
       <figure class="shot" data-full="performance/server-zmq.png" tabindex="0">
         <h3>Chain object rate: comparative (log scale)</h3>
@@ -548,15 +548,17 @@
       8 to 10 ms.
     </p>
     <p class="lede after">
-      Block dispatch is measured with 256 to 6,144 rawblock subscribers on one ZMTP endpoint, while
-      one P2P peer offers nine blocks 6 seconds apart. The rate is taken as for transactions. At
-      6,144 subscribers Libbitcoin delivers each block to all of them in about 310 ms, Bitcoin Core in
-      about 360 ms. As subscribers increase, the Libbitcoin rate rises from about 16,000 to 20,000 per
-      second, and the Bitcoin Core rate stays between 15,000 and 17,500. On Windows, Defender network
-      inspection, Web Threat Defense and the Windows Firewall examine each TCP send under a shared
-      kernel lock. Libbitcoin sends to subscribers in parallel and spends about half of its delivery
-      CPU waiting on that lock. Bitcoin Core sends from a single thread, so the same inspection does
-      not contend.
+      Block fan-out is measured with 256 to 6,144 rawblock subscribers on one ZMTP endpoint, while
+      one P2P peer offers nine blocks 6 seconds apart. For each block, the time from its push to its
+      arrival at the last subscriber is taken, less the same time measured with one subscriber (the
+      server's download, validation and organization of the pushed block, which precede any
+      broadcast), and the median over the nine blocks is plotted. At 256 subscribers Libbitcoin
+      reaches the last of them 23 ms after its fan-out begins, Bitcoin Core 61 ms; at 6,144
+      subscribers, 754 ms and 1,514 ms. Libbitcoin sends to subscribers from 32 threads and
+      Bitcoin Core from one; on Windows, Defender network inspection, Web Threat Defense and the
+      Windows Firewall examine each TCP send under a shared kernel lock, so the parallel sends
+      contend where the single sender does not, and Libbitcoin's delivery CPU per block is several
+      times Bitcoin Core's at the larger counts.
     </p>
     <p class="lede after">
       The chain object rate times each of the 28,142 transactions of blocks 950,001 to 950,009,
