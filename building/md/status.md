@@ -33,11 +33,11 @@ See [Release builds](../architecture/build/release) and
 
 | Package | Distribution | Latest |
 | ------- | ------------ | ------ |
-| deb | apt repository | |
+| deb | apt repository | [![apt](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Flibbitcoin%2Fapt%2Fmain%2Fdists%2Fstable%2Fmain%2Fbinary-amd64%2FPackages&search=Version%3A%20%28%5CS%2B%29&replace=%241&label=apt)](https://github.com/libbitcoin/apt) |
 | Homebrew formula | tap | [![Homebrew](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Flibbitcoin%2Fhomebrew-tap%2Fmain%2FFormula%2Flibbitcoin-server.rb&search=version%20%22%28%5B%5E%22%5D%2B%29%22&replace=%241&label=tap)](https://github.com/libbitcoin/homebrew-tap) |
 | winget | `winget-pkgs` | [![winget](https://img.shields.io/winget/v/Libbitcoin.Server)](https://github.com/microsoft/winget-pkgs/tree/master/manifests/l/Libbitcoin/Server) |
-| Docker image | `ghcr.io` | |
+| Docker image | `ghcr.io` | [![Docker](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fgithub.com%2Flibbitcoin%2Flibbitcoin-server%2Fpkgs%2Fcontainer%2Flibbitcoin-server&search=%5C%3Ftag%3D%28%5Cd%5B%5E%22%5D%2A%29%22&replace=%241&label=ghcr)](https://github.com/libbitcoin/libbitcoin-server/pkgs/container/libbitcoin-server) |
 | Umbrel app | app store | [![Umbrel](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fgetumbrel%2Fumbrel-apps%2Fmaster%2Fbitcoin-server%2Fumbrel-app.yml&query=%24.version&label=umbrel)](https://github.com/getumbrel/umbrel-apps/tree/master/bitcoin-server) |
-| StartOS package | registry | |
+| StartOS package | registry | [![StartOS](https://img.shields.io/badge/startos-resource%20not%20found-red)](https://marketplace.start9.com/?id=bitcoin-server) |
 
 See [Packaging](../architecture/build/packaging).
