@@ -33,7 +33,7 @@ The result is `~/libbitcoin/bin/bs`. On Windows, see
 $ bs
 ```
 
-With no configuration, `bs` syncs mainnet into a `bitcoin` store in the
+With no configuration, `bs` syncs mainnet into a `mainnet` store in the
 current directory, creating it if it does not exist. Progress is logged
 to the console. To stop, type `c` and `<enter>`, or press `<ctrl> c`. A
 restart resumes where it stopped.
@@ -48,9 +48,6 @@ configuration serves the admin console and the block explorer locally,
 and Electrum wallets on the network:
 
 ```ini
-[database]
-path = bitcoin
-
 [admin]
 bind = 127.0.0.1:8080
 connections = 10

@@ -13,14 +13,12 @@ $ bs -c signet.cfg
 The store is created in a `signet` directory under the working directory,
 apart from any mainnet store.
 
-Without a configuration file, `bs -n signet` creates a store with the same
-signet settings in the `bitcoin` directory. Later runs read the network
-from that store, so they need neither `-n` nor a configuration file.
+Without a configuration file, `bs -n signet` runs with the built-in
+signet settings, on the same `signet` store. Every run selects the network,
+by `-c signet.cfg` or `-n signet`. Without either, `bs` uses the `mainnet`
+store.
 
 ```ini
-[database]
-path = signet
-
 [bitcoin]
 network = signet
 bip16_activation_time = 1329264000

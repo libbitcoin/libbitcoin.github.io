@@ -338,13 +338,11 @@ instead of being mined competitively, so it produces blocks steadily, about
 </code></pre>
 <p>The store is created in a <code>signet</code> directory under the working directory,
 apart from any mainnet store.</p>
-<p>Without a configuration file, <code>bs -n signet</code> creates a store with the same
-signet settings in the <code>bitcoin</code> directory. Later runs read the network
-from that store, so they need neither <code>-n</code> nor a configuration file.</p>
-<pre><code class="language-ini"><span class="section">[database]</span>
-path = signet
-
-<span class="section">[bitcoin]</span>
+<p>Without a configuration file, <code>bs -n signet</code> runs with the built-in
+signet settings, on the same <code>signet</code> store. Every run selects the network,
+by <code>-c signet.cfg</code> or <code>-n signet</code>. Without either, <code>bs</code> uses the <code>mainnet</code>
+store.</p>
+<pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = signet
 bip16_activation_time = 1329264000
 bip34_activation_sample = 0

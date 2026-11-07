@@ -6,7 +6,7 @@ The executable is `bs` (`bs.exe` on Windows), and the examples run the
 same on Linux, macOS and Windows. `bs` runs with built-in mainnet
 defaults. No configuration file is read unless `--config` is given.
 
-Run with defaults. The store is created in a `bitcoin` directory under
+Run with defaults. The store is created in a `mainnet` directory under
 the current directory if it does not exist.
 
 ```
@@ -19,7 +19,8 @@ With a configuration file:
 $ bs --config bs.cfg
 ```
 
-To create the store for testnet3, testnet4, regtest or signet:
+To run on testnet3, testnet4, regtest or signet, with the store in a
+directory named for the network:
 
 ```
 $ bs -n testnet4
@@ -34,12 +35,13 @@ All options, grouped by purpose:
 | Group | Option | Purpose |
 | ----- | ------ | ------- |
 | Configuration | `-c`, `--config <path>` | Read settings from a configuration file |
+| | `-n`, `--net <network>` | Select the network (`mainnet`, `testnet3`, `testnet4`, `regtest` or `signet`), by default the configured `bitcoin.network` (`mainnet`) |
 | Prompts | `-a`, `--accept` | Accept startup prompts without interaction |
 | Information | `-h`, `--help` | Display command line options |
 | | `-s`, `--settings` | Display all configuration settings (with any `--config` applied) |
 | | `-v`, `--version` | Display version information |
 | | `-w`, `--hardware` | Display hardware compatibility (CPU features, GPU) |
-| Store | `-n`, `--new [<network>]` | Create a new store in the configured directory for the network (`mainnet`, `testnet3`, `testnet4`, `regtest` or `signet`), by default `mainnet` unless overridden by `bitcoin.network` in the configuration file |
+| Store | `-m`, `--make` | Create a new store in the configured directory, without running |
 | | `-b`, `--backup` | Snapshot the store (also available live from the console) |
 | | `-r`, `--restore` | Restore from the most recent snapshot |
 | Service | `-d`, `--daemon <value>` | Install (`true`) or uninstall (`false`) as a daemon/service |
@@ -49,9 +51,15 @@ All options, grouped by purpose:
 | | `-k`, `--buckets` | Display hashmap bucket fill |
 | | `-l`, `--collisions` | Display hashmap collision statistics (time consuming) |
 
-`-n` only creates the store. To create the store and run on a test
-network in one command, set the network in the configuration file
-instead, and start `bs` with it:
+The store directory is named for the network (`mainnet`, `testnet4` and
+so on). It is under the working directory, or under `database.path` when
+that is configured: `path = bitcoin` puts the mainnet store in
+`bitcoin/mainnet`. `bs` creates the store if it does not exist, and `-m`
+creates it without running. Every run selects the network, by `-n` or by
+`bitcoin.network` in a configuration file. Without either, `bs` uses the
+`mainnet` store.
+
+The network can be set in the configuration file instead of by `-n`:
 
 ```ini
 [bitcoin]
@@ -67,8 +75,8 @@ Display command line help:
 ```
 $ bs -h
 
-Usage: bs [-abfhiklnrsvw] [--config value] [--daemon value] [--user
-value]
+Usage: bs [-abfhiklmrsvw] [--config value] [--daemon value] [--net value]
+[--user value]
 
 Info: Runs a full node bitcoin server.
 
@@ -83,7 +91,10 @@ Options (named):
 -i [--information]   Scan and display store information.
 -k [--buckets]       Scan and display hashmap bucket fill.
 -l [--collisions]    Scan and show hashmap collision stats (may SIGKILL).
--n [--new]           Create new store for the network (mainnet|testnet3|testnet4|regtest|signet), defaults to the configured network.
+-m [--make]          Make new store in configured directory.
+-n [--net]           Specify the network
+                     (mainnet|testnet3|testnet4|regtest|signet), defaults
+                     to the configured network.
 -r [--restore]       Restore from most recent snapshot.
 -s [--settings]      Display all configuration settings.
 -u [--user]          Daemon logon credential, defaults to system account.
@@ -97,13 +108,13 @@ Display version information:
 $ bs --version
 Version Information...
 secp256k1............ internal
-openssl (tls)........ internal tls 1.3
-libbitcoin-system.... 4.0.10255 63f7b348
-libbitcoin-database.. 4.0.4703 10e63cfe
-libbitcoin-network... 4.0.7306 1feceb44
-libbitcoin-node...... 4.0.4262 74e460da
-libbitcoin-server.... 4.0.3334 996bec9f
-compiled schema...... 4.0.16
+tls.................. internal tls 1.3
+libbitcoin-system.... 4.0.10444 8a3cb4da
+libbitcoin-database.. 4.0.4814 167d381a
+libbitcoin-network... 4.0.7428 dd3e7777
+libbitcoin-node...... 4.0.4343 efadf0b5
+libbitcoin-server.... 4.0.3513 71a3750f
+compiled schema...... 4.0.29
 ```
 
 Display hardware compatibility:

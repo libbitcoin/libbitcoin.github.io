@@ -352,7 +352,7 @@ extensions they all have (see <a href="../building/options.html#2-hardware-optio
 <h2 id="2-sync">2. Sync<a class="anchor" href="#2-sync" aria-label="Link to this section">#</a></h2>
 <pre class="console"><code>$ bs
 </code></pre>
-<p>With no configuration, <code>bs</code> syncs mainnet into a <code>bitcoin</code> store in the
+<p>With no configuration, <code>bs</code> syncs mainnet into a <code>mainnet</code> store in the
 current directory, creating it if it does not exist. Progress is logged
 to the console. To stop, type <code>c</code> and <code>&lt;enter&gt;</code>, or press <code>&lt;ctrl&gt; c</code>. A
 restart resumes where it stopped.</p>
@@ -362,10 +362,7 @@ restart resumes where it stopped.</p>
 <p>Each interface is enabled by an address and a connection limit. This
 configuration serves the admin console and the block explorer locally,
 and Electrum wallets on the network:</p>
-<pre><code class="language-ini"><span class="section">[database]</span>
-path = bitcoin
-
-<span class="section">[admin]</span>
+<pre><code class="language-ini"><span class="section">[admin]</span>
 bind = 127.0.0.1:8080
 connections = 10
 

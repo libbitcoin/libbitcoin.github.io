@@ -336,13 +336,11 @@
 </code></pre>
 <p>The store is created in a <code>testnet4</code> directory under the working
 directory, apart from any mainnet store.</p>
-<p>Without a configuration file, <code>bs -n testnet4</code> creates a store with the same
-testnet4 settings in the <code>bitcoin</code> directory. Later runs read the network
-from that store, so they need neither <code>-n</code> nor a configuration file.</p>
-<pre><code class="language-ini"><span class="section">[database]</span>
-path = testnet4
-
-<span class="section">[bitcoin]</span>
+<p>Without a configuration file, <code>bs -n testnet4</code> runs with the built-in
+testnet4 settings, on the same <code>testnet4</code> store. Every run selects the network,
+by <code>-c testnet4.cfg</code> or <code>-n testnet4</code>. Without either, <code>bs</code> uses the <code>mainnet</code>
+store.</p>
+<pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = testnet4
 bip16_activation_time = 1329264000
 bip34_activation_sample = 0

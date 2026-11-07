@@ -12,14 +12,12 @@ $ bs -c testnet3.cfg
 The store is created in a `testnet3` directory under the working
 directory, apart from any mainnet store.
 
-Without a configuration file, `bs -n testnet3` creates a store with the same
-testnet3 settings in the `bitcoin` directory. Later runs read the network
-from that store, so they need neither `-n` nor a configuration file.
+Without a configuration file, `bs -n testnet3` runs with the built-in
+testnet3 settings, on the same `testnet3` store. Every run selects the network,
+by `-c testnet3.cfg` or `-n testnet3`. Without either, `bs` uses the `mainnet`
+store.
 
 ```ini
-[database]
-path = testnet3
-
 [bitcoin]
 network = testnet3
 bip16_activation_time = 1329264000

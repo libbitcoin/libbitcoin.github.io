@@ -14,14 +14,12 @@ $ bs -c regtest.cfg
 The store is created in a `regtest` directory under the working
 directory, apart from any mainnet store.
 
-Without a configuration file, `bs -n regtest` creates a store with the same
-regtest settings in the `bitcoin` directory. Later runs read the network
-from that store, so they need neither `-n` nor a configuration file.
+Without a configuration file, `bs -n regtest` runs with the built-in
+regtest settings, on the same `regtest` store. Every run selects the network,
+by `-c regtest.cfg` or `-n regtest`. Without either, `bs` uses the `mainnet`
+store.
 
 ```ini
-[database]
-path = regtest
-
 [bitcoin]
 network = regtest
 bip16_activation_time = 1329264000

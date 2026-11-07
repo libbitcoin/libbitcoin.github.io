@@ -334,14 +334,15 @@
 <p>The executable is <code>bs</code> (<code>bs.exe</code> on Windows), and the examples run the
 same on Linux, macOS and Windows. <code>bs</code> runs with built-in mainnet
 defaults. No configuration file is read unless <code>--config</code> is given.</p>
-<p>Run with defaults. The store is created in a <code>bitcoin</code> directory under
+<p>Run with defaults. The store is created in a <code>mainnet</code> directory under
 the current directory if it does not exist.</p>
 <pre class="console"><code>$ bs
 </code></pre>
 <p>With a configuration file:</p>
 <pre class="console"><code>$ bs --config bs.cfg
 </code></pre>
-<p>To create the store for testnet3, testnet4, regtest or signet:</p>
+<p>To run on testnet3, testnet4, regtest or signet, with the store in a
+directory named for the network:</p>
 <pre class="console"><code>$ bs -n testnet4
 </code></pre>
 <hr />
@@ -360,6 +361,11 @@ the current directory if it does not exist.</p>
 <td>Configuration</td>
 <td><code>-c</code>, <code>--config &lt;path&gt;</code></td>
 <td>Read settings from a configuration file</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-n</code>, <code>--net &lt;network&gt;</code></td>
+<td>Select the network (<code>mainnet</code>, <code>testnet3</code>, <code>testnet4</code>, <code>regtest</code> or <code>signet</code>), by default the configured <code>bitcoin.network</code> (<code>mainnet</code>)</td>
 </tr>
 <tr>
 <td>Prompts</td>
@@ -388,8 +394,8 @@ the current directory if it does not exist.</p>
 </tr>
 <tr>
 <td>Store</td>
-<td><code>-n</code>, <code>--new [&lt;network&gt;]</code></td>
-<td>Create a new store in the configured directory for the network (<code>mainnet</code>, <code>testnet3</code>, <code>testnet4</code>, <code>regtest</code> or <code>signet</code>), by default <code>mainnet</code> unless overridden by <code>bitcoin.network</code> in the configuration file</td>
+<td><code>-m</code>, <code>--make</code></td>
+<td>Create a new store in the configured directory, without running</td>
 </tr>
 <tr>
 <td></td>
@@ -433,9 +439,14 @@ the current directory if it does not exist.</p>
 </tr>
 </tbody>
 </table></div>
-<p><code>-n</code> only creates the store. To create the store and run on a test
-network in one command, set the network in the configuration file
-instead, and start <code>bs</code> with it:</p>
+<p>The store directory is named for the network (<code>mainnet</code>, <code>testnet4</code> and
+so on). It is under the working directory, or under <code>database.path</code> when
+that is configured: <code>path = bitcoin</code> puts the mainnet store in
+<code>bitcoin/mainnet</code>. <code>bs</code> creates the store if it does not exist, and <code>-m</code>
+creates it without running. Every run selects the network, by <code>-n</code> or by
+<code>bitcoin.network</code> in a configuration file. Without either, <code>bs</code> uses the
+<code>mainnet</code> store.</p>
+<p>The network can be set in the configuration file instead of by <code>-n</code>:</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = testnet4
 </code></pre>
@@ -444,8 +455,8 @@ network = testnet4
 <p>Display command line help:</p>
 <pre class="console"><code>$ bs -h
 
-Usage: bs [-abfhiklnrsvw] [--config value] [--daemon value] [--user
-value]
+Usage: bs [-abfhiklmrsvw] [--config value] [--daemon value] [--net value]
+[--user value]
 
 Info: Runs a full node bitcoin server.
 
@@ -460,7 +471,10 @@ Options (named):
 -i [--information]   Scan and display store information.
 -k [--buckets]       Scan and display hashmap bucket fill.
 -l [--collisions]    Scan and show hashmap collision stats (may SIGKILL).
--n [--new]           Create new store for the network (mainnet|testnet3|testnet4|regtest|signet), defaults to the configured network.
+-m [--make]          Make new store in configured directory.
+-n [--net]           Specify the network
+                     (mainnet|testnet3|testnet4|regtest|signet), defaults
+                     to the configured network.
 -r [--restore]       Restore from most recent snapshot.
 -s [--settings]      Display all configuration settings.
 -u [--user]          Daemon logon credential, defaults to system account.
@@ -471,13 +485,13 @@ Options (named):
 <pre class="console"><code>$ bs --version
 Version Information...
 secp256k1............ internal
-openssl (tls)........ internal tls 1.3
-libbitcoin-system.... 4.0.10255 63f7b348
-libbitcoin-database.. 4.0.4703 10e63cfe
-libbitcoin-network... 4.0.7306 1feceb44
-libbitcoin-node...... 4.0.4262 74e460da
-libbitcoin-server.... 4.0.3334 996bec9f
-compiled schema...... 4.0.16
+tls.................. internal tls 1.3
+libbitcoin-system.... 4.0.10444 8a3cb4da
+libbitcoin-database.. 4.0.4814 167d381a
+libbitcoin-network... 4.0.7428 dd3e7777
+libbitcoin-node...... 4.0.4343 efadf0b5
+libbitcoin-server.... 4.0.3513 71a3750f
+compiled schema...... 4.0.29
 </code></pre>
 <p>Display hardware compatibility:</p>
 <pre class="console"><code>$ bs --hardware

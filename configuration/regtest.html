@@ -338,13 +338,11 @@ testing.</p>
 </code></pre>
 <p>The store is created in a <code>regtest</code> directory under the working
 directory, apart from any mainnet store.</p>
-<p>Without a configuration file, <code>bs -n regtest</code> creates a store with the same
-regtest settings in the <code>bitcoin</code> directory. Later runs read the network
-from that store, so they need neither <code>-n</code> nor a configuration file.</p>
-<pre><code class="language-ini"><span class="section">[database]</span>
-path = regtest
-
-<span class="section">[bitcoin]</span>
+<p>Without a configuration file, <code>bs -n regtest</code> runs with the built-in
+regtest settings, on the same <code>regtest</code> store. Every run selects the network,
+by <code>-c regtest.cfg</code> or <code>-n regtest</code>. Without either, <code>bs</code> uses the <code>mainnet</code>
+store.</p>
+<pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = regtest
 bip16_activation_time = 1329264000
 bip34_activation_sample = 0

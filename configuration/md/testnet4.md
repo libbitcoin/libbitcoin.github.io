@@ -11,14 +11,12 @@ $ bs -c testnet4.cfg
 The store is created in a `testnet4` directory under the working
 directory, apart from any mainnet store.
 
-Without a configuration file, `bs -n testnet4` creates a store with the same
-testnet4 settings in the `bitcoin` directory. Later runs read the network
-from that store, so they need neither `-n` nor a configuration file.
+Without a configuration file, `bs -n testnet4` runs with the built-in
+testnet4 settings, on the same `testnet4` store. Every run selects the network,
+by `-c testnet4.cfg` or `-n testnet4`. Without either, `bs` uses the `mainnet`
+store.
 
 ```ini
-[database]
-path = testnet4
-
 [bitcoin]
 network = testnet4
 bip16_activation_time = 1329264000

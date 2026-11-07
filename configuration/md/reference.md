@@ -50,8 +50,8 @@ gpu_scan_minimum = 65536
 interval_depth = 11
 # Save unconfirmable block state (prevents revalidation), defaults to 'true'.
 mark_unconfirmable = true
-# The blockchain database directory, defaults to 'bitcoin'.
-path = bitcoin
+# The base of the network-named blockchain database directory, defaults to the working directory.
+path = mainnet
 # Allow individual non-validation queries to use all CPUs, defaults to 'true'.
 turbo = true
 ```
