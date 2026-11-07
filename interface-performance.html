@@ -157,15 +157,12 @@
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 14px; margin-bottom: 56px; }
-  .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; cursor: zoom-in; }
-  .shot:hover, .shot:focus { border-color: var(--accent); outline: none; }
+  .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; }
+  .shot:hover, .shot:focus-within { border-color: var(--accent); }
+  .shot a { display: block; cursor: zoom-in; outline: none; }
   .shot h3 { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 0; }
   .shot img { display: block; width: 100%; height: auto; border-radius: 2px; }
   .shot figcaption { color: var(--ink-2); font-size: 13px; line-height: 1.45; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.88); overflow: auto; padding: 24px; cursor: grab; }
-  .lightbox.panning { cursor: grabbing; user-select: none; }
-  .lightbox[hidden] { display: none; }
-  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
   @media (max-width: 560px) { .gallery { grid-template-columns: 1fr; } }
 </style>
 <script src="skins/skins.js"></script>
@@ -337,9 +334,9 @@
   <section>
     <h2 id="efficiency">Efficiency<a class="anchor" href="#efficiency" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-efficiency.png" tabindex="0">
+      <figure class="shot">
         <h3>Index efficiency: multiple of other product (log scale)</h3>
-        <img src="performance/server-efficiency.png" alt="Index efficiency: multiple of other product (log scale)" loading="lazy">
+        <a href="performance/server-efficiency.png"><img src="performance/server-efficiency.png" alt="Index efficiency: multiple of other product (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -355,29 +352,29 @@
   <section>
     <h2 id="throughput">Throughput<a class="anchor" href="#throughput" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-throughput-p2ps-linear.png" tabindex="0">
+      <figure class="shot">
         <h3>P2P/S block throughput (linear scale)</h3>
-        <img src="performance/server-throughput-p2ps-linear.png" alt="P2P/S block throughput (linear scale)" loading="lazy">
+        <a href="performance/server-throughput-p2ps-linear.png"><img src="performance/server-throughput-p2ps-linear.png" alt="P2P/S block throughput (linear scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-throughput-p2p.png" tabindex="0">
+      <figure class="shot">
         <h3>P2P/S block/tx throughput (log scale)</h3>
-        <img src="performance/server-throughput-p2p.png" alt="P2P/S block/tx throughput (log scale)" loading="lazy">
+        <a href="performance/server-throughput-p2p.png"><img src="performance/server-throughput-p2p.png" alt="P2P/S block/tx throughput (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-throughput-rpc.png" tabindex="0">
+      <figure class="shot">
         <h3>Bitcoind JSON-RPC block/tx throughput (log scale)</h3>
-        <img src="performance/server-throughput-rpc.png" alt="Bitcoind JSON-RPC block/tx throughput (log scale)" loading="lazy">
+        <a href="performance/server-throughput-rpc.png"><img src="performance/server-throughput-rpc.png" alt="Bitcoind JSON-RPC block/tx throughput (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-throughput-rest.png" tabindex="0">
+      <figure class="shot">
         <h3>Bitcoind REST block/tx throughput (log scale)</h3>
-        <img src="performance/server-throughput-rest.png" alt="Bitcoind REST block/tx throughput (log scale)" loading="lazy">
+        <a href="performance/server-throughput-rest.png"><img src="performance/server-throughput-rest.png" alt="Bitcoind REST block/tx throughput (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-throughput-rest-hex.png" tabindex="0">
+      <figure class="shot">
         <h3>Bitcoind REST hex block/tx throughput (log scale)</h3>
-        <img src="performance/server-throughput-rest-hex.png" alt="Bitcoind REST hex block/tx throughput (log scale)" loading="lazy">
+        <a href="performance/server-throughput-rest-hex.png"><img src="performance/server-throughput-rest-hex.png" alt="Bitcoind REST hex block/tx throughput (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-throughput-native.png" tabindex="0">
+      <figure class="shot">
         <h3>Native REST block/tx throughput (log scale)</h3>
-        <img src="performance/server-throughput-native.png" alt="Native REST block/tx throughput (log scale)" loading="lazy">
+        <a href="performance/server-throughput-native.png"><img src="performance/server-throughput-native.png" alt="Native REST block/tx throughput (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -415,13 +412,13 @@
   <section>
     <h2 id="native-rest-interface">Native REST Interface<a class="anchor" href="#native-rest-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-native.png" tabindex="0">
+      <figure class="shot">
         <h3>Chain object rate (log scale)</h3>
-        <img src="performance/server-native.png" alt="Chain object rate (log scale)" loading="lazy">
+        <a href="performance/server-native.png"><img src="performance/server-native.png" alt="Chain object rate (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-native-history.png" tabindex="0">
+      <figure class="shot">
         <h3>Address output rate (log scale)</h3>
-        <img src="performance/server-native-history.png" alt="Address output rate (log scale)" loading="lazy">
+        <a href="performance/server-native-history.png"><img src="performance/server-native-history.png" alt="Address output rate (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -434,13 +431,13 @@
   <section>
     <h2 id="electrum-interface">Electrum Interface<a class="anchor" href="#electrum-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-electrum.png" tabindex="0">
+      <figure class="shot">
         <h3>Chain object rate: comparative (log scale)</h3>
-        <img src="performance/server-electrum.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+        <a href="performance/server-electrum.png"><img src="performance/server-electrum.png" alt="Chain object rate: comparative (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-history.png" tabindex="0">
+      <figure class="shot">
         <h3>Address history rate: comparative (log scale)</h3>
-        <img src="performance/server-history.png" alt="Address history rate: comparative (log scale)" loading="lazy">
+        <a href="performance/server-history.png"><img src="performance/server-history.png" alt="Address history rate: comparative (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -455,13 +452,13 @@
   <section>
     <h2 id="sparrow-interface">Sparrow Interface<a class="anchor" href="#sparrow-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-sp-gpu.png" tabindex="0">
+      <figure class="shot">
         <h3>Silent payments scan rate, GPU: comparative (log scale)</h3>
-        <img src="performance/server-sp-gpu.png" alt="Silent payments scan rate, GPU: comparative (log scale)" loading="lazy">
+        <a href="performance/server-sp-gpu.png"><img src="performance/server-sp-gpu.png" alt="Silent payments scan rate, GPU: comparative (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-sp-cpu.png" tabindex="0">
+      <figure class="shot">
         <h3>Silent payments scan rate, CPU: comparative (log scale)</h3>
-        <img src="performance/server-sp-cpu.png" alt="Silent payments scan rate, CPU: comparative (log scale)" loading="lazy">
+        <a href="performance/server-sp-cpu.png"><img src="performance/server-sp-cpu.png" alt="Silent payments scan rate, CPU: comparative (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -484,9 +481,9 @@
   <section>
     <h2 id="bitcoin-p2p-interface">Bitcoin P2P Interface<a class="anchor" href="#bitcoin-p2p-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-p2p.png" tabindex="0">
+      <figure class="shot">
         <h3>Chain object rate: comparative (log scale)</h3>
-        <img src="performance/server-p2p.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+        <a href="performance/server-p2p.png"><img src="performance/server-p2p.png" alt="Chain object rate: comparative (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -499,9 +496,9 @@
   <section>
     <h2 id="bitcoind-json-rpc-interface">Bitcoind JSON-RPC Interface<a class="anchor" href="#bitcoind-json-rpc-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-bitcoind.png" tabindex="0">
+      <figure class="shot">
         <h3>Chain object rate: comparative (log scale)</h3>
-        <img src="performance/server-bitcoind.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+        <a href="performance/server-bitcoind.png"><img src="performance/server-bitcoind.png" alt="Chain object rate: comparative (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -512,9 +509,9 @@
   <section>
     <h2 id="bitcoind-rest-interface">Bitcoind REST Interface<a class="anchor" href="#bitcoind-rest-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-rest.png" tabindex="0">
+      <figure class="shot">
         <h3>Chain object rate: comparative (log scale)</h3>
-        <img src="performance/server-rest.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+        <a href="performance/server-rest.png"><img src="performance/server-rest.png" alt="Chain object rate: comparative (log scale)" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -525,17 +522,17 @@
   <section>
     <h2 id="bitcoind-zmq-interface">Bitcoind ZMQ Interface<a class="anchor" href="#bitcoind-zmq-interface" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/server-dispatch-zmq.png" tabindex="0">
+      <figure class="shot">
         <h3>Transaction notification dispatch rate: comparative (log scale)</h3>
-        <img src="performance/server-dispatch-zmq.png" alt="Transaction notification dispatch rate: comparative (log scale)" loading="lazy">
+        <a href="performance/server-dispatch-zmq.png"><img src="performance/server-dispatch-zmq.png" alt="Transaction notification dispatch rate: comparative (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-dispatch-zmq-block.png" tabindex="0">
+      <figure class="shot">
         <h3>Block notification fan-out time: comparative (log scale)</h3>
-        <img src="performance/server-dispatch-zmq-block.png" alt="Block notification fan-out time: comparative (log scale)" loading="lazy">
+        <a href="performance/server-dispatch-zmq-block.png"><img src="performance/server-dispatch-zmq-block.png" alt="Block notification fan-out time: comparative (log scale)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/server-zmq.png" tabindex="0">
+      <figure class="shot">
         <h3>Chain object rate: comparative (log scale)</h3>
-        <img src="performance/server-zmq.png" alt="Chain object rate: comparative (log scale)" loading="lazy">
+        <a href="performance/server-zmq.png"><img src="performance/server-zmq.png" alt="Chain object rate: comparative (log scale)" loading="lazy"></a>
       </figure>
 </div>
     <p class="lede after">
@@ -601,50 +598,11 @@
     </p>
   </section>
 
-  <div class="lightbox" id="lightbox" hidden><img alt=""></div>
 
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
 </div>
-<script>
-(function () {
-  var box = document.getElementById('lightbox'), img = box.querySelector('img');
-  function open(el) {
-    var copy = el.querySelector('img').cloneNode(true);
-    copy.removeAttribute('loading');
-    img.replaceWith(copy);
-    img = copy;
-    box.hidden = false;
-  }
-  function close() { box.hidden = true; }
-  document.querySelectorAll('.shot').forEach(function (el) {
-    el.addEventListener('click', function () { open(el); });
-    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(el); } });
-  });
-  var drag = null, dragged = false;
-  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
-  box.addEventListener('pointerdown', function (e) {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    e.preventDefault();
-    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
-    dragged = false;
-  });
-  box.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
-    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
-    box.scrollLeft = drag.left - dx;
-    box.scrollTop = drag.top - dy;
-  });
-  function release() { drag = null; box.classList.remove('panning'); }
-  box.addEventListener('pointerup', release);
-  box.addEventListener('pointercancel', release);
-  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-})();
-</script>
 <script>
 document.addEventListener('click', function (e) {
   document.querySelectorAll('nav.site details[open]').forEach(function (d) {

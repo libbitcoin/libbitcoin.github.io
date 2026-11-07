@@ -152,14 +152,10 @@
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
-  .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
+  .mermaid svg { max-width: 100%; height: auto; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
-  .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
-  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
-  .lightbox.panning { cursor: grabbing; user-select: none; }
-  .lightbox[hidden] { display: none; }
-  .lightbox svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
+  .doc a.figure { cursor: zoom-in; }
+  .doc a:not(.figure) img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .mermaid:not([data-processed]) { font-family: var(--mono); font-size: 12px; text-align: left; white-space: pre; color: var(--ink-3); }
   .mermaid p, .mermaid span, .mermaid div { margin: 0; max-width: none; }
 
@@ -404,7 +400,7 @@ one body type and exposes the query interface.</p>
 </tr>
 </tbody>
 </table></div>
-<p><img alt="Head types" src="figures/heads.png" /></p>
+<p><a class="figure" href="figures/heads.png"><img alt="Head types" src="figures/heads.png" /></a></p>
 <hr />
 <h2 id="1-links-and-keys">1. Links and keys<a class="anchor" href="#1-links-and-keys" aria-label="Link to this section">#</a></h2>
 <h3 id="11-linkagesize-bits">1.1 <code>linkage&lt;Size, Bits&gt;</code><a class="anchor" href="#11-linkagesize-bits" aria-label="Link to this section">#</a></h3>
@@ -475,7 +471,7 @@ terminal).</p>
 <code>Link::bits</code>. When <code>CellSize</code> is wider than the link, the remaining high
 bits are a <strong>bucket filter</strong>: a small bloom filter over the keys pushed into
 the bucket (<code>hashhead.hpp:43-48</code>).</p>
-<p><img alt="Hash head cell" src="figures/hash-cell.png" /></p>
+<p><a class="figure" href="figures/hash-cell.png"><img alt="Hash head cell" src="figures/hash-cell.png" /></a></p>
 <ul>
 <li><strong>Push</strong> computes the new cell (new link, filter OR the key's k bits) and
   installs it with a compare-exchange loop, so the filter can never lag the
@@ -490,7 +486,7 @@ the bucket (<code>hashhead.hpp:43-48</code>).</p>
   store keeps the k it was built with.</li>
 </ul>
 <p>Only three tables have spare cell bits, and so a working filter:</p>
-<p><img alt="Hash head cells of the store" src="figures/hash-cells.png" /></p>
+<p><a class="figure" href="figures/hash-cells.png"><img alt="Hash head cells of the store" src="figures/hash-cells.png" /></a></p>
 <blockquote>
 <p><strong>Invariant (Head-Hash-1).</strong> A cell's filter is a superset of the keys
 reachable from its link. A clear filter bit is therefore a proof of
@@ -516,7 +512,7 @@ count, so publishing the size publishes the newest cell. A value is either a
 link (masked to terminal) or an opaque integer no wider than the cell. A
 cell size of <code>max_size_t</code> makes the head a byte-addressed slab (used only by
 the envelope).</p>
-<p><img alt="Head map" src="figures/headmap.png" /></p>
+<p><a class="figure" href="figures/headmap.png"><img alt="Head map" src="figures/headmap.png" /></a></p>
 <p>Because a headmap has no body, its whole content is in the head, and it is
 restored with the heads at snapshot (<code>impl/primitives/headmap.ipp:51-62</code>).</p>
 <hr />
@@ -550,7 +546,7 @@ reclaims the prevout, pool, spends, wtxid and batch bodies
 <p>A hash head over a body whose elements are <code>[next][key][value]</code>
 (<code>primitives/hashmap.hpp:38-275</code>). Elements in a bucket form a stack
 through <code>next</code>, newest first.</p>
-<p><img alt="Hash map" src="figures/hashmap.png" /></p>
+<p><a class="figure" href="figures/hashmap.png"><img alt="Hash map" src="figures/hashmap.png" /></a></p>
 <ul>
 <li><strong>Two-phase commit.</strong> <code>allocate</code> and <code>set</code> write a complete element with
   its <code>next</code> unset, and <code>commit</code> pushes it onto the bucket. Until the
@@ -568,7 +564,7 @@ through <code>next</code>, newest first.</p>
 <p>Slab hashmaps (variable elements, byte-offset links) are supported by the
 template; the store uses record hashmaps throughout and keeps variable data
 in no maps and array maps.</p>
-<p><img alt="Hash map over a slab" src="figures/hashmap-slab.png" /></p>
+<p><a class="figure" href="figures/hashmap-slab.png"><img alt="Hash map over a slab" src="figures/hashmap-slab.png" /></a></p>
 <blockquote>
 <p><strong>Invariant (Map-Hash-1).</strong> An element is searchable if and only if its
 commit completed, and once searchable it remains so (heads are never
@@ -585,7 +581,7 @@ element (<code>primitives/arraymap.hpp:36-125</code>). <code>put(key, element)</
 element and stores its link into the bucket, expanding the head as needed.
 Buckets are mutable, so a key can be repointed while the old element stays
 in the body unreachable.</p>
-<p><img alt="Array map" src="figures/arraymap.png" /></p>
+<p><a class="figure" href="figures/arraymap.png"><img alt="Array map" src="figures/arraymap.png" /></a></p>
 <p>In the store every array map is keyed by <strong>header link</strong>: txs (block to its
 transactions), prevout (block to its spent-output cache), filter_bk and
 filter_tx (block to its BIP157 header and BIP158 filter). These replace the
@@ -595,7 +591,7 @@ already known, so the association is a direct index.</p>
 <p>A no head over a body, addressed only by link (<code>primitives/nomap.hpp:29-148</code>).
 Inputs and outputs are slab no maps: a transaction's inputs and outputs are
 found through foreign keys held by ins and outs, never by search.</p>
-<p><img alt="No map" src="figures/nomap.png" /></p>
+<p><a class="figure" href="figures/nomap.png"><img alt="No map" src="figures/nomap.png" /></a></p>
 <h3 id="44-multi-record-forms-hashmaps-arraymaps-nomaps">4.4 Multi-record forms: <code>hashmaps</code>, <code>arraymaps</code>, <code>nomaps</code><a class="anchor" href="#44-multi-record-forms-hashmaps-arraymaps-nomaps" aria-label="Link to this section">#</a></h3>
 <p>The three maps are general over record(s); <code>hashmap</code>, <code>arraymap</code> and
 <code>nomap</code> are the case of record(1)
@@ -603,7 +599,7 @@ found through foreign keys held by ins and outs, never by search.</p>
 hashmaps, record zero is keyed and searched; the other records are read by
 the same row link. A query that needs one record reads only that record's
 file, which keeps hot data dense in memory.</p>
-<p><img alt="Records" src="figures/records.png" /></p>
+<p><a class="figure" href="figures/records.png"><img alt="Records" src="figures/records.png" /></a></p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -673,56 +669,10 @@ file, which keeps hot data dense in memory.</p>
 
   <nav class="pager"><a href="reliability.html">&larr; Reliability</a><a href="tables.html">Tables &rarr;</a></nav>
 
-  <div class="lightbox" id="lightbox" hidden></div>
-
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
 </div>
-<script>
-(function () {
-  var box = document.getElementById('lightbox');
-  function open(svg) {
-    var copy = svg.cloneNode(true);
-    var view = (svg.getAttribute('viewBox') || '').split(/\s+/);
-    var width = parseFloat(view[2]) || svg.getBoundingClientRect().width;
-    copy.style.width = Math.max(width, 0) + 'px';
-    copy.removeAttribute('height');
-    box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
-  }
-  function close() { box.hidden = true; box.innerHTML = ''; }
-  document.addEventListener('click', function (e) {
-    var svg = e.target.closest('.mermaid svg');
-    if (svg) open(svg);
-    var img = e.target.closest('.doc img');
-    if (img && !img.closest('a')) {
-      var copy = img.cloneNode(true);
-      copy.style.width = img.naturalWidth + 'px';
-      box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
-    }
-  });
-  var drag = null, dragged = false;
-  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
-  box.addEventListener('pointerdown', function (e) {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
-    dragged = false;
-  });
-  box.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
-    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
-    box.scrollLeft = drag.left - dx;
-    box.scrollTop = drag.top - dy;
-  });
-  function release() { drag = null; box.classList.remove('panning'); }
-  box.addEventListener('pointerup', release);
-  box.addEventListener('pointercancel', release);
-  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-})();
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {

@@ -139,8 +139,9 @@
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 14px; margin-bottom: 56px; }
-  .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; cursor: zoom-in; }
-  .shot:hover, .shot:focus { border-color: var(--accent); outline: none; }
+  .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; }
+  .shot:hover, .shot:focus-within { border-color: var(--accent); }
+  .shot a { display: block; cursor: zoom-in; outline: none; }
   .menu { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 28px; padding: 10px 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
@@ -168,10 +169,6 @@
   .shot h3 { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 0; }
   .shot img { display: block; width: 100%; height: auto; border-radius: 2px; }
   .shot figcaption { color: var(--ink-2); font-size: 13px; line-height: 1.45; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.88); overflow: auto; padding: 24px; cursor: grab; }
-  .lightbox.panning { cursor: grabbing; user-select: none; }
-  .lightbox[hidden] { display: none; }
-  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
   @media (max-width: 560px) { .gallery { grid-template-columns: 1fr; } }
 </style>
 <script src="skins/skins.js"></script>
@@ -336,161 +333,122 @@
   <section>
     <h2 id="nodes">Nodes<a class="anchor" href="#nodes" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/stratton-milestone.png" tabindex="0">
+      <figure class="shot">
         <h3>Xeon E5: comparative milestone</h3>
-        <img src="performance/stratton-milestone.png" alt="Xeon E5: comparative milestone" loading="lazy">
+        <a href="performance/stratton-milestone.png"><img src="performance/stratton-milestone.png" alt="Xeon E5: comparative milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/stratton-validation.png" tabindex="0">
+      <figure class="shot">
         <h3>Xeon E5: comparative validation</h3>
-        <img src="performance/stratton-validation.png" alt="Xeon E5: comparative validation" loading="lazy">
+        <a href="performance/stratton-validation.png"><img src="performance/stratton-validation.png" alt="Xeon E5: comparative validation" loading="lazy"></a>
       </figure>
     </div>
 
     <h2 id="milestone">Milestone<a class="anchor" href="#milestone" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/shelly-milestone.png" tabindex="0">
+      <figure class="shot">
         <h3>Threadripper PRO: comparative milestone</h3>
-        <img src="performance/shelly-milestone.png" alt="Threadripper PRO: comparative milestone" loading="lazy">
+        <a href="performance/shelly-milestone.png"><img src="performance/shelly-milestone.png" alt="Threadripper PRO: comparative milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/shelly-milestone-bs.png" tabindex="0">
+      <figure class="shot">
         <h3>Threadripper PRO: milestone</h3>
-        <img src="performance/shelly-milestone-bs.png" alt="Threadripper PRO: milestone" loading="lazy">
+        <a href="performance/shelly-milestone-bs.png"><img src="performance/shelly-milestone-bs.png" alt="Threadripper PRO: milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/jennings-milestone.png" tabindex="0">
+      <figure class="shot">
         <h3>Raspberry Pi5: comparative milestone</h3>
-        <img src="performance/jennings-milestone.png" alt="Raspberry Pi5: comparative milestone" loading="lazy">
+        <a href="performance/jennings-milestone.png"><img src="performance/jennings-milestone.png" alt="Raspberry Pi5: comparative milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/jennings-milestone-bs.png" tabindex="0">
+      <figure class="shot">
         <h3>Raspberry Pi5: milestone</h3>
-        <img src="performance/jennings-milestone-bs.png" alt="Raspberry Pi5: milestone" loading="lazy">
+        <a href="performance/jennings-milestone-bs.png"><img src="performance/jennings-milestone-bs.png" alt="Raspberry Pi5: milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/minram-milestone-bs.png" tabindex="0">
+      <figure class="shot">
         <h3>Minimum RAM: all OS pruned milestone</h3>
-        <img src="performance/minram-milestone-bs.png" alt="Minimum RAM: all OS pruned milestone" loading="lazy">
+        <a href="performance/minram-milestone-bs.png"><img src="performance/minram-milestone-bs.png" alt="Minimum RAM: all OS pruned milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/minram-milestone-unpruned-bs.png" tabindex="0">
+      <figure class="shot">
         <h3>Minimum RAM: all OS unpruned milestone</h3>
-        <img src="performance/minram-milestone-unpruned-bs.png" alt="Minimum RAM: all OS unpruned milestone" loading="lazy">
+        <a href="performance/minram-milestone-unpruned-bs.png"><img src="performance/minram-milestone-unpruned-bs.png" alt="Minimum RAM: all OS unpruned milestone" loading="lazy"></a>
       </figure>
     </div>
 
     <h2 id="full-validation">Full validation<a class="anchor" href="#full-validation" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/shelly-reindex.png" tabindex="0">
+      <figure class="shot">
         <h3>Threadripper PRO: comparative validation</h3>
-        <img src="performance/shelly-reindex.png" alt="Threadripper PRO: comparative validation" loading="lazy">
+        <a href="performance/shelly-reindex.png"><img src="performance/shelly-reindex.png" alt="Threadripper PRO: comparative validation" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/shelly-validate-bs.png" tabindex="0">
+      <figure class="shot">
         <h3>Threadripper PRO: validation</h3>
-        <img src="performance/shelly-validate-bs.png" alt="Threadripper PRO: validation" loading="lazy">
+        <a href="performance/shelly-validate-bs.png"><img src="performance/shelly-validate-bs.png" alt="Threadripper PRO: validation" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/jennings-validate.png" tabindex="0">
+      <figure class="shot">
         <h3>Raspberry Pi5: comparative validation</h3>
-        <img src="performance/jennings-validate.png" alt="Raspberry Pi5: comparative validation" loading="lazy">
+        <a href="performance/jennings-validate.png"><img src="performance/jennings-validate.png" alt="Raspberry Pi5: comparative validation" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/jennings-lb-vs-core.png" tabindex="0">
+      <figure class="shot">
         <h3>Raspberry Pi5: Bitcoin Core v32 vs. v31</h3>
-        <img src="performance/jennings-lb-vs-core.png" alt="Raspberry Pi5: Bitcoin Core v32 vs. v31" loading="lazy">
+        <a href="performance/jennings-lb-vs-core.png"><img src="performance/jennings-lb-vs-core.png" alt="Raspberry Pi5: Bitcoin Core v32 vs. v31" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/minram-validate-bs.png" tabindex="0">
+      <figure class="shot">
         <h3>Minimum RAM: all OS validation</h3>
-        <img src="performance/minram-validate-bs.png" alt="Minimum RAM: all OS validation" loading="lazy">
+        <a href="performance/minram-validate-bs.png"><img src="performance/minram-validate-bs.png" alt="Minimum RAM: all OS validation" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/nm-lopp.png" tabindex="0">
+      <figure class="shot">
         <h3>Lopp benchmark: comparative validation</h3>
-        <img src="performance/nm-lopp.png" alt="Lopp benchmark: comparative validation" loading="lazy">
+        <a href="performance/nm-lopp.png"><img src="performance/nm-lopp.png" alt="Lopp benchmark: comparative validation" loading="lazy"></a>
       </figure>
     </div>
 
     <h2 id="mainnet-and-testnets">Mainnet and testnets<a class="anchor" href="#mainnet-and-testnets" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/sync-mainnet-milestone.png" tabindex="0">
+      <figure class="shot">
         <h3>Mainnet: milestone</h3>
-        <img src="performance/sync-mainnet-milestone.png" alt="Mainnet: milestone" loading="lazy">
+        <a href="performance/sync-mainnet-milestone.png"><img src="performance/sync-mainnet-milestone.png" alt="Mainnet: milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/sync-mainnet-validation.png" tabindex="0">
+      <figure class="shot">
         <h3>Mainnet: full validation</h3>
-        <img src="performance/sync-mainnet-validation.png" alt="Mainnet: full validation" loading="lazy">
+        <a href="performance/sync-mainnet-validation.png"><img src="performance/sync-mainnet-validation.png" alt="Mainnet: full validation" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/sync-testnet3-milestone.png" tabindex="0">
+      <figure class="shot">
         <h3>Testnet3: milestone</h3>
-        <img src="performance/sync-testnet3-milestone.png" alt="Testnet3: milestone" loading="lazy">
+        <a href="performance/sync-testnet3-milestone.png"><img src="performance/sync-testnet3-milestone.png" alt="Testnet3: milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/sync-testnet3-validation.png" tabindex="0">
+      <figure class="shot">
         <h3>Testnet3: full validation</h3>
-        <img src="performance/sync-testnet3-validation.png" alt="Testnet3: full validation" loading="lazy">
+        <a href="performance/sync-testnet3-validation.png"><img src="performance/sync-testnet3-validation.png" alt="Testnet3: full validation" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/sync-testnet4-milestone.png" tabindex="0">
+      <figure class="shot">
         <h3>Testnet4: milestone</h3>
-        <img src="performance/sync-testnet4-milestone.png" alt="Testnet4: milestone" loading="lazy">
+        <a href="performance/sync-testnet4-milestone.png"><img src="performance/sync-testnet4-milestone.png" alt="Testnet4: milestone" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/sync-testnet4-validation.png" tabindex="0">
+      <figure class="shot">
         <h3>Testnet4: full validation</h3>
-        <img src="performance/sync-testnet4-validation.png" alt="Testnet4: full validation" loading="lazy">
+        <a href="performance/sync-testnet4-validation.png"><img src="performance/sync-testnet4-validation.png" alt="Testnet4: full validation" loading="lazy"></a>
       </figure>
     </div>
 
     <h2 id="analysis">Analysis<a class="anchor" href="#analysis" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/machines-950k.png" tabindex="0">
+      <figure class="shot">
         <h3>Eight machines to block 950,000</h3>
-        <img src="performance/machines-950k.png" alt="Eight machines to block 950,000" loading="lazy">
+        <a href="performance/machines-950k.png"><img src="performance/machines-950k.png" alt="Eight machines to block 950,000" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/machines-power-memory.png" tabindex="0">
+      <figure class="shot">
         <h3>Eight machines: CPU power and RAM</h3>
-        <img src="performance/machines-power-memory.png" alt="Eight machines: CPU power and RAM" loading="lazy">
+        <a href="performance/machines-power-memory.png"><img src="performance/machines-power-memory.png" alt="Eight machines: CPU power and RAM" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/boundedness-950k.png" tabindex="0">
+      <figure class="shot">
         <h3>Boundedness by resource</h3>
-        <img src="performance/boundedness-950k.png" alt="Boundedness by resource" loading="lazy">
+        <a href="performance/boundedness-950k.png"><img src="performance/boundedness-950k.png" alt="Boundedness by resource" loading="lazy"></a>
       </figure>
     </div>
   </section>
 
-  <div class="lightbox" id="lightbox" hidden><img alt=""></div>
 
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
 </div>
-<script>
-(function () {
-  var box = document.getElementById('lightbox'), img = box.querySelector('img');
-  function open(el) {
-    var copy = el.querySelector('img').cloneNode(true);
-    copy.removeAttribute('loading');
-    img.replaceWith(copy);
-    img = copy;
-    box.hidden = false;
-  }
-  function close() { box.hidden = true; }
-  document.querySelectorAll('.shot').forEach(function (el) {
-    el.addEventListener('click', function () { open(el); });
-    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(el); } });
-  });
-  var drag = null, dragged = false;
-  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
-  box.addEventListener('pointerdown', function (e) {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    e.preventDefault();
-    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
-    dragged = false;
-  });
-  box.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
-    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
-    box.scrollLeft = drag.left - dx;
-    box.scrollTop = drag.top - dy;
-  });
-  function release() { drag = null; box.classList.remove('panning'); }
-  box.addEventListener('pointerup', release);
-  box.addEventListener('pointercancel', release);
-  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-})();
-</script>
 <script>
 document.addEventListener('click', function (e) {
   document.querySelectorAll('nav.site details[open]').forEach(function (d) {

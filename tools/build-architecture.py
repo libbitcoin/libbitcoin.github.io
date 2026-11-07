@@ -419,14 +419,10 @@ STYLE = """
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
-  .mermaid svg { max-width: 100%; height: auto; cursor: zoom-in; }
+  .mermaid svg { max-width: 100%; height: auto; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
-  .doc a img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
-  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.92); overflow: auto; padding: 24px; cursor: grab; }
-  .lightbox.panning { cursor: grabbing; user-select: none; }
-  .lightbox[hidden] { display: none; }
-  .lightbox svg { display: block; margin: 0 auto; max-width: none !important; height: auto; }
+  .doc a.figure { cursor: zoom-in; }
+  .doc a:not(.figure) img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .mermaid:not([data-processed]) { font-family: var(--mono); font-size: 12px; text-align: left; white-space: pre; color: var(--ink-3); }
   .mermaid p, .mermaid span, .mermaid div { margin: 0; max-width: none; }
 
@@ -523,6 +519,15 @@ def fade_comments(body):
         return m.group(1) + "\n".join(lines) + m.group(3)
 
     return re.sub(r'(<code class="language-ini">)(.*?)(</code>)', fade, body, flags=re.S)
+
+
+def link_images(body):
+    def link(m):
+        if m.group(1):
+            return m.group(0)
+        return '<a class="figure" href="%s">%s</a>' % (m.group(3), m.group(2))
+
+    return re.sub(r'(<a [^>]*>\s*)?(<img [^>]*src="([^"]+)"[^>]*>)', link, body)
 
 
 def wrap_tables(body):
@@ -632,6 +637,7 @@ def render(key, name, md, guard, logo, mermaid_src):
     body = fix_links(body, key)
     body = add_heading_ids(body)
     body = wrap_tables(body)
+    body = link_images(body)
     body = body.replace("<pre><code>$ ", '<pre class="console"><code>$ ')
     body = fade_comments(body)
     page_title = section["title"] if name == "index" or len(pages) == 1 else section["title"] + ": " + lede(title)
@@ -695,56 +701,10 @@ def render(key, name, md, guard, logo, mermaid_src):
 
   %(pager)s
 
-  <div class="lightbox" id="lightbox" hidden></div>
-
   <p class="foot">
     %(foot)s<span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
 </div>
-<script>
-(function () {
-  var box = document.getElementById('lightbox');
-  function open(svg) {
-    var copy = svg.cloneNode(true);
-    var view = (svg.getAttribute('viewBox') || '').split(/\s+/);
-    var width = parseFloat(view[2]) || svg.getBoundingClientRect().width;
-    copy.style.width = Math.max(width, 0) + 'px';
-    copy.removeAttribute('height');
-    box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
-  }
-  function close() { box.hidden = true; box.innerHTML = ''; }
-  document.addEventListener('click', function (e) {
-    var svg = e.target.closest('.mermaid svg');
-    if (svg) open(svg);
-    var img = e.target.closest('.doc img');
-    if (img && !img.closest('a')) {
-      var copy = img.cloneNode(true);
-      copy.style.width = img.naturalWidth + 'px';
-      box.innerHTML = ''; box.appendChild(copy); box.hidden = false;
-    }
-  });
-  var drag = null, dragged = false;
-  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
-  box.addEventListener('pointerdown', function (e) {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
-    dragged = false;
-  });
-  box.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
-    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
-    box.scrollLeft = drag.left - dx;
-    box.scrollTop = drag.top - dy;
-  });
-  function release() { drag = null; box.classList.remove('panning'); }
-  box.addEventListener('pointerup', release);
-  box.addEventListener('pointercancel', release);
-  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-})();
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
 <script>
 document.querySelectorAll('.doc pre > code.language-python, .doc pre > code.language-json, .doc pre > code.language-cpp, .doc pre > code.language-xml, .doc pre > code.language-sh').forEach(function (code) {
@@ -881,7 +841,7 @@ class Indexer(HTMLParser):
     VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
     INLINE = {"a", "abbr", "b", "code", "em", "i", "kbd", "mark", "small", "span", "strong", "sub", "sup"}
     SKIP_TAGS = {"script", "style", "nav", "svg", "template", "title"}
-    SKIP_CLASSES = {"eyebrow", "pager", "foot", "lightbox", "anchor", "mermaid"}
+    SKIP_CLASSES = {"eyebrow", "pager", "foot", "anchor", "mermaid"}
 
     def __init__(self, lede):
         super().__init__(convert_charrefs=True)

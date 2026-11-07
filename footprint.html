@@ -139,8 +139,9 @@
   a { color: var(--accent); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 14px; margin-bottom: 56px; }
-  .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; cursor: zoom-in; }
-  .shot:hover, .shot:focus { border-color: var(--accent); outline: none; }
+  .shot { margin: 0; background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 10px; }
+  .shot:hover, .shot:focus-within { border-color: var(--accent); }
+  .shot a { display: block; cursor: zoom-in; outline: none; }
   .menu { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 28px; padding: 10px 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
   .menu a { color: var(--ink-2); text-decoration: none; }
   .menu a:hover, .menu a:focus { color: var(--heading); }
@@ -168,10 +169,6 @@
   .shot h3 { color: var(--heading); font-family: var(--mono); font-size: 14px; font-weight: 600; margin: 0; }
   .shot img { display: block; width: 100%; height: auto; border-radius: 2px; }
   .shot figcaption { color: var(--ink-2); font-size: 13px; line-height: 1.45; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.88); overflow: auto; padding: 24px; cursor: grab; }
-  .lightbox.panning { cursor: grabbing; user-select: none; }
-  .lightbox[hidden] { display: none; }
-  .lightbox img { display: block; margin: 0 auto; max-width: none; height: auto; -webkit-user-drag: none; user-select: none; }
   @media (max-width: 560px) { .gallery { grid-template-columns: 1fr; } }
 </style>
 <script src="skins/skins.js"></script>
@@ -334,100 +331,61 @@
   <section>
     <h2 id="dependencies">Dependencies<a class="anchor" href="#dependencies" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/install-makeup-libbitcoin.png" tabindex="0">
+      <figure class="shot">
         <h3>Libbitcoin Server (C++20)</h3>
-        <img src="performance/install-makeup-libbitcoin.png" alt="Libbitcoin Server (C++20)" loading="lazy">
+        <a href="performance/install-makeup-libbitcoin.png"><img src="performance/install-makeup-libbitcoin.png" alt="Libbitcoin Server (C++20)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/install-makeup-btcd.png" tabindex="0">
+      <figure class="shot">
         <h3>btcd (Go)</h3>
-        <img src="performance/install-makeup-btcd.png" alt="btcd (Go)" loading="lazy">
+        <a href="performance/install-makeup-btcd.png"><img src="performance/install-makeup-btcd.png" alt="btcd (Go)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/install-makeup-satd.png" tabindex="0">
+      <figure class="shot">
         <h3>satd (Rust)</h3>
-        <img src="performance/install-makeup-satd.png" alt="satd (Rust)" loading="lazy">
+        <a href="performance/install-makeup-satd.png"><img src="performance/install-makeup-satd.png" alt="satd (Rust)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/install-makeup-floresta.png" tabindex="0">
+      <figure class="shot">
         <h3>Floresta (Rust)</h3>
-        <img src="performance/install-makeup-floresta.png" alt="Floresta (Rust)" loading="lazy">
+        <a href="performance/install-makeup-floresta.png"><img src="performance/install-makeup-floresta.png" alt="Floresta (Rust)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/install-makeup-rbitcoin.png" tabindex="0">
+      <figure class="shot">
         <h3>rbitcoin (Rust)</h3>
-        <img src="performance/install-makeup-rbitcoin.png" alt="rbitcoin (Rust)" loading="lazy">
+        <a href="performance/install-makeup-rbitcoin.png"><img src="performance/install-makeup-rbitcoin.png" alt="rbitcoin (Rust)" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/install-makeup.png" tabindex="0">
+      <figure class="shot">
         <h3>Bitcoin Core (C++20) with Fulcrum (C++20) and Frigate (Java)</h3>
-        <img src="performance/install-makeup.png" alt="Bitcoin Core (C++20) with Fulcrum (C++20) and Frigate (Java)" loading="lazy">
+        <a href="performance/install-makeup.png"><img src="performance/install-makeup.png" alt="Bitcoin Core (C++20) with Fulcrum (C++20) and Frigate (Java)" loading="lazy"></a>
       </figure>
     </div>
 
     <h2 id="store-size">Store size<a class="anchor" href="#store-size" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/store-sizes.png" tabindex="0">
+      <figure class="shot">
         <h3>Comparative store size as a function of indexing</h3>
-        <img src="performance/store-sizes.png" alt="Comparative store size as a function of indexing" loading="lazy">
+        <a href="performance/store-sizes.png"><img src="performance/store-sizes.png" alt="Comparative store size as a function of indexing" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/index-sizes.png" tabindex="0">
+      <figure class="shot">
         <h3>Comparative incremental index size</h3>
-        <img src="performance/index-sizes.png" alt="Comparative incremental index size" loading="lazy">
+        <a href="performance/index-sizes.png"><img src="performance/index-sizes.png" alt="Comparative incremental index size" loading="lazy"></a>
       </figure>
     </div>
     <h2 id="size-and-scope">Size and scope<a class="anchor" href="#size-and-scope" aria-label="Link to this section">#</a></h2>
     <div class="gallery">
-      <figure class="shot" data-full="performance/install-sizes.png" tabindex="0">
+      <figure class="shot">
         <h3>Size required to run node, by platform</h3>
-        <img src="performance/install-sizes.png" alt="Size required to run node, by platform" loading="lazy">
+        <a href="performance/install-sizes.png"><img src="performance/install-sizes.png" alt="Size required to run node, by platform" loading="lazy"></a>
       </figure>
-      <figure class="shot" data-full="performance/install-interfaces.png" tabindex="0">
+      <figure class="shot">
         <h3>Interfaces and their protocols, by node</h3>
-        <img src="performance/install-interfaces.png" alt="Interfaces and their protocols, by node" loading="lazy">
+        <a href="performance/install-interfaces.png"><img src="performance/install-interfaces.png" alt="Interfaces and their protocols, by node" loading="lazy"></a>
       </figure>
     </div>
   </section>
 
-  <div class="lightbox" id="lightbox" hidden><img alt=""></div>
 
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
   </p>
 </div>
-<script>
-(function () {
-  var box = document.getElementById('lightbox'), img = box.querySelector('img');
-  function open(el) {
-    var copy = el.querySelector('img').cloneNode(true);
-    copy.removeAttribute('loading');
-    img.replaceWith(copy);
-    img = copy;
-    box.hidden = false;
-  }
-  function close() { box.hidden = true; }
-  document.querySelectorAll('.shot').forEach(function (el) {
-    el.addEventListener('click', function () { open(el); });
-    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(el); } });
-  });
-  var drag = null, dragged = false;
-  box.addEventListener('dragstart', function (e) { e.preventDefault(); });
-  box.addEventListener('pointerdown', function (e) {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    e.preventDefault();
-    drag = { x: e.clientX, y: e.clientY, left: box.scrollLeft, top: box.scrollTop };
-    dragged = false;
-  });
-  box.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (!dragged && Math.abs(dx) + Math.abs(dy) < 4) return;
-    if (!dragged) { dragged = true; box.classList.add('panning'); box.setPointerCapture(e.pointerId); }
-    box.scrollLeft = drag.left - dx;
-    box.scrollTop = drag.top - dy;
-  });
-  function release() { drag = null; box.classList.remove('panning'); }
-  box.addEventListener('pointerup', release);
-  box.addEventListener('pointercancel', release);
-  box.addEventListener('click', function () { if (!dragged) close(); dragged = false; });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-})();
-</script>
 <script>
 document.addEventListener('click', function (e) {
   document.querySelectorAll('nav.site details[open]').forEach(function (d) {
