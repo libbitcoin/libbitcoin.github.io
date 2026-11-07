@@ -333,15 +333,20 @@
 <p>Regtest is a private test chain with minimal difficulty, for local
 testing.</p>
 <p>These settings have not yet been verified.</p>
-<p>Save the settings below as <code>regtest.cfg</code> and start the node with it:</p>
-<pre class="console"><code>$ bs -c regtest.cfg
+<p>Start the node on regtest:</p>
+<pre class="console"><code>$ bs -n regtest
 </code></pre>
-<p>The store is created in a <code>regtest</code> directory under the working
-directory, apart from any mainnet store.</p>
-<p>Without a configuration file, <code>bs -n regtest</code> runs with the built-in
-regtest settings, on the same <code>regtest</code> store. Every run selects the network,
-by <code>-c regtest.cfg</code> or <code>-n regtest</code>. Without either, <code>bs</code> uses the <code>mainnet</code>
-store.</p>
+<p><code>-n regtest</code> applies the built-in regtest defaults below, and keeps the store
+in a <code>regtest</code> directory under the working directory, apart from any mainnet
+store. Every run selects the network the same way. Without <code>-n regtest</code>,
+<code>bs</code> uses the <code>mainnet</code> store.</p>
+<p>The log files and the peer address cache (<code>hosts.cache</code>) are written by default
+to the working directory and are not separated by network, so run each
+network from its own working directory.</p>
+<h2 id="defaults">Defaults<a class="anchor" href="#defaults" aria-label="Link to this section">#</a></h2>
+<p>These are the settings in which the regtest defaults differ from mainnet, as
+displayed by <code>bs -n regtest --settings</code>. The derived bucket counts of the
+other tables also differ, as do the service ports (<a href="#ports">Ports</a>).</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = regtest
 bip16_activation_time = 1329264000
@@ -368,7 +373,6 @@ bip9_bit2_speedy_trial = false
 bip9_bit2_start = 4294967295
 bip9_bit2_threshold = 0
 bip9_bit2_timeout = 0
-checkpoint = 0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206:0
 genesis_block = 0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff7f20020000000101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000
 milestone = 0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206:0
 minimum_work = 0000000000000000000000000000000000000000000000000000000000000000
@@ -392,14 +396,11 @@ wif_prefix = 239
 witness_prefix = bcrt
 
 <span class="section">[inbound]</span>
-bind = 127.0.0.1:18444
+bind = 0.0.0.0:18444
 
 <span class="section">[outbound]</span>
 connections = 0
 host_pool_capacity = 0
-
-<span class="section">[manual]</span>
-peer = 127.0.0.1:18445
 
 <span class="section">[table.header]</span>
 expected = 10000
@@ -436,30 +437,48 @@ buckets = 10001
 <span class="section">[table.state]</span>
 buckets = 10001
 
-<span class="comment"># [table.scan]</span>
-<span class="comment"># buckets = 10001</span>
+<span class="section">[table.scan]</span>
+buckets = 10001
 </code></pre>
 <ul>
-<li><code>bitcoin.network</code> selects the regtest defaults, including the service
-  ports (<a href="#ports">Ports</a>).</li>
 <li><code>[bitcoin]</code> sets the regtest genesis block and difficulty limit, all
   soft forks active from genesis, and a 150 block subsidy interval.
-  There are no checkpoints beyond genesis and no minimum work.</li>
+  There are no checkpoints and no minimum work.</li>
 <li><code>forks.retarget = false</code> disables difficulty retargeting.</li>
 <li><code>peer.identifier</code> is the regtest network magic.</li>
 <li><code>[wallet]</code> sets the regtest address and key prefixes used by the server
   (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
-<li><code>bs</code> does not mine, so blocks come from a peer.</li>
 <li><code>[outbound]</code> disables seeding and outbound connections.</li>
-<li><code>[manual]</code> connects to a local node that generates blocks, here on port
-  18445 since <code>bs</code> listens on 18444.</li>
 <li><code>[table.*]</code> keeps the store small, since the mainnet defaults
   preallocate for the mainnet chain.</li>
-<li><code>[table.scan]</code> is commented out because it enables silent payments
-  (<a href="index.html#514-silent-payments">§5.14</a>). Uncomment it to index them.</li>
 </ul>
+<h2 id="configuration">Configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h2>
+<p>A configuration file is needed only to change a default. <code>bs</code> does not
+mine, and the regtest defaults make no outbound connections, so blocks
+come from a local node that generates them. This recommended file
+connects to one on port 18445, since <code>bs</code> listens on 18444, and serves the
+admin console and block explorer locally, which are off by default:</p>
+<pre><code class="language-ini"><span class="section">[bitcoin]</span>
+network = regtest
+
+<span class="section">[manual]</span>
+peer = 127.0.0.1:18445
+
+<span class="section">[admin]</span>
+bind = 127.0.0.1:28080
+connections = 10
+
+<span class="section">[native]</span>
+bind = 127.0.0.1:28180
+connections = 10
+</code></pre>
+<p>Save it as <code>regtest.cfg</code> and start the node with it:</p>
+<pre class="console"><code>$ bs -c regtest.cfg
+</code></pre>
+<p><code>bitcoin.network</code> in the file selects the network, so <code>-n</code> is not needed.
+The store is the same <code>regtest</code> store.</p>
 <h2 id="ports">Ports<a class="anchor" href="#ports" aria-label="Link to this section">#</a></h2>
-<p>With <code>bitcoin.network = regtest</code>, each service listens by default on its
+<p>On regtest, each service listens by default on its
 mainnet port plus 20,000 (<a href="index.html#6-ports">Ports</a>):</p>
 <div class="scroller"><table>
 <thead>

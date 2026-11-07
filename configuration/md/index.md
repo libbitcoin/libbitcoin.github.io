@@ -59,6 +59,10 @@ creates it without running. Every run selects the network, by `-n` or by
 `bitcoin.network` in a configuration file. Without either, `bs` uses the
 `mainnet` store.
 
+The log files and the peer address cache (`hosts.cache`) are written by default
+to the working directory and are not separated by network, so run each
+network from its own working directory.
+
 The network can be set in the configuration file instead of by `-n`:
 
 ```ini

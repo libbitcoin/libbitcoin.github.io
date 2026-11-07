@@ -331,15 +331,20 @@
 
   <article class="doc">
 <p>Testnet4 is the newest public test network, about 150,000 blocks.</p>
-<p>Save the settings below as <code>testnet4.cfg</code> and start the node with it:</p>
-<pre class="console"><code>$ bs -c testnet4.cfg
+<p>Start the node on testnet4:</p>
+<pre class="console"><code>$ bs -n testnet4
 </code></pre>
-<p>The store is created in a <code>testnet4</code> directory under the working
-directory, apart from any mainnet store.</p>
-<p>Without a configuration file, <code>bs -n testnet4</code> runs with the built-in
-testnet4 settings, on the same <code>testnet4</code> store. Every run selects the network,
-by <code>-c testnet4.cfg</code> or <code>-n testnet4</code>. Without either, <code>bs</code> uses the <code>mainnet</code>
-store.</p>
+<p><code>-n testnet4</code> applies the built-in testnet4 defaults below, and keeps the store
+in a <code>testnet4</code> directory under the working directory, apart from any mainnet
+store. Every run selects the network the same way. Without <code>-n testnet4</code>,
+<code>bs</code> uses the <code>mainnet</code> store.</p>
+<p>The log files and the peer address cache (<code>hosts.cache</code>) are written by default
+to the working directory and are not separated by network, so run each
+network from its own working directory.</p>
+<h2 id="defaults">Defaults<a class="anchor" href="#defaults" aria-label="Link to this section">#</a></h2>
+<p>These are the settings in which the testnet4 defaults differ from mainnet, as
+displayed by <code>bs -n testnet4 --settings</code>. The derived bucket counts of the
+other tables also differ, as do the service ports (<a href="#ports">Ports</a>).</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = testnet4
 bip16_activation_time = 1329264000
@@ -363,8 +368,8 @@ bip9_bit2_threshold = 0
 bip9_bit2_timeout = 0
 checkpoint = 00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043:0
 genesis_block = 0100000000000000000000000000000000000000000000000000000000000000000000004e7b2b9128fe0291db0693af2ae418b767e657cd407e80cb1434221eaea7a07a046f3566ffff001dbb0c78170101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff5504ffff001d01044c4c30332f4d61792f323032342030303030303030303030303030303030303030303165626435386332343439373062336161396437383362623030313031316662653865613865393865303065ffffffff0100f2052a010000002321000000000000000000000000000000000000000000000000000000000000000000ac00000000
-milestone = 0000000000d9877342754dea8ec1eb24631517d38e3443c370465ee53a8b7434:150000
-minimum_work = 0000000000000000000000000000000000000000000009a0fe15d0177d086304
+milestone = 0000000002368b1e4ee27e2e85676ae6f9f9e69579b29093e9a82c170bf7cf8a:123613
+minimum_work = 000000000000000000000000000000000000000000000b6a51f415a67c0da307
 
 <span class="section">[forks]</span>
 block_storm_patch = true
@@ -384,7 +389,7 @@ wif_prefix = 239
 witness_prefix = tb
 
 <span class="section">[inbound]</span>
-bind = 127.0.0.1:48333
+bind = 0.0.0.0:48333
 
 <span class="section">[outbound]</span>
 seed = seed.testnet4.bitcoin.sprovoost.nl:48333
@@ -430,12 +435,10 @@ buckets = 150001
 <span class="section">[table.state]</span>
 buckets = 150001
 
-<span class="comment"># [table.scan]</span>
-<span class="comment"># buckets = 150001</span>
+<span class="section">[table.scan]</span>
+buckets = 150001
 </code></pre>
 <ul>
-<li><code>bitcoin.network</code> selects the testnet4 defaults, including the service
-  ports (<a href="#ports">Ports</a>).</li>
 <li><code>[bitcoin]</code> replaces the chain parameters, with soft forks active from
   block 1.</li>
 <li><code>forks.time_warp_patch</code> enables the testnet4 time warp rule.</li>
@@ -446,13 +449,31 @@ buckets = 150001
 <li><code>[wallet]</code> sets the testnet address and key prefixes used by the server
   (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
 <li><code>[table.*]</code> sizes the store for the chain at 150,000 blocks.</li>
-<li><code>[table.scan]</code> is commented out because it enables silent payments
-  (<a href="index.html#514-silent-payments">§5.14</a>). Uncomment it to index them.</li>
 <li><code>node.maximum_concurrency</code> raises the download window, since testnet
   blocks are small.</li>
 </ul>
+<h2 id="configuration">Configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h2>
+<p>A configuration file is needed only to change a default. Network
+operation needs none, but the admin console and block explorer are off by
+default. This recommended file serves both locally:</p>
+<pre><code class="language-ini"><span class="section">[bitcoin]</span>
+network = testnet4
+
+<span class="section">[admin]</span>
+bind = 127.0.0.1:48080
+connections = 10
+
+<span class="section">[native]</span>
+bind = 127.0.0.1:48180
+connections = 10
+</code></pre>
+<p>Save it as <code>testnet4.cfg</code> and start the node with it:</p>
+<pre class="console"><code>$ bs -c testnet4.cfg
+</code></pre>
+<p><code>bitcoin.network</code> in the file selects the network, so <code>-n</code> is not needed.
+The store is the same <code>testnet4</code> store.</p>
 <h2 id="ports">Ports<a class="anchor" href="#ports" aria-label="Link to this section">#</a></h2>
-<p>With <code>bitcoin.network = testnet4</code>, each service listens by default on its
+<p>On testnet4, each service listens by default on its
 mainnet port plus 40,000 (<a href="index.html#6-ports">Ports</a>):</p>
 <div class="scroller"><table>
 <thead>

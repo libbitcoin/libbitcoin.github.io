@@ -4,19 +4,26 @@ Signet is a public test network whose blocks are signed by its operators
 instead of being mined competitively, so it produces blocks steadily, about
 321,000 to date.
 
-Save the settings below as `signet.cfg` and start the node with it:
+Start the node on signet:
 
 ```
-$ bs -c signet.cfg
+$ bs -n signet
 ```
 
-The store is created in a `signet` directory under the working directory,
-apart from any mainnet store.
+`-n signet` applies the built-in signet defaults below, and keeps the store
+in a `signet` directory under the working directory, apart from any mainnet
+store. Every run selects the network the same way. Without `-n signet`,
+`bs` uses the `mainnet` store.
 
-Without a configuration file, `bs -n signet` runs with the built-in
-signet settings, on the same `signet` store. Every run selects the network,
-by `-c signet.cfg` or `-n signet`. Without either, `bs` uses the `mainnet`
-store.
+The log files and the peer address cache (`hosts.cache`) are written by default
+to the working directory and are not separated by network, so run each
+network from its own working directory.
+
+## Defaults
+
+These are the settings in which the signet defaults differ from mainnet, as
+displayed by `bs -n signet --settings`. The derived bucket counts of the
+other tables also differ, as do the service ports ([Ports](#ports)).
 
 ```ini
 [bitcoin]
@@ -63,7 +70,7 @@ wif_prefix = 239
 witness_prefix = tb
 
 [inbound]
-bind = 127.0.0.1:38333
+bind = 0.0.0.0:38333
 
 [outbound]
 seed = seed.signet.bitcoin.sprovoost.nl:38333
@@ -104,12 +111,10 @@ buckets = 330001
 [table.state]
 buckets = 330001
 
-# [table.scan]
-# buckets = 330001
+[table.scan]
+buckets = 330001
 ```
 
-- `bitcoin.network` selects the signet defaults, including the service
-  ports ([Ports](#ports)).
 - `[bitcoin]` replaces the chain parameters: genesis block, soft fork
   activations, checkpoint, milestone, minimum work and proof of work limit.
 - `bitcoin.signet_challenge` is the script that each block's signature must
@@ -121,12 +126,38 @@ buckets = 330001
   ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the chain-height tables for about 330,000 blocks and
   starts every table body empty.
-- `[table.scan]` is commented out because it enables silent payments
-  ([§5.14](index#514-silent-payments)). Uncomment it to index them.
+
+## Configuration
+
+A configuration file is needed only to change a default. Network
+operation needs none, but the admin console and block explorer are off by
+default. This recommended file serves both locally:
+
+```ini
+[bitcoin]
+network = signet
+
+[admin]
+bind = 127.0.0.1:38080
+connections = 10
+
+[native]
+bind = 127.0.0.1:38180
+connections = 10
+```
+
+Save it as `signet.cfg` and start the node with it:
+
+```
+$ bs -c signet.cfg
+```
+
+`bitcoin.network` in the file selects the network, so `-n` is not needed.
+The store is the same `signet` store.
 
 ## Ports
 
-With `bitcoin.network = signet`, each service listens by default on its
+On signet, each service listens by default on its
 mainnet port plus 30,000 ([Ports](index#6-ports)):
 
 | Service | Section | Clear | Secure |

@@ -3,19 +3,26 @@
 Testnet3 is a long-running public test network, about 5.1 million
 blocks.
 
-Save the settings below as `testnet3.cfg` and start the node with it:
+Start the node on testnet3:
 
 ```
-$ bs -c testnet3.cfg
+$ bs -n testnet3
 ```
 
-The store is created in a `testnet3` directory under the working
-directory, apart from any mainnet store.
+`-n testnet3` applies the built-in testnet3 defaults below, and keeps the store
+in a `testnet3` directory under the working directory, apart from any mainnet
+store. Every run selects the network the same way. Without `-n testnet3`,
+`bs` uses the `mainnet` store.
 
-Without a configuration file, `bs -n testnet3` runs with the built-in
-testnet3 settings, on the same `testnet3` store. Every run selects the network,
-by `-c testnet3.cfg` or `-n testnet3`. Without either, `bs` uses the `mainnet`
-store.
+The log files and the peer address cache (`hosts.cache`) are written by default
+to the working directory and are not separated by network, so run each
+network from its own working directory.
+
+## Defaults
+
+These are the settings in which the testnet3 defaults differ from mainnet, as
+displayed by `bs -n testnet3 --settings`. The derived bucket counts of the
+other tables also differ, as do the service ports ([Ports](#ports)).
 
 ```ini
 [bitcoin]
@@ -36,14 +43,14 @@ bip9_bit2_activation_height = 0
 bip9_bit2_threshold = 1512
 checkpoint = 000000002a936ca763904c3c35fce2f3556c559c0214345d31b1bcebf76acb70:546
 genesis_block = 0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff001d1aa4ae180101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000
-milestone = 0000000000010c0090875c05870eed86761b7cde2c03e69d04e5314f6ff59341:5100000
+milestone = 0000000000000093bcb68c03a9a168ae252572d348a2eaeba2cdf9231d73206f:2500000
 minimum_work = 000000000000000000000000000000000000000000000b6a51f415a67c0da307
 
 [forks]
 difficult = false
 
 [inbound]
-bind = 127.0.0.1:18333
+bind = 0.0.0.0:18333
 
 [peer]
 identifier = 118034699
@@ -102,12 +109,10 @@ buckets = 5100001
 [table.state]
 buckets = 5100001
 
-# [table.scan]
-# buckets = 5100001
+[table.scan]
+buckets = 5100001
 ```
 
-- `bitcoin.network` selects the testnet3 defaults, including the service
-  ports ([Ports](#ports)).
 - `[bitcoin]` replaces the chain parameters: genesis block, soft fork
   activations, checkpoint, milestone and minimum work.
 - `forks.difficult = false` enables testnet's minimum difficulty blocks.
@@ -116,14 +121,40 @@ buckets = 5100001
 - `[wallet]` sets the testnet address and key prefixes used by the server
   ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the store for the chain at 5.1 million blocks.
-- `[table.scan]` is commented out because it enables silent payments
-  ([§5.14](index#514-silent-payments)). Uncomment it to index them.
 - `node.maximum_concurrency` raises the download window, since testnet
   blocks are small.
 
+## Configuration
+
+A configuration file is needed only to change a default. Network
+operation needs none, but the admin console and block explorer are off by
+default. This recommended file serves both locally:
+
+```ini
+[bitcoin]
+network = testnet3
+
+[admin]
+bind = 127.0.0.1:18080
+connections = 10
+
+[native]
+bind = 127.0.0.1:18180
+connections = 10
+```
+
+Save it as `testnet3.cfg` and start the node with it:
+
+```
+$ bs -c testnet3.cfg
+```
+
+`bitcoin.network` in the file selects the network, so `-n` is not needed.
+The store is the same `testnet3` store.
+
 ## Ports
 
-With `bitcoin.network = testnet3`, each service listens by default on its
+On testnet3, each service listens by default on its
 mainnet port plus 10,000 ([Ports](index#6-ports)):
 
 | Service | Section | Clear | Secure |

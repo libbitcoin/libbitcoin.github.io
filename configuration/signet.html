@@ -333,15 +333,20 @@
 <p>Signet is a public test network whose blocks are signed by its operators
 instead of being mined competitively, so it produces blocks steadily, about
 321,000 to date.</p>
-<p>Save the settings below as <code>signet.cfg</code> and start the node with it:</p>
-<pre class="console"><code>$ bs -c signet.cfg
+<p>Start the node on signet:</p>
+<pre class="console"><code>$ bs -n signet
 </code></pre>
-<p>The store is created in a <code>signet</code> directory under the working directory,
-apart from any mainnet store.</p>
-<p>Without a configuration file, <code>bs -n signet</code> runs with the built-in
-signet settings, on the same <code>signet</code> store. Every run selects the network,
-by <code>-c signet.cfg</code> or <code>-n signet</code>. Without either, <code>bs</code> uses the <code>mainnet</code>
-store.</p>
+<p><code>-n signet</code> applies the built-in signet defaults below, and keeps the store
+in a <code>signet</code> directory under the working directory, apart from any mainnet
+store. Every run selects the network the same way. Without <code>-n signet</code>,
+<code>bs</code> uses the <code>mainnet</code> store.</p>
+<p>The log files and the peer address cache (<code>hosts.cache</code>) are written by default
+to the working directory and are not separated by network, so run each
+network from its own working directory.</p>
+<h2 id="defaults">Defaults<a class="anchor" href="#defaults" aria-label="Link to this section">#</a></h2>
+<p>These are the settings in which the signet defaults differ from mainnet, as
+displayed by <code>bs -n signet --settings</code>. The derived bucket counts of the
+other tables also differ, as do the service ports (<a href="#ports">Ports</a>).</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = signet
 bip16_activation_time = 1329264000
@@ -386,7 +391,7 @@ wif_prefix = 239
 witness_prefix = tb
 
 <span class="section">[inbound]</span>
-bind = 127.0.0.1:38333
+bind = 0.0.0.0:38333
 
 <span class="section">[outbound]</span>
 seed = seed.signet.bitcoin.sprovoost.nl:38333
@@ -427,12 +432,10 @@ buckets = 330001
 <span class="section">[table.state]</span>
 buckets = 330001
 
-<span class="comment"># [table.scan]</span>
-<span class="comment"># buckets = 330001</span>
+<span class="section">[table.scan]</span>
+buckets = 330001
 </code></pre>
 <ul>
-<li><code>bitcoin.network</code> selects the signet defaults, including the service
-  ports (<a href="#ports">Ports</a>).</li>
 <li><code>[bitcoin]</code> replaces the chain parameters: genesis block, soft fork
   activations, checkpoint, milestone, minimum work and proof of work limit.</li>
 <li><code>bitcoin.signet_challenge</code> is the script that each block's signature must
@@ -444,11 +447,29 @@ buckets = 330001
   (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
 <li><code>[table.*]</code> sizes the chain-height tables for about 330,000 blocks and
   starts every table body empty.</li>
-<li><code>[table.scan]</code> is commented out because it enables silent payments
-  (<a href="index.html#514-silent-payments">§5.14</a>). Uncomment it to index them.</li>
 </ul>
+<h2 id="configuration">Configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h2>
+<p>A configuration file is needed only to change a default. Network
+operation needs none, but the admin console and block explorer are off by
+default. This recommended file serves both locally:</p>
+<pre><code class="language-ini"><span class="section">[bitcoin]</span>
+network = signet
+
+<span class="section">[admin]</span>
+bind = 127.0.0.1:38080
+connections = 10
+
+<span class="section">[native]</span>
+bind = 127.0.0.1:38180
+connections = 10
+</code></pre>
+<p>Save it as <code>signet.cfg</code> and start the node with it:</p>
+<pre class="console"><code>$ bs -c signet.cfg
+</code></pre>
+<p><code>bitcoin.network</code> in the file selects the network, so <code>-n</code> is not needed.
+The store is the same <code>signet</code> store.</p>
 <h2 id="ports">Ports<a class="anchor" href="#ports" aria-label="Link to this section">#</a></h2>
-<p>With <code>bitcoin.network = signet</code>, each service listens by default on its
+<p>On signet, each service listens by default on its
 mainnet port plus 30,000 (<a href="index.html#6-ports">Ports</a>):</p>
 <div class="scroller"><table>
 <thead>

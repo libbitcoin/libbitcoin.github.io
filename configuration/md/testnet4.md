@@ -2,19 +2,26 @@
 
 Testnet4 is the newest public test network, about 150,000 blocks.
 
-Save the settings below as `testnet4.cfg` and start the node with it:
+Start the node on testnet4:
 
 ```
-$ bs -c testnet4.cfg
+$ bs -n testnet4
 ```
 
-The store is created in a `testnet4` directory under the working
-directory, apart from any mainnet store.
+`-n testnet4` applies the built-in testnet4 defaults below, and keeps the store
+in a `testnet4` directory under the working directory, apart from any mainnet
+store. Every run selects the network the same way. Without `-n testnet4`,
+`bs` uses the `mainnet` store.
 
-Without a configuration file, `bs -n testnet4` runs with the built-in
-testnet4 settings, on the same `testnet4` store. Every run selects the network,
-by `-c testnet4.cfg` or `-n testnet4`. Without either, `bs` uses the `mainnet`
-store.
+The log files and the peer address cache (`hosts.cache`) are written by default
+to the working directory and are not separated by network, so run each
+network from its own working directory.
+
+## Defaults
+
+These are the settings in which the testnet4 defaults differ from mainnet, as
+displayed by `bs -n testnet4 --settings`. The derived bucket counts of the
+other tables also differ, as do the service ports ([Ports](#ports)).
 
 ```ini
 [bitcoin]
@@ -40,8 +47,8 @@ bip9_bit2_threshold = 0
 bip9_bit2_timeout = 0
 checkpoint = 00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043:0
 genesis_block = 0100000000000000000000000000000000000000000000000000000000000000000000004e7b2b9128fe0291db0693af2ae418b767e657cd407e80cb1434221eaea7a07a046f3566ffff001dbb0c78170101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff5504ffff001d01044c4c30332f4d61792f323032342030303030303030303030303030303030303030303165626435386332343439373062336161396437383362623030313031316662653865613865393865303065ffffffff0100f2052a010000002321000000000000000000000000000000000000000000000000000000000000000000ac00000000
-milestone = 0000000000d9877342754dea8ec1eb24631517d38e3443c370465ee53a8b7434:150000
-minimum_work = 0000000000000000000000000000000000000000000009a0fe15d0177d086304
+milestone = 0000000002368b1e4ee27e2e85676ae6f9f9e69579b29093e9a82c170bf7cf8a:123613
+minimum_work = 000000000000000000000000000000000000000000000b6a51f415a67c0da307
 
 [forks]
 block_storm_patch = true
@@ -61,7 +68,7 @@ wif_prefix = 239
 witness_prefix = tb
 
 [inbound]
-bind = 127.0.0.1:48333
+bind = 0.0.0.0:48333
 
 [outbound]
 seed = seed.testnet4.bitcoin.sprovoost.nl:48333
@@ -107,12 +114,10 @@ buckets = 150001
 [table.state]
 buckets = 150001
 
-# [table.scan]
-# buckets = 150001
+[table.scan]
+buckets = 150001
 ```
 
-- `bitcoin.network` selects the testnet4 defaults, including the service
-  ports ([Ports](#ports)).
 - `[bitcoin]` replaces the chain parameters, with soft forks active from
   block 1.
 - `forks.time_warp_patch` enables the testnet4 time warp rule.
@@ -123,14 +128,40 @@ buckets = 150001
 - `[wallet]` sets the testnet address and key prefixes used by the server
   ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the store for the chain at 150,000 blocks.
-- `[table.scan]` is commented out because it enables silent payments
-  ([§5.14](index#514-silent-payments)). Uncomment it to index them.
 - `node.maximum_concurrency` raises the download window, since testnet
   blocks are small.
 
+## Configuration
+
+A configuration file is needed only to change a default. Network
+operation needs none, but the admin console and block explorer are off by
+default. This recommended file serves both locally:
+
+```ini
+[bitcoin]
+network = testnet4
+
+[admin]
+bind = 127.0.0.1:48080
+connections = 10
+
+[native]
+bind = 127.0.0.1:48180
+connections = 10
+```
+
+Save it as `testnet4.cfg` and start the node with it:
+
+```
+$ bs -c testnet4.cfg
+```
+
+`bitcoin.network` in the file selects the network, so `-n` is not needed.
+The store is the same `testnet4` store.
+
 ## Ports
 
-With `bitcoin.network = testnet4`, each service listens by default on its
+On testnet4, each service listens by default on its
 mainnet port plus 40,000 ([Ports](index#6-ports)):
 
 | Service | Section | Clear | Secure |
