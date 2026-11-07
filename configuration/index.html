@@ -380,7 +380,7 @@ directory named for the network:</p>
 <tr>
 <td></td>
 <td><code>-s</code>, <code>--settings</code></td>
-<td>Display all configuration settings (with any <code>--config</code> applied)</td>
+<td>Display the settings in effect, with their descriptions and defaults (§4.1)</td>
 </tr>
 <tr>
 <td></td>
@@ -690,6 +690,28 @@ each name with its section:</p>
 <pre><code class="language-ini">database.path = bitcoin
 log.path = log
 </code></pre>
+<h3 id="41-displaying-settings">4.1 Displaying settings<a class="anchor" href="#41-displaying-settings" aria-label="Link to this section">#</a></h3>
+<p><code>bs -s</code> (<code>--settings</code>) prints every setting with the value in effect for
+that run, each under its section and preceded by its description and
+default. The values are the selected network's defaults, the values
+derived from them (such as table bucket counts, <a href="#91-bucket-autotuning">§9.1</a>),
+and any configured value, which is marked <code># configured</code>. Combine it with
+<code>-c</code> to see what a configuration file does, and with <code>-n</code> to see a
+network's values:</p>
+<pre class="console"><code>$ bs -c bs.cfg -s
+</code></pre>
+<pre><code class="language-ini"><span class="section">[node]</span>
+<span class="comment"># Maximum block height to populate, defaults to '0' (unlimited).</span>
+maximum_height = 900000 # configured
+
+<span class="section">[table.header]</span>
+<span class="comment"># The number of buckets in the header table head, dynamic default.</span>
+buckets = 385181
+</code></pre>
+<p>A setting with no value, such as an unset list, is printed commented out.
+Settings captured by an existing store (<a href="#10-settings-fixed-at-store-creation">§10</a>)
+are shown as configured; the store's values replace them when the store
+opens.</p>
 <hr />
 <h2 id="5-common-setups">5. Common setups<a class="anchor" href="#5-common-setups" aria-label="Link to this section">#</a></h2>
 <h3 id="51-sync-to-a-height-and-stop">5.1 Sync to a height and stop<a class="anchor" href="#51-sync-to-a-height-and-stop" aria-label="Link to this section">#</a></h3>
@@ -1931,8 +1953,39 @@ apply.</p>
 <hr />
 <h2 id="9-store-table-sizing-table">9. Store table sizing (<code>[table.*]</code>)<a class="anchor" href="#9-store-table-sizing-table" aria-label="Link to this section">#</a></h2>
 <p>The <code>[table.*]</code> settings are advanced and generally do not need to be
-changed. Each table has some of <code>buckets</code>, <code>expected</code>, <code>size</code> and
-<code>rate</code>, and the defaults are sized for mainnet at 950,000 blocks.</p>
+changed. Each table has some of these settings:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>buckets</code></td>
+<td>The number of buckets in the table head. For a searched (hashmap) table, more buckets mean shorter searches and a larger head. <code>0</code> disables an optional table.</td>
+</tr>
+<tr>
+<td><code>expected</code></td>
+<td>The expected entry count of a hashmap table, from which its bucket count is derived (<a href="#91-bucket-autotuning">§9.1</a>).</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td>The minimum allocation of the table body, in bytes.</td>
+</tr>
+<tr>
+<td><code>rate</code></td>
+<td>The percentage by which the table body grows when it fills.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The defaults depend on the network. Mainnet's are sized for 950,000
+blocks, and a test chain's are much smaller (<code>bs -n regtest -s</code> shows
+them). A body grows as needed, so <code>size</code> and <code>rate</code> only shape its
+allocation and can be changed at any time. The bucket counts of the
+hashmap tables are fixed when the store is created
+(<a href="#10-settings-fixed-at-store-creation">§10</a>).</p>
 <p>The common changes are:</p>
 <ul>
 <li>disabling the address index (<a href="#513-disable-the-address-index">5.13</a>);</li>
@@ -1972,9 +2025,11 @@ sync.</p>
 </table></div>
 <p>Between 8 and 32 GB the load factor falls in proportion to the memory.
 So a store created on a smaller machine uses less memory for its heads,
-and one created on a larger machine searches faster. A configured
-<code>buckets</code> value replaces the derived count, and <code>0</code> disables an optional
-table.</p>
+and one created on a larger machine searches faster. The <code>strong</code> table
+has one bucket per expected transaction (<code>table.tx.expected</code>), whatever
+the memory. A configured <code>buckets</code> value replaces the derived count, and
+<code>0</code> disables an optional table. <code>bs -s</code> shows the counts derived on the
+machine it runs on.</p>
 <hr />
 <h2 id="10-settings-fixed-at-store-creation">10. Settings fixed at store creation<a class="anchor" href="#10-settings-fixed-at-store-creation" aria-label="Link to this section">#</a></h2>
 <p>Some settings are captured in the store when it is created, in its
@@ -2001,7 +2056,7 @@ by name:</p>
 <tbody>
 <tr>
 <td><code>[bitcoin]</code></td>
-<td><code>network</code>, the chain parameters, soft fork activations and the milestone</td>
+<td><code>network</code>, the chain parameters, soft fork activations, the milestone, the top checkpoint and <code>signet_challenge</code></td>
 </tr>
 <tr>
 <td><code>[forks]</code></td>
@@ -2021,11 +2076,27 @@ by name:</p>
 </tr>
 </tbody>
 </table></div>
+<p>The values captured are those in effect when the store is created, not
+only those in the configuration file:</p>
+<ul>
+<li><strong>Network defaults.</strong> Any of these settings that is not configured
+  takes the selected network's default, and that default is captured.</li>
+<li><strong>Derived bucket counts.</strong> A bucket count that is not configured is
+  derived from the table's <code>expected</code> count and the installed memory
+  (<a href="#91-bucket-autotuning">§9.1</a>), and the derived count is captured. So
+  the same configuration creates different stores on machines with
+  different memory, and a store moved to another machine keeps its
+  counts.</li>
+</ul>
 <p>A different top checkpoint is logged but not replaced, and client filters
 cannot be added to a store created without them. To change any of these
 settings, create a new store. The setups that depend on
 them, from milestone sync and pruning to disabling the address index,
 take effect only on a new store.</p>
+<p>Of these values, <code>bs -s</code> reads only the network from an existing store.
+For the others it shows the values the configuration produces on the
+machine it runs on, and the store's values replace them when the store
+opens, each logged as above.</p>
 <hr />
 <h2 id="11-settings-reference">11. Settings Reference<a class="anchor" href="#11-settings-reference" aria-label="Link to this section">#</a></h2>
 <p>Every setting, by section, with its description and default, is on the

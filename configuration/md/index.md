@@ -38,7 +38,7 @@ All options, grouped by purpose:
 | | `-n`, `--net <network>` | Select the network (`mainnet`, `testnet3`, `testnet4`, `regtest` or `signet`), by default the configured `bitcoin.network` (`mainnet`) |
 | Prompts | `-a`, `--accept` | Accept startup prompts without interaction |
 | Information | `-h`, `--help` | Display command line options |
-| | `-s`, `--settings` | Display all configuration settings (with any `--config` applied) |
+| | `-s`, `--settings` | Display the settings in effect, with their descriptions and defaults (§4.1) |
 | | `-v`, `--version` | Display version information |
 | | `-w`, `--hardware` | Display hardware compatibility (CPU features, GPU) |
 | Store | `-m`, `--make` | Create a new store in the configured directory, without running |
@@ -228,6 +228,35 @@ each name with its section:
 database.path = bitcoin
 log.path = log
 ```
+
+### 4.1 Displaying settings
+
+`bs -s` (`--settings`) prints every setting with the value in effect for
+that run, each under its section and preceded by its description and
+default. The values are the selected network's defaults, the values
+derived from them (such as table bucket counts, [§9.1](#91-bucket-autotuning)),
+and any configured value, which is marked `# configured`. Combine it with
+`-c` to see what a configuration file does, and with `-n` to see a
+network's values:
+
+```
+$ bs -c bs.cfg -s
+```
+
+```ini
+[node]
+# Maximum block height to populate, defaults to '0' (unlimited).
+maximum_height = 900000 # configured
+
+[table.header]
+# The number of buckets in the header table head, dynamic default.
+buckets = 385181
+```
+
+A setting with no value, such as an unset list, is printed commented out.
+Settings captured by an existing store ([§10](#10-settings-fixed-at-store-creation))
+are shown as configured; the store's values replace them when the store
+opens.
 
 ---
 
@@ -1317,8 +1346,21 @@ apply.
 ## 9. Store table sizing (`[table.*]`)
 
 The `[table.*]` settings are advanced and generally do not need to be
-changed. Each table has some of `buckets`, `expected`, `size` and
-`rate`, and the defaults are sized for mainnet at 950,000 blocks.
+changed. Each table has some of these settings:
+
+| Setting | Purpose |
+| ------- | ------- |
+| `buckets` | The number of buckets in the table head. For a searched (hashmap) table, more buckets mean shorter searches and a larger head. `0` disables an optional table. |
+| `expected` | The expected entry count of a hashmap table, from which its bucket count is derived ([§9.1](#91-bucket-autotuning)). |
+| `size` | The minimum allocation of the table body, in bytes. |
+| `rate` | The percentage by which the table body grows when it fills. |
+
+The defaults depend on the network. Mainnet's are sized for 950,000
+blocks, and a test chain's are much smaller (`bs -n regtest -s` shows
+them). A body grows as needed, so `size` and `rate` only shape its
+allocation and can be changed at any time. The bucket counts of the
+hashmap tables are fixed when the store is created
+([§10](#10-settings-fixed-at-store-creation)).
 
 The common changes are:
 
@@ -1346,9 +1388,11 @@ sync.
 
 Between 8 and 32 GB the load factor falls in proportion to the memory.
 So a store created on a smaller machine uses less memory for its heads,
-and one created on a larger machine searches faster. A configured
-`buckets` value replaces the derived count, and `0` disables an optional
-table.
+and one created on a larger machine searches faster. The `strong` table
+has one bucket per expected transaction (`table.tx.expected`), whatever
+the memory. A configured `buckets` value replaces the derived count, and
+`0` disables an optional table. `bs -s` shows the counts derived on the
+machine it runs on.
 
 ---
 
@@ -1375,17 +1419,34 @@ The captured settings are:
 
 | Section | Settings |
 | ------- | -------- |
-| `[bitcoin]` | `network`, the chain parameters, soft fork activations and the milestone |
+| `[bitcoin]` | `network`, the chain parameters, soft fork activations, the milestone, the top checkpoint and `signet_challenge` |
 | `[forks]` | all |
 | `[database]` | `interval_depth` |
 | `[table.*]` | `buckets` of `header`, `tx`, `ins`, `outs`, `duplicate`, `pool` and `wtxid`, and whether client filters are enabled |
 | `[node]` | `limited_blocks` and `silent_start_height` |
+
+The values captured are those in effect when the store is created, not
+only those in the configuration file:
+
+- **Network defaults.** Any of these settings that is not configured
+  takes the selected network's default, and that default is captured.
+- **Derived bucket counts.** A bucket count that is not configured is
+  derived from the table's `expected` count and the installed memory
+  ([§9.1](#91-bucket-autotuning)), and the derived count is captured. So
+  the same configuration creates different stores on machines with
+  different memory, and a store moved to another machine keeps its
+  counts.
 
 A different top checkpoint is logged but not replaced, and client filters
 cannot be added to a store created without them. To change any of these
 settings, create a new store. The setups that depend on
 them, from milestone sync and pruning to disabling the address index,
 take effect only on a new store.
+
+Of these values, `bs -s` reads only the network from an existing store.
+For the others it shows the values the configuration produces on the
+machine it runs on, and the store's values replace them when the store
+opens, each logged as above.
 
 ---
 
