@@ -395,8 +395,8 @@
       unconfirmed transactions over P2P, so P2P transactions are shown for Libbitcoin alone. Bitcoin
       Core serves P2P blocks from a single thread and levels off at about 1,100 blocks per second
       from two connections, with latency growing in proportion to the load; Libbitcoin serves them
-      concurrently and reaches about 5,900 per second by 64 connections. Over encrypted (BIP324)
-      P2P, Libbitcoin reaches about 4,600 blocks per second and Bitcoin Core about 630, while
+      concurrently and reaches about 7,900 per second by 64 connections. Over encrypted (BIP324)
+      P2P, Libbitcoin reaches about 4,500 blocks per second and Bitcoin Core about 630, while
       Libbitcoin transactions are faster than unencrypted, since BIP324 drops the per-message
       double SHA-256 checksum and Libbitcoin's ChaCha20 is hardware accelerated.
     </p>
@@ -407,7 +407,7 @@
       is sent as about a hundred separately encrypted and authenticated records; that per-record
       work is inherent to HTTPS and secure websockets and weighs most on large responses. The HTTPS and secure websocket curves level off where the test
       client's TLS saturates its processes; Libbitcoin uses under six cores at those rates, and the
-      rate rises with more client processes. Plain HTTP transactions level off near 140,000 per
+      rate rises with more client processes. Plain HTTP transactions level off near 185,000 per
       second.
     </p>
   </section>
@@ -544,7 +544,8 @@
       offers the transactions of blocks 950,001 to 950,009 at 500 per second. For each notification,
       the span from its arrival at the first subscriber to its arrival at the last is taken, and the
       rate is the subscribers reached after the first per second of the median span. At 256
-      subscribers Libbitcoin delivers each notification to all of them in about 2 ms, Bitcoin Core in
+      subscribers Libbitcoin delivers each notification to all of them in 1.5 to 1.7 ms (2.7 to 3.2 ms
+      over CurveZMQ), Bitcoin Core in
       8 to 10 ms.
     </p>
     <p class="lede after">
