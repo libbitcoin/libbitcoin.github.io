@@ -7,6 +7,10 @@ where [Test practices](testing) says otherwise.
 code disagree, match the surrounding code and raise the discrepancy.
 Never restyle code you are not otherwise changing.
 
+**The C++20 contract holds both ways.** Code that exceeds C++20 is fixed
+in the code. A compiler that rejects conforming C++20 gets upgraded; the
+code is not contorted around it.
+
 ## 1. Files
 
 **License header.** Every hand-written source file begins with the AGPL
@@ -60,6 +64,13 @@ namespace network {
 } // namespace network
 } // namespace libbitcoin
 ```
+
+- Prefix OS and global symbols with `::`: `::CloseHandle`,
+  `::GetSystemInfo`.
+- A `.cpp` takes `using namespace system;` and names system symbols
+  unqualified. Headers qualify with `system::`. Base-namespace utilities
+  (`zero`, `is_zero`, `std_vector`) are never written `system::`. Keep a
+  `using namespace` at the narrowest scope possible.
 
 ### Includes
 
@@ -302,11 +313,6 @@ Classify the conversion from what the standard fixes, never from the
 compiler in front of you. For floating point, use `to_integer` and
 `to_floating`. For `bool`, use `to_int`.
 
-- **Use promotion-free math.** For sub-int operands use `add<T>`,
-  `subtract<T>` and `is_add_overflow<T>` (in the target type), and
-  `is_lesser` and `is_greater`. For mixed types use `greater` and
-  `lesser`, never `std::max` or `std::min`, which require both arguments
-  of one type.
 - Use `is_zero(x)`, `is_nonzero(x)`, `is_one(x)`, `zero`, `one`, `two`,
   `add1` and `sub1` rather than raw literals and `== 0`.
 - Add a literal suffix (`_size`, `_u64`) only where it establishes a type.
@@ -319,15 +325,22 @@ compiler in front of you. For floating point, use `to_integer` and
   change, which is `sign_cast`.
 - Arithmetic templates are constrained to unsigned types. Do not declare
   signed overloads.
-- Prefix OS and global symbols with `::`: `::CloseHandle`,
-  `::GetSystemInfo`.
-- A `.cpp` takes `using namespace system;` and names system symbols
-  unqualified. Headers qualify with `system::`. Base-namespace utilities
-  (`zero`, `is_zero`, `std_vector`) are never written `system::`. Keep a
-  `using namespace` at the narrowest scope possible.
-- **The C++20 contract holds both ways.** Code that exceeds C++20 is fixed
-  in the code. A compiler that rejects conforming C++20 gets upgraded; the
-  code is not contorted around it.
+
+### Integer math
+
+Native integer operators promote sub-`int` operands, convert signed to
+unsigned in mixed expressions, and leave overflow and wide shifts
+undefined. Use the constexpr math helpers in
+`<bitcoin/system/math/math.hpp>` instead, which fix the result type and
+define the edges: `add`, `subtract`, `is_lesser`, `is_greater`,
+`greater`, `lesser`, `shift_left`, `bit_and`, `floored_divide`,
+`is_add_overflow` and their siblings. Widen with the helper's template
+argument, not a cast:
+
+```cpp
+const auto total = add<uint64_t>(count, size);
+const auto top = shift_left<uint32_t>(byte, subtract(bits<uint32_t>, byte_bits));
+```
 
 ## 7. Errors and assertions
 
@@ -383,7 +396,8 @@ Run these against the diff before committing.
    `git diff -U0 | grep '^+#include <'`, then check each path.
 4. **Vocabulary.** Run the grep in section 2 over the added lines.
 5. **Casts and math.** No `static_cast<` on integers, no `std::max` or
-   `std::min` on mixed types, and no `== 0`:
+   `std::min` on mixed types, no native operator on mixed-sign or sub-int
+   operands, and no `== 0`:
    `git diff -U0 | grep -E '^\+.*(static_cast<|std::(max|min)\(| == 0\b)'`.
 6. **Macro bodies.** Every macro under a conditional is braced.
 7. **`NOEXCEPT`.** Present on every new function.

@@ -333,6 +333,9 @@ where <a href="testing.html">Test practices</a> says otherwise.</p>
 <p><strong>The code is the specification.</strong> Where this guide and the surrounding
 code disagree, match the surrounding code and raise the discrepancy.
 Never restyle code you are not otherwise changing.</p>
+<p><strong>The C++20 contract holds both ways.</strong> Code that exceeds C++20 is fixed
+in the code. A compiler that rejects conforming C++20 gets upgraded; the
+code is not contorted around it.</p>
 <h2 id="1-files">1. Files<a class="anchor" href="#1-files" aria-label="Link to this section">#</a></h2>
 <p><strong>License header.</strong> Every hand-written source file begins with the AGPL
 header, <code>Copyright (c) 2011-2026 libbitcoin developers</code>, copied verbatim
@@ -395,6 +398,14 @@ namespace network {
 } // namespace network
 } // namespace libbitcoin
 </code></pre>
+<ul>
+<li>Prefix OS and global symbols with <code>::</code>: <code>::CloseHandle</code>,
+  <code>::GetSystemInfo</code>.</li>
+<li>A <code>.cpp</code> takes <code>using namespace system;</code> and names system symbols
+  unqualified. Headers qualify with <code>system::</code>. Base-namespace utilities
+  (<code>zero</code>, <code>is_zero</code>, <code>std_vector</code>) are never written <code>system::</code>. Keep a
+  <code>using namespace</code> at the narrowest scope possible.</li>
+</ul>
 <h3 id="includes">Includes<a class="anchor" href="#includes" aria-label="Link to this section">#</a></h3>
 <p>Headers may not form an inclusion cycle, so the header dependencies of a
 library form a directed acyclic graph. These rules keep it that way, and
@@ -729,11 +740,6 @@ whose name states what is certain and what is possible:</p>
 compiler in front of you. For floating point, use <code>to_integer</code> and
 <code>to_floating</code>. For <code>bool</code>, use <code>to_int</code>.</p>
 <ul>
-<li><strong>Use promotion-free math.</strong> For sub-int operands use <code>add&lt;T&gt;</code>,
-  <code>subtract&lt;T&gt;</code> and <code>is_add_overflow&lt;T&gt;</code> (in the target type), and
-  <code>is_lesser</code> and <code>is_greater</code>. For mixed types use <code>greater</code> and
-  <code>lesser</code>, never <code>std::max</code> or <code>std::min</code>, which require both arguments
-  of one type.</li>
 <li>Use <code>is_zero(x)</code>, <code>is_nonzero(x)</code>, <code>is_one(x)</code>, <code>zero</code>, <code>one</code>, <code>two</code>,
   <code>add1</code> and <code>sub1</code> rather than raw literals and <code>== 0</code>.</li>
 <li>Add a literal suffix (<code>_size</code>, <code>_u64</code>) only where it establishes a type.
@@ -746,16 +752,19 @@ compiler in front of you. For floating point, use <code>to_integer</code> and
   change, which is <code>sign_cast</code>.</li>
 <li>Arithmetic templates are constrained to unsigned types. Do not declare
   signed overloads.</li>
-<li>Prefix OS and global symbols with <code>::</code>: <code>::CloseHandle</code>,
-  <code>::GetSystemInfo</code>.</li>
-<li>A <code>.cpp</code> takes <code>using namespace system;</code> and names system symbols
-  unqualified. Headers qualify with <code>system::</code>. Base-namespace utilities
-  (<code>zero</code>, <code>is_zero</code>, <code>std_vector</code>) are never written <code>system::</code>. Keep a
-  <code>using namespace</code> at the narrowest scope possible.</li>
-<li><strong>The C++20 contract holds both ways.</strong> Code that exceeds C++20 is fixed
-  in the code. A compiler that rejects conforming C++20 gets upgraded; the
-  code is not contorted around it.</li>
 </ul>
+<h3 id="integer-math">Integer math<a class="anchor" href="#integer-math" aria-label="Link to this section">#</a></h3>
+<p>Native integer operators promote sub-<code>int</code> operands, convert signed to
+unsigned in mixed expressions, and leave overflow and wide shifts
+undefined. Use the constexpr math helpers in
+<code>&lt;bitcoin/system/math/math.hpp&gt;</code> instead, which fix the result type and
+define the edges: <code>add</code>, <code>subtract</code>, <code>is_lesser</code>, <code>is_greater</code>,
+<code>greater</code>, <code>lesser</code>, <code>shift_left</code>, <code>bit_and</code>, <code>floored_divide</code>,
+<code>is_add_overflow</code> and their siblings. Widen with the helper's template
+argument, not a cast:</p>
+<pre><code class="language-cpp">const auto total = add&lt;uint64_t&gt;(count, size);
+const auto top = shift_left&lt;uint32_t&gt;(byte, subtract(bits&lt;uint32_t&gt;, byte_bits));
+</code></pre>
 <h2 id="7-errors-and-assertions">7. Errors and assertions<a class="anchor" href="#7-errors-and-assertions" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><strong>Never collapse error conditions.</strong> When you expect a specific failure,
@@ -809,7 +818,8 @@ compiler in front of you. For floating point, use <code>to_integer</code> and
    <code>git diff -U0 | grep '^+#include &lt;'</code>, then check each path.</li>
 <li><strong>Vocabulary.</strong> Run the grep in section 2 over the added lines.</li>
 <li><strong>Casts and math.</strong> No <code>static_cast&lt;</code> on integers, no <code>std::max</code> or
-   <code>std::min</code> on mixed types, and no <code>== 0</code>:
+   <code>std::min</code> on mixed types, no native operator on mixed-sign or sub-int
+   operands, and no <code>== 0</code>:
    <code>git diff -U0 | grep -E '^\+.*(static_cast&lt;|std::(max|min)\(| == 0\b)'</code>.</li>
 <li><strong>Macro bodies.</strong> Every macro under a conditional is braced.</li>
 <li><strong><code>NOEXCEPT</code>.</strong> Present on every new function.</li>
