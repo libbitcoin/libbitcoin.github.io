@@ -249,7 +249,7 @@ $ bs -c bs.cfg -s
 maximum_height = 900000 # configured
 
 [table.header]
-# The number of buckets in the header table head, dynamic default.
+# The number of buckets in the header table head, derived from expected and memory, defaults to '385181'.
 buckets = 385181
 ```
 
