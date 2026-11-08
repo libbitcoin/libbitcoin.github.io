@@ -336,7 +336,8 @@
 <p>Bitcoin Explorer (<code>bx</code>) is the libbitcoin command line client. Its
 commands work offline, on keys, addresses, transactions, scripts and
 encodings, and online, querying a libbitcoin server. It is built on
-libbitcoin-explorer, which depends on libbitcoin-system alone (see
+libbitcoin-explorer, which depends on libbitcoin-system and
+libbitcoin-network (see
 <a href="../developers/index.html">Developers</a>).</p>
 <p>Each command is run as <code>bx &lt;command&gt;</code>, with <code>bx &lt;command&gt; --help</code>
 describing its arguments. Commands read their main argument from the
@@ -624,7 +625,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tbody>
 <tr>
 <td><code>input-set</code></td>
-<td>Assign a script to an existing transaction input.</td>
+<td>Assign a script, and optionally a witness, to an existing transaction input.</td>
 </tr>
 <tr>
 <td><code>input-sign</code></td>
@@ -653,6 +654,14 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tr>
 <td><code>tx-sign</code></td>
 <td>Sign a set of transactions using a private key. Output is suitable for sending to Bitcoin network.</td>
+</tr>
+<tr>
+<td><code>witness-decode</code></td>
+<td>Decode a witness to bracketed Base16 data tokens.</td>
+</tr>
+<tr>
+<td><code>witness-encode</code></td>
+<td>Base16 encode a witness of bracketed Base16 data tokens.</td>
 </tr>
 </tbody>
 </table></div>
@@ -775,10 +784,6 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tr>
 <td><code>validate-tx</code></td>
 <td>Determine if a transaction is valid for submission to the blockchain. Requires a Libbitcoin server connection.</td>
-</tr>
-<tr>
-<td><code>version</code></td>
-<td>Fetch and display the libbitcoin server and client versions. Requires a Libbitcoin server connection.</td>
 </tr>
 <tr>
 <td><code>watch-key</code></td>
@@ -953,12 +958,20 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </thead>
 <tbody>
 <tr>
+<td><code>hardware</code></td>
+<td>Display hardware compatibility.</td>
+</tr>
+<tr>
 <td><code>help</code></td>
 <td>Get the list of commands.</td>
 </tr>
 <tr>
 <td><code>settings</code></td>
-<td>Display the loaded configuration settings.</td>
+<td>Display all configuration settings.</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>Display version information.</td>
 </tr>
 </tbody>
 </table></div>

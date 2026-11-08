@@ -5,7 +5,8 @@
 Bitcoin Explorer (`bx`) is the libbitcoin command line client. Its
 commands work offline, on keys, addresses, transactions, scripts and
 encodings, and online, querying a libbitcoin server. It is built on
-libbitcoin-explorer, which depends on libbitcoin-system alone (see
+libbitcoin-explorer, which depends on libbitcoin-system and
+libbitcoin-network (see
 [Developers](../developers/index)).
 
 Each command is run as `bx <command>`, with `bx <command> --help`
@@ -105,7 +106,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 
 | Command | Description |
 | ------- | ----------- |
-| `input-set` | Assign a script to an existing transaction input. |
+| `input-set` | Assign a script, and optionally a witness, to an existing transaction input. |
 | `input-sign` | Create an endorsement for a transaction input. |
 | `input-validate` | Validate a transaction input endorsement. |
 | `script-decode` | Decode a script to plain text tokens. |
@@ -113,6 +114,8 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `tx-decode` | Decode a Base16 transaction. |
 | `tx-encode` | Encode an unsigned transaction as Base16. |
 | `tx-sign` | Sign a set of transactions using a private key. Output is suitable for sending to Bitcoin network. |
+| `witness-decode` | Decode a witness to bracketed Base16 data tokens. |
+| `witness-encode` | Base16 encode a witness of bracketed Base16 data tokens. |
 
 ## 6. Messaging
 
@@ -148,7 +151,6 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `subscribe-block` | Watch the network for all blocks. Requires a Libbitcoin server connection. |
 | `subscribe-tx` | Watch the network for all transactions. Requires a Libbitcoin server connection. |
 | `validate-tx` | Determine if a transaction is valid for submission to the blockchain. Requires a Libbitcoin server connection. |
-| `version` | Fetch and display the libbitcoin server and client versions. Requires a Libbitcoin server connection. |
 | `watch-key` | Watch the network for transactions in which a payment key participates. Requires a Libbitcoin server connection. |
 | `watch-tx` | Watch the network for a transaction by hash. Requires a Libbitcoin server connection. |
 
@@ -201,5 +203,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 
 | Command | Description |
 | ------- | ----------- |
+| `hardware` | Display hardware compatibility. |
 | `help` | Get the list of commands. |
-| `settings` | Display the loaded configuration settings. |
+| `settings` | Display all configuration settings. |
+| `version` | Display version information. |

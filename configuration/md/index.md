@@ -1550,6 +1550,60 @@ apply.
 | `outbound.connections` | `100` | Outgoing peer connections while syncing. More peers may be required to saturate a high bandwidth network connection. |
 | `outbound.current_connections` | `10` | Outgoing peer connections once the chain is current, when fewer are needed. `0` keeps `outbound.connections`. |
 
+### 8.4 NUMA balancing (multi-socket Linux)
+
+On a Linux machine with more than one NUMA node (usually a machine with
+more than one CPU socket), disable the kernel's automatic NUMA balancing
+before you run `bs`. Ubuntu and most other distributions turn it on by
+default whenever the machine has more than one node.
+
+Check the node count and the current setting (`1` is on, `0` is off):
+
+```
+$ lscpu | grep NUMA
+$ cat /proc/sys/kernel/numa_balancing
+```
+
+Disable it for the whole machine, both now and after reboots:
+
+```
+$ echo 'kernel.numa_balancing = 0' | sudo tee /etc/sysctl.d/90-numa-balancing.conf
+$ sudo sysctl --system
+```
+
+If you can't change the setting for the whole machine, start `bs` with
+interleaved memory placement instead:
+
+```
+$ numactl --interleave=all bs --config bs.cfg
+```
+
+**Why it matters.** With balancing on, the kernel repeatedly unmaps pages
+of a running process to sample which NUMA node is reading them, then
+moves each page to the node that reads it most. `bs` maps its store into
+memory and reads and writes it from many threads running on every
+socket. Pages that both nodes use keep getting sampled and moved, and the
+kernel's page-migration walks and lock spinning take the CPU time that
+validation needs.
+
+**Measured on stratton.** stratton has 2× Xeon E5-2683 v4 (32 cores, 64
+threads, 2 NUMA nodes) and 256 GB RAM, running Ubuntu 26.04 with Linux
+7.0. Download time is measured from the first block to height 345,000.
+Each row is a set of identical runs:
+
+| Configuration | Runs | Download time (s) | Slow runs |
+| ------------- | ---- | ----------------- | --------- |
+| Balancing on (default) | 8 | 261 to 305 when fast; 443, 494 and more than 1,137 when slow | 3 |
+| Balancing on, `numactl --interleave=all` | 8 | 211 to 257 | 0 |
+| Balancing off (`kernel.numa_balancing = 0`) | 8 | 235 to 264 | 0 |
+
+With balancing on, about a third of all runs were slow. In the slow
+periods, the kernel's page migration took 40 to 59% of `bs` CPU time,
+and SHA-256 hashing took only 1 to 5%. In fast periods, migration took 0
+to 2%.
+
+Machines with a single NUMA node are not affected.
+
 ---
 
 ## 9. Store table sizing (`[table.*]`)
