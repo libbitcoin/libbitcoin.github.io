@@ -356,7 +356,8 @@ The admin interface is libbitcoin's own, and provides:
 - HTTP and websocket on each port. Over a websocket, each frame is one
   request path, and `log_subscribe` and `event_subscribe` stream the
   node's log and events.
-- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- TLS on its `safe` addresses (§7.2), with optional client certificates
+  (§7.3).
 - Credentials (§7.3), restricted by REST method names.
 
 ### 5.6 Block explorer
@@ -425,7 +426,8 @@ The native interface is libbitcoin's own, and provides:
   request path, and the `subscribe` paths (top, block, transaction,
   output and address) push notifications.
 - Data, text, JSON and HTML formats for each path.
-- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- TLS on its `safe` addresses (§7.2), with optional client certificates
+  (§7.3).
 - Credentials (§7.3), restricted by REST method names.
 
 ### 5.7 Electrum server
@@ -446,7 +448,7 @@ Beyond the standard Electrum transports (TCP and TLS), `bs` provides:
 - HTTP and websocket on the same ports. Subscriptions need a full duplex
   transport (TCP or websocket), so an HTTP connection's subscriptions
   are held until it upgrades to a websocket.
-- Client certificates on its `safe` addresses (§7.2).
+- Client certificates on its `safe` addresses (§7.3).
 - Credentials (§7.3), restricted by RPC method names. A credential
   refuses raw TCP clients.
 
@@ -475,7 +477,8 @@ Beyond the standard bitcoind interfaces (JSON-RPC over HTTP, and REST),
 `bs` provides:
 
 - JSON-RPC over websocket and raw TCP on the same ports.
-- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- TLS on its `safe` addresses (§7.2), with optional client certificates
+  (§7.3).
 - Credentials (§7.3) for REST as well as RPC, restricted by RPC and REST
   method names, which are distinct. A credential refuses raw TCP clients.
 
@@ -505,7 +508,7 @@ Beyond the standard btcd transports (HTTP and websocket, with TLS),
 `bs` provides:
 
 - JSON-RPC over raw TCP on the same ports.
-- Client certificates on its `safe` addresses (§7.2).
+- Client certificates on its `safe` addresses (§7.3).
 - Credentials (§7.3), restricted by RPC method names. Raw TCP clients
   authenticate with `authenticate`.
 
@@ -544,7 +547,8 @@ Beyond the standard Esplora interface, `bs` provides:
 - Websocket on the same ports. Each frame is one request path, and a
   request with a body (a broadcast) follows the path with a newline and
   the body.
-- TLS on its `safe` addresses (§7.2), with optional client certificates.
+- TLS on its `safe` addresses (§7.2), with optional client certificates
+  (§7.3).
 - Credentials (§7.3), restricted by REST method names.
 
 ### 5.12 Client filters (BIP157/158)
@@ -1179,6 +1183,126 @@ connections = 10
 credential = user:password
 ```
 
+### 6.1 Public servers
+
+The libbitcoin project runs two public `bs` servers:
+
+| Host | Address |
+| ---- | ------- |
+| `wormer.libbitcoin.net` | 72.65.246.83 |
+| `carmine.libbitcoin.net` | 72.65.246.84 |
+
+Each address serves mainnet, testnet3 and testnet4. Every chain accepts
+inbound P2P connections and serves these client services on its
+default ports (clear / secure):
+
+| Service | mainnet | testnet3 | testnet4 |
+| ------- | ------- | -------- | -------- |
+| P2P network | 8333 | 18333 | 48333 |
+| Native web and REST | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 |
+| Bitcoind RPC and REST | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 |
+| Bitcoind ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 |
+| BTCD RPC | 8480 / 8443 | 18480 / 18443 | 48480 / 48443 |
+| Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 |
+| Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 |
+| Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 |
+
+### 6.2 Running a public server
+
+A public server needs a DNS name for its address, a TLS certificate for
+that name, and a CurveZMQ key pair. This example uses
+`node.example.com` on Linux.
+
+**1. Get a TLS certificate.** [Let's Encrypt](https://letsencrypt.org)
+issues free certificates that clients trust without configuration.
+[Certbot](https://certbot.eff.org) proves control of the name by
+answering on port 80, which `bs` does not use. Open port 80 to the
+machine, then:
+
+```
+$ sudo certbot certonly --standalone --key-type ecdsa \
+    --elliptic-curve secp256r1 -d node.example.com
+```
+
+`bs` accepts ECDSA keys on P-256 or P-384, not RSA. Certbot writes the
+certificate chain and its key to `/etc/letsencrypt/live/node.example.com/`,
+readable only by root. Copy them where `bs` runs, owned by its user:
+
+```
+$ sudo install -o bitcoin -m 600 \
+    /etc/letsencrypt/live/node.example.com/fullchain.pem \
+    /etc/letsencrypt/live/node.example.com/privkey.pem ~bitcoin/
+```
+
+**2. Renew it.** Let's Encrypt certificates last 90 days, and certbot
+renews them automatically, again over port 80. `bs` reads its
+certificates when it starts, so each renewal must copy the new files and
+restart `bs`. Certbot runs a deploy hook after each renewal; place the
+`install` command above, followed by the restart, in
+`/etc/letsencrypt/renewal-hooks/deploy/bs.sh`.
+
+> **Note.** `bx` is not quite ready yet. The commands used here are not
+> yet available in a `bx` release.
+
+**3. Create the CurveZMQ key pair.** `bx curve-new` makes a server secret
+key from 256 bits of entropy. `bx dice-rolls` gives the number of
+throws, 256 for a coin, and `bx dice-entropy` converts them. Flip a coin
+that many times, write the flips down as one string of digits (heads 1,
+tails 0), and convert them:
+
+```
+$ bx dice-rolls --sides 2 --bits 256
+$ bx dice-entropy --sides 2 1101001110...
+$ bx curve-new <entropy>
+$ bx curve-public '<secret key>'
+```
+
+A die of up to 16 sides also works. Write each roll as one 0-based digit,
+using `a` to `f` above 9, and give its sides to both commands. For
+example, a six-sided die takes `--sides 6` and 102 rolls. `dice-entropy`
+rejects a sequence that would bias the entropy, which must then be
+rolled again.
+
+`curve-new` prints the secret key and `curve-public` its public key, both
+Z85 encoded. Z85 includes `#`, which a configuration file reads as a
+comment, so `curve-new` reports `The entropy produced an invalid key.`
+when either key contains one, and the coin must be flipped again. Quote
+the keys on the command line, as they contain shell characters.
+
+**4. Configure the services.** Bind each service on every adapter, clear
+and secure, with the certificate and key from step 1 and the ZMQ secret
+key from step 3:
+
+```ini
+[inbound]
+bind = 0.0.0.0:8333
+bind = [::]:8333
+
+[electrum]
+bind = 0.0.0.0:8580
+bind = [::]:8580
+safe = 0.0.0.0:8543
+safe = [::]:8543
+cert_path = fullchain.pem
+key_path = privkey.pem
+
+[bitcoind_zmq]
+bind = 0.0.0.0:8380
+bind = [::]:8380
+safe = 0.0.0.0:8343
+safe = [::]:8343
+key = <secret key>
+```
+
+The other client services follow `[electrum]`, each on its own ports
+(§6). With no `bitcoind_zmq.cert` lines, any ZMQ client may connect.
+Leave `[admin]` on the local machine (§5.5).
+
+**5. Publish the ZMQ public key.** TLS clients verify the server by its
+certificate, but a CurveZMQ client must already hold the server's public
+key. Publish the `curve-public` key beside the server's name and ports,
+for clients to configure as the server key. Never publish the secret key.
+
 ---
 
 ## 7. Settings shared by every service
@@ -1215,7 +1339,6 @@ addresses.
 | `cert_path` | Server certificate file (PEM). |
 | `key_path` | Server private key file (PEM). |
 | `key_pass` | Password of an encrypted private key, if any. |
-| `cert_auth` | Directory of trusted certificate files (PEM). When set, clients must present a certificate trusted by one of them, such as the client's own certificate. |
 
 The same certificate and key may be used by every service. For example,
 `[admin]` over TLS only:
@@ -1230,9 +1353,31 @@ key_path = server.key
 ```
 
 ZMQ uses CurveZMQ instead of TLS. Its `safe` addresses require the
-server's secret key (`bitcoind_zmq.key`, Z85 encoded), and each
-`bitcoind_zmq.cert` line authorizes one client public key. With no `cert`
-lines, any client may connect.
+server's secret key (`bitcoind_zmq.key`, Z85 encoded), made by
+`bx curve-new` (§6.2, step 3).
+
+#### Self-signed certificates
+
+> **Note.** `bx` is not quite ready yet. The commands used here are not
+> yet available in a `bx` release.
+
+A service that is not public, such as `[admin]`, needs no certificate
+authority. `bx tls-new` makes a P-256 private key from 256 bits of
+entropy, from coin flips or dice (§6.2, step 3), and `bx tls-cert` makes
+a self-signed certificate for it, naming the server by each host name
+and address its clients use:
+
+```
+$ bx tls-new <entropy> > server.key
+$ bx tls-cert --host localhost --ip 127.0.0.1 --ip ::1 < server.key > server.pem
+```
+
+The certificate is valid from now for 365 days, or `--days` days, and
+`--name` sets its common name. Set the two files as `cert_path` and
+`key_path`. A client trusts the server by holding `server.pem`, which
+contains no secret, as a trusted certificate (for example, `curl
+--cacert server.pem`). A browser shows a warning for a certificate it
+does not trust until it is imported or accepted.
 
 ### 7.3 Authentication
 
@@ -1261,6 +1406,49 @@ REST interfaces use these names, one for each kind of request path:
 | `[native]` | configuration, top, top_subscribe, block, block_header, block_header_context, block_details, block_tx, block_txs, block_filter, block_filter_hash, block_filter_header, block_subscribe, tx, tx_header, tx_details, tx_subscribe, inputs, input, input_script, input_witness, outputs, output, output_script, output_spender, output_spenders, output_subscribe, address, address_confirmed, address_unconfirmed, address_balance, address_subscribe |
 | `[esplora]` | blocks, block, block_header, block_height, block_status, block_txid, block_txids, block_txs, tip_hash, tip_height, tx, tx_status, tx_merkle_proof, tx_merkleblock_proof, tx_outspend, tx_outspends, address, address_txs, address_txs_chain, address_txs_mempool, address_utxo, mempool, mempool_txids, mempool_recent, fee_estimates, broadcast, broadcast_package |
 | `[admin]` | log_subscribe, event_subscribe |
+
+#### Client certificates
+
+`cert_auth` names a directory of trusted certificate files (PEM). When it
+is set, a TLS client must present a certificate trusted by one of them,
+such as the client's own certificate. The client makes its own key and
+self-signed certificate (§7.2), and gives only the certificate to the
+server operator, who places it in the `cert_auth` directory:
+
+```
+$ bx tls-new <entropy> > client.key
+$ bx tls-cert --name alice < client.key > client.pem
+```
+
+```ini
+[admin]
+safe = 127.0.0.1:8043
+safe = [::1]:8043
+cert_path = server.pem
+key_path = server.key
+cert_auth = clients
+```
+
+The client then presents both files, for example `curl --cert client.pem
+--key client.key --cacert server.pem https://localhost:8043/`. A browser
+imports a client certificate as PKCS#12, which `openssl pkcs12 -export`
+makes from the two files. Removing a certificate from `cert_auth` revokes
+that client when `bs` next starts.
+
+#### CurveZMQ client keys
+
+Each `bitcoind_zmq.cert` line authorizes one client public key on the ZMQ
+`safe` addresses. With no `cert` lines, any client may connect. The
+client makes its own key pair with `bx curve-new` and `bx curve-public`
+(§6.2, step 3), and gives only the public key to the server operator:
+
+```ini
+[bitcoind_zmq]
+safe = 127.0.0.1:8343
+safe = [::1]:8343
+key = <server secret key>
+cert = <client public key>
+```
 
 ### 7.4 HTTP services
 

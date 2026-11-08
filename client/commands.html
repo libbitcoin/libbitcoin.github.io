@@ -431,7 +431,11 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </tr>
 <tr>
 <td><code>dice-entropy</code></td>
-<td>Convert a sequence of dice rolls to Base16 data.</td>
+<td>Convert a sequence of dice rolls to Base16 entropy.</td>
+</tr>
+<tr>
+<td><code>dice-rolls</code></td>
+<td>Get the number of dice rolls that dice-entropy requires for an entropy size.</td>
 </tr>
 <tr>
 <td><code>ec-decompress</code></td>
@@ -894,11 +898,11 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <td>Convert BTC to satoshi.</td>
 </tr>
 <tr>
-<td><code>cert-new</code></td>
-<td>Create a Base85 Curve ZMQ private key for use with a Libbitcoin server. WARNING: entropy is obtained from the underlying platform.</td>
+<td><code>curve-new</code></td>
+<td>Create a Base85 Curve ZMQ private key for use with a Libbitcoin server from entropy.</td>
 </tr>
 <tr>
-<td><code>cert-public</code></td>
+<td><code>curve-public</code></td>
 <td>Derive a Base85 Curve ZMQ public key for use with a Libbitcoin server.</td>
 </tr>
 <tr>
@@ -928,6 +932,14 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tr>
 <td><code>satoshi-to-btc</code></td>
 <td>Convert satoshi to BTC.</td>
+</tr>
+<tr>
+<td><code>tls-cert</code></td>
+<td>Create a self-signed PEM TLS certificate for a P-256 private key, for use with a Libbitcoin server.</td>
+</tr>
+<tr>
+<td><code>tls-new</code></td>
+<td>Create a PEM P-256 TLS private key for use with a Libbitcoin server from entropy.</td>
 </tr>
 </tbody>
 </table></div>

@@ -50,7 +50,8 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `address-embed` | Create a pay-to-public-key-hash payment address with an embedded record of binary data. WARNING: any coin spent to this address is lost. |
 | `address-encode` | Convert a RIPEMD160 value to a payment address. |
 | `address-to-key` | Derive the payments search key of a payment address. |
-| `dice-entropy` | Convert a sequence of dice rolls to Base16 data. |
+| `dice-entropy` | Convert a sequence of dice rolls to Base16 entropy. |
+| `dice-rolls` | Get the number of dice rolls that dice-entropy requires for an entropy size. |
 | `ec-decompress` | Decompress a compressed EC public key. |
 | `ec-new` | Create a new Base16 EC private key from entropy. |
 | `ec-to-address` | Create a pay-to-public-key-hash address from an EC public key. |
@@ -184,8 +185,8 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | Command | Description |
 | ------- | ----------- |
 | `btc-to-satoshi` | Convert BTC to satoshi. |
-| `cert-new` | Create a Base85 Curve ZMQ private key for use with a Libbitcoin server. WARNING: entropy is obtained from the underlying platform. |
-| `cert-public` | Derive a Base85 Curve ZMQ public key for use with a Libbitcoin server. |
+| `curve-new` | Create a Base85 Curve ZMQ private key for use with a Libbitcoin server from entropy. |
+| `curve-public` | Derive a Base85 Curve ZMQ public key for use with a Libbitcoin server. |
 | `ec-add` | Calculate the EC function POINT + (SECRET * curve-generator-point). |
 | `ec-add-secrets` | Calculate the EC function (SECRET + SECRET) % curve-order. |
 | `ec-multiply` | Calculate the EC product (POINT * SECRET). |
@@ -193,6 +194,8 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `match-neutrino-address` | Determine whether the provided client filter probabilistically matches the provided payment address. |
 | `match-neutrino-script` | Determine whether the provided client filter probabilistically matches the provided script. |
 | `satoshi-to-btc` | Convert satoshi to BTC. |
+| `tls-cert` | Create a self-signed PEM TLS certificate for a P-256 private key, for use with a Libbitcoin server. |
+| `tls-new` | Create a PEM P-256 TLS private key for use with a Libbitcoin server from entropy. |
 
 ## 11. Meta
 

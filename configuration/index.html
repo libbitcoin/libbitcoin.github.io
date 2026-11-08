@@ -781,7 +781,8 @@ set <code>admin.path</code>. A request for <code>/</code> returns <code>admin.de
 <li>HTTP and websocket on each port. Over a websocket, each frame is one
   request path, and <code>log_subscribe</code> and <code>event_subscribe</code> stream the
   node's log and events.</li>
-<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates.</li>
+<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates
+  (§7.3).</li>
 <li>Credentials (§7.3), restricted by REST method names.</li>
 </ul>
 <h3 id="56-block-explorer">5.6 Block explorer<a class="anchor" href="#56-block-explorer" aria-label="Link to this section">#</a></h3>
@@ -879,7 +880,8 @@ site, set <code>native.path</code>. A request for <code>/</code> returns <code>n
   request path, and the <code>subscribe</code> paths (top, block, transaction,
   output and address) push notifications.</li>
 <li>Data, text, JSON and HTML formats for each path.</li>
-<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates.</li>
+<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates
+  (§7.3).</li>
 <li>Credentials (§7.3), restricted by REST method names.</li>
 </ul>
 <h3 id="57-electrum-server">5.7 Electrum server<a class="anchor" href="#57-electrum-server" aria-label="Link to this section">#</a></h3>
@@ -896,7 +898,7 @@ key_path = server.key
 <li>HTTP and websocket on the same ports. Subscriptions need a full duplex
   transport (TCP or websocket), so an HTTP connection's subscriptions
   are held until it upgrades to a websocket.</li>
-<li>Client certificates on its <code>safe</code> addresses (§7.2).</li>
+<li>Client certificates on its <code>safe</code> addresses (§7.3).</li>
 <li>Credentials (§7.3), restricted by RPC method names. A credential
   refuses raw TCP clients.</li>
 </ul>
@@ -918,7 +920,8 @@ credential = reader:password:getblockcount,getblockhash,getblock,block
 <code>bs</code> provides:</p>
 <ul>
 <li>JSON-RPC over websocket and raw TCP on the same ports.</li>
-<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates.</li>
+<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates
+  (§7.3).</li>
 <li>Credentials (§7.3) for REST as well as RPC, restricted by RPC and REST
   method names, which are distinct. A credential refuses raw TCP clients.</li>
 </ul>
@@ -942,7 +945,7 @@ an invalid parameters error.</p>
 <code>bs</code> provides:</p>
 <ul>
 <li>JSON-RPC over raw TCP on the same ports.</li>
-<li>Client certificates on its <code>safe</code> addresses (§7.2).</li>
+<li>Client certificates on its <code>safe</code> addresses (§7.3).</li>
 <li>Credentials (§7.3), restricted by RPC method names. Raw TCP clients
   authenticate with <code>authenticate</code>.</li>
 </ul>
@@ -971,7 +974,8 @@ one address.</p>
 <li>Websocket on the same ports. Each frame is one request path, and a
   request with a body (a broadcast) follows the path with a newline and
   the body.</li>
-<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates.</li>
+<li>TLS on its <code>safe</code> addresses (§7.2), with optional client certificates
+  (§7.3).</li>
 <li>Credentials (§7.3), restricted by REST method names.</li>
 </ul>
 <h3 id="512-client-filters-bip157158">5.12 Client filters (BIP157/158)<a class="anchor" href="#512-client-filters-bip157158" aria-label="Link to this section">#</a></h3>
@@ -1617,6 +1621,167 @@ bind = 192.168.0.10:8280
 connections = 10
 credential = user:password
 </code></pre>
+<h3 id="61-public-servers">6.1 Public servers<a class="anchor" href="#61-public-servers" aria-label="Link to this section">#</a></h3>
+<p>The libbitcoin project runs two public <code>bs</code> servers:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Host</th>
+<th>Address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wormer.libbitcoin.net</code></td>
+<td>72.65.246.83</td>
+</tr>
+<tr>
+<td><code>carmine.libbitcoin.net</code></td>
+<td>72.65.246.84</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each address serves mainnet, testnet3 and testnet4. Every chain accepts
+inbound P2P connections and serves these client services on its
+default ports (clear / secure):</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>mainnet</th>
+<th>testnet3</th>
+<th>testnet4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P2P network</td>
+<td>8333</td>
+<td>18333</td>
+<td>48333</td>
+</tr>
+<tr>
+<td>Native web and REST</td>
+<td>8180 / 8143</td>
+<td>18180 / 18143</td>
+<td>48180 / 48143</td>
+</tr>
+<tr>
+<td>Bitcoind RPC and REST</td>
+<td>8280 / 8243</td>
+<td>18280 / 18243</td>
+<td>48280 / 48243</td>
+</tr>
+<tr>
+<td>Bitcoind ZMQ</td>
+<td>8380 / 8343</td>
+<td>18380 / 18343</td>
+<td>48380 / 48343</td>
+</tr>
+<tr>
+<td>BTCD RPC</td>
+<td>8480 / 8443</td>
+<td>18480 / 18443</td>
+<td>48480 / 48443</td>
+</tr>
+<tr>
+<td>Electrum</td>
+<td>8580 / 8543</td>
+<td>18580 / 18543</td>
+<td>48580 / 48543</td>
+</tr>
+<tr>
+<td>Sparrow</td>
+<td>8680 / 8643</td>
+<td>18680 / 18643</td>
+<td>48680 / 48643</td>
+</tr>
+<tr>
+<td>Esplora</td>
+<td>8780 / 8743</td>
+<td>18780 / 18743</td>
+<td>48780 / 48743</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="62-running-a-public-server">6.2 Running a public server<a class="anchor" href="#62-running-a-public-server" aria-label="Link to this section">#</a></h3>
+<p>A public server needs a DNS name for its address, a TLS certificate for
+that name, and a CurveZMQ key pair. This example uses
+<code>node.example.com</code> on Linux.</p>
+<p><strong>1. Get a TLS certificate.</strong> <a href="https://letsencrypt.org">Let's Encrypt</a>
+issues free certificates that clients trust without configuration.
+<a href="https://certbot.eff.org">Certbot</a> proves control of the name by
+answering on port 80, which <code>bs</code> does not use. Open port 80 to the
+machine, then:</p>
+<pre class="console"><code>$ sudo certbot certonly --standalone --key-type ecdsa \
+    --elliptic-curve secp256r1 -d node.example.com
+</code></pre>
+<p><code>bs</code> accepts ECDSA keys on P-256 or P-384, not RSA. Certbot writes the
+certificate chain and its key to <code>/etc/letsencrypt/live/node.example.com/</code>,
+readable only by root. Copy them where <code>bs</code> runs, owned by its user:</p>
+<pre class="console"><code>$ sudo install -o bitcoin -m 600 \
+    /etc/letsencrypt/live/node.example.com/fullchain.pem \
+    /etc/letsencrypt/live/node.example.com/privkey.pem ~bitcoin/
+</code></pre>
+<p><strong>2. Renew it.</strong> Let's Encrypt certificates last 90 days, and certbot
+renews them automatically, again over port 80. <code>bs</code> reads its
+certificates when it starts, so each renewal must copy the new files and
+restart <code>bs</code>. Certbot runs a deploy hook after each renewal; place the
+<code>install</code> command above, followed by the restart, in
+<code>/etc/letsencrypt/renewal-hooks/deploy/bs.sh</code>.</p>
+<blockquote>
+<p><strong>Note.</strong> <code>bx</code> is not quite ready yet. The commands used here are not
+yet available in a <code>bx</code> release.</p>
+</blockquote>
+<p><strong>3. Create the CurveZMQ key pair.</strong> <code>bx curve-new</code> makes a server secret
+key from 256 bits of entropy. <code>bx dice-rolls</code> gives the number of
+throws, 256 for a coin, and <code>bx dice-entropy</code> converts them. Flip a coin
+that many times, write the flips down as one string of digits (heads 1,
+tails 0), and convert them:</p>
+<pre class="console"><code>$ bx dice-rolls --sides 2 --bits 256
+$ bx dice-entropy --sides 2 1101001110...
+$ bx curve-new &lt;entropy&gt;
+$ bx curve-public '&lt;secret key&gt;'
+</code></pre>
+<p>A die of up to 16 sides also works. Write each roll as one 0-based digit,
+using <code>a</code> to <code>f</code> above 9, and give its sides to both commands. For
+example, a six-sided die takes <code>--sides 6</code> and 102 rolls. <code>dice-entropy</code>
+rejects a sequence that would bias the entropy, which must then be
+rolled again.</p>
+<p><code>curve-new</code> prints the secret key and <code>curve-public</code> its public key, both
+Z85 encoded. Z85 includes <code>#</code>, which a configuration file reads as a
+comment, so <code>curve-new</code> reports <code>The entropy produced an invalid key.</code>
+when either key contains one, and the coin must be flipped again. Quote
+the keys on the command line, as they contain shell characters.</p>
+<p><strong>4. Configure the services.</strong> Bind each service on every adapter, clear
+and secure, with the certificate and key from step 1 and the ZMQ secret
+key from step 3:</p>
+<pre><code class="language-ini"><span class="section">[inbound]</span>
+bind = 0.0.0.0:8333
+bind = [::]:8333
+
+<span class="section">[electrum]</span>
+bind = 0.0.0.0:8580
+bind = [::]:8580
+safe = 0.0.0.0:8543
+safe = [::]:8543
+cert_path = fullchain.pem
+key_path = privkey.pem
+
+<span class="section">[bitcoind_zmq]</span>
+bind = 0.0.0.0:8380
+bind = [::]:8380
+safe = 0.0.0.0:8343
+safe = [::]:8343
+key = &lt;secret key&gt;
+</code></pre>
+<p>The other client services follow <code>[electrum]</code>, each on its own ports
+(§6). With no <code>bitcoind_zmq.cert</code> lines, any ZMQ client may connect.
+Leave <code>[admin]</code> on the local machine (§5.5).</p>
+<p><strong>5. Publish the ZMQ public key.</strong> TLS clients verify the server by its
+certificate, but a CurveZMQ client must already hold the server's public
+key. Publish the <code>curve-public</code> key beside the server's name and ports,
+for clients to configure as the server key. Never publish the secret key.</p>
 <hr />
 <h2 id="7-settings-shared-by-every-service">7. Settings shared by every service<a class="anchor" href="#7-settings-shared-by-every-service" aria-label="Link to this section">#</a></h2>
 <p>The client services (<code>[admin]</code>, <code>[native]</code>, <code>[bitcoind]</code>, <code>[electrum]</code>,
@@ -1676,10 +1841,6 @@ addresses.</p>
 <td><code>key_pass</code></td>
 <td>Password of an encrypted private key, if any.</td>
 </tr>
-<tr>
-<td><code>cert_auth</code></td>
-<td>Directory of trusted certificate files (PEM). When set, clients must present a certificate trusted by one of them, such as the client's own certificate.</td>
-</tr>
 </tbody>
 </table></div>
 <p>The same certificate and key may be used by every service. For example,
@@ -1692,9 +1853,27 @@ cert_path = server.pem
 key_path = server.key
 </code></pre>
 <p>ZMQ uses CurveZMQ instead of TLS. Its <code>safe</code> addresses require the
-server's secret key (<code>bitcoind_zmq.key</code>, Z85 encoded), and each
-<code>bitcoind_zmq.cert</code> line authorizes one client public key. With no <code>cert</code>
-lines, any client may connect.</p>
+server's secret key (<code>bitcoind_zmq.key</code>, Z85 encoded), made by
+<code>bx curve-new</code> (§6.2, step 3).</p>
+<h4 id="self-signed-certificates">Self-signed certificates<a class="anchor" href="#self-signed-certificates" aria-label="Link to this section">#</a></h4>
+<blockquote>
+<p><strong>Note.</strong> <code>bx</code> is not quite ready yet. The commands used here are not
+yet available in a <code>bx</code> release.</p>
+</blockquote>
+<p>A service that is not public, such as <code>[admin]</code>, needs no certificate
+authority. <code>bx tls-new</code> makes a P-256 private key from 256 bits of
+entropy, from coin flips or dice (§6.2, step 3), and <code>bx tls-cert</code> makes
+a self-signed certificate for it, naming the server by each host name
+and address its clients use:</p>
+<pre class="console"><code>$ bx tls-new &lt;entropy&gt; &gt; server.key
+$ bx tls-cert --host localhost --ip 127.0.0.1 --ip ::1 &lt; server.key &gt; server.pem
+</code></pre>
+<p>The certificate is valid from now for 365 days, or <code>--days</code> days, and
+<code>--name</code> sets its common name. Set the two files as <code>cert_path</code> and
+<code>key_path</code>. A client trusts the server by holding <code>server.pem</code>, which
+contains no secret, as a trusted certificate (for example, <code>curl
+--cacert server.pem</code>). A browser shows a warning for a certificate it
+does not trust until it is imported or accepted.</p>
 <h3 id="73-authentication">7.3 Authentication<a class="anchor" href="#73-authentication" aria-label="Link to this section">#</a></h3>
 <p>Every client service except <code>[bitcoind_zmq]</code> has:</p>
 <div class="scroller"><table>
@@ -1748,6 +1927,38 @@ REST interfaces use these names, one for each kind of request path:</p>
 </tr>
 </tbody>
 </table></div>
+<h4 id="client-certificates">Client certificates<a class="anchor" href="#client-certificates" aria-label="Link to this section">#</a></h4>
+<p><code>cert_auth</code> names a directory of trusted certificate files (PEM). When it
+is set, a TLS client must present a certificate trusted by one of them,
+such as the client's own certificate. The client makes its own key and
+self-signed certificate (§7.2), and gives only the certificate to the
+server operator, who places it in the <code>cert_auth</code> directory:</p>
+<pre class="console"><code>$ bx tls-new &lt;entropy&gt; &gt; client.key
+$ bx tls-cert --name alice &lt; client.key &gt; client.pem
+</code></pre>
+<pre><code class="language-ini"><span class="section">[admin]</span>
+safe = 127.0.0.1:8043
+safe = [::1]:8043
+cert_path = server.pem
+key_path = server.key
+cert_auth = clients
+</code></pre>
+<p>The client then presents both files, for example <code>curl --cert client.pem
+--key client.key --cacert server.pem https://localhost:8043/</code>. A browser
+imports a client certificate as PKCS#12, which <code>openssl pkcs12 -export</code>
+makes from the two files. Removing a certificate from <code>cert_auth</code> revokes
+that client when <code>bs</code> next starts.</p>
+<h4 id="curvezmq-client-keys">CurveZMQ client keys<a class="anchor" href="#curvezmq-client-keys" aria-label="Link to this section">#</a></h4>
+<p>Each <code>bitcoind_zmq.cert</code> line authorizes one client public key on the ZMQ
+<code>safe</code> addresses. With no <code>cert</code> lines, any client may connect. The
+client makes its own key pair with <code>bx curve-new</code> and <code>bx curve-public</code>
+(§6.2, step 3), and gives only the public key to the server operator:</p>
+<pre><code class="language-ini"><span class="section">[bitcoind_zmq]</span>
+safe = 127.0.0.1:8343
+safe = [::1]:8343
+key = &lt;server secret key&gt;
+cert = &lt;client public key&gt;
+</code></pre>
 <h3 id="74-http-services">7.4 HTTP services<a class="anchor" href="#74-http-services" aria-label="Link to this section">#</a></h3>
 <p><code>[admin]</code>, <code>[native]</code>, <code>[bitcoind]</code>, <code>[btcd]</code> and <code>[esplora]</code> are HTTP
 services, and also have:</p>
