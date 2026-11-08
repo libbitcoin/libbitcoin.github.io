@@ -51,8 +51,9 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `address-embed` | Create a pay-to-public-key-hash payment address with an embedded record of binary data. WARNING: any coin spent to this address is lost. |
 | `address-encode` | Convert a RIPEMD160 value to a payment address. |
 | `address-to-key` | Derive the payments search key of a payment address. |
-| `dice-entropy` | Convert a sequence of dice rolls to Base16 entropy. |
-| `dice-rolls` | Get the number of dice rolls that dice-entropy requires for an entropy size. |
+| `address-to-script` | Derive the output script of a payment address, as plain text tokens. |
+| `dice-entropy` | Convert a sequence of dice rolls to Base16 entropy. Each roll is one character, the face value 0 to 15 as a hexadecimal digit, so the rolls of a sixteen-sided die are their own Base16 encoding. Subtract one from each roll of a die with faces numbered from one, writing a six-sided roll of 1 to 6 as 0 to 5. |
+| `dice-rolls` | Get the number of dice rolls that dice-entropy requires for an entropy size, the count least likely to be rejected and rolled again. |
 | `ec-decompress` | Decompress a compressed EC public key. |
 | `ec-new` | Create a new Base16 EC private key from entropy. |
 | `ec-to-address` | Create a pay-to-public-key-hash address from an EC public key. |
@@ -61,7 +62,11 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `ec-to-witness` | Create a BIP173 pay-to-witness-public-key-hash address from an EC public key. |
 | `electrum-decode` | Convert an Electrum mnemonic to its numeric entropy. Entropy round-trips with the electrum-new command. |
 | `electrum-new` | Create an Electrum mnemonic from entropy. After the mnemonic is created, entropy round-trips with the electrum-decode command. |
+| `electrum-to-prefix` | Identify the type of an Electrum mnemonic, 'standard', 'witness', '2fa' or '2faw'. Electrum words that also form an Electrum v1 or BIP39 mnemonic are 'old' or 'bip39', and any other words are 'none'. |
 | `electrum-to-seed` | Convert an Electrum dictionary-based mnemonic to a wallet seed. Entropy cannot be derived from the seed. WARNING: mnemonic should be created from properly generated entropy. |
+| `electrum-v1-decode` | Convert an Electrum v1 mnemonic to its numeric entropy. Entropy round-trips with the electrum-v1-encode command. |
+| `electrum-v1-encode` | Convert numeric entropy to its Electrum v1 mnemonic, the format of Electrum wallets prior to version 2. Entropy round-trips with the electrum-v1-decode command. |
+| `electrum-v1-to-seed` | Convert an Electrum v1 mnemonic to its master private key, as Base16. The master public key is the EC public key of the master private key. Electrum accepts a mnemonic that was not encoded from entropy, and so does this command. |
 | `hd-new` | Create a new HD (BIP32) private key from entropy. |
 | `hd-private` | Derive a child HD (BIP32) private key from another HD private key. |
 | `hd-public` | Derive a child HD (BIP32) public key from another HD public or private key. |
@@ -70,15 +75,19 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `mnemonic-decode` | Convert a BIP39 mnemonic to its numeric entropy. |
 | `mnemonic-encode` | Convert numeric entropy to its BIP39 mnemonic. |
 | `mnemonic-to-seed` | Convert a BIP39 dictionary-based mnemonic to a wallet seed. Entropy cannot be derived from the seed. WARNING: mnemonic should be created from properly generated entropy. |
-| `qrcode` | Create a square QRCODE TIFF file for a payment address. |
+| `qrcode` | Create a square QRCODE PNG file for text, such as a Bitcoin URI, an address or a key. |
 | `script-to-address` | Create a BIP16 pay-to-script-hash address from a script. |
 | `script-to-key` | Derive the payments search key of an output script. |
 | `script-to-witness` | Create a BIP173 pay-to-witness-script-hash address from a script. |
+| `slip39-combine` | Recover a master secret from SLIP39 shares, as Base16. A threshold of shares from each of a threshold of groups is required. |
+| `slip39-decode` | Decode the metadata of a SLIP39 share, as JSON. |
+| `slip39-split` | Split a master secret into groups of SLIP39 shares, one share per line, in group order. |
 | `uri-decode` | Decompose a Bitcoin URI into its parts. |
 | `uri-encode` | Compose a Bitcoin URI from specified parts. |
 | `wif-to-ec` | Convert a WIF private key to an EC private key. |
 | `wif-to-public` | Derive the EC public key from a WIF private key. |
 | `witness-to-key` | Derive the payments search key of a witness address. |
+| `witness-to-script` | Derive the output script of a witness address, as plain text tokens. |
 
 ## 3. Key encryption
 
@@ -113,7 +122,6 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `script-encode` | Base16 encode a plain text script. |
 | `tx-decode` | Decode a Base16 transaction. |
 | `tx-encode` | Encode an unsigned transaction as Base16. |
-| `tx-sign` | Sign a set of transactions using a private key. Output is suitable for sending to Bitcoin network. |
 | `witness-decode` | Decode a witness to bracketed Base16 data tokens. |
 | `witness-encode` | Base16 encode a witness of bracketed Base16 data tokens. |
 
@@ -128,12 +136,11 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 
 | Command | Description |
 | ------- | ----------- |
-| `broadcast-tx` | Broadcast a transaction to the Bitcoin network via the Bitcoin peer-to-peer network. |
 | `fetch-balance` | Get the balance in satoshi of a payment address. Requires a Libbitcoin server connection. |
 | `fetch-block` | Get the block from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection. |
-| `fetch-block-hashes` | Get the block from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection. |
+| `fetch-block-hashes` | Get the transaction hashes of the block from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection. |
 | `fetch-block-height` | Get the block height from the specified hash. Requires a Libbitcoin server connection. |
-| `fetch-filter` | Retrieve compact filters from a Libbitcoin server. |
+| `fetch-filter` | Get the compact filter of the block from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection. |
 | `fetch-filter-checkpoint` | Retrieve compact filter checkpoint from a Libbitcoin server. |
 | `fetch-filter-headers` | Retrieve compact filter headers from a Libbitcoin server. The distance between provided height and hash must be strictly less than 2000. |
 | `fetch-header` | Get the block header from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection. |
@@ -143,10 +150,6 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `fetch-tx` | Get a transaction by its hash. Requires a Libbitcoin server connection. |
 | `fetch-tx-index` | Get the block height and index of a transaction. Requires a Libbitcoin server connection. |
 | `fetch-utxo` | Get enough unspent transaction outputs from a payment address to pay a number of satoshi. Requires a Libbitcoin server connection. |
-| `get-filter-checkpoint` | Retrieve compact filter checkpoint from a single Bitcoin network node. |
-| `get-filter-headers` | Retrieve compact filter headers from a single Bitcoin network node. The distance between provided height and hash must be strictly less than 2000. |
-| `get-filters` | Retrieve compact filters from a single Bitcoin network node. The distance between provided height and hash must be strictly less than 100. |
-| `put-tx` | Broadcast a transaction to the Bitcoin network via a single Bitcoin network node. |
 | `send-tx` | Broadcast a transaction to the Bitcoin network via a Libbitcoin server. |
 | `subscribe-block` | Watch the network for all blocks. Requires a Libbitcoin server connection. |
 | `subscribe-tx` | Watch the network for all transactions. Requires a Libbitcoin server connection. |

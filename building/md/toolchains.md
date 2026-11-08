@@ -93,15 +93,13 @@ variants for each set of hardware options, for example:
 | Platform | Compiler | Variants |
 | -------- | -------- | -------- |
 | Linux x64 (glibc) | Clang 18 | AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations |
-| Linux x64 (musl) | Alpine GCC | The same, fully static |
 | Linux ARM64 | GCC 14 | Baseline, SHA-2, SHA-3 |
 | macOS ARM64 | Apple clang | SHA-2, SHA-3, AES |
 | macOS x64 | Apple clang | AVX2, SSE4.1, AES-NI |
 | Windows x64 | MSVC v145 | AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations |
 | Windows ARM64 | MSVC v145 | Baseline, SHA-2, SHA-3 |
 
-On Linux glibc builds, the C library remains dynamic. The musl builds
-have no dynamic dependencies.
+On Linux builds, the C library remains dynamic.
 
 ## 5. Deterministic builds
 

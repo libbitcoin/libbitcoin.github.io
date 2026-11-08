@@ -30,8 +30,7 @@ extension level it is built for, if any. Windows builds end in `.exe`.
 
 | Platform | Runs on |
 | -------- | ------- |
-| `linux` | Linux, linked with its C library (glibc) |
-| `musl` | Linux, linked with musl, independent of the distribution's C library |
+| `linux` | Linux (glibc) |
 | `macos` | macOS |
 | `windows` | Windows |
 
@@ -45,9 +44,9 @@ extension level it is built for, if any. Windows builds end in `.exe`.
 | `arm64-sha2` | ARMv8 SHA-2, AES |
 | `arm64-sha3` | ARMv8 SHA-2, AES, ARMv8.2 SHA-3 |
 
-Linux and Windows have every build above, and musl has the `x64`
-builds. macOS has one build for each architecture: `arm64`, which uses
-ARMv8 SHA-2, SHA-3 and AES, and `x64`, which uses AES-NI.
+Linux and Windows have every build above. macOS has one build for each
+architecture: `arm64`, which uses ARMv8 SHA-2, SHA-3 and AES, and `x64`,
+which uses AES-NI.
 
 A build runs only on a CPU that has every extension it uses, and is
 faster for using them. To select one, run the build without an extension
@@ -62,6 +61,22 @@ all among them, preferring `avx512ifma` to `avxifma`, and either to
 `shani`. For example, a CPU with SHA extensions and AVX-512 IFMA uses
 `bs-linux-x64-avx512ifma`. For what each extension does, see
 [Hardware options](../building/options#2-hardware-options).
+
+The list ends with CUDA, for batch signature verification on an NVIDIA
+GPU:
+
+```
+cuda........ platform:1 compiled:1.
+cuda ecc.... platform:1 enabled:1.
+```
+
+`platform:1` means the NVIDIA driver reports a supported device, and
+`compiled:1` that the build includes CUDA, as the Linux and Windows
+builds do and the macOS builds do not. The driver is loaded when `bs`
+runs, so a build with CUDA also runs without a GPU. The `cuda ecc` line
+appears only when a device is present, and shows whether it supports
+error correcting memory and whether that is enabled. `bx hardware`
+prints the same list.
 
 ## 3. Verifying a build
 

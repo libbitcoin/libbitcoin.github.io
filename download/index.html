@@ -355,11 +355,7 @@ extension level it is built for, if any. Windows builds end in <code>.exe</code>
 <tbody>
 <tr>
 <td><code>linux</code></td>
-<td>Linux, linked with its C library (glibc)</td>
-</tr>
-<tr>
-<td><code>musl</code></td>
-<td>Linux, linked with musl, independent of the distribution's C library</td>
+<td>Linux (glibc)</td>
 </tr>
 <tr>
 <td><code>macos</code></td>
@@ -409,9 +405,9 @@ extension level it is built for, if any. Windows builds end in <code>.exe</code>
 </tr>
 </tbody>
 </table></div>
-<p>Linux and Windows have every build above, and musl has the <code>x64</code>
-builds. macOS has one build for each architecture: <code>arm64</code>, which uses
-ARMv8 SHA-2, SHA-3 and AES, and <code>x64</code>, which uses AES-NI.</p>
+<p>Linux and Windows have every build above. macOS has one build for each
+architecture: <code>arm64</code>, which uses ARMv8 SHA-2, SHA-3 and AES, and <code>x64</code>,
+which uses AES-NI.</p>
 <p>A build runs only on a CPU that has every extension it uses, and is
 faster for using them. To select one, run the build without an extension
 level, which runs on any CPU of its architecture, with <code>--hardware</code>:</p>
@@ -422,6 +418,18 @@ all among them, preferring <code>avx512ifma</code> to <code>avxifma</code>, and 
 <code>shani</code>. For example, a CPU with SHA extensions and AVX-512 IFMA uses
 <code>bs-linux-x64-avx512ifma</code>. For what each extension does, see
 <a href="../building/options.html#2-hardware-options">Hardware options</a>.</p>
+<p>The list ends with CUDA, for batch signature verification on an NVIDIA
+GPU:</p>
+<pre><code>cuda........ platform:1 compiled:1.
+cuda ecc.... platform:1 enabled:1.
+</code></pre>
+<p><code>platform:1</code> means the NVIDIA driver reports a supported device, and
+<code>compiled:1</code> that the build includes CUDA, as the Linux and Windows
+builds do and the macOS builds do not. The driver is loaded when <code>bs</code>
+runs, so a build with CUDA also runs without a GPU. The <code>cuda ecc</code> line
+appears only when a device is present, and shows whether it supports
+error correcting memory and whether that is enabled. <code>bx hardware</code>
+prints the same list.</p>
 <h2 id="3-verifying-a-build">3. Verifying a build<a class="anchor" href="#3-verifying-a-build" aria-label="Link to this section">#</a></h2>
 <p>Verify a build before running it. A build is verified by its signature,
 made with the libbitcoin release key. The signature proves the build is

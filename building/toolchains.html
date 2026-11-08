@@ -525,11 +525,6 @@ variants for each set of hardware options, for example:</p>
 <td>AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations</td>
 </tr>
 <tr>
-<td>Linux x64 (musl)</td>
-<td>Alpine GCC</td>
-<td>The same, fully static</td>
-</tr>
-<tr>
 <td>Linux ARM64</td>
 <td>GCC 14</td>
 <td>Baseline, SHA-2, SHA-3</td>
@@ -556,8 +551,7 @@ variants for each set of hardware options, for example:</p>
 </tr>
 </tbody>
 </table></div>
-<p>On Linux glibc builds, the C library remains dynamic. The musl builds
-have no dynamic dependencies.</p>
+<p>On Linux builds, the C library remains dynamic.</p>
 <h2 id="5-deterministic-builds">5. Deterministic builds<a class="anchor" href="#5-deterministic-builds" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>

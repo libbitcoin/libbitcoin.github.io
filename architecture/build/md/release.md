@@ -65,10 +65,6 @@ the tests (`--build-skip-tests`):
 | `bs-linux-arm64` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a` | |
 | `bs-linux-arm64-sha2` | `ubuntu-24.04-arm` | gcc 14 | `armv8-a+sha2+aes` | sha2, aes |
 | `bs-linux-arm64-sha3` | `ubuntu-24.04-arm` | gcc 14 | `armv8.2-a+sha2+aes+sha3` | sha2, sha3, aes |
-| `bs-musl-x64` | Alpine 3.22 | gcc | `x86-64-v3` | avx2, sse41 |
-| `bs-musl-x64-shani` | Alpine 3.22 | gcc | `x86-64-v3` | shani, avx2, sse41 |
-| `bs-musl-x64-avxifma` | Alpine 3.22 | gcc | `x86-64-v3` | avxifma, shani, avx2, sse41 |
-| `bs-musl-x64-avx512ifma` | Alpine 3.22 | gcc | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
 | `bs-macos-arm64` | `macos-latest` | Apple Clang | `armv8.2-a+sha2+aes+sha3`, macOS 13.3 | sha2, sha3, aes |
 | `bs-macos-x64` | `macos-26-intel` | Apple Clang | `x86-64-v3`, macOS 13.3 | avx2, sse41, aesni |
 | `bs-windows-x64` | `windows-latest` | MSVC | x64 | avx2, sse41 |
@@ -94,8 +90,7 @@ Every x64 build assumes AVX2 and SSE4.1 (`x86-64-v3`) as the baseline of
 its architecture.
 
 Linux builds link the C++ and GCC runtimes statically
-(`-static-libstdc++ -static-libgcc`); musl builds also link the C library
-statically (`--static`). Windows builds end in `.exe`.
+(`-static-libstdc++ -static-libgcc`). Windows builds end in `.exe`.
 
 After the build, each job:
 

@@ -431,12 +431,16 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <td>Derive the payments search key of a payment address.</td>
 </tr>
 <tr>
+<td><code>address-to-script</code></td>
+<td>Derive the output script of a payment address, as plain text tokens.</td>
+</tr>
+<tr>
 <td><code>dice-entropy</code></td>
-<td>Convert a sequence of dice rolls to Base16 entropy.</td>
+<td>Convert a sequence of dice rolls to Base16 entropy. Each roll is one character, the face value 0 to 15 as a hexadecimal digit, so the rolls of a sixteen-sided die are their own Base16 encoding. Subtract one from each roll of a die with faces numbered from one, writing a six-sided roll of 1 to 6 as 0 to 5.</td>
 </tr>
 <tr>
 <td><code>dice-rolls</code></td>
-<td>Get the number of dice rolls that dice-entropy requires for an entropy size.</td>
+<td>Get the number of dice rolls that dice-entropy requires for an entropy size, the count least likely to be rejected and rolled again.</td>
 </tr>
 <tr>
 <td><code>ec-decompress</code></td>
@@ -471,8 +475,24 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <td>Create an Electrum mnemonic from entropy. After the mnemonic is created, entropy round-trips with the electrum-decode command.</td>
 </tr>
 <tr>
+<td><code>electrum-to-prefix</code></td>
+<td>Identify the type of an Electrum mnemonic, 'standard', 'witness', '2fa' or '2faw'. Electrum words that also form an Electrum v1 or BIP39 mnemonic are 'old' or 'bip39', and any other words are 'none'.</td>
+</tr>
+<tr>
 <td><code>electrum-to-seed</code></td>
 <td>Convert an Electrum dictionary-based mnemonic to a wallet seed. Entropy cannot be derived from the seed. WARNING: mnemonic should be created from properly generated entropy.</td>
+</tr>
+<tr>
+<td><code>electrum-v1-decode</code></td>
+<td>Convert an Electrum v1 mnemonic to its numeric entropy. Entropy round-trips with the electrum-v1-encode command.</td>
+</tr>
+<tr>
+<td><code>electrum-v1-encode</code></td>
+<td>Convert numeric entropy to its Electrum v1 mnemonic, the format of Electrum wallets prior to version 2. Entropy round-trips with the electrum-v1-decode command.</td>
+</tr>
+<tr>
+<td><code>electrum-v1-to-seed</code></td>
+<td>Convert an Electrum v1 mnemonic to its master private key, as Base16. The master public key is the EC public key of the master private key. Electrum accepts a mnemonic that was not encoded from entropy, and so does this command.</td>
 </tr>
 <tr>
 <td><code>hd-new</code></td>
@@ -508,7 +528,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </tr>
 <tr>
 <td><code>qrcode</code></td>
-<td>Create a square QRCODE TIFF file for a payment address.</td>
+<td>Create a square QRCODE PNG file for text, such as a Bitcoin URI, an address or a key.</td>
 </tr>
 <tr>
 <td><code>script-to-address</code></td>
@@ -521,6 +541,18 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tr>
 <td><code>script-to-witness</code></td>
 <td>Create a BIP173 pay-to-witness-script-hash address from a script.</td>
+</tr>
+<tr>
+<td><code>slip39-combine</code></td>
+<td>Recover a master secret from SLIP39 shares, as Base16. A threshold of shares from each of a threshold of groups is required.</td>
+</tr>
+<tr>
+<td><code>slip39-decode</code></td>
+<td>Decode the metadata of a SLIP39 share, as JSON.</td>
+</tr>
+<tr>
+<td><code>slip39-split</code></td>
+<td>Split a master secret into groups of SLIP39 shares, one share per line, in group order.</td>
 </tr>
 <tr>
 <td><code>uri-decode</code></td>
@@ -541,6 +573,10 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tr>
 <td><code>witness-to-key</code></td>
 <td>Derive the payments search key of a witness address.</td>
+</tr>
+<tr>
+<td><code>witness-to-script</code></td>
+<td>Derive the output script of a witness address, as plain text tokens.</td>
 </tr>
 </tbody>
 </table></div>
@@ -652,10 +688,6 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <td>Encode an unsigned transaction as Base16.</td>
 </tr>
 <tr>
-<td><code>tx-sign</code></td>
-<td>Sign a set of transactions using a private key. Output is suitable for sending to Bitcoin network.</td>
-</tr>
-<tr>
 <td><code>witness-decode</code></td>
 <td>Decode a witness to bracketed Base16 data tokens.</td>
 </tr>
@@ -694,10 +726,6 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </thead>
 <tbody>
 <tr>
-<td><code>broadcast-tx</code></td>
-<td>Broadcast a transaction to the Bitcoin network via the Bitcoin peer-to-peer network.</td>
-</tr>
-<tr>
 <td><code>fetch-balance</code></td>
 <td>Get the balance in satoshi of a payment address. Requires a Libbitcoin server connection.</td>
 </tr>
@@ -707,7 +735,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </tr>
 <tr>
 <td><code>fetch-block-hashes</code></td>
-<td>Get the block from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection.</td>
+<td>Get the transaction hashes of the block from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection.</td>
 </tr>
 <tr>
 <td><code>fetch-block-height</code></td>
@@ -715,7 +743,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </tr>
 <tr>
 <td><code>fetch-filter</code></td>
-<td>Retrieve compact filters from a Libbitcoin server.</td>
+<td>Get the compact filter of the block from the specified hash or height. Height is ignored if both are specified. Requires a Libbitcoin server connection.</td>
 </tr>
 <tr>
 <td><code>fetch-filter-checkpoint</code></td>
@@ -752,22 +780,6 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tr>
 <td><code>fetch-utxo</code></td>
 <td>Get enough unspent transaction outputs from a payment address to pay a number of satoshi. Requires a Libbitcoin server connection.</td>
-</tr>
-<tr>
-<td><code>get-filter-checkpoint</code></td>
-<td>Retrieve compact filter checkpoint from a single Bitcoin network node.</td>
-</tr>
-<tr>
-<td><code>get-filter-headers</code></td>
-<td>Retrieve compact filter headers from a single Bitcoin network node. The distance between provided height and hash must be strictly less than 2000.</td>
-</tr>
-<tr>
-<td><code>get-filters</code></td>
-<td>Retrieve compact filters from a single Bitcoin network node. The distance between provided height and hash must be strictly less than 100.</td>
-</tr>
-<tr>
-<td><code>put-tx</code></td>
-<td>Broadcast a transaction to the Bitcoin network via a single Bitcoin network node.</td>
 </tr>
 <tr>
 <td><code>send-tx</code></td>

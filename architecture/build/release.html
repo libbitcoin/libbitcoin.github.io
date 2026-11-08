@@ -462,34 +462,6 @@ the tests (<code>--build-skip-tests</code>):</p>
 <td>sha2, sha3, aes</td>
 </tr>
 <tr>
-<td><code>bs-musl-x64</code></td>
-<td>Alpine 3.22</td>
-<td>gcc</td>
-<td><code>x86-64-v3</code></td>
-<td>avx2, sse41</td>
-</tr>
-<tr>
-<td><code>bs-musl-x64-shani</code></td>
-<td>Alpine 3.22</td>
-<td>gcc</td>
-<td><code>x86-64-v3</code></td>
-<td>shani, avx2, sse41</td>
-</tr>
-<tr>
-<td><code>bs-musl-x64-avxifma</code></td>
-<td>Alpine 3.22</td>
-<td>gcc</td>
-<td><code>x86-64-v3</code></td>
-<td>avxifma, shani, avx2, sse41</td>
-</tr>
-<tr>
-<td><code>bs-musl-x64-avx512ifma</code></td>
-<td>Alpine 3.22</td>
-<td>gcc</td>
-<td><code>x86-64-v3</code></td>
-<td>avx512ifma, shani, avx2, sse41</td>
-</tr>
-<tr>
 <td><code>bs-macos-arm64</code></td>
 <td><code>macos-latest</code></td>
 <td>Apple Clang</td>
@@ -591,8 +563,7 @@ the processor's features, for the packages that choose a variant at install
 <p>Every x64 build assumes AVX2 and SSE4.1 (<code>x86-64-v3</code>) as the baseline of
 its architecture.</p>
 <p>Linux builds link the C++ and GCC runtimes statically
-(<code>-static-libstdc++ -static-libgcc</code>); musl builds also link the C library
-statically (<code>--static</code>). Windows builds end in <code>.exe</code>.</p>
+(<code>-static-libstdc++ -static-libgcc</code>). Windows builds end in <code>.exe</code>.</p>
 <p>After the build, each job:</p>
 <ol>
 <li>copies the program to its build name,</li>

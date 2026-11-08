@@ -9,6 +9,8 @@
 | Linux | arm64 | ✔ CI | ✔ |
 | Linux | arm32 | ✔ CI | ◑ CI |
 | Linux | s390x (big-endian) | ✔ CI | ● |
+| Linux | ppc64le | ✔ CI | ● |
+| Linux | ppc64 (big-endian) | ✔ CI | Release build |
 | macOS | x64 | ✔ CI | ✔ |
 | macOS | arm64 | ✔ CI | ✔ CI |
 | Windows | x64 | ✔ CI | ✔ CI |
@@ -97,6 +99,7 @@ Bitcoin Core's experimental validation library is not released, or called by `bi
 - ✔ Built and tested outside of CI.
 - ● Expected to build: the toolchain supports it.
 - No target: no documented build or CI for the platform.
+- Release build: built for release, not in CI.
 
 Compiler versions are those built in CI.
 Bitcoin Core is shown from its build files and CI configuration at master
