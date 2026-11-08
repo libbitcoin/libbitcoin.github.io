@@ -1212,7 +1212,6 @@ avx512...... platform:0 compiled:0.
 avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:0 compiled:0.
 cuda........ platform:0 compiled:1.
-cuda ecc.... platform:0 enabled:0.
 ```
 
 Each address serves mainnet, testnet3 and testnet4. Every chain accepts
