@@ -7,12 +7,20 @@
 | Linux | x64 | ✔ CI | ✔ CI |
 | Linux | x86 (32-bit) | ✔ CI | ✔ CI |
 | Linux | arm64 | ✔ CI | ✔ |
-| Linux | arm32 | ✔ CI | ✔ CI |
+| Linux | arm32 | ✔ CI | ◑ CI |
+| Linux | s390x (big-endian) | ✔ CI | ● |
 | macOS | x64 | ✔ CI | ✔ |
 | macOS | arm64 | ✔ CI | ✔ CI |
 | Windows | x64 | ✔ CI | ✔ CI |
 | Windows | x86 (32-bit) | ✔ CI | No target |
 | Windows | arm64 | ✔ CI | No target |
+| FreeBSD | x64 | ◑ CI | ◑ CI |
+| OpenBSD | x64 | ◑ CI | ◑ CI |
+| NetBSD | x64 | ◑ CI | ◑ CI |
+
+Linux is tested under both glibc and musl. The BSD tests have all been
+verified outside of CI, and `bs` has not been performance tuned on BSD.
+NetBSD requires GCC 13 or later from pkgsrc.
 
 All libraries and Bitcoin Explorer (`bx`) are supported on 32-bit
 platforms, however Bitcoin Server (`bs`) requires 64-bit.
@@ -85,6 +93,7 @@ Bitcoin Core's experimental validation library is not released, or called by `bi
 ## 9. Notes
 
 - ✔ CI: built and tested on every change.
+- ◑ CI: built on every change, tests not run.
 - ✔ Built and tested outside of CI.
 - ● Expected to build: the toolchain supports it.
 - No target: no documented build or CI for the platform.

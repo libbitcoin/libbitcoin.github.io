@@ -364,7 +364,13 @@
 <td>Linux</td>
 <td>arm32</td>
 <td>✔ CI</td>
+<td>◑ CI</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>s390x (big-endian)</td>
 <td>✔ CI</td>
+<td>●</td>
 </tr>
 <tr>
 <td>macOS</td>
@@ -396,8 +402,29 @@
 <td>✔ CI</td>
 <td>No target</td>
 </tr>
+<tr>
+<td>FreeBSD</td>
+<td>x64</td>
+<td>◑ CI</td>
+<td>◑ CI</td>
+</tr>
+<tr>
+<td>OpenBSD</td>
+<td>x64</td>
+<td>◑ CI</td>
+<td>◑ CI</td>
+</tr>
+<tr>
+<td>NetBSD</td>
+<td>x64</td>
+<td>◑ CI</td>
+<td>◑ CI</td>
+</tr>
 </tbody>
 </table></div>
+<p>Linux is tested under both glibc and musl. The BSD tests have all been
+verified outside of CI, and <code>bs</code> has not been performance tuned on BSD.
+NetBSD requires GCC 13 or later from pkgsrc.</p>
 <p>All libraries and Bitcoin Explorer (<code>bx</code>) are supported on 32-bit
 platforms, however Bitcoin Server (<code>bs</code>) requires 64-bit.</p>
 <h2 id="2-compilers">2. Compilers<a class="anchor" href="#2-compilers" aria-label="Link to this section">#</a></h2>
@@ -673,6 +700,7 @@ platforms, however Bitcoin Server (<code>bs</code>) requires 64-bit.</p>
 <h2 id="9-notes">9. Notes<a class="anchor" href="#9-notes" aria-label="Link to this section">#</a></h2>
 <ul>
 <li>✔ CI: built and tested on every change.</li>
+<li>◑ CI: built on every change, tests not run.</li>
 <li>✔ Built and tested outside of CI.</li>
 <li>● Expected to build: the toolchain supports it.</li>
 <li>No target: no documented build or CI for the platform.</li>
