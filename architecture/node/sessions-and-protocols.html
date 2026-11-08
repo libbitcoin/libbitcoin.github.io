@@ -375,7 +375,7 @@
 </tr>
 <tr>
 <td><code>include/bitcoin/node/channels/channel_peer.hpp</code> + <code>src/channels/channel_peer.cpp</code></td>
-<td>node channel: announcement cache, witness frame context</td>
+<td>node channel: anti-echo filter, witness frame context</td>
 </tr>
 <tr>
 <td><code>include/bitcoin/node/protocols/protocol.hpp</code> + <code>src/protocols/protocol.cpp</code></td>
@@ -509,8 +509,8 @@ count is restored when the chain goes stale.</p>
 <h2 id="2-channel-construction-and-protocol-attach">2. Channel construction and protocol attach<a class="anchor" href="#2-channel-construction-and-protocol-attach" aria-label="Link to this section">#</a></h2>
 <h3 id="21-create_channelsocket--session_peeripp41-52">2.1 <code>create_channel(socket)</code> — <code>session_peer.ipp:41-52</code><a class="anchor" href="#21-create_channelsocket--session_peeripp41-52" aria-label="Link to this section">#</a></h3>
 <p>Returns a <code>node::channel_peer</code> upcast to <code>network::channel</code>. The node
-channel adds the per-channel announcement cache (<code>announcement_cache</code>
-hashes, <code>src/channels/channel_peer.cpp:32-49</code>) and stamps the witness
+channel adds the per-channel anti-echo filter (a rolling bloom filter of
+announced hashes, <code>src/channels/channel_peer.cpp:32-42</code>) and stamps the witness
 parse context on every inbound frame
 (<code>include/bitcoin/node/channels/channel_peer.hpp:54-61</code>), so messages
 are deserialized with witness data iff the node requires witness.</p>
@@ -666,7 +666,7 @@ calls it on early failure or if the channel already stopped
 <h3 id="32-protocol_peer">3.2 <code>protocol_peer</code><a class="anchor" href="#32-protocol_peer" aria-label="Link to this section">#</a></h3>
 <p><code>node::protocol_peer</code> (<code>src/protocols/protocol_peer.cpp</code>) adds the
 download-map RPCs (<code>get_hashes</code>/<code>put_hashes</code>), <code>performance</code>, <code>fault</code>
-(self-stop plus session fault, <code>:53-61</code>), the announcement cache
+(self-stop plus session fault, <code>:53-61</code>), the anti-echo filter
 accessors <code>set_announced</code>/<code>was_announced</code> (per channel, <code>:66-79</code>),
 <code>set_current</code> (channel buffer policy, <code>:71-74</code>), event notification, and
 <code>make_compact_block</code> (BIP152 v2 compact block of an associated block with

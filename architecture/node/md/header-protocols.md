@@ -405,9 +405,18 @@ it falls back to the 70012 `headers` announcement when the peer also sent
 
 ## 8. Anti-echo mechanism (`set_announced` / `was_announced`)
 
-Lives on `node::channel_peer` (`src/channels/channel_peer.cpp:32-49`).
-Each channel maintains a bounded deque of recently-announced hashes
-(`node.announcement_cache` entries; zero disables).
+Lives on `node::channel_peer` (`src/channels/channel_peer.cpp:32-42`).
+Each channel keeps the hashes announced to it in a rolling bloom filter
+(`node::rolling_bloom_filter`, `src/rolling_bloom_filter.cpp`):
+
+- Three generations of `max_inventory` (50,000) hashes each. When the
+  current generation is full, the oldest is cleared and becomes current,
+  so the filter retains at least the most recent 100,000 hashes.
+- Each generation is a bloom array of 20 probes over 1,442,696 bits
+  (about 176 KiB, allocated on its first insert), keyed by the first 8
+  bytes of the hash. The false positive rate is about 2^-20 per
+  generation, at most about 3 in 2^20 for the three together.
+- There is no setting; every channel has the filter.
 
 - `set_announced(hash)`: called by header-in (headers after
   subscription, compact blocks) and tx-in (every announced tx) when
@@ -420,8 +429,9 @@ to break the local A↔B echo.
 
 > **Invariant (Anti-Echo-1).** The pair `(set_announced, was_announced)`
 > guarantees a peer that announced X to us is never sent X back, *on
-> that channel*, while X is within the last `announcement_cache`
-> announcements. It does not guarantee global no-duplication.
+> that channel*, while X is within the last 100,000 announcements. A
+> false positive may withhold an announcement the peer has not seen. It
+> does not guarantee global no-duplication.
 
 ---
 

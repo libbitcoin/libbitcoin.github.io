@@ -542,7 +542,6 @@ the architecture docs refer to:
 | `allowed_deviation`        | slow-peer detection ([03](download-chaser))                                           |
 | `minimum_fee_rate`, `minimum_bump_rate` | pool admission and fee filter ([10](transaction-protocols), [11](transaction-chaser))                |
 | `current_connections`      | outbound reduction when recent ([06](sessions-and-protocols))                                |
-| `announcement_cache`       | per-channel anti-echo cache size ([07](header-protocols))                              |
 | `fee_estimate_horizon`     | estimator ([12](periphery-chasers))                                                     |
 | `maximum_height`           | stop height for check and validate ([03](download-chaser), [04](validation-chaser)); `is_recent`           |
 | `maximum_concurrency`      | download window and validation backlog ([03](download-chaser), [04](validation-chaser))                    |

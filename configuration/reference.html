@@ -329,7 +329,8 @@
 <p><code>bs --settings</code> displays every setting in its section, each with a
 comment giving its description and default, followed by its configured
 value. With <code>--config</code>, a setting configured to other than its default is
-marked by a comment. The sections below are the defaults, grouped by
+marked by a comment. The sections below are the defaults on mainnet, with
+32 GiB or more of memory for the derived table buckets, grouped by
 area.</p>
 <h2 id="1-log">1. <code>[log]</code><a class="anchor" href="#1-log" aria-label="Link to this section">#</a></h2>
 <p>Logging: which kinds of events are logged (unless changed at the console), and where log files are written.</p>
@@ -420,7 +421,7 @@ rate = 1
 size = 0
 
 <span class="section">[table.header]</span>
-<span class="comment"># The number of buckets in the header table head, dynamic default.</span>
+<span class="comment"># The number of buckets in the header table head, derived from expected and memory, defaults to '385181'.</span>
 buckets = 385181
 <span class="comment"># The expected element count of the header table, defaults to '962953'.</span>
 expected = 962953
@@ -436,7 +437,7 @@ rate = 1
 size = 67269346
 
 <span class="section">[table.ins]</span>
-<span class="comment"># The number of buckets in the ins table head, dynamic default.</span>
+<span class="comment"># The number of buckets in the ins table head, derived from expected and memory, defaults to '1345386900'.</span>
 buckets = 1345386900
 <span class="comment"># The expected element count of the ins table, defaults to '3363467251'.</span>
 expected = 3363467251
@@ -452,7 +453,7 @@ rate = 1
 size = 1278023220
 
 <span class="section">[table.outs]</span>
-<span class="comment"># The number of buckets in the outs table head, dynamic default (0 disables address index).</span>
+<span class="comment"># The number of buckets in the outs table head, derived from expected and memory, defaults to '748385817' (0 disables address index).</span>
 buckets = 748385817
 <span class="comment"># The expected element count of the outs table, defaults to '3741929086'.</span>
 expected = 3741929086
@@ -462,7 +463,7 @@ rate = 1
 size = 336773618
 
 <span class="section">[table.pool]</span>
-<span class="comment"># The number of buckets in the pool table head, dynamic default (0 disables).</span>
+<span class="comment"># The number of buckets in the pool table head, derived from expected and memory, defaults to '4000000' (0 disables).</span>
 buckets = 4000000
 <span class="comment"># The expected element count of the pool table, defaults to '10000000'.</span>
 expected = 10000000
@@ -524,13 +525,13 @@ buckets = 950001
 rate = 1
 
 <span class="section">[table.strong]</span>
-<span class="comment"># The number of buckets provisioned in the strong table head, defaults to '1359871695'.</span>
+<span class="comment"># The number of buckets provisioned in the strong table head, derived from tx expected, defaults to '1359871695'.</span>
 buckets = 1359871695
 <span class="comment"># The percentage expansion of the strong table head, defaults to '1'.</span>
 rate = 1
 
 <span class="section">[table.tx]</span>
-<span class="comment"># The number of buckets in the tx table head, dynamic default.</span>
+<span class="comment"># The number of buckets in the tx table head, derived from expected and memory, defaults to '543948678'.</span>
 buckets = 543948678
 <span class="comment"># The expected element count of the tx table, defaults to '1359871695'.</span>
 expected = 1359871695
@@ -548,7 +549,7 @@ rate = 1
 size = 54471017
 
 <span class="section">[table.wtxid]</span>
-<span class="comment"># The number of buckets in the wtxid table head, dynamic default (0 disables).</span>
+<span class="comment"># The number of buckets in the wtxid table head, derived from expected and memory, defaults to '4000000' (0 disables).</span>
 buckets = 4000000
 <span class="comment"># The expected element count of the wtxid table, defaults to '10000000'.</span>
 expected = 10000000
@@ -680,7 +681,7 @@ initial_block_subsidy_bitcoin = 50
 milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
 <span class="comment"># The minimum work for any branch to be considered valid, defaults to '000000000000000000000000000000000000000052b2559353df4117b7348b64'.</span>
 minimum_work = 000000000000000000000000000000000000000052b2559353df4117b7348b64
-<span class="comment"># The network of the chain defaults, defaults to 'mainnet'.</span>
+<span class="comment"># The network of the defaults (mainnet|testnet3|testnet4|regtest|signet), defaults to 'mainnet'.</span>
 network = mainnet
 <span class="comment"># The proof of work limit, defaults to '486604799'.</span>
 proof_of_work_limit = 486604799
@@ -688,6 +689,8 @@ proof_of_work_limit = 486604799
 retargeting_factor = 4
 <span class="comment"># The difficulty retargeting period, defaults to '1209600'.</span>
 retargeting_interval_seconds = 1209600
+<span class="comment"># The signet block challenge script, defaults to none (signet).</span>
+signet_challenge =
 <span class="comment"># The subsidy halving period, defaults to '210000'.</span>
 subsidy_interval = 210000
 <span class="comment"># The future timestamp allowance, defaults to '7200'.</span>
@@ -748,6 +751,8 @@ ltc_scrypt_proof_of_work = false
 ltc_time_warp_patch = false
 <span class="comment"># Retarget difficulty, defaults to 'true' (use false for regtest).</span>
 retarget = true
+<span class="comment"># Require signet block solutions, defaults to 'false' (signet).</span>
+signet = false
 <span class="comment"># Assume time_warp_patch activation if enabled, defaults to 'false' (testnet4).</span>
 time_warp_patch = false
 </code></pre>
@@ -784,8 +789,6 @@ witness_prefix = bc
 <pre><code class="language-ini"><span class="section">[node]</span>
 <span class="comment"># Allowable underperformance standard deviation, defaults to '1.5' (0 disables).</span>
 allowed_deviation = 1.5
-<span class="comment"># Limit of per channel cached peer block and tx announcements, to avoid replay, defaults to '42'.</span>
-announcement_cache = 42
 <span class="comment"># Count of silent payment transactions to index in each batch, defaults to '1000000' (0 disables).</span>
 batch_silent = 1000000
 <span class="comment"># Count of signatures to verify in each batch, defaults to '1000000' (0 disables).</span>
@@ -900,8 +903,8 @@ path =
 protocol_maximum = 70016
 <span class="comment"># The minimum network protocol version, defaults to '31800'.</span>
 protocol_minimum = 31800
-<span class="comment"># The node user agent string, defaults to '/libbitcoin:4.0.10255/'.</span>
-user_agent = /libbitcoin:4.0.10255/
+<span class="comment"># The node user agent string, defaults to '/libbitcoin:4.0.10444/'.</span>
+user_agent = /libbitcoin:4.0.10444/
 <span class="comment"># Validate the checksum of network messages, defaults to 'false'.</span>
 validate_checksum = false
 </code></pre>
@@ -1027,6 +1030,8 @@ cert_path =
 connect_timeout_seconds = 0
 <span class="comment"># The required maximum number of connections, defaults to '0'.</span>
 connections = 0
+<span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
+<span class="comment">#credential =</span>
 <span class="comment"># The path of the default source page, defaults to 'index.html'.</span>
 default = index.html
 <span class="comment"># The maximum connection duration, defaults to '60'.</span>
@@ -1073,6 +1078,8 @@ cert_path =
 connect_timeout_seconds = 0
 <span class="comment"># The required maximum number of connections, defaults to '0'.</span>
 connections = 0
+<span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
+<span class="comment">#credential =</span>
 <span class="comment"># The path of the default source page, defaults to 'index.html'.</span>
 default = index.html
 <span class="comment"># The maximum connection duration, defaults to '60'.</span>
@@ -1235,18 +1242,24 @@ server = libbitcoin/4
 banner_message =
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
+cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
 <span class="comment"># The time limit for connection establishment, defaults to '0' (network controls).</span>
 connect_timeout_seconds = 0
 <span class="comment"># The required maximum number of connections, defaults to '0'.</span>
 connections = 0
+<span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
+<span class="comment">#credential =</span>
 <span class="comment"># String returned by server.donation_address, defaults to empty.</span>
 donation_address =
 <span class="comment"># The maximum connection duration, defaults to '60'.</span>
 expiration_minutes = 60
 <span class="comment"># The idle timeout (http keep-alive), defaults to '10'.</span>
 inactivity_minutes = 10
+<span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
+key_pass =
 <span class="comment"># The path to the server private key file (.PEM), defaults to empty.</span>
 key_path =
 <span class="comment"># The maximum write backlog of a channel, defaults to '1048576'.</span>
@@ -1283,8 +1296,8 @@ rate_limit = 0
 <span class="comment">#self_bind =</span>
 <span class="comment"># Advertised secure host:port at which this server can be reached (defaults to empty).</span>
 <span class="comment">#self_safe =</span>
-<span class="comment"># String returned by server.version, defaults to '/libbitcoin:4.0.10255/'.</span>
-server_name = /libbitcoin:4.0.10255/
+<span class="comment"># String returned by server.version, defaults to '/libbitcoin:4.0.10444/'.</span>
+server_name = /libbitcoin:4.0.10444/
 </code></pre>
 <h2 id="19-sparrow">19. <code>[sparrow]</code><a class="anchor" href="#19-sparrow" aria-label="Link to this section">#</a></h2>
 <p>The Electrum protocol server with silent payment extensions, for Sparrow.</p>
@@ -1293,18 +1306,24 @@ server_name = /libbitcoin:4.0.10255/
 banner_message =
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
+cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
 <span class="comment"># The time limit for connection establishment, defaults to '0' (network controls).</span>
 connect_timeout_seconds = 0
 <span class="comment"># The required maximum number of connections, defaults to '0'.</span>
 connections = 0
+<span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
+<span class="comment">#credential =</span>
 <span class="comment"># String returned by server.donation_address, defaults to empty.</span>
 donation_address =
 <span class="comment"># The maximum connection duration, defaults to '60'.</span>
 expiration_minutes = 60
 <span class="comment"># The idle timeout (http keep-alive), defaults to '10'.</span>
 inactivity_minutes = 10
+<span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
+key_pass =
 <span class="comment"># The path to the server private key file (.PEM), defaults to empty.</span>
 key_path =
 <span class="comment"># The maximum write backlog of a channel, defaults to '1048576'.</span>
@@ -1341,8 +1360,8 @@ rate_limit = 0
 <span class="comment">#self_bind =</span>
 <span class="comment"># Advertised secure host:port at which this server can be reached (defaults to empty).</span>
 <span class="comment">#self_safe =</span>
-<span class="comment"># String returned by server.version, defaults to '/libbitcoin:4.0.10255/'.</span>
-server_name = /libbitcoin:4.0.10255/
+<span class="comment"># String returned by server.version, defaults to '/libbitcoin:4.0.10444/'.</span>
+server_name = /libbitcoin:4.0.10444/
 </code></pre>
 <h2 id="20-esplora">20. <code>[esplora]</code><a class="anchor" href="#20-esplora" aria-label="Link to this section">#</a></h2>
 <p>The Esplora interface.</p>
@@ -1359,6 +1378,8 @@ cert_path =
 connect_timeout_seconds = 0
 <span class="comment"># The required maximum number of connections, defaults to '0'.</span>
 connections = 0
+<span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
+<span class="comment">#credential =</span>
 <span class="comment"># The maximum connection duration, defaults to '60'.</span>
 expiration_minutes = 60
 <span class="comment"># The host name (http verification), multiple allowed, defaults to empty (disabled).</span>

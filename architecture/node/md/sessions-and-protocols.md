@@ -24,7 +24,7 @@
 | `include/bitcoin/node/sessions/session.hpp` + `src/sessions/session.cpp`| `node::session` mixin (sibling to `network::session`)              |
 | `include/bitcoin/node/sessions/session_peer.hpp` + `.../impl/...ipp`    | CRTP template combining mixin with `network::session_*`            |
 | `include/bitcoin/node/sessions/session_{inbound,outbound,manual}.hpp`   | Concrete sessions                                                  |
-| `include/bitcoin/node/channels/channel_peer.hpp` + `src/channels/channel_peer.cpp` | node channel: announcement cache, witness frame context |
+| `include/bitcoin/node/channels/channel_peer.hpp` + `src/channels/channel_peer.cpp` | node channel: anti-echo filter, witness frame context |
 | `include/bitcoin/node/protocols/protocol.hpp` + `src/protocols/protocol.cpp` | `node::protocol` base — sibling of `network::protocol`        |
 | `src/protocols/protocol_peer.cpp`                                       | `node::protocol_peer`: organizers, performance, announcements, compact blocks |
 | `src/protocols/protocol_observer.cpp`                                   | Universal channel observer (suspend, diagnostics, terminator)     |
@@ -155,8 +155,8 @@ nonzero. On `chase::block` and `chase::stale` it calls
 ### 2.1 `create_channel(socket)` — `session_peer.ipp:41-52`
 
 Returns a `node::channel_peer` upcast to `network::channel`. The node
-channel adds the per-channel announcement cache (`announcement_cache`
-hashes, `src/channels/channel_peer.cpp:32-49`) and stamps the witness
+channel adds the per-channel anti-echo filter (a rolling bloom filter of
+announced hashes, `src/channels/channel_peer.cpp:32-42`) and stamps the witness
 parse context on every inbound frame
 (`include/bitcoin/node/channels/channel_peer.hpp:54-61`), so messages
 are deserialized with witness data iff the node requires witness.
@@ -301,7 +301,7 @@ subscribes → completer fires → `handle_subscribe` stores the `key_` →
 
 `node::protocol_peer` (`src/protocols/protocol_peer.cpp`) adds the
 download-map RPCs (`get_hashes`/`put_hashes`), `performance`, `fault`
-(self-stop plus session fault, `:53-61`), the announcement cache
+(self-stop plus session fault, `:53-61`), the anti-echo filter
 accessors `set_announced`/`was_announced` (per channel, `:66-79`),
 `set_current` (channel buffer policy, `:71-74`), event notification, and
 `make_compact_block` (BIP152 v2 compact block of an associated block with

@@ -139,6 +139,7 @@ libbitcoin-node
 │   ├── configuration.cpp / settings.cpp ..... (mentioned in 00, not detailed)
 │   ├── error.cpp ............................ 00 §9
 │   ├── estimator.cpp ........................ 12 §4 (interface only)
+│   ├── rolling_bloom_filter.cpp ............. 07 §8
 │   │
 │   ├── chasers/
 │   │   ├── chaser.cpp ....................... 00 §3 (base; per-doc as needed)
@@ -162,7 +163,7 @@ libbitcoin-node
 │   │   └── session_manual.cpp ............... 06 §1 (typedef)
 │   │
 │   ├── channels/
-│   │   └── channel_peer.cpp ................. 07 §8 (announcement cache)
+│   │   └── channel_peer.cpp ................. 07 §8 (anti-echo filter)
 │   │
 │   └── protocols/
 │       ├── protocol.cpp ..................... 06 §3

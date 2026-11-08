@@ -718,13 +718,25 @@ cases (doc 08 §4).</p>
 </blockquote>
 <hr />
 <h2 id="8-anti-echo-mechanism-set_announced--was_announced">8. Anti-echo mechanism (<code>set_announced</code> / <code>was_announced</code>)<a class="anchor" href="#8-anti-echo-mechanism-set_announced--was_announced" aria-label="Link to this section">#</a></h2>
-<p>Lives on <code>node::channel_peer</code> (<code>src/channels/channel_peer.cpp:32-49</code>).
-Each channel maintains a bounded deque of recently-announced hashes
-(<code>node.announcement_cache</code> entries; zero disables).</p>
+<p>Lives on <code>node::channel_peer</code> (<code>src/channels/channel_peer.cpp:32-42</code>).
+Each channel keeps the hashes announced to it in a rolling bloom filter
+(<code>node::rolling_bloom_filter</code>, <code>src/rolling_bloom_filter.cpp</code>):</p>
 <ul>
-<li><code>set_announced(hash)</code>: called by header-in (headers after
+<li>Three generations of <code>max_inventory</code> (50,000) hashes each. When the
+  current generation is full, the oldest is cleared and becomes current,
+  so the filter retains at least the most recent 100,000 hashes.</li>
+<li>Each generation is a bloom array of 20 probes over 1,442,696 bits
+  (about 176 KiB, allocated on its first insert), keyed by the first 8
+  bytes of the hash. The false positive rate is about 2^-20 per
+  generation, at most about 3 in 2^20 for the three together.</li>
+<li>
+<p>There is no setting; every channel has the filter.</p>
+</li>
+<li>
+<p><code>set_announced(hash)</code>: called by header-in (headers after
   subscription, compact blocks) and tx-in (every announced tx) when
-  receiving an announcement.</li>
+  receiving an announcement.</p>
+</li>
 <li><code>was_announced(hash)</code>: called by header-out, block-out and tx-out
   before sending an announcement.</li>
 </ul>
@@ -733,8 +745,9 @@ to break the local A↔B echo.</p>
 <blockquote>
 <p><strong>Invariant (Anti-Echo-1).</strong> The pair <code>(set_announced, was_announced)</code>
 guarantees a peer that announced X to us is never sent X back, <em>on
-that channel</em>, while X is within the last <code>announcement_cache</code>
-announcements. It does not guarantee global no-duplication.</p>
+that channel</em>, while X is within the last 100,000 announcements. A
+false positive may withhold an announcement the peer has not seen. It
+does not guarantee global no-duplication.</p>
 </blockquote>
 <hr />
 <h2 id="9-error--outcome-inventory">9. Error / outcome inventory<a class="anchor" href="#9-error--outcome-inventory" aria-label="Link to this section">#</a></h2>

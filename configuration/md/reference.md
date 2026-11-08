@@ -3,7 +3,8 @@
 `bs --settings` displays every setting in its section, each with a
 comment giving its description and default, followed by its configured
 value. With `--config`, a setting configured to other than its default is
-marked by a comment. The sections below are the defaults, grouped by
+marked by a comment. The sections below are the defaults on mainnet, with
+32 GiB or more of memory for the derived table buckets, grouped by
 area.
 
 ## 1. `[log]`
@@ -106,7 +107,7 @@ rate = 1
 size = 0
 
 [table.header]
-# The number of buckets in the header table head, dynamic default.
+# The number of buckets in the header table head, derived from expected and memory, defaults to '385181'.
 buckets = 385181
 # The expected element count of the header table, defaults to '962953'.
 expected = 962953
@@ -122,7 +123,7 @@ rate = 1
 size = 67269346
 
 [table.ins]
-# The number of buckets in the ins table head, dynamic default.
+# The number of buckets in the ins table head, derived from expected and memory, defaults to '1345386900'.
 buckets = 1345386900
 # The expected element count of the ins table, defaults to '3363467251'.
 expected = 3363467251
@@ -138,7 +139,7 @@ rate = 1
 size = 1278023220
 
 [table.outs]
-# The number of buckets in the outs table head, dynamic default (0 disables address index).
+# The number of buckets in the outs table head, derived from expected and memory, defaults to '748385817' (0 disables address index).
 buckets = 748385817
 # The expected element count of the outs table, defaults to '3741929086'.
 expected = 3741929086
@@ -148,7 +149,7 @@ rate = 1
 size = 336773618
 
 [table.pool]
-# The number of buckets in the pool table head, dynamic default (0 disables).
+# The number of buckets in the pool table head, derived from expected and memory, defaults to '4000000' (0 disables).
 buckets = 4000000
 # The expected element count of the pool table, defaults to '10000000'.
 expected = 10000000
@@ -210,13 +211,13 @@ buckets = 950001
 rate = 1
 
 [table.strong]
-# The number of buckets provisioned in the strong table head, defaults to '1359871695'.
+# The number of buckets provisioned in the strong table head, derived from tx expected, defaults to '1359871695'.
 buckets = 1359871695
 # The percentage expansion of the strong table head, defaults to '1'.
 rate = 1
 
 [table.tx]
-# The number of buckets in the tx table head, dynamic default.
+# The number of buckets in the tx table head, derived from expected and memory, defaults to '543948678'.
 buckets = 543948678
 # The expected element count of the tx table, defaults to '1359871695'.
 expected = 1359871695
@@ -234,7 +235,7 @@ rate = 1
 size = 54471017
 
 [table.wtxid]
-# The number of buckets in the wtxid table head, dynamic default (0 disables).
+# The number of buckets in the wtxid table head, derived from expected and memory, defaults to '4000000' (0 disables).
 buckets = 4000000
 # The expected element count of the wtxid table, defaults to '10000000'.
 expected = 10000000
@@ -370,7 +371,7 @@ initial_block_subsidy_bitcoin = 50
 milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
 # The minimum work for any branch to be considered valid, defaults to '000000000000000000000000000000000000000052b2559353df4117b7348b64'.
 minimum_work = 000000000000000000000000000000000000000052b2559353df4117b7348b64
-# The network of the chain defaults, defaults to 'mainnet'.
+# The network of the defaults (mainnet|testnet3|testnet4|regtest|signet), defaults to 'mainnet'.
 network = mainnet
 # The proof of work limit, defaults to '486604799'.
 proof_of_work_limit = 486604799
@@ -378,6 +379,8 @@ proof_of_work_limit = 486604799
 retargeting_factor = 4
 # The difficulty retargeting period, defaults to '1209600'.
 retargeting_interval_seconds = 1209600
+# The signet block challenge script, defaults to none (signet).
+signet_challenge =
 # The subsidy halving period, defaults to '210000'.
 subsidy_interval = 210000
 # The future timestamp allowance, defaults to '7200'.
@@ -442,6 +445,8 @@ ltc_scrypt_proof_of_work = false
 ltc_time_warp_patch = false
 # Retarget difficulty, defaults to 'true' (use false for regtest).
 retarget = true
+# Require signet block solutions, defaults to 'false' (signet).
+signet = false
 # Assume time_warp_patch activation if enabled, defaults to 'false' (testnet4).
 time_warp_patch = false
 ```
@@ -486,8 +491,6 @@ The node: validation threads, batching and GPU use, the download window, fee pol
 [node]
 # Allowable underperformance standard deviation, defaults to '1.5' (0 disables).
 allowed_deviation = 1.5
-# Limit of per channel cached peer block and tx announcements, to avoid replay, defaults to '42'.
-announcement_cache = 42
 # Count of silent payment transactions to index in each batch, defaults to '1000000' (0 disables).
 batch_silent = 1000000
 # Count of signatures to verify in each batch, defaults to '1000000' (0 disables).
@@ -610,8 +613,8 @@ path =
 protocol_maximum = 70016
 # The minimum network protocol version, defaults to '31800'.
 protocol_minimum = 31800
-# The node user agent string, defaults to '/libbitcoin:4.0.10255/'.
-user_agent = /libbitcoin:4.0.10255/
+# The node user agent string, defaults to '/libbitcoin:4.0.10444/'.
+user_agent = /libbitcoin:4.0.10444/
 # Validate the checksum of network messages, defaults to 'false'.
 validate_checksum = false
 ```
@@ -753,6 +756,8 @@ cert_path =
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
 connections = 0
+# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
+#credential =
 # The path of the default source page, defaults to 'index.html'.
 default = index.html
 # The maximum connection duration, defaults to '60'.
@@ -803,6 +808,8 @@ cert_path =
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
 connections = 0
+# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
+#credential =
 # The path of the default source page, defaults to 'index.html'.
 default = index.html
 # The maximum connection duration, defaults to '60'.
@@ -981,18 +988,24 @@ The Electrum protocol server.
 banner_message =
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
+# The trusted client certificate directory (*.PEM), enables client authentication.
+cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
 connections = 0
+# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
+#credential =
 # String returned by server.donation_address, defaults to empty.
 donation_address =
 # The maximum connection duration, defaults to '60'.
 expiration_minutes = 60
 # The idle timeout (http keep-alive), defaults to '10'.
 inactivity_minutes = 10
+# The password to decrypt the server private key file (.PEM), optional.
+key_pass =
 # The path to the server private key file (.PEM), defaults to empty.
 key_path =
 # The maximum write backlog of a channel, defaults to '1048576'.
@@ -1029,8 +1042,8 @@ rate_limit = 0
 #self_bind =
 # Advertised secure host:port at which this server can be reached (defaults to empty).
 #self_safe =
-# String returned by server.version, defaults to '/libbitcoin:4.0.10255/'.
-server_name = /libbitcoin:4.0.10255/
+# String returned by server.version, defaults to '/libbitcoin:4.0.10444/'.
+server_name = /libbitcoin:4.0.10444/
 ```
 
 ## 19. `[sparrow]`
@@ -1043,18 +1056,24 @@ The Electrum protocol server with silent payment extensions, for Sparrow.
 banner_message =
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
+# The trusted client certificate directory (*.PEM), enables client authentication.
+cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
 connections = 0
+# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
+#credential =
 # String returned by server.donation_address, defaults to empty.
 donation_address =
 # The maximum connection duration, defaults to '60'.
 expiration_minutes = 60
 # The idle timeout (http keep-alive), defaults to '10'.
 inactivity_minutes = 10
+# The password to decrypt the server private key file (.PEM), optional.
+key_pass =
 # The path to the server private key file (.PEM), defaults to empty.
 key_path =
 # The maximum write backlog of a channel, defaults to '1048576'.
@@ -1091,8 +1110,8 @@ rate_limit = 0
 #self_bind =
 # Advertised secure host:port at which this server can be reached (defaults to empty).
 #self_safe =
-# String returned by server.version, defaults to '/libbitcoin:4.0.10255/'.
-server_name = /libbitcoin:4.0.10255/
+# String returned by server.version, defaults to '/libbitcoin:4.0.10444/'.
+server_name = /libbitcoin:4.0.10444/
 ```
 
 ## 20. `[esplora]`
@@ -1113,6 +1132,8 @@ cert_path =
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
 connections = 0
+# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
+#credential =
 # The maximum connection duration, defaults to '60'.
 expiration_minutes = 60
 # The host name (http verification), multiple allowed, defaults to empty (disabled).
