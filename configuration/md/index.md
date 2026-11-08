@@ -1185,12 +1185,35 @@ credential = user:password
 
 ### 6.1 Public servers
 
+> **Note.** These servers are still being configured, for TLS and other
+> services, so not every service listed here is available yet.
+
 The libbitcoin project runs two public `bs` servers:
 
 | Host | Address |
 | ---- | ------- |
-| `wormer.libbitcoin.net` | 72.65.246.83 |
-| `carmine.libbitcoin.net` | 72.65.246.84 |
+| [wormer.libbitcoin.net](http://wormer.libbitcoin.net:8080) | 72.65.246.83 |
+| [carmine.libbitcoin.net](http://carmine.libbitcoin.net:8080) | 72.65.246.84 |
+
+Both have two AMD EPYC 7F32 processors (Zen 2), 16 cores and 32
+threads in all, and no GPU. A `--hardware-optimized` build on either
+reports (§2):
+
+```
+$ bs --hardware
+Hardware configuration (x64)...
+aesni....... platform:1 compiled:1.
+vaes........ platform:0 compiled:0.
+shani....... platform:1 compiled:1.
+sha512...... platform:0 compiled:0.
+sse41....... platform:1 compiled:1.
+avx2........ platform:1 compiled:1.
+avx512...... platform:0 compiled:0.
+avxifma..... platform:0 compiled:0.
+avx512ifma.. platform:0 compiled:0.
+cuda........ platform:0 compiled:1.
+cuda ecc.... platform:0 enabled:0.
+```
 
 Each address serves mainnet, testnet3 and testnet4. Every chain accepts
 inbound P2P connections and serves these client services on its
@@ -1254,7 +1277,7 @@ tails 0), and convert them:
 $ bx dice-rolls --sides 2 --bits 256
 $ bx dice-entropy --sides 2 1101001110...
 $ bx curve-new <entropy>
-$ bx curve-public '<secret key>'
+$ bx curve-new <entropy> | bx curve-public
 ```
 
 A die of up to 16 sides also works. Write each roll as one 0-based digit,
@@ -1263,11 +1286,10 @@ example, a six-sided die takes `--sides 6` and 102 rolls. `dice-entropy`
 rejects a sequence that would bias the entropy, which must then be
 rolled again.
 
-`curve-new` prints the secret key and `curve-public` its public key, both
-Z85 encoded. Z85 includes `#`, which a configuration file reads as a
+`curve-new` prints the secret key, and piped to `curve-public` its public
+key, both Z85 encoded. Z85 includes `#`, which a configuration file reads as a
 comment, so `curve-new` reports `The entropy produced an invalid key.`
-when either key contains one, and the coin must be flipped again. Quote
-the keys on the command line, as they contain shell characters.
+when either key contains one, and the coin must be flipped again.
 
 **4. Configure the services.** Bind each service on every adapter, clear
 and secure, with the certificate and key from step 1 and the ZMQ secret

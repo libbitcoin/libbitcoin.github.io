@@ -1622,6 +1622,10 @@ connections = 10
 credential = user:password
 </code></pre>
 <h3 id="61-public-servers">6.1 Public servers<a class="anchor" href="#61-public-servers" aria-label="Link to this section">#</a></h3>
+<blockquote>
+<p><strong>Note.</strong> These servers are still being configured, for TLS and other
+services, so not every service listed here is available yet.</p>
+</blockquote>
 <p>The libbitcoin project runs two public <code>bs</code> servers:</p>
 <div class="scroller"><table>
 <thead>
@@ -1632,15 +1636,32 @@ credential = user:password
 </thead>
 <tbody>
 <tr>
-<td><code>wormer.libbitcoin.net</code></td>
+<td><a href="http://wormer.libbitcoin.net:8080">wormer.libbitcoin.net</a></td>
 <td>72.65.246.83</td>
 </tr>
 <tr>
-<td><code>carmine.libbitcoin.net</code></td>
+<td><a href="http://carmine.libbitcoin.net:8080">carmine.libbitcoin.net</a></td>
 <td>72.65.246.84</td>
 </tr>
 </tbody>
 </table></div>
+<p>Both have two AMD EPYC 7F32 processors (Zen 2), 16 cores and 32
+threads in all, and no GPU. A <code>--hardware-optimized</code> build on either
+reports (§2):</p>
+<pre class="console"><code>$ bs --hardware
+Hardware configuration (x64)...
+aesni....... platform:1 compiled:1.
+vaes........ platform:0 compiled:0.
+shani....... platform:1 compiled:1.
+sha512...... platform:0 compiled:0.
+sse41....... platform:1 compiled:1.
+avx2........ platform:1 compiled:1.
+avx512...... platform:0 compiled:0.
+avxifma..... platform:0 compiled:0.
+avx512ifma.. platform:0 compiled:0.
+cuda........ platform:0 compiled:1.
+cuda ecc.... platform:0 enabled:0.
+</code></pre>
 <p>Each address serves mainnet, testnet3 and testnet4. Every chain accepts
 inbound P2P connections and serves these client services on its
 default ports (clear / secure):</p>
@@ -1741,18 +1762,17 @@ tails 0), and convert them:</p>
 <pre class="console"><code>$ bx dice-rolls --sides 2 --bits 256
 $ bx dice-entropy --sides 2 1101001110...
 $ bx curve-new &lt;entropy&gt;
-$ bx curve-public '&lt;secret key&gt;'
+$ bx curve-new &lt;entropy&gt; | bx curve-public
 </code></pre>
 <p>A die of up to 16 sides also works. Write each roll as one 0-based digit,
 using <code>a</code> to <code>f</code> above 9, and give its sides to both commands. For
 example, a six-sided die takes <code>--sides 6</code> and 102 rolls. <code>dice-entropy</code>
 rejects a sequence that would bias the entropy, which must then be
 rolled again.</p>
-<p><code>curve-new</code> prints the secret key and <code>curve-public</code> its public key, both
-Z85 encoded. Z85 includes <code>#</code>, which a configuration file reads as a
+<p><code>curve-new</code> prints the secret key, and piped to <code>curve-public</code> its public
+key, both Z85 encoded. Z85 includes <code>#</code>, which a configuration file reads as a
 comment, so <code>curve-new</code> reports <code>The entropy produced an invalid key.</code>
-when either key contains one, and the coin must be flipped again. Quote
-the keys on the command line, as they contain shell characters.</p>
+when either key contains one, and the coin must be flipped again.</p>
 <p><strong>4. Configure the services.</strong> Bind each service on every adapter, clear
 and secure, with the certificate and key from step 1 and the ZMQ secret
 key from step 3:</p>
