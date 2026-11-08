@@ -18,7 +18,7 @@ Its protocols share one port, and their secure forms share another:
 
 | Method | Purpose |
 | ------ | ------- |
-| [`server.features`](#serverfeatures) | Adds silent payment support |
+| [`server.features`](#serverfeatures) | Advertises silent payment support |
 | [`blockchain.silentpayments.subscribe`](#blockchainsilentpaymentssubscribe) | Scans for a wallet's silent payments, and notifies new ones |
 | [`blockchain.silentpayments.unsubscribe`](#blockchainsilentpaymentsunsubscribe) | Ends a silent payment subscription |
 | [`blockchain.block.stats`](#blockchainblockstats) | Not yet implemented |
