@@ -4,14 +4,189 @@
 
 The libbitcoin project runs two public `bs` servers:
 
-| Host | Address |
-| ---- | ------- |
-| [wormer.libbitcoin.net](http://wormer.libbitcoin.net:8180) | 72.65.246.83 |
-| [carmine.libbitcoin.net](http://carmine.libbitcoin.net:8180) | 72.65.246.84 |
+<div id="server-status"></div>
+
+| Host | Address | mainnet | testnet3 | testnet4 |
+| ---- | ------- | ------- | -------- | -------- |
+| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:8143) | 72.65.246.83 | – | – | – |
+| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:8143) | 72.65.246.84 | – | – | – |
+
+<div id="server-scan"></div>
+
+| Service | mainnet | testnet3 | testnet4 |
+| ------- | ------- | -------- | -------- |
+| P2P network | 8333 | 18333 | 48333 |
+| ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 |
+| Native web and REST | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 |
+| Bitcoind RPC and REST | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 |
+| BTCD RPC | 8480 / 8443 | 18480 / 18443 | 48480 / 48443 |
+| Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 |
+| Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 |
+| Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 |
+
+<style>
+.scan-host { margin: 1.4em 0 .4em; font-family: var(--mono); }
+.scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
+.scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
+.scan-wait { color: var(--ink-3); }
+.scan-some { color: var(--partial, #ffa022); font-weight: 600; }
+</style>
+
+<script>
+(function () {
+  var marker = document.getElementById("server-scan");
+  if (!marker || !window.fetch || !window.AbortController) return;
+  var scroller = marker.nextElementSibling;
+  if (!scroller || !scroller.querySelector("table")) return;
+  var hosts = ["wormer.libbitcoin.net", "carmine.libbitcoin.net"];
+  var http = ["Native web and REST", "Bitcoind RPC and REST", "BTCD RPC", "Electrum", "Sparrow", "Esplora"];
+  var genesis = {
+    mainnet: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+    testnet3: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
+    testnet4: "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043"
+  };
+  var paths = {
+    "Native web and REST": "/v1/block/height/0?format=json",
+    "Bitcoind RPC and REST": function (chain) { return "/rest/block/" + genesis[chain] + ".json"; },
+    "Esplora": "/block-height/0"
+  };
+  var electrum = [
+    { jsonrpc: "2.0", id: 0, method: "server.version", params: ["libbitcoin.org", "1.4"] },
+    { jsonrpc: "2.0", id: 1, method: "blockchain.block.header", params: [0] }
+  ];
+  var requests = {
+    "Electrum": electrum,
+    "Sparrow": electrum,
+    "BTCD RPC": { jsonrpc: "1.0", id: 1, method: "getblockhash", params: [0] }
+  };
+
+  function open(target, body) {
+    var view = window.open("about:blank", "_blank");
+    var show = function (text, type) {
+      if (!view) return;
+      var blob = new Blob([text], { type: type });
+      view.location.href = URL.createObjectURL(blob);
+    };
+    fetch(target, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+      .then(function (response) { return response.text(); })
+      .then(function (text) { show(text, "application/json"); }, function () {
+        if (view) view.location.href = failure("unreadable", target);
+      });
+  }
+  var missing = new URL("../404.html", location.href).href;
+
+  function failure(reason, target) {
+    return missing + "?reason=" + reason + "&url=" + encodeURIComponent(target);
+  }
+  var clear = location.protocol === "http:";
+  var cache = {};
+
+  function url(host, port, path) {
+    var scheme = String(port).slice(-2) === "43" ? "https" : "http";
+    return scheme + "://" + host + ":" + port + (path || "/");
+  }
+
+  function probe(host, port, path) {
+    var key = host + ":" + port;
+    if (cache[key]) return cache[key];
+    var abort = new AbortController();
+    var timer = setTimeout(function () { abort.abort(); }, 8000);
+    cache[key] = fetch(url(host, port, path), { mode: "no-cors", cache: "no-store", signal: abort.signal })
+      .then(function () { return "up"; }, function () { return abort.signal.aborted ? "timeout" : "failed"; })
+      .then(function (state) { clearTimeout(timer); return state; });
+    return cache[key];
+  }
+
+  var tally = {};
+  var status = document.getElementById("server-status");
+  var summary = status && status.nextElementSibling;
+  var chains = [].map.call(scroller.querySelectorAll("thead th"), function (th) { return th.textContent.trim(); });
+
+  function count(host, chain, promise) {
+    var key = host + " " + chain;
+    var entry = tally[key] || (tally[key] = { total: 0, up: 0, done: 0 });
+    entry.total++;
+    promise.then(function (state) {
+      entry.done++;
+      if (state === "up") entry.up++;
+      show(host, chain, entry);
+    });
+  }
+
+  function show(host, chain, entry) {
+    if (!summary) return;
+    summary.querySelectorAll("tbody tr").forEach(function (row) {
+      if (row.cells[0].textContent.trim() !== host) return;
+      var head = [].map.call(summary.querySelectorAll("thead th"), function (th) { return th.textContent.trim(); });
+      var cell = row.cells[head.indexOf(chain)];
+      if (!cell) return;
+      cell.textContent = entry.up + " of " + entry.total;
+      cell.className = entry.done < entry.total ? "scan-wait" :
+        entry.up === entry.total ? "scan-up" : entry.up ? "scan-some" : "scan-down";
+      cell.title = entry.up + " of " + entry.total + " checked ports answered";
+    });
+  }
+
+  hosts.forEach(function (host) {
+    var heading = document.createElement("p");
+    heading.className = "scan-host";
+    heading.textContent = host;
+    var copy = scroller.cloneNode(true);
+    marker.appendChild(heading);
+    marker.appendChild(copy);
+    copy.querySelectorAll("tbody tr").forEach(function (row) {
+      var cells = row.querySelectorAll("td");
+      var service = cells[0].textContent.trim();
+      var checked = http.indexOf(service) >= 0;
+      var path = paths[service];
+      var request = requests[service];
+      for (var i = 1; i < cells.length; i++) {
+        var ports = cells[i].textContent.split("/").map(function (t) { return t.trim(); });
+        cells[i].textContent = "";
+        var chain = chains[i];
+        ports.forEach(function (port, j) {
+          var where = typeof path === "function" ? path(chain) : path;
+          if (j) cells[i].appendChild(document.createTextNode(" / "));
+          var span = document.createElement(where || request ? "a" : "span");
+          span.textContent = port;
+          if (where || request) {
+            span.target = "_blank";
+            span.rel = "noopener";
+          }
+          if (where) span.href = url(host, port, where);
+          if (request) {
+            span.href = url(host, port);
+            span.addEventListener("click", function (event) {
+              event.preventDefault();
+              if (span.dataset.reason) window.open(failure(span.dataset.reason, url(host, port)), "_blank");
+              else open(url(host, port), request);
+            });
+          }
+          cells[i].appendChild(span);
+          if (!checked || (port.slice(-2) !== "43" && !clear)) return;
+          span.className = "scan-wait";
+          var result = probe(host, port, where);
+          count(host, chains[i], result);
+          result.then(function (state) {
+            var up = state === "up";
+            span.className = up ? "scan-up" : "scan-down";
+            if (!up) span.dataset.reason = state;
+            if (!up && where) span.href = failure(state, url(host, port, where));
+            span.title = up ? "Answered" : "No answer";
+          });
+        });
+      }
+    });
+  });
+  scroller.style.display = "none";
+})();
+</script>
 
 Both have two AMD EPYC 7F32 processors (Zen 2), 16 cores and 32
-threads in all, and no GPU. A `--hardware-optimized` build on either
-reports ([Command Line](command-line)):
+threads in all, and no GPU.
+
+A `--hardware-optimized` build on either reports
+([Command Line](command-line)):
 
 ```
 $ bs --hardware
@@ -27,21 +202,6 @@ avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:0 compiled:0.
 cuda........ platform:0 compiled:1.
 ```
-
-Each address serves mainnet, testnet3 and testnet4. Every chain accepts
-inbound P2P connections and serves these client services on its
-default ports (clear / secure):
-
-| Service | mainnet | testnet3 | testnet4 |
-| ------- | ------- | -------- | -------- |
-| P2P network | 8333 | 18333 | 48333 |
-| Native web and REST | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 |
-| Bitcoind RPC and REST | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 |
-| Bitcoind ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 |
-| BTCD RPC | 8480 / 8443 | 18480 / 18443 | 48480 / 48443 |
-| Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 |
-| Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 |
-| Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 |
 
 ## 2. Running a public server
 
@@ -122,7 +282,7 @@ safe = [::]:8543
 cert_path = fullchain.pem
 key_path = privkey.pem
 
-[bitcoind_zmq]
+[zmq]
 bind = 0.0.0.0:8380
 bind = [::]:8380
 safe = 0.0.0.0:8343
@@ -131,10 +291,27 @@ key = <secret key>
 ```
 
 The other client services follow `[electrum]`, each on its own ports
-([Conventional Ports](ports)). With no `bitcoind_zmq.cert` lines, any ZMQ client may connect.
+([Conventional Ports](ports)). With no `zmq.cert` lines, any ZMQ client may connect.
 Leave `[admin]` on the local machine ([Admin site](setups#5-admin-site)).
 
-**5. Publish the ZMQ public key.** TLS clients verify the server by its
+**5. Allow web pages.** The HTTP services accept cross-origin requests
+from web pages on other sites ([CORS](https://fetch.spec.whatwg.org/#http-cors-protocol)).
+With no `origin` setting, a service accepts a request from any page and
+returns the page's origin in `Access-Control-Allow-Origin`, so a block
+explorer or wallet hosted elsewhere can query the server from a browser.
+To admit only particular sites, list them:
+
+```ini
+[native]
+origin = https://explorer.example.org
+```
+
+A request from any other page is then refused. Requests that carry no
+`Origin`, such as those from wallets and command line tools, are not
+affected. `allow_opaque_origin` admits pages opened as local files
+([HTTP services](services#4-http-services)).
+
+**6. Publish the ZMQ public key.** TLS clients verify the server by its
 certificate, but a CurveZMQ client must already hold the server's public
 key. Publish the `curve-public` key beside the server's name and ports,
 for clients to configure as the server key. Never publish the secret key.

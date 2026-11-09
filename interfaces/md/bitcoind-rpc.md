@@ -640,8 +640,8 @@ can be read but not changed. **Parameters:** `include`, `exclude`.
 
 ### getzmqnotifications
 
-The [Bitcoind ZMQ](zeromq) topics and their addresses. **Parameters:**
-none. Every topic is published on every `[bitcoind_zmq]` address.
+The [ZMQ](zeromq) topics and their addresses. **Parameters:**
+none. Every topic is published on every `[zmq]` address.
 
 ## 11. Methods not served
 

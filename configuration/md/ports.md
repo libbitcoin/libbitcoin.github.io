@@ -16,7 +16,7 @@ conflict.
 | Admin web | `[admin]` | 8080 | 8043 |
 | Native web and REST | `[native]` | 8180 | 8143 |
 | Bitcoind RPC and REST | `[bitcoind]` | 8280 | 8243 |
-| Bitcoind ZMQ | `[bitcoind_zmq]` | 8380 | 8343 |
+| ZMQ | `[zmq]` | 8380 | 8343 |
 | BTCD RPC | `[btcd]` | 8480 | 8443 |
 | Electrum | `[electrum]` | 8580 | 8543 |
 | Sparrow | `[sparrow]` | 8680 | 8643 |

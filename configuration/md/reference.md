@@ -896,12 +896,12 @@ subversion = /libbitcoin:server/
 version = 0.0
 ```
 
-## 16. `[bitcoind_zmq]`
+## 16. `[zmq]`
 
-The bitcoind ZMQ notification interface.
+The ZMQ notification interface (bitcoind compatible).
 
 ```ini
-[bitcoind_zmq]
+[zmq]
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
 # The Z85 encoded public key of an authorized client, multiple allowed, defaults to empty (all).

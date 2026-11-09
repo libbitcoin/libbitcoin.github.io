@@ -2,7 +2,7 @@
 
 The client services (`[admin]`, `[native]`, `[bitcoind]`, `[electrum]`,
 `[btcd]`, `[sparrow]` and `[esplora]`) share these settings.
-`[bitcoind_zmq]` shares the listening settings, and secures its
+`[zmq]` shares the listening settings, and secures its
 connections using CurveZMQ rather than TLS ([Secure connections](#2-secure-connections)).
 
 ## 1. Listening
@@ -46,7 +46,7 @@ key_path = server.key
 ```
 
 ZMQ uses CurveZMQ instead of TLS. Its `safe` addresses require the
-server's secret key (`bitcoind_zmq.key`, Z85 encoded), made by
+server's secret key (`zmq.key`, Z85 encoded), made by
 `bx curve-new` ([Running a public server](public#2-running-a-public-server), step 3).
 
 ### Self-signed certificates
@@ -74,7 +74,7 @@ does not trust until it is imported or accepted.
 
 ## 3. Authentication
 
-Every client service except `[bitcoind_zmq]` has:
+Every client service except `[zmq]` has:
 
 | Setting | Purpose |
 | ------- | ------- |
@@ -130,13 +130,13 @@ that client when `bs` next starts.
 
 ### CurveZMQ client keys
 
-Each `bitcoind_zmq.cert` line authorizes one client public key on the ZMQ
+Each `zmq.cert` line authorizes one client public key on the ZMQ
 `safe` addresses. With no `cert` lines, any client may connect. The
 client makes its own key pair with `bx curve-new` and `bx curve-public`
 ([Running a public server](public#2-running-a-public-server), step 3), and gives only the public key to the server operator:
 
 ```ini
-[bitcoind_zmq]
+[zmq]
 safe = 127.0.0.1:8343
 safe = [::1]:8343
 key = <server secret key>

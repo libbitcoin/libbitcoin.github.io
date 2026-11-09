@@ -303,7 +303,7 @@
         <a href="../../interfaces/p2p.html">Bitcoin P2P</a>
         <a href="../../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
         <a href="../../interfaces/bitcoind-rest.html">Bitcoind REST</a>
-        <a href="../../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../../interfaces/zeromq.html">ZMQ</a>
         <a href="../../interfaces/btcd.html">BTCD</a>
         <a href="../../interfaces/esplora.html">Esplora</a>
         <a href="../../interfaces/stratum-v1.html">Stratum v1</a>
@@ -370,7 +370,7 @@ in turn, each start completing into the next:</p>
 }
 </code></pre>
 <p>The order is admin, native, bitcoind, btcd, electrum, sparrow, esplora,
-stratum v1, stratum v2 and bitcoind ZMQ. Each <code>attach_*_session()</code> is
+stratum v1, stratum v2 and ZMQ. Each <code>attach_*_session()</code> is
 virtual, and constructs its session from the server configuration and the
 service's own settings section (for example <code>config_.server.electrum</code>).</p>
 <div class="mermaid">
@@ -490,10 +490,10 @@ the node's <code>delay_inbound</code> is set (<code>enabled()</code>). <code>ser
 <td><code>stratum_v2</code></td>
 </tr>
 <tr>
-<td><code>session_bitcoind_zmq</code></td>
-<td><code>protocol_bitcoind_zmq</code></td>
-<td><code>channel_bitcoind_zmq</code></td>
-<td><code>bitcoind_zmq</code></td>
+<td><code>session_zmq</code></td>
+<td><code>protocol_zmq</code></td>
+<td><code>channel_zmq</code></td>
+<td><code>zmq</code></td>
 </tr>
 </tbody>
 </table></div>
@@ -554,7 +554,7 @@ channel of their transport:</p>
 <td>Binary</td>
 </tr>
 <tr>
-<td><code>channel_bitcoind_zmq</code></td>
+<td><code>channel_zmq</code></td>
 <td><code>network::channel_rpc</code></td>
 <td>ZMTP publisher</td>
 </tr>
@@ -633,8 +633,8 @@ that sparrow extends is overridden, not reimplemented (<code>add_features</code>
 <td><a href="../../interfaces/bitcoind-rest.html">bitcoind REST</a></td>
 </tr>
 <tr>
-<td>bitcoind ZMQ</td>
-<td><code>protocol_bitcoind_zmq</code></td>
+<td>ZMQ</td>
+<td><code>protocol_zmq</code></td>
 <td><a href="../../interfaces/zeromq.html">ZeroMQ</a></td>
 </tr>
 <tr>
@@ -849,7 +849,7 @@ only atomic subscription flags, and posts the work with the event's link
 <td><code>organized</code>, <code>reorganized</code></td>
 </tr>
 <tr>
-<td><code>protocol_bitcoind_zmq</code></td>
+<td><code>protocol_zmq</code></td>
 <td><code>organized</code>, <code>transaction</code>, <code>reorganized</code></td>
 </tr>
 </tbody>

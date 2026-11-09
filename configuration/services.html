@@ -303,7 +303,7 @@
         <a href="../interfaces/p2p.html">Bitcoin P2P</a>
         <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../interfaces/zeromq.html">ZMQ</a>
         <a href="../interfaces/btcd.html">BTCD</a>
         <a href="../interfaces/esplora.html">Esplora</a>
         <a href="../interfaces/stratum-v1.html">Stratum v1</a>
@@ -349,7 +349,7 @@
   <article class="doc">
 <p>The client services (<code>[admin]</code>, <code>[native]</code>, <code>[bitcoind]</code>, <code>[electrum]</code>,
 <code>[btcd]</code>, <code>[sparrow]</code> and <code>[esplora]</code>) share these settings.
-<code>[bitcoind_zmq]</code> shares the listening settings, and secures its
+<code>[zmq]</code> shares the listening settings, and secures its
 connections using CurveZMQ rather than TLS (<a href="#2-secure-connections">Secure connections</a>).</p>
 <h2 id="1-listening">1. Listening<a class="anchor" href="#1-listening" aria-label="Link to this section">#</a></h2>
 <p>A service runs only when it has somewhere to listen and is allowed
@@ -416,7 +416,7 @@ cert_path = server.pem
 key_path = server.key
 </code></pre>
 <p>ZMQ uses CurveZMQ instead of TLS. Its <code>safe</code> addresses require the
-server's secret key (<code>bitcoind_zmq.key</code>, Z85 encoded), made by
+server's secret key (<code>zmq.key</code>, Z85 encoded), made by
 <code>bx curve-new</code> (<a href="public.html#2-running-a-public-server">Running a public server</a>, step 3).</p>
 <h3 id="self-signed-certificates">Self-signed certificates<a class="anchor" href="#self-signed-certificates" aria-label="Link to this section">#</a></h3>
 <blockquote>
@@ -438,7 +438,7 @@ contains no secret, as a trusted certificate (for example, <code>curl
 --cacert server.pem</code>). A browser shows a warning for a certificate it
 does not trust until it is imported or accepted.</p>
 <h2 id="3-authentication">3. Authentication<a class="anchor" href="#3-authentication" aria-label="Link to this section">#</a></h2>
-<p>Every client service except <code>[bitcoind_zmq]</code> has:</p>
+<p>Every client service except <code>[zmq]</code> has:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -512,11 +512,11 @@ imports a client certificate as PKCS#12, which <code>openssl pkcs12 -export</cod
 makes from the two files. Removing a certificate from <code>cert_auth</code> revokes
 that client when <code>bs</code> next starts.</p>
 <h3 id="curvezmq-client-keys">CurveZMQ client keys<a class="anchor" href="#curvezmq-client-keys" aria-label="Link to this section">#</a></h3>
-<p>Each <code>bitcoind_zmq.cert</code> line authorizes one client public key on the ZMQ
+<p>Each <code>zmq.cert</code> line authorizes one client public key on the ZMQ
 <code>safe</code> addresses. With no <code>cert</code> lines, any client may connect. The
 client makes its own key pair with <code>bx curve-new</code> and <code>bx curve-public</code>
 (<a href="public.html#2-running-a-public-server">Running a public server</a>, step 3), and gives only the public key to the server operator:</p>
-<pre><code class="language-ini"><span class="section">[bitcoind_zmq]</span>
+<pre><code class="language-ini"><span class="section">[zmq]</span>
 safe = 127.0.0.1:8343
 safe = [::1]:8343
 key = &lt;server secret key&gt;

@@ -176,7 +176,7 @@ mainnet port plus 20,000 ([Conventional Ports](ports)):
 | Admin web | `[admin]` | 28080 | 28043 |
 | Native web and REST | `[native]` | 28180 | 28143 |
 | Bitcoind RPC and REST | `[bitcoind]` | 28280 | 28243 |
-| Bitcoind ZMQ | `[bitcoind_zmq]` | 28380 | 28343 |
+| ZMQ | `[zmq]` | 28380 | 28343 |
 | BTCD RPC | `[btcd]` | 28480 | 28443 |
 | Electrum | `[electrum]` | 28580 | 28543 |
 | Sparrow | `[sparrow]` | 28680 | 28643 |

@@ -32,7 +32,7 @@ void server_node::start_admin(const code& ec, const result_handler& handler) NOE
 ```
 
 The order is admin, native, bitcoind, btcd, electrum, sparrow, esplora,
-stratum v1, stratum v2 and bitcoind ZMQ. Each `attach_*_session()` is
+stratum v1, stratum v2 and ZMQ. Each `attach_*_session()` is
 virtual, and constructs its session from the server configuration and the
 service's own settings section (for example `config_.server.electrum`).
 
@@ -109,7 +109,7 @@ All sessions are aliases (`sessions/sessions.hpp`):
 | `session_esplora` | `protocol_esplora` | `channel_html` | `esplora` |
 | `session_stratum_v1` | `protocol_stratum_v1` | `channel_stratum_v1` | `stratum_v1` |
 | `session_stratum_v2` | `protocol_stratum_v2` | `channel_stratum_v2` | `stratum_v2` |
-| `session_bitcoind_zmq` | `protocol_bitcoind_zmq` | `channel_bitcoind_zmq` | `bitcoind_zmq` |
+| `session_zmq` | `protocol_zmq` | `channel_zmq` | `zmq` |
 
 The bitcoind subgroups are blockchain, control, mining, network,
 notifications, test, transaction, utility and wallet, each a protocol with
@@ -131,7 +131,7 @@ channel of their transport:
 | `channel_electrum` | `channel_rpc` | Negotiated version and client name |
 | `channel_stratum_v1` | `network::channel_rpc` | Non-HTTP JSON-RPC |
 | `channel_stratum_v2` | `network::channel` | Binary |
-| `channel_bitcoind_zmq` | `network::channel_rpc` | ZMTP publisher |
+| `channel_zmq` | `network::channel_rpc` | ZMTP publisher |
 
 State of the connection is held by the channel. `channel_electrum` holds
 the version that the handshake negotiates and `protocol_electrum` reads
@@ -192,7 +192,7 @@ that sparrow extends is overridden, not reimplemented (`add_features` for
 | Native REST | `protocol_native` | [Native](../../interfaces/native) |
 | bitcoind JSON-RPC | subgroups, `protocol_bitcoind` | [bitcoind RPC](../../interfaces/bitcoind-rpc) |
 | bitcoind REST | `protocol_bitcoind_rest` | [bitcoind REST](../../interfaces/bitcoind-rest) |
-| bitcoind ZMQ | `protocol_bitcoind_zmq` | [ZeroMQ](../../interfaces/zeromq) |
+| ZMQ | `protocol_zmq` | [ZeroMQ](../../interfaces/zeromq) |
 | btcd | `protocol_btcd`, bitcoind subgroups | [btcd](../../interfaces/btcd) |
 | Electrum | `protocol_electrum_version`, `protocol_electrum` | [Electrum](../../interfaces/electrum) |
 | Sparrow | `protocol_electrum_version`, `protocol_sparrow` | [Sparrow](../../interfaces/sparrow) |
@@ -361,7 +361,7 @@ only atomic subscription flags, and posts the work with the event's link
 | `protocol_sparrow` | `transaction`, `organized`, then electrum's |
 | `protocol_btcd` | `organized`, `reorganized`, `transaction` |
 | `protocol_bitcoind_blockchain` | `organized`, `reorganized` |
-| `protocol_bitcoind_zmq` | `organized`, `transaction`, `reorganized` |
+| `protocol_zmq` | `organized`, `transaction`, `reorganized` |
 
 `protocol_admin` subscribes to the logger instead, for its log and event
 streams. Notifications require a full duplex transport (WebSocket or TCP

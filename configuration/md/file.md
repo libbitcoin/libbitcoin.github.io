@@ -18,7 +18,7 @@ Section map:
 | Chain | `[bitcoin]`, `[forks]`, `[wallet]` |
 | Node | `[node]` |
 | P2P network | `[network]`, `[peer]`, `[outbound]`, `[inbound]`, `[manual]` |
-| Client-server | `[admin]`, `[native]`, `[bitcoind]`, `[bitcoind_zmq]`, `[btcd]`, `[electrum]`, `[sparrow]`, `[esplora]` |
+| Client-server | `[admin]`, `[native]`, `[bitcoind]`, `[zmq]`, `[btcd]`, `[electrum]`, `[sparrow]`, `[esplora]` |
 
 Simple example config file:
 

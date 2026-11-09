@@ -1,7 +1,7 @@
-# Bitcoind ZMQ
+# ZMQ
 
-The bitcoind ZMQ interface is a drop-in for the ZeroMQ notifications of
-bitcoind, published on the `[bitcoind_zmq]` binding. Any ZeroMQ `SUB`
+The ZMQ interface is a drop-in for the ZeroMQ notifications of
+bitcoind, published on the `[zmq]` binding. Any ZeroMQ `SUB`
 socket can subscribe.
 
 Every topic is published on one port, and with CurveZMQ on another:
@@ -28,7 +28,7 @@ Every topic is published on one port, and with CurveZMQ on another:
 The service starts only with both an address and a connection limit:
 
 ```ini
-[bitcoind_zmq]
+[zmq]
 bind = 127.0.0.1:8380
 bind = [::1]:8380
 connections = 10
@@ -48,7 +48,7 @@ topic, and `raw` to both `rawblock` and `rawtx`. Topics with no
 subscription are not sent. Cancelling a prefix stops every topic it
 matches, even one also matched by another subscription.
 
-`bitcoind_zmq.maximum_subscriptions` (default 100) limits the subscribe
+`zmq.maximum_subscriptions` (default 100) limits the subscribe
 commands of one connection. Each counts, and each cancel releases one.
 Exceeding it closes the connection.
 
@@ -85,7 +85,7 @@ hashblock 000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd 1
 
 ### 2.4 Backlog
 
-`bitcoind_zmq.maximum_backlog` (default 32 MB) bounds the notifications
+`zmq.maximum_backlog` (default 32 MB) bounds the notifications
 waiting to be sent to one connection. A notification that does not fit is
 dropped, and the connection is kept. A drop leaves a gap in that topic's
 sequence numbers, which is how a subscriber detects it.
@@ -96,7 +96,7 @@ The `safe` addresses (default port 8343) use CurveZMQ, enabled by the
 server's secret key:
 
 ```ini
-[bitcoind_zmq]
+[zmq]
 safe = 127.0.0.1:8343
 key = <server secret key, Z85>
 cert = <client public key, Z85>

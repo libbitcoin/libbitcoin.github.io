@@ -256,7 +256,7 @@ ZMQ publishes on its default port, 8380, here limited to the local
 machine.
 
 ```ini
-[bitcoind_zmq]
+[zmq]
 bind = 127.0.0.1:8380
 bind = [::1]:8380
 connections = 10
@@ -264,7 +264,7 @@ connections = 10
 
 Beyond the standard bitcoind notifications, `bs` provides CurveZMQ on its
 `safe` addresses ([Secure connections](services#2-secure-connections)): encrypted notifications, optionally only to
-the client keys listed in `bitcoind_zmq.cert`.
+the client keys listed in `zmq.cert`.
 
 ## 11. Esplora
 

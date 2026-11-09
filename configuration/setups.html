@@ -303,7 +303,7 @@
         <a href="../interfaces/p2p.html">Bitcoin P2P</a>
         <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../interfaces/zeromq.html">ZMQ</a>
         <a href="../interfaces/btcd.html">BTCD</a>
         <a href="../interfaces/esplora.html">Esplora</a>
         <a href="../interfaces/stratum-v1.html">Stratum v1</a>
@@ -589,14 +589,14 @@ an invalid parameters error.</p>
 <h2 id="10-zmq-notifications">10. ZMQ notifications<a class="anchor" href="#10-zmq-notifications" aria-label="Link to this section">#</a></h2>
 <p>ZMQ publishes on its default port, 8380, here limited to the local
 machine.</p>
-<pre><code class="language-ini"><span class="section">[bitcoind_zmq]</span>
+<pre><code class="language-ini"><span class="section">[zmq]</span>
 bind = 127.0.0.1:8380
 bind = [::1]:8380
 connections = 10
 </code></pre>
 <p>Beyond the standard bitcoind notifications, <code>bs</code> provides CurveZMQ on its
 <code>safe</code> addresses (<a href="services.html#2-secure-connections">Secure connections</a>): encrypted notifications, optionally only to
-the client keys listed in <code>bitcoind_zmq.cert</code>.</p>
+the client keys listed in <code>zmq.cert</code>.</p>
 <h2 id="11-esplora">11. Esplora<a class="anchor" href="#11-esplora" aria-label="Link to this section">#</a></h2>
 <p>The Esplora interface, on its assigned port:</p>
 <pre><code class="language-ini"><span class="section">[esplora]</span>

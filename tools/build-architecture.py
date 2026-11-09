@@ -70,7 +70,7 @@ SITE_MENU = [
         ("interfaces/p2p.html", "Bitcoin P2P"),
         ("interfaces/bitcoind-rpc.html", "Bitcoind JSON-RPC"),
         ("interfaces/bitcoind-rest.html", "Bitcoind REST"),
-        ("interfaces/zeromq.html", "Bitcoind ZMQ"),
+        ("interfaces/zeromq.html", "ZMQ"),
         ("interfaces/btcd.html", "BTCD"),
         ("interfaces/esplora.html", "Esplora"),
         ("interfaces/stratum-v1.html", "Stratum v1"),
@@ -332,7 +332,7 @@ SECTIONS = {
             ("p2p", "Bitcoin P2P"),
             ("bitcoind-rpc", "Bitcoind JSON-RPC"),
             ("bitcoind-rest", "Bitcoind REST"),
-            ("zeromq", "Bitcoind ZMQ"),
+            ("zeromq", "ZMQ"),
             ("btcd", "BTCD"),
             ("esplora", "Esplora"),
             ("stratum-v1", "Stratum v1"),
@@ -919,7 +919,7 @@ def index_site():
             if not file.endswith(".html"):
                 continue
             page = read(os.path.join(directory, file))
-            if 'http-equiv="refresh"' in page:
+            if 'http-equiv="refresh"' in page or file == "404.html":
                 continue
             url = posixpath.relpath(os.path.join(directory, file).replace(os.sep, "/"), ROOT.replace(os.sep, "/"))
             indexer = Indexer(file == "index.html" or "/" not in url)

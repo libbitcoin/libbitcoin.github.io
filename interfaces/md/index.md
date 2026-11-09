@@ -15,7 +15,7 @@ how to call them, with examples and their responses.
 | [Bitcoin P2P](p2p) | `[inbound]` | 8333 |  | P2P/S |
 | [Bitcoind JSON-RPC](bitcoind-rpc) | `[bitcoind]` | 8280 | 8243 | TCP/S, HTTP/S, WS/S |
 | [Bitcoind REST](bitcoind-rest) | `[bitcoind]` | 8280 | 8243 | HTTP/S |
-| [Bitcoind ZMQ](zeromq) | `[bitcoind_zmq]` | 8380 | 8343 | ZMTP/S |
+| [ZMQ](zeromq) | `[zmq]` | 8380 | 8343 | ZMTP/S |
 | [BTCD](btcd) | `[btcd]` | 8480 | 8443 | TCP/S, HTTP/S, WS/S |
 | [Esplora](esplora) | `[esplora]` | 8780 | 8743 | HTTP/S, WS/S |
 

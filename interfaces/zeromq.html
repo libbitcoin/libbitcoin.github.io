@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Interfaces: Bitcoind ZMQ</title>
+<title>Interfaces: ZMQ</title>
 <meta name="description" content="Reference documentation for each interface served by Bitcoin Server (bs): calling patterns, examples and responses.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.org/interfaces/zeromq.html">
@@ -41,7 +41,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.org/interfaces/zeromq.html">
-<meta property="og:title" content="Interfaces: Bitcoind ZMQ">
+<meta property="og:title" content="Interfaces: ZMQ">
 <meta property="og:description" content="Reference documentation for each interface served by Bitcoin Server (bs): calling patterns, examples and responses.">
 <meta property="og:image" content="https://libbitcoin.org/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.org/card3.png">
@@ -50,7 +50,7 @@
 <meta property="og:image:height" content="1260">
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Interfaces: Bitcoind ZMQ">
+<meta name="twitter:title" content="Interfaces: ZMQ">
 <meta name="twitter:description" content="Reference documentation for each interface served by Bitcoin Server (bs): calling patterns, examples and responses.">
 <meta name="twitter:image" content="https://libbitcoin.org/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
@@ -253,7 +253,7 @@
 </svg>
     </a>
     <div class="eyebrow">Full stack Bitcoin software</div>
-    <h1>Bitcoind ZMQ</h1>
+    <h1>ZMQ</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop" name="site"><summary>Getting Started</summary><div>
@@ -303,7 +303,7 @@
         <a href="../interfaces/p2p.html">Bitcoin P2P</a>
         <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html" class="here">Bitcoind ZMQ</a>
+        <a href="../interfaces/zeromq.html" class="here">ZMQ</a>
         <a href="../interfaces/btcd.html">BTCD</a>
         <a href="../interfaces/esplora.html">Esplora</a>
         <a href="../interfaces/stratum-v1.html">Stratum v1</a>
@@ -336,7 +336,7 @@
     <a href="p2p.html">Bitcoin P2P</a>
     <a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a>
     <a href="bitcoind-rest.html">Bitcoind REST</a>
-    <a href="zeromq.html" class="here">Bitcoind ZMQ</a>
+    <a href="zeromq.html" class="here">ZMQ</a>
     <a href="btcd.html">BTCD</a>
     <a href="esplora.html">Esplora</a>
     <a href="stratum-v1.html">Stratum v1</a>
@@ -344,8 +344,8 @@
   </nav>
 
   <article class="doc">
-<p>The bitcoind ZMQ interface is a drop-in for the ZeroMQ notifications of
-bitcoind, published on the <code>[bitcoind_zmq]</code> binding. Any ZeroMQ <code>SUB</code>
+<p>The ZMQ interface is a drop-in for the ZeroMQ notifications of
+bitcoind, published on the <code>[zmq]</code> binding. Any ZeroMQ <code>SUB</code>
 socket can subscribe.</p>
 <p>Every topic is published on one port, and with CurveZMQ on another:</p>
 <div class="scroller"><table>
@@ -409,7 +409,7 @@ socket can subscribe.</p>
 <h2 id="2-calling-pattern">2. Calling pattern<a class="anchor" href="#2-calling-pattern" aria-label="Link to this section">#</a></h2>
 <h3 id="21-enabling">2.1 Enabling<a class="anchor" href="#21-enabling" aria-label="Link to this section">#</a></h3>
 <p>The service starts only with both an address and a connection limit:</p>
-<pre><code class="language-ini"><span class="section">[bitcoind_zmq]</span>
+<pre><code class="language-ini"><span class="section">[zmq]</span>
 bind = 127.0.0.1:8380
 bind = [::1]:8380
 connections = 10
@@ -424,7 +424,7 @@ topic, set by its <code>-zmqpub</code> options.</p>
 topic, and <code>raw</code> to both <code>rawblock</code> and <code>rawtx</code>. Topics with no
 subscription are not sent. Cancelling a prefix stops every topic it
 matches, even one also matched by another subscription.</p>
-<p><code>bitcoind_zmq.maximum_subscriptions</code> (default 100) limits the subscribe
+<p><code>zmq.maximum_subscriptions</code> (default 100) limits the subscribe
 commands of one connection. Each counts, and each cancel releases one.
 Exceeding it closes the connection.</p>
 <h3 id="23-messages">2.3 Messages<a class="anchor" href="#23-messages" aria-label="Link to this section">#</a></h3>
@@ -468,14 +468,14 @@ while True:
 hashblock 000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd 1
 </code></pre>
 <h3 id="24-backlog">2.4 Backlog<a class="anchor" href="#24-backlog" aria-label="Link to this section">#</a></h3>
-<p><code>bitcoind_zmq.maximum_backlog</code> (default 32 MB) bounds the notifications
+<p><code>zmq.maximum_backlog</code> (default 32 MB) bounds the notifications
 waiting to be sent to one connection. A notification that does not fit is
 dropped, and the connection is kept. A drop leaves a gap in that topic's
 sequence numbers, which is how a subscriber detects it.</p>
 <h3 id="25-curvezmq">2.5 CurveZMQ<a class="anchor" href="#25-curvezmq" aria-label="Link to this section">#</a></h3>
 <p>The <code>safe</code> addresses (default port 8343) use CurveZMQ, enabled by the
 server's secret key:</p>
-<pre><code class="language-ini"><span class="section">[bitcoind_zmq]</span>
+<pre><code class="language-ini"><span class="section">[zmq]</span>
 safe = 127.0.0.1:8343
 key = &lt;server secret key, Z85&gt;
 cert = &lt;client public key, Z85&gt;
