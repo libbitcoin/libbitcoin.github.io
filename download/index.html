@@ -428,8 +428,9 @@ cuda ecc.... platform:1 enabled:1.
 builds do and the macOS builds do not. The driver is loaded when <code>bs</code>
 runs, so a build with CUDA also runs without a GPU. The <code>cuda ecc</code> line
 appears only when a device is present, and shows whether it supports
-error correcting memory and whether that is enabled. <code>bx hardware</code>
-prints the same list.</p>
+error correcting memory and whether that is enabled (see
+<a href="../configuration/#gpu-error-correction">GPU error correction</a>).
+<code>bx hardware</code> prints the same list.</p>
 <h2 id="3-verifying-a-build">3. Verifying a build<a class="anchor" href="#3-verifying-a-build" aria-label="Link to this section">#</a></h2>
 <p>Verify a build before running it. A build is verified by its signature,
 made with the libbitcoin release key. The signature proves the build is

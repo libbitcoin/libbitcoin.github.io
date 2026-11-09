@@ -518,7 +518,8 @@ download come from <code>shani</code> (or <code>sha2</code> on Arm), and otherwi
 reports whether the GPU's error correcting code (ECC) memory is enabled,
 which is set in your own environment. ECC is recommended but not
 required when using the GPU. When enabled it provides the same memory
-reliability as the main processor.</p>
+reliability as the main processor (see
+<a href="#gpu-error-correction">GPU error correction</a>).</p>
 <hr />
 <h2 id="3-the-running-console">3. The running console<a class="anchor" href="#3-the-running-console" aria-label="Link to this section">#</a></h2>
 <p>Commands typed into a running <code>bs</code> console (press <code>&lt;enter&gt;</code> after the character):</p>
@@ -2149,6 +2150,19 @@ apply.</p>
 </tr>
 </tbody>
 </table></div>
+<h4 id="gpu-error-correction">GPU error correction<a class="anchor" href="#gpu-error-correction" aria-label="Link to this section">#</a></h4>
+<p>A GPU that supports error correcting (ECC) memory but has it off shows
+<code>cuda ecc.... platform:1 enabled:0</code> in <code>bs -w</code>. Turn it on with
+<code>nvidia-smi</code>, as root on Linux or from an administrator prompt on
+Windows:</p>
+<pre class="console"><code>$ sudo nvidia-smi -e 1
+</code></pre>
+<p>The change takes effect after a reboot, after which <code>bs -w</code> shows
+<code>enabled:1</code>. <code>nvidia-smi -q -d ECC</code> shows the current and pending
+modes, <code>-i &lt;index&gt;</code> selects one GPU of several, and <code>-e 0</code> turns error
+correction off. On many cards it also reduces the memory available.
+<code>platform:0</code> means the device has no error correcting memory, and there
+is nothing to enable.</p>
 <h3 id="83-network">8.3 Network<a class="anchor" href="#83-network" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>

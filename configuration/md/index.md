@@ -151,7 +151,8 @@ CUDA (GPU) support is compiled by default, except on macOS. `cuda ecc`
 reports whether the GPU's error correcting code (ECC) memory is enabled,
 which is set in your own environment. ECC is recommended but not
 required when using the GPU. When enabled it provides the same memory
-reliability as the main processor.
+reliability as the main processor (see
+[GPU error correction](#gpu-error-correction)).
 
 ---
 
@@ -1541,6 +1542,24 @@ apply.
 | `node.batch_verify` | `1,000,000` | Signatures verified in each GPU batch. `0` disables GPU verification. |
 | `node.batch_silent` | `1,000,000` | Silent payment transactions indexed in each GPU batch. `0` disables GPU indexing. |
 | `database.gpu_scan_minimum` | `65,536` | Smallest silent payment scan, in transactions, sent to the GPU. Smaller scans run on the CPU, where they return sooner. |
+
+#### GPU error correction
+
+A GPU that supports error correcting (ECC) memory but has it off shows
+`cuda ecc.... platform:1 enabled:0` in `bs -w`. Turn it on with
+`nvidia-smi`, as root on Linux or from an administrator prompt on
+Windows:
+
+```
+$ sudo nvidia-smi -e 1
+```
+
+The change takes effect after a reboot, after which `bs -w` shows
+`enabled:1`. `nvidia-smi -q -d ECC` shows the current and pending
+modes, `-i <index>` selects one GPU of several, and `-e 0` turns error
+correction off. On many cards it also reduces the memory available.
+`platform:0` means the device has no error correcting memory, and there
+is nothing to enable.
 
 ### 8.3 Network
 

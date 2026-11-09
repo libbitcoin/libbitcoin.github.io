@@ -196,8 +196,8 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `ec-add-secrets` | Calculate the EC function (SECRET + SECRET) % curve-order. |
 | `ec-multiply` | Calculate the EC product (POINT * SECRET). |
 | `ec-multiply-secrets` | Calculate the EC function (SECRET * SECRET) % curve-order. |
-| `match-neutrino-address` | Determine whether the provided client filter probabilistically matches the provided payment address. |
-| `match-neutrino-script` | Determine whether the provided client filter probabilistically matches the provided script. |
+| `match-address` | Determine whether the provided client filter probabilistically matches the provided payment address. |
+| `match-script` | Determine whether the provided client filter probabilistically matches the provided script. |
 | `satoshi-to-btc` | Convert satoshi to BTC. |
 | `tls-cert` | Create a self-signed PEM TLS certificate for a P-256 private key, for use with a Libbitcoin server. |
 | `tls-new` | Create a PEM P-256 TLS private key for use with a Libbitcoin server from entropy. |
