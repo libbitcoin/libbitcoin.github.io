@@ -66,7 +66,7 @@ key_path = server.key
 
 ZMQ uses CurveZMQ instead of TLS. Its `safe` addresses require the
 server's secret key (`zmq.key`, Z85 encoded), made by
-`bx curve-new` ([Running a public server](public#2-running-a-public-server), step 3).
+`bx curve-new` ([Running a community server](public#2-running-a-community-server), step 3).
 
 ### Self-signed certificates
 
@@ -75,7 +75,7 @@ server's secret key (`zmq.key`, Z85 encoded), made by
 
 A service that is not public, such as `[admin]`, needs no certificate
 authority. `bx tls-new` makes a P-256 private key from 256 bits of
-entropy, from coin flips or dice ([Running a public server](public#2-running-a-public-server), step 3), and `bx tls-cert` makes
+entropy, from coin flips or dice ([Running a community server](public#2-running-a-community-server), step 3), and `bx tls-cert` makes
 a self-signed certificate for it, naming the server by each host name
 and address its clients use:
 
@@ -152,7 +152,7 @@ that client when `bs` next starts.
 Each `zmq.cert` line authorizes one client public key on the ZMQ
 `safe` addresses. With no `cert` lines, any client may connect. The
 client makes its own key pair with `bx curve-new` and `bx curve-public`
-([Running a public server](public#2-running-a-public-server), step 3), and gives only the public key to the server operator:
+([Running a community server](public#2-running-a-community-server), step 3), and gives only the public key to the server operator:
 
 ```ini
 [zmq]

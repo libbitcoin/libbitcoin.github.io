@@ -260,7 +260,7 @@
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html">Quick Start</a>
         <a href="../building/platforms.html">Platform Coverage</a>
-        <a href="../configuration/public.html">Public Servers</a>
+        <a href="../configuration/public.html">Community Servers</a>
         <a href="../building/status.html">Build Status</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
@@ -334,7 +334,7 @@
     <a href="file.html">Configuration File</a>
     <a href="setups.html">Common Setups</a>
     <a href="ports.html">Conventional Ports</a>
-    <a href="public.html">Public Servers</a>
+    <a href="public.html">Community Servers</a>
     <a href="store.html">Store Settings</a>
     <a href="services.html" class="here">Service Settings</a>
     <a href="performance.html">Performance Settings</a>
@@ -430,7 +430,7 @@ key_path = server.key
 </code></pre>
 <p>ZMQ uses CurveZMQ instead of TLS. Its <code>safe</code> addresses require the
 server's secret key (<code>zmq.key</code>, Z85 encoded), made by
-<code>bx curve-new</code> (<a href="public.html#2-running-a-public-server">Running a public server</a>, step 3).</p>
+<code>bx curve-new</code> (<a href="public.html#2-running-a-community-server">Running a community server</a>, step 3).</p>
 <h3 id="self-signed-certificates">Self-signed certificates<a class="anchor" href="#self-signed-certificates" aria-label="Link to this section">#</a></h3>
 <blockquote>
 <p><strong>Note.</strong> <code>bx</code> is not quite ready yet. The commands used here are not
@@ -438,7 +438,7 @@ yet available in a <code>bx</code> release.</p>
 </blockquote>
 <p>A service that is not public, such as <code>[admin]</code>, needs no certificate
 authority. <code>bx tls-new</code> makes a P-256 private key from 256 bits of
-entropy, from coin flips or dice (<a href="public.html#2-running-a-public-server">Running a public server</a>, step 3), and <code>bx tls-cert</code> makes
+entropy, from coin flips or dice (<a href="public.html#2-running-a-community-server">Running a community server</a>, step 3), and <code>bx tls-cert</code> makes
 a self-signed certificate for it, naming the server by each host name
 and address its clients use:</p>
 <pre class="console"><code>$ bx tls-new &lt;entropy&gt; &gt; server.key
@@ -528,7 +528,7 @@ that client when <code>bs</code> next starts.</p>
 <p>Each <code>zmq.cert</code> line authorizes one client public key on the ZMQ
 <code>safe</code> addresses. With no <code>cert</code> lines, any client may connect. The
 client makes its own key pair with <code>bx curve-new</code> and <code>bx curve-public</code>
-(<a href="public.html#2-running-a-public-server">Running a public server</a>, step 3), and gives only the public key to the server operator:</p>
+(<a href="public.html#2-running-a-community-server">Running a community server</a>, step 3), and gives only the public key to the server operator:</p>
 <pre><code class="language-ini"><span class="section">[zmq]</span>
 safe = 127.0.0.1:8343
 safe = [::1]:8343

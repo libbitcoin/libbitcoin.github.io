@@ -1,32 +1,32 @@
-# Public Servers
+# Community Servers
 
 ## 1. Libbitcoin servers
 
-The libbitcoin project maintains two public `bs` servers:
+The libbitcoin community maintains two public `bs` servers:
 
 <div id="server-status"></div>
 
 | Host | Address | mainnet | testnet3 | testnet4 |
 | ---- | ------- | ------- | -------- | -------- |
-| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:8143) | 72.65.246.83 | – | – | – |
-| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:8143) | 72.65.246.84 | – | – | – |
+| wormer.libbitcoin.net | 72.65.246.83 | – | – | – |
+| carmine.libbitcoin.net | 72.65.246.84 | – | – | – |
 
 <div id="server-details"></div>
 
-| Host | Chain | Top | Address index | Client filters | Pruned below |
+| Host | Chain | Top | Address index | Client filters | Unpruned Above |
 | ---- | ----- | --- | ------------- | -------------- | ------------ |
-| wormer.libbitcoin.net | mainnet | – | – | – | – |
-| wormer.libbitcoin.net | testnet3 | – | – | – | – |
-| wormer.libbitcoin.net | testnet4 | – | – | – | – |
-| carmine.libbitcoin.net | mainnet | – | – | – | – |
-| carmine.libbitcoin.net | testnet3 | – | – | – | – |
-| carmine.libbitcoin.net | testnet4 | – | – | – | – |
+| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:8143) | mainnet | – | – | – | – |
+| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:18143) | testnet3 | – | – | – | – |
+| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:48143) | testnet4 | – | – | – | – |
+| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:8143) | mainnet | – | – | – | – |
+| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:18143) | testnet3 | – | – | – | – |
+| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:48143) | testnet4 | – | – | – | – |
 
 <div id="server-scan"></div>
 
 | Service | mainnet | testnet3 | testnet4 |
 | ------- | ------- | -------- | -------- |
-| P2P network | 8333 | 18333 | 48333 |
+| P2P network | 8333 / 8333 | 18333 / 18333 | 48333 / 48333 |
 | ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 |
 | Native web and REST | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 |
 | Bitcoind RPC and REST | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 |
@@ -43,6 +43,10 @@ The libbitcoin project maintains two public `bs` servers:
 #server-scan .scan-wait, #server-status + .scroller .scan-wait { color: var(--ink-3); }
 #server-status + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
 #server-status + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
+#server-details + .scroller table { table-layout: fixed; min-width: 640px; }
+#server-details + .scroller th:first-child { width: 25%; }
+#server-details + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
+#server-details + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
 .scan-some { color: var(--partial, #ffa022); font-weight: 600; }
 </style>
 
@@ -144,7 +148,8 @@ The libbitcoin project maintains two public `bs` servers:
   var table = details && details.nextElementSibling;
   if (table) {
     var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000 };
-    var yes = function (value) { return value ? "Yes" : "No"; };
+    var mark = function (cell, text, state) { cell.textContent = text; cell.className = state; };
+    var yes = function (cell, value) { mark(cell, value ? "Yes" : "No", value ? "scan-up" : "scan-down"); };
     table.querySelectorAll("tbody tr").forEach(function (row) {
       var host = row.cells[0].textContent.trim();
       var chain = row.cells[1].textContent.trim();
@@ -160,9 +165,10 @@ The libbitcoin project maintains two public `bs` servers:
       }, function () {});
       get("/v1/configuration?format=json").then(function (text) {
         var config = JSON.parse(text);
-        row.cells[3].textContent = yes(config.address);
-        row.cells[4].textContent = yes(config.filter);
-        row.cells[5].textContent = config.pruned ? Number(config.pruned).toLocaleString("en-US") : "Not pruned";
+        yes(row.cells[3], config.address);
+        yes(row.cells[4], config.filter);
+        if (config.pruned) mark(row.cells[5], Number(config.pruned).toLocaleString("en-US"), "scan-some");
+        else mark(row.cells[5], "Genesis", "scan-up");
       }, function () {});
     });
   }
@@ -243,9 +249,9 @@ avx512ifma.. platform:0 compiled:0.
 cuda........ platform:0 compiled:1.
 ```
 
-## 2. Running a public server
+## 2. Running a community server
 
-A public server needs a DNS name for its address, a TLS certificate for
+A community server needs a DNS name for its address, a TLS certificate for
 that name, and a CurveZMQ key pair. This example uses
 `node.example.com` on Linux.
 

@@ -38,7 +38,7 @@ wait ([Until current](services#until-current)).
 | [Configuration File](file) | File syntax, and displaying the settings in effect. |
 | [Common Setups](setups) | Sync modes, checkpoints, each service, client filters, silent payments, anonymizing networks, peers and load balancing. |
 | [Conventional Ports](ports) | The ports of every service on each chain. |
-| [Public Servers](public) | Libbitcoin's public servers, and running your own. |
+| [Community Servers](public) | The community servers, and running your own. |
 | [Store Settings](store) | Table sizing, bucket autotuning, and the settings fixed when a store is created. |
 | [Service Settings](services) | Listening, TLS, authentication, HTTP and limits, shared by every service. |
 | [Performance Settings](performance) | Processor, GPU, network and NUMA settings. |

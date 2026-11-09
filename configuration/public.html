@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Configuration: Public Servers</title>
+<title>Configuration: Community Servers</title>
 <meta name="description" content="Configuring Bitcoin Server (bs): the command line, the configuration file, common setups, ports, services, performance, the store and the test chains.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.org/configuration/public.html">
@@ -41,7 +41,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.org/configuration/public.html">
-<meta property="og:title" content="Configuration: Public Servers">
+<meta property="og:title" content="Configuration: Community Servers">
 <meta property="og:description" content="Configuring Bitcoin Server (bs): the command line, the configuration file, common setups, ports, services, performance, the store and the test chains.">
 <meta property="og:image" content="https://libbitcoin.org/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.org/card3.png">
@@ -50,7 +50,7 @@
 <meta property="og:image:height" content="1260">
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Configuration: Public Servers">
+<meta name="twitter:title" content="Configuration: Community Servers">
 <meta name="twitter:description" content="Configuring Bitcoin Server (bs): the command line, the configuration file, common setups, ports, services, performance, the store and the test chains.">
 <meta name="twitter:image" content="https://libbitcoin.org/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
@@ -253,14 +253,14 @@
 </svg>
     </a>
     <div class="eyebrow">Full stack Bitcoin software</div>
-    <h1>Public Servers</h1>
+    <h1>Community Servers</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html">Quick Start</a>
         <a href="../building/platforms.html">Platform Coverage</a>
-        <a href="../configuration/public.html" class="here">Public Servers</a>
+        <a href="../configuration/public.html" class="here">Community Servers</a>
         <a href="../building/status.html">Build Status</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
@@ -334,7 +334,7 @@
     <a href="file.html">Configuration File</a>
     <a href="setups.html">Common Setups</a>
     <a href="ports.html">Conventional Ports</a>
-    <a href="public.html" class="here">Public Servers</a>
+    <a href="public.html" class="here">Community Servers</a>
     <a href="store.html">Store Settings</a>
     <a href="services.html">Service Settings</a>
     <a href="performance.html">Performance Settings</a>
@@ -348,7 +348,7 @@
 
   <article class="doc">
 <h2 id="1-libbitcoin-servers">1. Libbitcoin servers<a class="anchor" href="#1-libbitcoin-servers" aria-label="Link to this section">#</a></h2>
-<p>The libbitcoin project maintains two public <code>bs</code> servers:</p>
+<p>The libbitcoin community maintains two public <code>bs</code> servers:</p>
 <div id="server-status"></div>
 
 <div class="scroller"><table>
@@ -363,14 +363,14 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="https://wormer.libbitcoin.net:8143">wormer.libbitcoin.net</a></td>
+<td>wormer.libbitcoin.net</td>
 <td>72.65.246.83</td>
 <td>–</td>
 <td>–</td>
 <td>–</td>
 </tr>
 <tr>
-<td><a href="https://carmine.libbitcoin.net:8143">carmine.libbitcoin.net</a></td>
+<td>carmine.libbitcoin.net</td>
 <td>72.65.246.84</td>
 <td>–</td>
 <td>–</td>
@@ -388,12 +388,12 @@
 <th>Top</th>
 <th>Address index</th>
 <th>Client filters</th>
-<th>Pruned below</th>
+<th>Unpruned Above</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>wormer.libbitcoin.net</td>
+<td><a href="https://wormer.libbitcoin.net:8143">wormer.libbitcoin.net</a></td>
 <td>mainnet</td>
 <td>–</td>
 <td>–</td>
@@ -401,7 +401,7 @@
 <td>–</td>
 </tr>
 <tr>
-<td>wormer.libbitcoin.net</td>
+<td><a href="https://wormer.libbitcoin.net:18143">wormer.libbitcoin.net</a></td>
 <td>testnet3</td>
 <td>–</td>
 <td>–</td>
@@ -409,7 +409,7 @@
 <td>–</td>
 </tr>
 <tr>
-<td>wormer.libbitcoin.net</td>
+<td><a href="https://wormer.libbitcoin.net:48143">wormer.libbitcoin.net</a></td>
 <td>testnet4</td>
 <td>–</td>
 <td>–</td>
@@ -417,7 +417,7 @@
 <td>–</td>
 </tr>
 <tr>
-<td>carmine.libbitcoin.net</td>
+<td><a href="https://carmine.libbitcoin.net:8143">carmine.libbitcoin.net</a></td>
 <td>mainnet</td>
 <td>–</td>
 <td>–</td>
@@ -425,7 +425,7 @@
 <td>–</td>
 </tr>
 <tr>
-<td>carmine.libbitcoin.net</td>
+<td><a href="https://carmine.libbitcoin.net:18143">carmine.libbitcoin.net</a></td>
 <td>testnet3</td>
 <td>–</td>
 <td>–</td>
@@ -433,7 +433,7 @@
 <td>–</td>
 </tr>
 <tr>
-<td>carmine.libbitcoin.net</td>
+<td><a href="https://carmine.libbitcoin.net:48143">carmine.libbitcoin.net</a></td>
 <td>testnet4</td>
 <td>–</td>
 <td>–</td>
@@ -456,9 +456,9 @@
 <tbody>
 <tr>
 <td>P2P network</td>
-<td>8333</td>
-<td>18333</td>
-<td>48333</td>
+<td>8333 / 8333</td>
+<td>18333 / 18333</td>
+<td>48333 / 48333</td>
 </tr>
 <tr>
 <td>ZMQ</td>
@@ -512,6 +512,10 @@
 #server-scan .scan-wait, #server-status + .scroller .scan-wait { color: var(--ink-3); }
 #server-status + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
 #server-status + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
+#server-details + .scroller table { table-layout: fixed; min-width: 640px; }
+#server-details + .scroller th:first-child { width: 25%; }
+#server-details + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
+#server-details + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
 .scan-some { color: var(--partial, #ffa022); font-weight: 600; }
 </style>
 
@@ -613,7 +617,8 @@
   var table = details && details.nextElementSibling;
   if (table) {
     var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000 };
-    var yes = function (value) { return value ? "Yes" : "No"; };
+    var mark = function (cell, text, state) { cell.textContent = text; cell.className = state; };
+    var yes = function (cell, value) { mark(cell, value ? "Yes" : "No", value ? "scan-up" : "scan-down"); };
     table.querySelectorAll("tbody tr").forEach(function (row) {
       var host = row.cells[0].textContent.trim();
       var chain = row.cells[1].textContent.trim();
@@ -629,9 +634,10 @@
       }, function () {});
       get("/v1/configuration?format=json").then(function (text) {
         var config = JSON.parse(text);
-        row.cells[3].textContent = yes(config.address);
-        row.cells[4].textContent = yes(config.filter);
-        row.cells[5].textContent = config.pruned ? Number(config.pruned).toLocaleString("en-US") : "Not pruned";
+        yes(row.cells[3], config.address);
+        yes(row.cells[4], config.filter);
+        if (config.pruned) mark(row.cells[5], Number(config.pruned).toLocaleString("en-US"), "scan-some");
+        else mark(row.cells[5], "Genesis", "scan-up");
       }, function () {});
     });
   }
@@ -708,8 +714,8 @@ avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:0 compiled:0.
 cuda........ platform:0 compiled:1.
 </code></pre>
-<h2 id="2-running-a-public-server">2. Running a public server<a class="anchor" href="#2-running-a-public-server" aria-label="Link to this section">#</a></h2>
-<p>A public server needs a DNS name for its address, a TLS certificate for
+<h2 id="2-running-a-community-server">2. Running a community server<a class="anchor" href="#2-running-a-community-server" aria-label="Link to this section">#</a></h2>
+<p>A community server needs a DNS name for its address, a TLS certificate for
 that name, and a CurveZMQ key pair. This example uses
 <code>node.example.com</code> on Linux.</p>
 <p><strong>1. Get a TLS certificate.</strong> <a href="https://letsencrypt.org">Let's Encrypt</a>
