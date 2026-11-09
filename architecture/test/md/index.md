@@ -123,7 +123,7 @@ build model.
 libbitcoin-explorer each run their constant-time tests under
 [valgrind](https://valgrind.org/), in GCC 14 and Clang 18 release builds
 on Linux x64 and arm64. Valgrind reports any branch or memory access that depends
-on secret data ([Crypto](../system/crypto#2-native-vector-and-constant-time)).
+on secret data ([Crypto](../system/crypto#3-constant-time)).
 
 **Fuzzing.** libbitcoin-system is a module of
 [bitcoinfuzz](https://github.com/bitcoinfuzz/bitcoinfuzz), a differential

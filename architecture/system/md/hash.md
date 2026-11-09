@@ -3,7 +3,9 @@
 The hash functions, from SHA-256 to SHA-3, are C++ class templates rather
 than collections of C functions. One template
 implements each algorithm family, and the same source compiles to scalar
-code or to vector code over the extensions the build targets.
+code or to vector code over the extensions the build targets. SHA-1,
+SHA-256 and SHA-512 also have a native path over the dedicated SHA
+instructions.
 
 Paths are relative to `include/bitcoin/system/` in
 [libbitcoin-system](https://github.com/libbitcoin/libbitcoin-system), at
@@ -106,7 +108,7 @@ flowchart TB
     x128["xint128_t\nSSE4.1, NEON"]
     x256["xint256_t\nAVX2"]
     x512["xint512_t\nAVX-512"]
-    nat["native\nSHA-NI, ARM SHA2"]
+    nat["native\nSHA-NI, SHA512, ARM SHA2"]
 
     spec --> tmpl
     tmpl --> f
@@ -117,8 +119,9 @@ flowchart TB
     tmpl --> nat
 ```
 
-The dedicated SHA instructions (SHA-NI, ARM SHA2 and SHA512) are the one
-separate path. They keep the working variables in registers between rounds,
+The dedicated SHA instructions are the one separate path: SHA-NI or ARM
+SHA2 for SHA-1 and SHA-256, and the x86 or ARM SHA512 extension for
+SHA-512. RIPEMD and SHA-3 have no native path. They keep the working variables in registers between rounds,
 so they use their own round sequence (`impl/hash/sha/algorithm_native.ipp`),
 within the same template and behind the same interface.
 

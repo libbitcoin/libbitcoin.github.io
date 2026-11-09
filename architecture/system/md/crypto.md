@@ -39,11 +39,14 @@ using shamir128  = shamir::algorithm<shamir::k128>;
 using shamir256  = shamir::algorithm<shamir::k256>;
 ```
 
-## 2. Native, vector and constant time
+## 2. Native and vector
 
-Each cipher has a native path where the build targets the dedicated
-instructions, and otherwise a portable path written over the `f` operators
-and extended words, as the hash functions are. The selection is at compile
+AES and GHASH have a native path, where the build targets the dedicated
+instructions, as SHA-1, SHA-256 and SHA-512 do
+([Hash](hash#3-one-code-path-scalar-and-vector)), and otherwise a
+portable path written over the same `f` operators and extended words. ChaCha20 and the secp256k1
+field have only the portable path, vectorized across the lanes of an
+extended word. The selection is at compile
 time, by the same `have_*` flags and `if constexpr`
 (see [Hash](hash#4-selection-at-compile-time)).
 
@@ -65,6 +68,8 @@ static constexpr auto use_256 = Vector && bc::have_256;
 static constexpr auto use_512 = Vector && bc::have_512;
 ```
 
+## 3. Constant time
+
 Secret key operations are constant time: the bitsliced AES, the GHASH
 multiplication, signing and key derivation on the NIST curves, and field
 and scalar inversion on secp256k1 by fixed exponent.
@@ -83,12 +88,14 @@ optimized release builds (`-O3`, static) with GCC 14 and Clang 18. The
 x64 builds have intrinsics off, since Valgrind cannot execute SHA-NI or
 AVX-512, and the arm64 builds have the AES and SHA-2 intrinsics on. The
 check does not run on macOS or Windows, where Valgrind is not available,
-or on MSVC, 32-bit or CUDA builds. The other constant time code, including AES, GHASH and the
+or on MSVC, 32-bit or CUDA builds.
+
+The other constant time code, including AES, GHASH and the
 NIST curves, is constant time by construction and not tested under
 Valgrind; Welch t-tests of the NIST curves found no measurable timing
 difference with GCC, Clang or MSVC.
 
-## 3. secp256k1
+## 4. secp256k1
 
 `secp256k1::algorithm` (`crypto/secp256k1/algorithm.hpp`) implements the
 curve's arithmetic in the library, using the 5x52 field representation of
@@ -113,14 +120,14 @@ signatures at once, and scan for silent payments (BIP352), over the lanes
 of the extended words. Script execution feeds them through
 [signature capture](machine#8-signature-capture).
 
-## 4. Other curves
+## 5. Other curves
 
 `nist::algorithm` implements ECDSA over the short Weierstrass curves with
 a = -3, secp256r1 and secp384r1, with deterministic nonces (RFC 6979), for
 the X.509 certificate support (`x509/`). X25519 implements the
 Diffie-Hellman function over Curve25519 (RFC 7748).
 
-## 5. Entropy
+## 6. Entropy
 
 `maybe_random` draws on `std::random_device`, which may or may not obtain
 its values from the operating system or hardware, and whose values may or

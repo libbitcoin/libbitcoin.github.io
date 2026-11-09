@@ -413,10 +413,13 @@ using secp384r1  = nist::algorithm&lt;nist::p384&gt;;
 using shamir128  = shamir::algorithm&lt;shamir::k128&gt;;
 using shamir256  = shamir::algorithm&lt;shamir::k256&gt;;
 </code></pre>
-<h2 id="2-native-vector-and-constant-time">2. Native, vector and constant time<a class="anchor" href="#2-native-vector-and-constant-time" aria-label="Link to this section">#</a></h2>
-<p>Each cipher has a native path where the build targets the dedicated
-instructions, and otherwise a portable path written over the <code>f</code> operators
-and extended words, as the hash functions are. The selection is at compile
+<h2 id="2-native-and-vector">2. Native and vector<a class="anchor" href="#2-native-and-vector" aria-label="Link to this section">#</a></h2>
+<p>AES and GHASH have a native path, where the build targets the dedicated
+instructions, as SHA-1, SHA-256 and SHA-512 do
+(<a href="hash.html#3-one-code-path-scalar-and-vector">Hash</a>), and otherwise a
+portable path written over the same <code>f</code> operators and extended words. ChaCha20 and the secp256k1
+field have only the portable path, vectorized across the lanes of an
+extended word. The selection is at compile
 time, by the same <code>have_*</code> flags and <code>if constexpr</code>
 (see <a href="hash.html#4-selection-at-compile-time">Hash</a>).</p>
 <div class="scroller"><table>
@@ -458,6 +461,7 @@ static constexpr auto use_128 = Vector &amp;&amp; bc::have_128;
 static constexpr auto use_256 = Vector &amp;&amp; bc::have_256;
 static constexpr auto use_512 = Vector &amp;&amp; bc::have_512;
 </code></pre>
+<h2 id="3-constant-time">3. Constant time<a class="anchor" href="#3-constant-time" aria-label="Link to this section">#</a></h2>
 <p>Secret key operations are constant time: the bitsliced AES, the GHASH
 multiplication, signing and key derivation on the NIST curves, and field
 and scalar inversion on secp256k1 by fixed exponent.</p>
@@ -474,11 +478,12 @@ optimized release builds (<code>-O3</code>, static) with GCC 14 and Clang 18. Th
 x64 builds have intrinsics off, since Valgrind cannot execute SHA-NI or
 AVX-512, and the arm64 builds have the AES and SHA-2 intrinsics on. The
 check does not run on macOS or Windows, where Valgrind is not available,
-or on MSVC, 32-bit or CUDA builds. The other constant time code, including AES, GHASH and the
+or on MSVC, 32-bit or CUDA builds.</p>
+<p>The other constant time code, including AES, GHASH and the
 NIST curves, is constant time by construction and not tested under
 Valgrind; Welch t-tests of the NIST curves found no measurable timing
 difference with GCC, Clang or MSVC.</p>
-<h2 id="3-secp256k1">3. secp256k1<a class="anchor" href="#3-secp256k1" aria-label="Link to this section">#</a></h2>
+<h2 id="4-secp256k1">4. secp256k1<a class="anchor" href="#4-secp256k1" aria-label="Link to this section">#</a></h2>
 <p><code>secp256k1::algorithm</code> (<code>crypto/secp256k1/algorithm.hpp</code>) implements the
 curve's arithmetic in the library, using the 5x52 field representation of
 bitcoin-core/secp256k1. Its field operations are templates over the word
@@ -497,12 +502,12 @@ generator are <code>constexpr</code>, computed by the compiler
 signatures at once, and scan for silent payments (BIP352), over the lanes
 of the extended words. Script execution feeds them through
 <a href="machine.html#8-signature-capture">signature capture</a>.</p>
-<h2 id="4-other-curves">4. Other curves<a class="anchor" href="#4-other-curves" aria-label="Link to this section">#</a></h2>
+<h2 id="5-other-curves">5. Other curves<a class="anchor" href="#5-other-curves" aria-label="Link to this section">#</a></h2>
 <p><code>nist::algorithm</code> implements ECDSA over the short Weierstrass curves with
 a = -3, secp256r1 and secp384r1, with deterministic nonces (RFC 6979), for
 the X.509 certificate support (<code>x509/</code>). X25519 implements the
 Diffie-Hellman function over Curve25519 (RFC 7748).</p>
-<h2 id="5-entropy">5. Entropy<a class="anchor" href="#5-entropy" aria-label="Link to this section">#</a></h2>
+<h2 id="6-entropy">6. Entropy<a class="anchor" href="#6-entropy" aria-label="Link to this section">#</a></h2>
 <p><code>maybe_random</code> draws on <code>std::random_device</code>, which may or may not obtain
 its values from the operating system or hardware, and whose values may or
 may not be random. The standard permits a deterministic implementation, and

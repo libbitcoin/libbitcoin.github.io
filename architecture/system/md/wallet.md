@@ -17,7 +17,7 @@ is provided by the compiler, operating system or hardware beneath it, so
 the library leaves its source to the application and to the user. The
 `maybe_random` function in `crypto/` is named for this uncertainty, and is
 used only for ephemeral values such as network session keys, never for
-wallet seeds (see [Crypto](crypto#5-entropy)).
+wallet seeds (see [Crypto](crypto#6-entropy)).
 
 ## 2. Organization
 
