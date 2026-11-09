@@ -2,7 +2,7 @@
 
 ## 1. Libbitcoin servers
 
-The libbitcoin project runs two public `bs` servers:
+The libbitcoin project maintains two public `bs` servers:
 
 <div id="server-status"></div>
 
@@ -10,6 +10,17 @@ The libbitcoin project runs two public `bs` servers:
 | ---- | ------- | ------- | -------- | -------- |
 | [wormer.libbitcoin.net](https://wormer.libbitcoin.net:8143) | 72.65.246.83 | – | – | – |
 | [carmine.libbitcoin.net](https://carmine.libbitcoin.net:8143) | 72.65.246.84 | – | – | – |
+
+<div id="server-details"></div>
+
+| Host | Chain | Top | Address index | Client filters | Pruned below |
+| ---- | ----- | --- | ------------- | -------------- | ------------ |
+| wormer.libbitcoin.net | mainnet | – | – | – | – |
+| wormer.libbitcoin.net | testnet3 | – | – | – | – |
+| wormer.libbitcoin.net | testnet4 | – | – | – | – |
+| carmine.libbitcoin.net | mainnet | – | – | – | – |
+| carmine.libbitcoin.net | testnet3 | – | – | – | – |
+| carmine.libbitcoin.net | testnet4 | – | – | – | – |
 
 <div id="server-scan"></div>
 
@@ -26,9 +37,12 @@ The libbitcoin project runs two public `bs` servers:
 
 <style>
 .scan-host { margin: 1.4em 0 .4em; font-family: var(--mono); }
-.scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
-.scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
-.scan-wait { color: var(--ink-3); }
+#server-scan a { color: inherit; }
+#server-scan .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
+#server-scan .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
+#server-scan .scan-wait, #server-status + .scroller .scan-wait { color: var(--ink-3); }
+#server-status + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
+#server-status + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
 .scan-some { color: var(--partial, #ffa022); font-weight: 600; }
 </style>
 
@@ -78,7 +92,6 @@ The libbitcoin project runs two public `bs` servers:
   function failure(reason, target) {
     return missing + "?reason=" + reason + "&url=" + encodeURIComponent(target);
   }
-  var clear = location.protocol === "http:";
   var cache = {};
 
   function url(host, port, path) {
@@ -127,6 +140,33 @@ The libbitcoin project runs two public `bs` servers:
     });
   }
 
+  var details = document.getElementById("server-details");
+  var table = details && details.nextElementSibling;
+  if (table) {
+    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000 };
+    var yes = function (value) { return value ? "Yes" : "No"; };
+    table.querySelectorAll("tbody tr").forEach(function (row) {
+      var host = row.cells[0].textContent.trim();
+      var chain = row.cells[1].textContent.trim();
+      var base = "https://" + host + ":" + (8143 + offsets[chain]);
+      var get = function (target) {
+        return fetch(base + target, { cache: "no-store" }).then(function (response) {
+          if (!response.ok) throw new Error(response.status);
+          return response.text();
+        });
+      };
+      get("/v1/top?format=json").then(function (text) {
+        row.cells[2].textContent = Number(text).toLocaleString("en-US");
+      }, function () {});
+      get("/v1/configuration?format=json").then(function (text) {
+        var config = JSON.parse(text);
+        row.cells[3].textContent = yes(config.address);
+        row.cells[4].textContent = yes(config.filter);
+        row.cells[5].textContent = config.pruned ? Number(config.pruned).toLocaleString("en-US") : "Not pruned";
+      }, function () {});
+    });
+  }
+
   hosts.forEach(function (host) {
     var heading = document.createElement("p");
     heading.className = "scan-host";
@@ -163,7 +203,7 @@ The libbitcoin project runs two public `bs` servers:
             });
           }
           cells[i].appendChild(span);
-          if (!checked || (port.slice(-2) !== "43" && !clear)) return;
+          if (!checked || port.slice(-2) !== "43") return;
           span.className = "scan-wait";
           var result = probe(host, port, where);
           count(host, chains[i], result);
