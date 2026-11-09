@@ -383,7 +383,7 @@ is <code>prefix/&lt;preset&gt;/bin/bs</code> under the source directory.</p>
 <p><code>CFLAGS</code> and <code>CXXFLAGS</code> are kept and passed to every library.</p>
 <p>Hardware extensions are enabled with the hardware options, for example
 the ARM crypto extensions of a Raspberry Pi 5:</p>
-<pre class="console"><code>$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --enable-sha2 --enable-aes
+<pre class="console"><code>$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-sha2 --hardware-aes
 </code></pre>
 <p>See <a href="options.html">Build options</a> for the hardware options.</p>
   </article>

@@ -83,7 +83,7 @@ Hardware extensions are enabled with the hardware options, for example
 the ARM crypto extensions of a Raspberry Pi 5:
 
 ```
-$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --enable-sha2 --enable-aes
+$ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release --build-link=static --hardware-sha2 --hardware-aes
 ```
 
 See [Build options](options) for the hardware options.

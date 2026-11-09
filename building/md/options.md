@@ -63,16 +63,22 @@ extension of the build machine's CPU instead.
 
 | Option | Instructions |
 | ------ | ------------ |
-| `--enable-sha2` | ARMv8 SHA-1 and SHA-256 |
-| `--enable-sha3` | ARMv8.2 SHA-3, used for SHA-512 |
-| `--enable-aes` | ARMv8 AES and PMULL |
+| `--hardware-sha2` | ARMv8 SHA-1 and SHA-256 |
+| `--hardware-sha3` | ARMv8.2 SHA-3, used for SHA-512 |
+| `--hardware-aes` | ARMv8 AES and PMULL |
 
-The ARM options combine into one target flag, `-march=armv8-a+<extensions>`
-(`armv8.2-a` with `--enable-sha3`). For example, `--enable-sha2
---enable-aes --enable-sha3` builds with `-march=armv8.2-a+sha2+aes+sha3`.
-An ARM option cannot be combined with `-march` or `-mcpu` in `CFLAGS` or
-`CXXFLAGS`, and the build fails if both are given. Use either the options
-or your own `-march` or `-mcpu`. `-mtune` can be used with either.
+The ARM options are install script options. They combine into one target
+flag, `-march=armv8-a+<extensions>` (`armv8.2-a` with `--hardware-sha3`),
+added to `CFLAGS` and `CXXFLAGS`. For example, `--hardware-sha2
+--hardware-aes --hardware-sha3` builds with
+`-march=armv8.2-a+aes+sha2+sha3`. They cannot be combined with
+`--hardware-optimized`.
+
+The configure and CMake options `--enable-sha2`, `--enable-sha3` and
+`--enable-aes` add no flags. Each checks that the compiler flags enable
+its extension, and configure fails if they do not. When building without
+the install script, give your own `-march` or `-mcpu` in `CFLAGS` and
+`CXXFLAGS`, with the matching `--enable` options.
 
 ### GPU
 

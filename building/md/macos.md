@@ -41,7 +41,7 @@ and passing compiler flags apply on macOS too.
 
 ## 3. Hardware options
 
-On Apple silicon, `--enable-sha2`, `--enable-sha3` and `--enable-aes`
+On Apple silicon, `--hardware-sha2`, `--hardware-sha3` and `--hardware-aes`
 enable the ARM crypto instructions, which every M-series CPU has. On
 Intel Macs, use the x86 options (see [Build options](options)).
 

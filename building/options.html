@@ -479,25 +479,30 @@ extensions they all have.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>--enable-sha2</code></td>
+<td><code>--hardware-sha2</code></td>
 <td>ARMv8 SHA-1 and SHA-256</td>
 </tr>
 <tr>
-<td><code>--enable-sha3</code></td>
+<td><code>--hardware-sha3</code></td>
 <td>ARMv8.2 SHA-3, used for SHA-512</td>
 </tr>
 <tr>
-<td><code>--enable-aes</code></td>
+<td><code>--hardware-aes</code></td>
 <td>ARMv8 AES and PMULL</td>
 </tr>
 </tbody>
 </table></div>
-<p>The ARM options combine into one target flag, <code>-march=armv8-a+&lt;extensions&gt;</code>
-(<code>armv8.2-a</code> with <code>--enable-sha3</code>). For example, <code>--enable-sha2
---enable-aes --enable-sha3</code> builds with <code>-march=armv8.2-a+sha2+aes+sha3</code>.
-An ARM option cannot be combined with <code>-march</code> or <code>-mcpu</code> in <code>CFLAGS</code> or
-<code>CXXFLAGS</code>, and the build fails if both are given. Use either the options
-or your own <code>-march</code> or <code>-mcpu</code>. <code>-mtune</code> can be used with either.</p>
+<p>The ARM options are install script options. They combine into one target
+flag, <code>-march=armv8-a+&lt;extensions&gt;</code> (<code>armv8.2-a</code> with <code>--hardware-sha3</code>),
+added to <code>CFLAGS</code> and <code>CXXFLAGS</code>. For example, <code>--hardware-sha2
+--hardware-aes --hardware-sha3</code> builds with
+<code>-march=armv8.2-a+aes+sha2+sha3</code>. They cannot be combined with
+<code>--hardware-optimized</code>.</p>
+<p>The configure and CMake options <code>--enable-sha2</code>, <code>--enable-sha3</code> and
+<code>--enable-aes</code> add no flags. Each checks that the compiler flags enable
+its extension, and configure fails if they do not. When building without
+the install script, give your own <code>-march</code> or <code>-mcpu</code> in <code>CFLAGS</code> and
+<code>CXXFLAGS</code>, with the matching <code>--enable</code> options.</p>
 <h3 id="gpu">GPU<a class="anchor" href="#gpu" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>
