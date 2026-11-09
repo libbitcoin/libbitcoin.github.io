@@ -122,7 +122,7 @@ build model.
 **Constant time.** In the expanded matrix, libbitcoin-system and
 libbitcoin-explorer each run their constant-time tests under
 [valgrind](https://valgrind.org/), in GCC 14 and Clang 18 release builds
-on Linux x64, and they also pass on Linux arm64 outside of CI. Valgrind reports any branch or memory access that depends
+on Linux x64 and arm64. Valgrind reports any branch or memory access that depends
 on secret data ([Crypto](../system/crypto#2-native-vector-and-constant-time)).
 
 **Fuzzing.** libbitcoin-system is a module of
