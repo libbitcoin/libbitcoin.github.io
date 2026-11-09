@@ -1105,7 +1105,8 @@ constructs a state from given values and checks the context it computes
 (<code>test/chain/chain_state.cpp</code>, 132 cases).</p>
 <h3 id="43-activation">4.3 Activation<a class="anchor" href="#43-activation" aria-label="Link to this section">#</a></h3>
 <p><code>activation</code> sets the flag of each configured fork that is active at the
-state's height. Each fork activates by one method:</p>
+state's height. A configured fork is active at every height, and every
+other fork activates by one method:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -1122,7 +1123,7 @@ state's height. Each fork activates by one method:</p>
 </thead>
 <tbody>
 <tr>
-<td>Configuration</td>
+<td>Configured</td>
 <td>BIP30, BIP42, BIP90</td>
 <td></td>
 <td>At every height, BIP30 except its two exception blocks</td>
@@ -1244,6 +1245,9 @@ state's height. Each fork activates by one method:</p>
 </tr>
 </tbody>
 </table></div>
+<p>BIP42 was not activated: it defined the subsidy as zero after 64
+halvings, which no chain has reached, so its rule holds at every height
+by configuration alone.</p>
 <p>BIP90 is a rule of its own, active by configuration. It imposes the rules
 of BIP34, BIP66 and BIP65 above specified blocks. It does not change the
 activation of those forks, which remains as documented, but effectively

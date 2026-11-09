@@ -227,7 +227,7 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 | `witness` | `node.require_witness` |
 | `retarget` | `forks.retarget` |
 | `difficult` | `forks.difficult` |
-| `pruned` | The height below which blocks are pruned, or `0` |
+| `pruned` | The height above which blocks are not pruned, or `0` |
 
 ### top
 
@@ -392,7 +392,7 @@ $ curl "http://localhost:8180/v1/block/height/1/header/context?format=json"
         "unconfirmable": false
     },
     "forks": {
-        "bip30": false,
+        "bip30": true,
         "bip34": false,
         "bip66": false,
         "bip65": false,
@@ -403,16 +403,24 @@ $ curl "http://localhost:8180/v1/block/height/1/header/context?format=json"
         "bip141": false,
         "bip143": false,
         "bip147": false,
-        "bip42": false,
+        "bip42": true,
         "bip341": false,
-        "bip342": false
+        "bip342": false,
+        "bip54_timewarp": false,
+        "bip54_timespan": false,
+        "bip54_sigops": false,
+        "bip54_txsize": false,
+        "bip54_coinbase": false
     }
 }
 ```
 
 `state` is present once the block's transactions are stored. `forks` shows
-each soft fork as active or not at the block's height. This example is from
-a test store, where none are active.
+each soft fork as active or not at the block's height. BIP30, BIP42 and BIP90
+are configured forks, active at every height when configured
+([Activation](../architecture/system/chain#43-activation)). The mainnet
+defaults configure BIP30 and BIP42, not BIP90. BIP54 has no mainnet
+activation, and the other forks activate later in the chain.
 
 ### block_details
 

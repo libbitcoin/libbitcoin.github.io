@@ -776,7 +776,7 @@ new block:</p>
 </tr>
 <tr>
 <td><code>pruned</code></td>
-<td>The height below which blocks are pruned, or <code>0</code></td>
+<td>The height above which blocks are not pruned, or <code>0</code></td>
 </tr>
 </tbody>
 </table></div>
@@ -911,7 +911,7 @@ the soft forks active at its height.</p>
         &quot;unconfirmable&quot;: false
     },
     &quot;forks&quot;: {
-        &quot;bip30&quot;: false,
+        &quot;bip30&quot;: true,
         &quot;bip34&quot;: false,
         &quot;bip66&quot;: false,
         &quot;bip65&quot;: false,
@@ -922,15 +922,23 @@ the soft forks active at its height.</p>
         &quot;bip141&quot;: false,
         &quot;bip143&quot;: false,
         &quot;bip147&quot;: false,
-        &quot;bip42&quot;: false,
+        &quot;bip42&quot;: true,
         &quot;bip341&quot;: false,
-        &quot;bip342&quot;: false
+        &quot;bip342&quot;: false,
+        &quot;bip54_timewarp&quot;: false,
+        &quot;bip54_timespan&quot;: false,
+        &quot;bip54_sigops&quot;: false,
+        &quot;bip54_txsize&quot;: false,
+        &quot;bip54_coinbase&quot;: false
     }
 }
 </code></pre>
 <p><code>state</code> is present once the block's transactions are stored. <code>forks</code> shows
-each soft fork as active or not at the block's height. This example is from
-a test store, where none are active.</p>
+each soft fork as active or not at the block's height. BIP30, BIP42 and BIP90
+are configured forks, active at every height when configured
+(<a href="../architecture/system/chain.html#43-activation">Activation</a>). The mainnet
+defaults configure BIP30 and BIP42, not BIP90. BIP54 has no mainnet
+activation, and the other forks activate later in the chain.</p>
 <h3 id="block_details">block_details<a class="anchor" href="#block_details" aria-label="Link to this section">#</a></h3>
 <p>Sizes, value and reward of a block.</p>
 <pre><code>/v1/block/{block}/details
