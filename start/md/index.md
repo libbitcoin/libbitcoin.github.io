@@ -9,6 +9,21 @@ Windows.
 To use a published build instead, see [Download BS](../download/index), and
 continue from §2.
 
+First install the build tools. On Ubuntu or Debian:
+
+```
+$ sudo apt install build-essential git autoconf automake libtool pkg-config curl
+```
+
+On macOS, with [Homebrew](https://brew.sh):
+
+```
+$ xcode-select --install
+$ brew install autoconf automake libtool pkg-config
+```
+
+For other distributions see [Building on Linux](../building/linux).
+
 On Linux or macOS, a release build installed under `~/libbitcoin`,
 optimized for this machine:
 

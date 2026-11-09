@@ -341,6 +341,14 @@ Windows.</p>
 <h2 id="1-build">1. Build<a class="anchor" href="#1-build" aria-label="Link to this section">#</a></h2>
 <p>To use a published build instead, see <a href="../download/index.html">Download BS</a>, and
 continue from §2.</p>
+<p>First install the build tools. On Ubuntu or Debian:</p>
+<pre class="console"><code>$ sudo apt install build-essential git autoconf automake libtool pkg-config curl
+</code></pre>
+<p>On macOS, with <a href="https://brew.sh">Homebrew</a>:</p>
+<pre class="console"><code>$ xcode-select --install
+$ brew install autoconf automake libtool pkg-config
+</code></pre>
+<p>For other distributions see <a href="../building/linux.html">Building on Linux</a>.</p>
 <p>On Linux or macOS, a release build installed under <code>~/libbitcoin</code>,
 optimized for this machine:</p>
 <pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-server

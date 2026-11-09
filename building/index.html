@@ -462,10 +462,15 @@ systems with Bitcoin Core.</p>
 <li>A C++20 compiler. The versions tested in CI are listed in
   <a href="toolchains.html">Toolchains</a>.</li>
 <li>Git, to fetch the libbitcoin sources.</li>
+<li>The build tools of the chosen build system: autotools or CMake on
+  Linux and macOS, Visual Studio on Windows. The prerequisites of each
+  platform are listed on its page (<a href="linux.html">Linux</a>, <a href="macos.html">macOS</a>,
+  <a href="windows.html">Windows</a>).</li>
 </ul>
-<p>Nothing else is required (see <a href="options.html">Build options</a>).</p>
-<h2 id="5-quick-start">5. Quick start<a class="anchor" href="#5-quick-start" aria-label="Link to this section">#</a></h2>
-<p>On Linux or macOS, a static release build installed under
+<p>No other libraries need to be installed (see <a href="options.html">Build options</a>).</p>
+<h2 id="5-building-bs-and-bx">5. Building bs and bx<a class="anchor" href="#5-building-bs-and-bx" aria-label="Link to this section">#</a></h2>
+<p>With the prerequisites installed, on Linux or macOS, a static release
+build installed under
 <code>~/libbitcoin</code>, optimized for the build machine:</p>
 <pre class="console"><code>$ git clone https://github.com/libbitcoin/libbitcoin-server
 $ cd libbitcoin-server

@@ -50,12 +50,17 @@ systems with Bitcoin Core.
 - A C++20 compiler. The versions tested in CI are listed in
   [Toolchains](toolchains).
 - Git, to fetch the libbitcoin sources.
+- The build tools of the chosen build system: autotools or CMake on
+  Linux and macOS, Visual Studio on Windows. The prerequisites of each
+  platform are listed on its page ([Linux](linux), [macOS](macos),
+  [Windows](windows)).
 
-Nothing else is required (see [Build options](options)).
+No other libraries need to be installed (see [Build options](options)).
 
-## 5. Quick start
+## 5. Building bs and bx
 
-On Linux or macOS, a static release build installed under
+With the prerequisites installed, on Linux or macOS, a static release
+build installed under
 `~/libbitcoin`, optimized for the build machine:
 
 ```
