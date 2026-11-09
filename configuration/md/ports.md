@@ -38,6 +38,7 @@ port follows its network's convention:
 | regtest | +20000 | 28043–28980 | 18444 |
 | signet | +30000 | 38043–38980 | 38333 |
 | testnet4 | +40000 | 48043–48980 | 48333 |
+| testnet5 | +50000 | 58043–58980 | 18353 |
 
 To use a service as a drop-in replacement, bind it to the port its
 clients expect instead:

@@ -209,6 +209,7 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 
 ```json
 {
+    "network": "mainnet",
     "address": true,
     "filter": true,
     "turbo": false,
@@ -221,6 +222,7 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 
 | Field | Meaning |
 | ----- | ------- |
+| `network` | The network whose genesis block is configured (`mainnet`, `testnet3`, `testnet4`, `testnet5`, `regtest` or `signet`), or empty if none |
 | `address` | The address index is enabled |
 | `filter` | Client filters are enabled |
 | `turbo` | `database.turbo` |

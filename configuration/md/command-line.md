@@ -7,7 +7,7 @@ All options, grouped by purpose:
 | Group | Option | Purpose |
 | ----- | ------ | ------- |
 | Configuration | `-c`, `--config <path>` | Read settings from a configuration file |
-| | `-n`, `--net <network>` | Select the network (`mainnet`, `testnet3`, `testnet4`, `regtest` or `signet`), by default the configured `bitcoin.network` (`mainnet`) |
+| | `-n`, `--net <network>` | Select the network (`mainnet`, `testnet3`, `testnet4`, `testnet5`, `regtest` or `signet`), by default the configured `bitcoin.network` (`mainnet`) |
 | Prompts | `-a`, `--accept` | Accept startup prompts without interaction |
 | Information | `-h`, `--help` | Display command line options |
 | | `-s`, `--settings` | Display the settings in effect, with their descriptions and defaults ([Displaying settings](file#2-displaying-settings)) |
@@ -69,7 +69,7 @@ Options (named):
 -l [--collisions]    Scan and show hashmap collision stats (may SIGKILL).
 -m [--make]          Make new store in configured directory.
 -n [--net]           Specify the network
-                     (mainnet|testnet3|testnet4|regtest|signet), defaults
+                     (mainnet|testnet3|testnet4|regtest|signet|testnet5), defaults
                      to the configured network.
 -r [--restore]       Restore from most recent snapshot.
 -s [--settings]      Display all configuration settings.

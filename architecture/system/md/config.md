@@ -109,7 +109,7 @@ over their string form.
 
 `system::settings` (`settings.hpp`) holds the consensus parameters of a
 network, populated by its `chain::selection` constructor (mainnet, testnet3,
-testnet4, regtest, signet). Three of its members are config types, so they
+testnet4, regtest, signet, testnet5). Three of its members are config types, so they
 are set from configuration text through the same stream operators:
 
 ```cpp

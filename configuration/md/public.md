@@ -6,10 +6,10 @@ The libbitcoin community maintains two public `bs` servers:
 
 <div id="server-status"></div>
 
-| Host | Address | mainnet | testnet3 | testnet4 |
-| ---- | ------- | ------- | -------- | -------- |
-| wormer.libbitcoin.net | 72.65.246.83 | – | – | – |
-| carmine.libbitcoin.net | 72.65.246.84 | – | – | – |
+| Host | Address | mainnet | testnet3 | testnet4 | testnet5 |
+| ---- | ------- | ------- | -------- | -------- | -------- |
+| wormer.libbitcoin.net | 72.65.246.83 | – | – | – | – |
+| carmine.libbitcoin.net | 72.65.246.84 | – | – | – | – |
 
 <div id="server-details"></div>
 
@@ -18,22 +18,24 @@ The libbitcoin community maintains two public `bs` servers:
 | [wormer.libbitcoin.net](https://wormer.libbitcoin.net:8143) | mainnet | – | – | – | – |
 | [wormer.libbitcoin.net](https://wormer.libbitcoin.net:18143) | testnet3 | – | – | – | – |
 | [wormer.libbitcoin.net](https://wormer.libbitcoin.net:48143) | testnet4 | – | – | – | – |
+| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:58143) | testnet5 | – | – | – | – |
 | [carmine.libbitcoin.net](https://carmine.libbitcoin.net:8143) | mainnet | – | – | – | – |
 | [carmine.libbitcoin.net](https://carmine.libbitcoin.net:18143) | testnet3 | – | – | – | – |
 | [carmine.libbitcoin.net](https://carmine.libbitcoin.net:48143) | testnet4 | – | – | – | – |
+| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:58143) | testnet5 | – | – | – | – |
 
 <div id="server-scan"></div>
 
-| Service | mainnet | testnet3 | testnet4 |
-| ------- | ------- | -------- | -------- |
-| P2P network | 8333 / 8333 | 18333 / 18333 | 48333 / 48333 |
-| ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 |
-| Native web and REST | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 |
-| Bitcoind RPC and REST | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 |
-| BTCD RPC | 8480 / 8443 | 18480 / 18443 | 48480 / 48443 |
-| Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 |
-| Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 |
-| Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 |
+| Service | mainnet | testnet3 | testnet4 | testnet5 |
+| ------- | ------- | -------- | -------- | -------- |
+| P2P network | 8333 / 8333 | 18333 / 18333 | 48333 / 48333 | 18353 / 18353 |
+| ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 | 58380 / 58343 |
+| Native web and REST | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 | 58180 / 58143 |
+| Bitcoind RPC and REST | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 | 58280 / 58243 |
+| BTCD RPC | 8480 / 8443 | 18480 / 18443 | 48480 / 48443 | 58480 / 58443 |
+| Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 | 58580 / 58543 |
+| Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 | 58680 / 58643 |
+| Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 | 58780 / 58743 |
 
 <style>
 .scan-host { margin: 1.4em 0 .4em; font-family: var(--mono); }
@@ -61,7 +63,8 @@ The libbitcoin community maintains two public `bs` servers:
   var genesis = {
     mainnet: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
     testnet3: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
-    testnet4: "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043"
+    testnet4: "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043",
+    testnet5: "000000000001bd3ade1e24d07c1a3677d4868c34f2f1696fa419e3b9f061b1e0"
   };
   var paths = {
     "Native web and REST": "/v1/block/height/0?format=json",
@@ -147,7 +150,7 @@ The libbitcoin community maintains two public `bs` servers:
   var details = document.getElementById("server-details");
   var table = details && details.nextElementSibling;
   if (table) {
-    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000 };
+    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000, testnet5: 50000 };
     var mark = function (cell, text, state) { cell.textContent = text; cell.className = state; };
     var yes = function (cell, value) { mark(cell, value ? "Yes" : "No", value ? "scan-up" : "scan-down"); };
     table.querySelectorAll("tbody tr").forEach(function (row) {

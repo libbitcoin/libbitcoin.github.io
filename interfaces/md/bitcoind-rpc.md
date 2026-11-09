@@ -219,6 +219,10 @@ ratio of `blocks` to `headers`. `size_on_disk` is the size of the store.
 `bip9_softforks`, read by btcd clients such as lnd, lists taproot once it
 is active. The pruning and signet fields are not included.
 
+`chain` names the network of the configured genesis block: `main`,
+`test` (testnet3), `testnet4`, `testnet5`, `regtest` or `signet`, and
+otherwise `unknown`.
+
 ### getblockfilter
 
 A block's client filter. **Parameters:** `blockhash`, `filtertype`

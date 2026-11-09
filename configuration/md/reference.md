@@ -371,7 +371,7 @@ initial_block_subsidy_bitcoin = 50
 milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950000
 # The minimum work for any branch to be considered valid, defaults to '000000000000000000000000000000000000000052b2559353df4117b7348b64'.
 minimum_work = 000000000000000000000000000000000000000052b2559353df4117b7348b64
-# The network of the defaults (mainnet|testnet3|testnet4|regtest|signet), defaults to 'mainnet'.
+# The network of the defaults (mainnet|testnet3|testnet4|regtest|signet|testnet5), defaults to 'mainnet'.
 network = mainnet
 # The proof of work limit, defaults to '486604799'.
 proof_of_work_limit = 486604799
@@ -463,7 +463,7 @@ addresses, keys and descriptors in client requests and responses:
 
 They do not affect the node or the store. The defaults are mainnet, and a
 test chain sets its own, as on the [Testnet3](testnet3),
-[Testnet4](testnet4), [Signet](signet) and [Regtest](regtest) pages.
+[Testnet4](testnet4), [Testnet5](testnet5), [Signet](signet) and [Regtest](regtest) pages.
 
 ```ini
 [wallet]

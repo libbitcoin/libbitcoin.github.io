@@ -664,6 +664,9 @@ height, confirmations, median time, chain work and adjacent hashes.</p>
 ratio of <code>blocks</code> to <code>headers</code>. <code>size_on_disk</code> is the size of the store.
 <code>bip9_softforks</code>, read by btcd clients such as lnd, lists taproot once it
 is active. The pruning and signet fields are not included.</p>
+<p><code>chain</code> names the network of the configured genesis block: <code>main</code>,
+<code>test</code> (testnet3), <code>testnet4</code>, <code>testnet5</code>, <code>regtest</code> or <code>signet</code>, and
+otherwise <code>unknown</code>.</p>
 <h3 id="getblockfilter">getblockfilter<a class="anchor" href="#getblockfilter" aria-label="Link to this section">#</a></h3>
 <p>A block's client filter. <strong>Parameters:</strong> <code>blockhash</code>, <code>filtertype</code>
 (<code>basic</code>). <strong>Result:</strong> <code>{"filter", "header"}</code>. Requires client filters,

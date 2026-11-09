@@ -140,6 +140,10 @@ $ curl "http://localhost:8280/rest/chaininfo.json"
 `blocks` is the top confirmed height, and `headers` the top candidate
 height. This is a subset of bitcoind's `chaininfo`.
 
+`chain` names the network of the configured genesis block: `main`,
+`test` (testnet3), `testnet4`, `testnet5`, `regtest` or `signet`, and
+otherwise `unknown`.
+
 ### deploymentinfo
 
 The soft forks active at a block.

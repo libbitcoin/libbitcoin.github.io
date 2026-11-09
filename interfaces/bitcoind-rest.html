@@ -630,6 +630,9 @@ which are distinct from the RPC names (see
 </code></pre>
 <p><code>blocks</code> is the top confirmed height, and <code>headers</code> the top candidate
 height. This is a subset of bitcoind's <code>chaininfo</code>.</p>
+<p><code>chain</code> names the network of the configured genesis block: <code>main</code>,
+<code>test</code> (testnet3), <code>testnet4</code>, <code>testnet5</code>, <code>regtest</code> or <code>signet</code>, and
+otherwise <code>unknown</code>.</p>
 <h3 id="deploymentinfo">deploymentinfo<a class="anchor" href="#deploymentinfo" aria-label="Link to this section">#</a></h3>
 <p>The soft forks active at a block.</p>
 <pre><code>/rest/deploymentinfo.json

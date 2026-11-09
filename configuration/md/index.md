@@ -19,7 +19,7 @@ With a configuration file:
 $ bs --config bs.cfg
 ```
 
-To run on testnet3, testnet4, regtest or signet, with the store in a
+To run on testnet3, testnet4, testnet5, regtest or signet, with the store in a
 directory named for the network:
 
 ```
@@ -44,4 +44,4 @@ wait ([Until current](services#until-current)).
 | [Performance Settings](performance) | Processor, GPU, network and NUMA settings. |
 | [Settings Reference](reference) | Every setting, by section, with its description and default. |
 | [BX Settings](bx) | The configuration of Bitcoin Explorer (`bx`). |
-| [Testnet3](testnet3), [Testnet4](testnet4), [Signet](signet), [Regtest](regtest) | Settings for the test chains. |
+| [Testnet3](testnet3), [Testnet4](testnet4), [Testnet5](testnet5), [Signet](signet), [Regtest](regtest) | Settings for the test chains. |

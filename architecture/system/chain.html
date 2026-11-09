@@ -1117,6 +1117,7 @@ other fork activates by one method:</p>
 <th>Mainnet</th>
 <th>Testnet3</th>
 <th>Testnet4</th>
+<th>Testnet5</th>
 <th>Signet</th>
 <th>Regtest</th>
 </tr>
@@ -1127,6 +1128,7 @@ other fork activates by one method:</p>
 <td>BIP30, BIP42, BIP90</td>
 <td></td>
 <td>At every height, BIP30 except its two exception blocks</td>
+<td>genesis</td>
 <td>genesis</td>
 <td>genesis</td>
 <td>genesis</td>
@@ -1143,14 +1145,16 @@ other fork activates by one method:</p>
 <td>2012&#8209;02&#8209;15</td>
 <td>2012&#8209;02&#8209;15</td>
 <td>2012&#8209;02&#8209;15</td>
+<td>2012&#8209;02&#8209;15</td>
 </tr>
 <tr>
 <td>Version (BIP34)</td>
 <td>BIP34, BIP66, BIP65</td>
 <td></td>
-<td>When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3; zero on testnet4, signet and regtest, so every block above genesis)</td>
+<td>When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3; zero on testnet4, testnet5, signet and regtest, so every block above genesis)</td>
 <td>227,931, 363,725, 388,381</td>
 <td>21,111, 330,776, 581,885</td>
+<td>1</td>
 <td>1</td>
 <td>1</td>
 <td>1</td>
@@ -1165,6 +1169,7 @@ other fork activates by one method:</p>
 <td>1</td>
 <td>1</td>
 <td>1</td>
+<td>1</td>
 </tr>
 <tr>
 <td></td>
@@ -1173,6 +1178,7 @@ other fork activates by one method:</p>
 <td></td>
 <td>481,824</td>
 <td>834,624</td>
+<td>1</td>
 <td>1</td>
 <td>1</td>
 <td>1</td>
@@ -1187,6 +1193,7 @@ other fork activates by one method:</p>
 <td>1</td>
 <td>1</td>
 <td>1</td>
+<td>1</td>
 </tr>
 <tr>
 <td></td>
@@ -1196,6 +1203,7 @@ other fork activates by one method:</p>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
+<td><span class="proposed">1</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="proposed">1</span></td>
 </tr>
@@ -1207,6 +1215,7 @@ other fork activates by one method:</p>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
+<td><span class="proposed">1</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="proposed">1</span></td>
 </tr>
@@ -1218,6 +1227,7 @@ other fork activates by one method:</p>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
+<td><span class="proposed">1</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="proposed">1</span></td>
 </tr>
@@ -1229,6 +1239,7 @@ other fork activates by one method:</p>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
+<td><span class="proposed">1</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="proposed">1</span></td>
 </tr>
@@ -1240,6 +1251,7 @@ other fork activates by one method:</p>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="dim">TBD</span></td>
+<td><span class="proposed">1</span></td>
 <td><span class="dim">TBD</span></td>
 <td><span class="proposed">1</span></td>
 </tr>
@@ -1400,7 +1412,7 @@ switch and deployment: <code>bip54_timewarp</code>, <code>bip54_timespan</code>,
 <code>bip54_txsize</code> and <code>bip54_coinbase</code>. Each is a speedy trial. Their version
 bits, 5 through 9, are provisional, and their thresholds are zero on
 mainnet, testnet3, testnet4 and signet, so none is signaled or active
-there. On regtest each is active above genesis.</p>
+there. On testnet5 and regtest each is active above genesis.</p>
 <p>A fork's flags are stored with each header once it is active. A fork
 enabled after its activation is therefore enforced only on the headers
 archived from then on, as is any soft fork adopted late: the node does not

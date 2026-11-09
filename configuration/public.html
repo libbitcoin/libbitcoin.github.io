@@ -342,6 +342,7 @@
     <a href="bx.html">BX Settings</a>
     <a href="testnet3.html">Testnet3</a>
     <a href="testnet4.html">Testnet4</a>
+    <a href="testnet5.html">Testnet5</a>
     <a href="signet.html">Signet</a>
     <a href="regtest.html">Regtest</a>
   </nav>
@@ -359,6 +360,7 @@
 <th>mainnet</th>
 <th>testnet3</th>
 <th>testnet4</th>
+<th>testnet5</th>
 </tr>
 </thead>
 <tbody>
@@ -368,10 +370,12 @@
 <td>–</td>
 <td>–</td>
 <td>–</td>
+<td>–</td>
 </tr>
 <tr>
 <td>carmine.libbitcoin.net</td>
 <td>72.65.246.84</td>
+<td>–</td>
 <td>–</td>
 <td>–</td>
 <td>–</td>
@@ -417,6 +421,14 @@
 <td>–</td>
 </tr>
 <tr>
+<td><a href="https://wormer.libbitcoin.net:58143">wormer.libbitcoin.net</a></td>
+<td>testnet5</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
+<tr>
 <td><a href="https://carmine.libbitcoin.net:8143">carmine.libbitcoin.net</a></td>
 <td>mainnet</td>
 <td>–</td>
@@ -440,6 +452,14 @@
 <td>–</td>
 <td>–</td>
 </tr>
+<tr>
+<td><a href="https://carmine.libbitcoin.net:58143">carmine.libbitcoin.net</a></td>
+<td>testnet5</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
 </tbody>
 </table></div>
 <div id="server-scan"></div>
@@ -451,6 +471,7 @@
 <th>mainnet</th>
 <th>testnet3</th>
 <th>testnet4</th>
+<th>testnet5</th>
 </tr>
 </thead>
 <tbody>
@@ -459,48 +480,56 @@
 <td>8333 / 8333</td>
 <td>18333 / 18333</td>
 <td>48333 / 48333</td>
+<td>18353 / 18353</td>
 </tr>
 <tr>
 <td>ZMQ</td>
 <td>8380 / 8343</td>
 <td>18380 / 18343</td>
 <td>48380 / 48343</td>
+<td>58380 / 58343</td>
 </tr>
 <tr>
 <td>Native web and REST</td>
 <td>8180 / 8143</td>
 <td>18180 / 18143</td>
 <td>48180 / 48143</td>
+<td>58180 / 58143</td>
 </tr>
 <tr>
 <td>Bitcoind RPC and REST</td>
 <td>8280 / 8243</td>
 <td>18280 / 18243</td>
 <td>48280 / 48243</td>
+<td>58280 / 58243</td>
 </tr>
 <tr>
 <td>BTCD RPC</td>
 <td>8480 / 8443</td>
 <td>18480 / 18443</td>
 <td>48480 / 48443</td>
+<td>58480 / 58443</td>
 </tr>
 <tr>
 <td>Electrum</td>
 <td>8580 / 8543</td>
 <td>18580 / 18543</td>
 <td>48580 / 48543</td>
+<td>58580 / 58543</td>
 </tr>
 <tr>
 <td>Sparrow</td>
 <td>8680 / 8643</td>
 <td>18680 / 18643</td>
 <td>48680 / 48643</td>
+<td>58680 / 58643</td>
 </tr>
 <tr>
 <td>Esplora</td>
 <td>8780 / 8743</td>
 <td>18780 / 18743</td>
 <td>48780 / 48743</td>
+<td>58780 / 58743</td>
 </tr>
 </tbody>
 </table></div>
@@ -530,7 +559,8 @@
   var genesis = {
     mainnet: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
     testnet3: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
-    testnet4: "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043"
+    testnet4: "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043",
+    testnet5: "000000000001bd3ade1e24d07c1a3677d4868c34f2f1696fa419e3b9f061b1e0"
   };
   var paths = {
     "Native web and REST": "/v1/block/height/0?format=json",
@@ -616,7 +646,7 @@
   var details = document.getElementById("server-details");
   var table = details && details.nextElementSibling;
   if (table) {
-    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000 };
+    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000, testnet5: 50000 };
     var mark = function (cell, text, state) { cell.textContent = text; cell.className = state; };
     var yes = function (cell, value) { mark(cell, value ? "Yes" : "No", value ? "scan-up" : "scan-down"); };
     table.querySelectorAll("tbody tr").forEach(function (row) {

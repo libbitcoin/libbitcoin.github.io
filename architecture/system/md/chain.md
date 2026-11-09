@@ -541,19 +541,19 @@ constructs a state from given values and checks the context it computes
 state's height. A configured fork is active at every height, and every
 other fork activates by one method:
 
-| Method | Forks | Bit | Active | Mainnet | Testnet3 | Testnet4 | Signet | Regtest |
-| ------ | ----- | --- | ------ | ------- | -------- | -------- | ------ | ------- |
-| Configured | BIP30, BIP42, BIP90 |  | At every height, BIP30 except its two exception blocks | genesis | genesis | genesis | genesis | genesis |
-| Flag day | BIP16 |  | By a coinbase vote of miners, read by manual inspection and later fixed as a block timestamp | 2012&#8209;04&#8209;01 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 |
-| Version (BIP34) | BIP34, BIP66, BIP65 |  | When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3; zero on testnet4, signet and regtest, so every block above genesis) | 227,931, 363,725, 388,381 | 21,111, 330,776, 581,885 | 1 | 1 | 1 |
-| Signaling (BIP9) | BIP68, BIP112, BIP113 | 0 | From the versions of the chain's own blocks: after the period in which its bit reaches the threshold and one locked-in period, and no earlier than its minimum activation height | 419,328 | 770,112 | 1 | 1 | 1 |
-|  | BIP141, BIP143, BIP147 | 1 |  | 481,824 | 834,624 | 1 | 1 | 1 |
-|  | BIP341, BIP342 | 2 |  | 709,632 | 2,011,968 | 1 | 1 | 1 |
-|  | <span class="proposed">BIP54 timewarp</span> | <span class="proposed">5</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
-|  | <span class="proposed">BIP54 timespan</span> | <span class="proposed">6</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
-|  | <span class="proposed">BIP54 sigops</span> | <span class="proposed">7</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
-|  | <span class="proposed">BIP54 txsize</span> | <span class="proposed">8</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
-|  | <span class="proposed">BIP54 coinbase</span> | <span class="proposed">9</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+| Method | Forks | Bit | Active | Mainnet | Testnet3 | Testnet4 | Testnet5 | Signet | Regtest |
+| ------ | ----- | --- | ------ | ------- | -------- | -------- | -------- | ------ | ------- |
+| Configured | BIP30, BIP42, BIP90 |  | At every height, BIP30 except its two exception blocks | genesis | genesis | genesis | genesis | genesis | genesis |
+| Flag day | BIP16 |  | By a coinbase vote of miners, read by manual inspection and later fixed as a block timestamp | 2012&#8209;04&#8209;01 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 | 2012&#8209;02&#8209;15 |
+| Version (BIP34) | BIP34, BIP66, BIP65 |  | When an activation threshold of the preceding sample of blocks, and the block, have the version; the version is required at an enforcement threshold (750 and 950 of 1,000 on mainnet, 51 and 75 of 100 on testnet3; zero on testnet4, testnet5, signet and regtest, so every block above genesis) | 227,931, 363,725, 388,381 | 21,111, 330,776, 581,885 | 1 | 1 | 1 | 1 |
+| Signaling (BIP9) | BIP68, BIP112, BIP113 | 0 | From the versions of the chain's own blocks: after the period in which its bit reaches the threshold and one locked-in period, and no earlier than its minimum activation height | 419,328 | 770,112 | 1 | 1 | 1 | 1 |
+|  | BIP141, BIP143, BIP147 | 1 |  | 481,824 | 834,624 | 1 | 1 | 1 | 1 |
+|  | BIP341, BIP342 | 2 |  | 709,632 | 2,011,968 | 1 | 1 | 1 | 1 |
+|  | <span class="proposed">BIP54 timewarp</span> | <span class="proposed">5</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 timespan</span> | <span class="proposed">6</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 sigops</span> | <span class="proposed">7</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 txsize</span> | <span class="proposed">8</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
+|  | <span class="proposed">BIP54 coinbase</span> | <span class="proposed">9</span> |  | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> | <span class="dim">TBD</span> | <span class="proposed">1</span> |
 
 BIP42 was not activated: it defined the subsidy as zero after 64
 halvings, which no chain has reached, so its rule holds at every height
@@ -642,7 +642,7 @@ switch and deployment: `bip54_timewarp`, `bip54_timespan`, `bip54_sigops`,
 `bip54_txsize` and `bip54_coinbase`. Each is a speedy trial. Their version
 bits, 5 through 9, are provisional, and their thresholds are zero on
 mainnet, testnet3, testnet4 and signet, so none is signaled or active
-there. On regtest each is active above genesis.
+there. On testnet5 and regtest each is active above genesis.
 
 A fork's flags are stored with each header once it is active. A fork
 enabled after its activation is therefore enforced only on the headers

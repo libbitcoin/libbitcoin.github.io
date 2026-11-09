@@ -295,6 +295,7 @@ SECTIONS = {
             ("bx", "BX Settings"),
             ("testnet3", "Testnet3"),
             ("testnet4", "Testnet4"),
+            ("testnet5", "Testnet5"),
             ("signet", "Signet"),
             ("regtest", "Regtest"),
         ],

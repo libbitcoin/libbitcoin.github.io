@@ -36,7 +36,7 @@ numerical bugs in several of them:
 | Value overflow (2010, CVE-2010-5139) | The sum of a transaction's output values overflowed a signed 64 bit integer | A transaction creating more than 184 billion bitcoin was valid, and the chain was forked to remove it |
 | `OP_LSHIFT` crash (2010, CVE-2010-5137) | A script could shift a number by an arbitrary amount | Any node could be crashed by a transaction, and the shift opcodes were disabled |
 | Subsidy shift (BIP42) | The subsidy was computed as `50 * COIN >> halvings`, and a shift by 64 or more is undefined | On common hardware the shift count wraps, so after 64 halvings the subsidy would have returned to 50 bitcoin; BIP42 defined it as zero |
-| Retarget off by one | The retarget measures 2015 block intervals of a 2016 block period | The time warp attack, mitigated by BIP94 for testnet4 |
+| Retarget off by one | The retarget measures 2015 block intervals of a 2016 block period | The time warp attack, mitigated by BIP94 for testnet4 and by BIP54 for testnet5 |
 | Compact number sign | The target's compact form was derived from a signed format | A mantissa bit is lost to a sign that a target cannot have (see [Chain](chain#5-compact-number)) |
 
 The subsidy shows the problem in its purest form. The original code was

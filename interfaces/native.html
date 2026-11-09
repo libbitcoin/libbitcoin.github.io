@@ -733,6 +733,7 @@ new block:</p>
 <pre class="console"><code>$ curl &quot;http://localhost:8180/v1/configuration?format=json&quot;
 </code></pre>
 <pre><code class="language-json">{
+    &quot;network&quot;: &quot;mainnet&quot;,
     &quot;address&quot;: true,
     &quot;filter&quot;: true,
     &quot;turbo&quot;: false,
@@ -750,6 +751,10 @@ new block:</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><code>network</code></td>
+<td>The network whose genesis block is configured (<code>mainnet</code>, <code>testnet3</code>, <code>testnet4</code>, <code>testnet5</code>, <code>regtest</code> or <code>signet</code>), or empty if none</td>
+</tr>
 <tr>
 <td><code>address</code></td>
 <td>The address index is enabled</td>

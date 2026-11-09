@@ -65,7 +65,7 @@ pay_to_script_hash_version = 196
 url = http://127.0.0.1:18180
 ```
 
-The same `[wallet]` settings apply to testnet4 and signet, and to regtest
+The same `[wallet]` settings apply to testnet4, testnet5 and signet, and to regtest
 with `bcrt` as its witness address prefix. The server port is the `bs`
 native port on the chain: `18180` on testnet3, `48180` on testnet4,
-`38180` on signet and `28180` on regtest ([Conventional Ports](ports)).
+`58180` on testnet5, `38180` on signet and `28180` on regtest ([Conventional Ports](ports)).
