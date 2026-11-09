@@ -259,12 +259,23 @@
       <details class="drop here" name="site"><summary>Getting Started</summary><div>
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html" class="here">Quick Start</a>
-        <a href="../configuration/index.html">Configuration</a>
-        <a href="../configuration/reference.html">Settings Reference</a>
         <a href="../building/platforms.html">Platform Coverage</a>
+        <a href="../configuration/public.html">Public Servers</a>
         <a href="../building/status.html">Build Status</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Configuration</summary><div>
+        <a href="../configuration/index.html">Overview</a>
+        <a href="../configuration/command-line.html">Command Line</a>
+        <a href="../configuration/file.html">Configuration File</a>
+        <a href="../configuration/setups.html">Common Setups</a>
+        <a href="../configuration/ports.html">Conventional Ports</a>
+        <a href="../configuration/store.html">Store Settings</a>
+        <a href="../configuration/services.html">Service Settings</a>
+        <a href="../configuration/performance.html">Performance Settings</a>
+        <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../configuration/bx.html">BX Settings</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync BS</a>
@@ -351,7 +362,9 @@ extensions they all have (see <a href="../building/options.html#2-hardware-optio
 <p>With no configuration, <code>bs</code> syncs mainnet into a <code>mainnet</code> store in the
 current directory, creating it if it does not exist. Progress is logged
 to the console. To stop, type <code>c</code> and <code>&lt;enter&gt;</code>, or press <code>&lt;ctrl&gt; c</code>. A
-restart resumes where it stopped.</p>
+restart resumes where it stopped. To sync a test chain, or to stop at a
+height, see <a href="../configuration/command-line.html">Command Line</a> and
+<a href="../configuration/setups.html">Common Setups</a>.</p>
 <p>The time a sync takes and the space its store needs are shown on the
 <a href="../sync.html">Sync BS</a> and <a href="../footprint.html">Footprint</a> pages.</p>
 <h2 id="3-serve">3. Serve<a class="anchor" href="#3-serve" aria-label="Link to this section">#</a></h2>
@@ -399,8 +412,14 @@ show the sync's progress. The other interfaces accept connections once
 the node is current.</p>
 <h2 id="4-next">4. Next<a class="anchor" href="#4-next" aria-label="Link to this section">#</a></h2>
 <ul>
-<li><a href="../configuration/index.html">Configuration</a>: common setups, such as
-  milestone sync, TLS, credentials and test networks.</li>
+<li><a href="../configuration/index.html">Configuration</a>: the command line and
+  configuration file, and every setting.</li>
+<li><a href="../configuration/setups.html">Common Setups</a>: milestone sync, each
+  service, client filters, silent payments and anonymizing networks.</li>
+<li><a href="../configuration/services.html">Service Settings</a>: TLS, credentials and
+  client certificates.</li>
+<li><a href="../configuration/performance.html">Performance Settings</a>: processor, GPU
+  and network settings.</li>
 <li><a href="../interfaces/index.html">Interfaces</a>: every interface, its methods and
   examples.</li>
 <li><a href="../building/index.html">Building</a>: platforms, build options and hardware

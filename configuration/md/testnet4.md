@@ -162,7 +162,7 @@ The store is the same `testnet4` store.
 ## Ports
 
 On testnet4, each service listens by default on its
-mainnet port plus 40,000 ([Ports](index#6-ports)):
+mainnet port plus 40,000 ([Conventional Ports](ports)):
 
 | Service | Section | Clear | Secure |
 | ------- | ------- | ----- | ------ |

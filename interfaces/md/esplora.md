@@ -109,7 +109,7 @@ Each response carries one of these statuses
 ### 2.4 Credentials
 
 A credential's method list names Esplora endpoints by the method names in
-§1 (see [Configuration §7.3](../configuration/index#73-authentication)).
+§1 (see [Configuration §7.3](../configuration/services#3-authentication)).
 The `/hex` and `/raw` paths share the method of their object.
 
 ### 2.5 Websocket

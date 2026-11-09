@@ -99,7 +99,7 @@ credential = monitor:secret:getblockcount,getblockchaininfo
 
 Each `credential` is `username:password`, optionally followed by the
 methods it may call (see
-[Configuration §7.3](../configuration/index#73-authentication)). With no
+[Configuration §7.3](../configuration/services#3-authentication)). With no
 credential, no authentication is required. The credential is stored as
 written, and its password may not contain `:`.
 
@@ -121,7 +121,7 @@ Client certificates are a `bs` extension, though this does not support
 method binding. With `bitcoind.cert_auth` set, each secure
 connection must present a client certificate trusted by one of the files
 in that directory (see
-[Configuration §7.2](../configuration/index#72-secure-connections)).
+[Configuration §7.2](../configuration/services#2-secure-connections)).
 This also restricts TCPS clients, which carry no credentials.
 
 ### 2.4 Transports

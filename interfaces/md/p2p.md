@@ -4,7 +4,7 @@ The Bitcoin P2P interface is Bitcoin's wire protocol, on which `bs` both
 syncs the chain and serves it. It is configured by the `[network]`,
 `[peer]`, `[inbound]`, `[outbound]` and `[manual]` sections (see
 [Configuration
-§5.17](../configuration/index#517-peer-services-and-policy)).
+§5.17](../configuration/setups#17-peer-services-and-policy)).
 
 P2P and P2PS (BIP324) are reached on the same port:
 
@@ -140,7 +140,7 @@ banning. `network.blacklist` and `network.whitelist` set which addresses
 connect at all.
 
 Limits that protect against denial of service apply to every service,
-including P2P (see [Configuration §7.5](../configuration/index#75-limits)).
+including P2P (see [Configuration §7.5](../configuration/services#5-limits)).
 
 ## 3. Handshake
 

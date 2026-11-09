@@ -168,7 +168,7 @@ The store is the same `regtest` store.
 ## Ports
 
 On regtest, each service listens by default on its
-mainnet port plus 20,000 ([Ports](index#6-ports)):
+mainnet port plus 20,000 ([Conventional Ports](ports)):
 
 | Service | Section | Clear | Secure |
 | ------- | ------- | ----- | ------ |

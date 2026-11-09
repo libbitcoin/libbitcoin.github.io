@@ -155,7 +155,7 @@ The store is the same `testnet3` store.
 ## Ports
 
 On testnet3, each service listens by default on its
-mainnet port plus 10,000 ([Ports](index#6-ports)):
+mainnet port plus 10,000 ([Conventional Ports](ports)):
 
 | Service | Section | Clear | Secure |
 | ------- | ------- | ----- | ------ |

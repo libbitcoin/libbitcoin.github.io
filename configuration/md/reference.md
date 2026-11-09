@@ -59,7 +59,7 @@ turbo = true
 
 ## 3. Store tables (`[table.*]`)
 
-The sizing of each store table. These are advanced settings and are rarely changed (§9).
+The sizing of each store table. These are advanced settings and are rarely changed ([Store Settings](store)).
 
 ```ini
 [table.candidate]

@@ -259,12 +259,23 @@
       <details class="drop" name="site"><summary>Getting Started</summary><div>
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html">Quick Start</a>
-        <a href="../configuration/index.html">Configuration</a>
-        <a href="../configuration/reference.html">Settings Reference</a>
         <a href="../building/platforms.html">Platform Coverage</a>
+        <a href="../configuration/public.html">Public Servers</a>
         <a href="../building/status.html">Build Status</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Configuration</summary><div>
+        <a href="../configuration/index.html">Overview</a>
+        <a href="../configuration/command-line.html">Command Line</a>
+        <a href="../configuration/file.html">Configuration File</a>
+        <a href="../configuration/setups.html">Common Setups</a>
+        <a href="../configuration/ports.html">Conventional Ports</a>
+        <a href="../configuration/store.html">Store Settings</a>
+        <a href="../configuration/services.html">Service Settings</a>
+        <a href="../configuration/performance.html">Performance Settings</a>
+        <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../configuration/bx.html">BX Settings</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync BS</a>
@@ -336,7 +347,7 @@
 <p>The Bitcoin P2P interface is Bitcoin's wire protocol, on which <code>bs</code> both
 syncs the chain and serves it. It is configured by the <code>[network]</code>,
 <code>[peer]</code>, <code>[inbound]</code>, <code>[outbound]</code> and <code>[manual]</code> sections (see
-<a href="../configuration/index.html#517-peer-services-and-policy">Configuration
+<a href="../configuration/setups.html#17-peer-services-and-policy">Configuration
 §5.17</a>).</p>
 <p>P2P and P2PS (BIP324) are reached on the same port:</p>
 <div class="scroller"><table>
@@ -669,7 +680,7 @@ an unrequested or invalid header, block, or transaction. There is no
 banning. <code>network.blacklist</code> and <code>network.whitelist</code> set which addresses
 connect at all.</p>
 <p>Limits that protect against denial of service apply to every service,
-including P2P (see <a href="../configuration/index.html#75-limits">Configuration §7.5</a>).</p>
+including P2P (see <a href="../configuration/services.html#5-limits">Configuration §7.5</a>).</p>
 <h2 id="3-handshake">3. Handshake<a class="anchor" href="#3-handshake" aria-label="Link to this section">#</a></h2>
 <h3 id="version">version<a class="anchor" href="#version" aria-label="Link to this section">#</a></h3>
 <p>Sent on connection, with:</p>

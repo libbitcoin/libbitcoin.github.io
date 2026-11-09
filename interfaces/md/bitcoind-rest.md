@@ -88,7 +88,7 @@ Each response carries one of these statuses
 
 A credential's method list names REST endpoints by these method names,
 which are distinct from the RPC names (see
-[Configuration §7.3](../configuration/index#73-authentication)):
+[Configuration §7.3](../configuration/services#3-authentication)):
 
 | Endpoint | Method name |
 | -------- | ----------- |

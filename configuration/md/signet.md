@@ -158,7 +158,7 @@ The store is the same `signet` store.
 ## Ports
 
 On signet, each service listens by default on its
-mainnet port plus 30,000 ([Ports](index#6-ports)):
+mainnet port plus 30,000 ([Conventional Ports](ports)):
 
 | Service | Section | Clear | Secure |
 | ------- | ------- | ----- | ------ |

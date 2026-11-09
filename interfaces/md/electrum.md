@@ -228,7 +228,7 @@ The service starts only with an address and a connection limit. The
 script, script hash and address methods require the address index, and
 return -32601 without it. To serve clients that expect the usual ports,
 bind 50001 and 50002 instead. See
-[Configuration §5.7](../configuration/index#57-electrum-server) for TLS,
+[Configuration §5.7](../configuration/setups#7-electrum-server) for TLS,
 credentials and limits.
 
 ## 3. Server

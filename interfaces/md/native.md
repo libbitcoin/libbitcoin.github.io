@@ -5,7 +5,7 @@ websocket. It navigates blocks, headers, transactions, inputs, outputs,
 spenders and addresses, and serves each object as JSON, as raw bytes, or
 as hex text.
 It also serves the embedded block explorer (see
-[Configuration](../configuration/index#56-block-explorer)).
+[Configuration](../configuration/setups#6-block-explorer)).
 
 Its protocols share one port, and their secure forms share another:
 
@@ -864,7 +864,7 @@ Formats: `json`, `data`, `text`. Options: `stop`.
 
 Address methods identify an address by its script hash (§2.1). They
 require the address index, which is enabled unless disabled
-([Configuration §5.13](../configuration/index#513-disable-the-address-index)),
+([Configuration §5.13](../configuration/setups#13-disable-the-address-index)),
 and return 501 without it.
 
 ### address

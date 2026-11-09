@@ -259,12 +259,23 @@
       <details class="drop" name="site"><summary>Getting Started</summary><div>
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html">Quick Start</a>
-        <a href="../configuration/index.html">Configuration</a>
-        <a href="../configuration/reference.html">Settings Reference</a>
         <a href="../building/platforms.html">Platform Coverage</a>
+        <a href="../configuration/public.html">Public Servers</a>
         <a href="../building/status.html">Build Status</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Configuration</summary><div>
+        <a href="../configuration/index.html">Overview</a>
+        <a href="../configuration/command-line.html">Command Line</a>
+        <a href="../configuration/file.html">Configuration File</a>
+        <a href="../configuration/setups.html">Common Setups</a>
+        <a href="../configuration/ports.html">Conventional Ports</a>
+        <a href="../configuration/store.html">Store Settings</a>
+        <a href="../configuration/services.html">Service Settings</a>
+        <a href="../configuration/performance.html">Performance Settings</a>
+        <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../configuration/bx.html">BX Settings</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync BS</a>
@@ -512,7 +523,7 @@ credential = monitor:secret:getblockcount,getblockchaininfo
 </code></pre>
 <p>Each <code>credential</code> is <code>username:password</code>, optionally followed by the
 methods it may call (see
-<a href="../configuration/index.html#73-authentication">Configuration §7.3</a>). With no
+<a href="../configuration/services.html#3-authentication">Configuration §7.3</a>). With no
 credential, no authentication is required. The credential is stored as
 written, and its password may not contain <code>:</code>.</p>
 <p>Clients of <code>bs</code> and of bitcoind can authenticate with HTTP basic
@@ -544,7 +555,7 @@ connection is closed.</p>
 method binding. With <code>bitcoind.cert_auth</code> set, each secure
 connection must present a client certificate trusted by one of the files
 in that directory (see
-<a href="../configuration/index.html#72-secure-connections">Configuration §7.2</a>).
+<a href="../configuration/services.html#2-secure-connections">Configuration §7.2</a>).
 This also restricts TCPS clients, which carry no credentials.</p>
 <h3 id="24-transports">2.4 Transports<a class="anchor" href="#24-transports" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>

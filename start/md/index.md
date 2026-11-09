@@ -36,7 +36,9 @@ $ bs
 With no configuration, `bs` syncs mainnet into a `mainnet` store in the
 current directory, creating it if it does not exist. Progress is logged
 to the console. To stop, type `c` and `<enter>`, or press `<ctrl> c`. A
-restart resumes where it stopped.
+restart resumes where it stopped. To sync a test chain, or to stop at a
+height, see [Command Line](../configuration/command-line) and
+[Common Setups](../configuration/setups).
 
 The time a sync takes and the space its store needs are shown on the
 [Sync BS](../sync.html) and [Footprint](../footprint.html) pages.
@@ -77,8 +79,14 @@ the node is current.
 
 ## 4. Next
 
-- [Configuration](../configuration/index): common setups, such as
-  milestone sync, TLS, credentials and test networks.
+- [Configuration](../configuration/index): the command line and
+  configuration file, and every setting.
+- [Common Setups](../configuration/setups): milestone sync, each
+  service, client filters, silent payments and anonymizing networks.
+- [Service Settings](../configuration/services): TLS, credentials and
+  client certificates.
+- [Performance Settings](../configuration/performance): processor, GPU
+  and network settings.
 - [Interfaces](../interfaces/index): every interface, its methods and
   examples.
 - [Building](../building/index): platforms, build options and hardware

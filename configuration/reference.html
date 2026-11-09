@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Configuration: Settings Reference</title>
-<meta name="description" content="Configuring Bitcoin Server (bs): command line options, the running console and the configuration file.">
+<meta name="description" content="Configuring Bitcoin Server (bs): the command line, the configuration file, common setups, ports, services, performance, the store and the test chains.">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
 <link rel="canonical" href="https://libbitcoin.org/configuration/reference.html">
 <script>
@@ -42,7 +42,7 @@
 <meta property="og:site_name" content="libbitcoin">
 <meta property="og:url" content="https://libbitcoin.org/configuration/reference.html">
 <meta property="og:title" content="Configuration: Settings Reference">
-<meta property="og:description" content="Configuring Bitcoin Server (bs): command line options, the running console and the configuration file.">
+<meta property="og:description" content="Configuring Bitcoin Server (bs): the command line, the configuration file, common setups, ports, services, performance, the store and the test chains.">
 <meta property="og:image" content="https://libbitcoin.org/card3.png">
 <meta property="og:image:secure_url" content="https://libbitcoin.org/card3.png">
 <meta property="og:image:type" content="image/png">
@@ -51,7 +51,7 @@
 <meta property="og:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server speaking Electrum, bitcoind, btcd, ZeroMQ, Stratum and the peer protocol.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Configuration: Settings Reference">
-<meta name="twitter:description" content="Configuring Bitcoin Server (bs): command line options, the running console and the configuration file.">
+<meta name="twitter:description" content="Configuring Bitcoin Server (bs): the command line, the configuration file, common setups, ports, services, performance, the store and the test chains.">
 <meta name="twitter:image" content="https://libbitcoin.org/card3.png">
 <meta name="twitter:image:alt" content="Libbitcoin is Coming &mdash; a Bitcoin full node and query server.">
 <style>
@@ -256,15 +256,26 @@
     <h1>Settings Reference</h1>
     <nav class="menu site">
       <a href="../index.html">Home</a>
-      <details class="drop here" name="site"><summary>Getting Started</summary><div>
+      <details class="drop" name="site"><summary>Getting Started</summary><div>
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html">Quick Start</a>
-        <a href="../configuration/index.html">Configuration</a>
-        <a href="../configuration/reference.html" class="here">Settings Reference</a>
         <a href="../building/platforms.html">Platform Coverage</a>
+        <a href="../configuration/public.html">Public Servers</a>
         <a href="../building/status.html">Build Status</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
+      </div></details>
+      <details class="drop here" name="site"><summary>Configuration</summary><div>
+        <a href="../configuration/index.html">Overview</a>
+        <a href="../configuration/command-line.html">Command Line</a>
+        <a href="../configuration/file.html">Configuration File</a>
+        <a href="../configuration/setups.html">Common Setups</a>
+        <a href="../configuration/ports.html">Conventional Ports</a>
+        <a href="../configuration/store.html">Store Settings</a>
+        <a href="../configuration/services.html">Service Settings</a>
+        <a href="../configuration/performance.html">Performance Settings</a>
+        <a href="../configuration/reference.html" class="here">Settings Reference</a>
+        <a href="../configuration/bx.html">BX Settings</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync BS</a>
@@ -312,17 +323,27 @@
     </nav>
     <p class="lede">
       Configuring <strong>Bitcoin Server</strong> (bs):
-      command line options, the running console and the configuration file.
+      the command line, the configuration file, common setups, ports,
+      services, performance, the store and the test chains.
     </p>
   </header>
 
   <nav class="menu">
-    <a href="index.html">Configuration</a>
+    <a href="index.html">Overview</a>
+    <a href="command-line.html">Command Line</a>
+    <a href="file.html">Configuration File</a>
+    <a href="setups.html">Common Setups</a>
+    <a href="ports.html">Conventional Ports</a>
+    <a href="public.html">Public Servers</a>
+    <a href="store.html">Store Settings</a>
+    <a href="services.html">Service Settings</a>
+    <a href="performance.html">Performance Settings</a>
+    <a href="reference.html" class="here">Settings Reference</a>
+    <a href="bx.html">BX Settings</a>
     <a href="testnet3.html">Testnet3</a>
     <a href="testnet4.html">Testnet4</a>
     <a href="signet.html">Signet</a>
     <a href="regtest.html">Regtest</a>
-    <a href="reference.html" class="here">Settings Reference</a>
   </nav>
 
   <article class="doc">
@@ -375,7 +396,7 @@ path = mainnet
 turbo = true
 </code></pre>
 <h2 id="3-store-tables-table">3. Store tables (<code>[table.*]</code>)<a class="anchor" href="#3-store-tables-table" aria-label="Link to this section">#</a></h2>
-<p>The sizing of each store table. These are advanced settings and are rarely changed (§9).</p>
+<p>The sizing of each store table. These are advanced settings and are rarely changed (<a href="store.html">Store Settings</a>).</p>
 <pre><code class="language-ini"><span class="section">[table.candidate]</span>
 <span class="comment"># The number of buckets provisioned in the candidate table head, defaults to '950001'.</span>
 buckets = 950001
@@ -1411,7 +1432,7 @@ server = libbitcoin/4
 </code></pre>
   </article>
 
-  <nav class="pager"><a href="regtest.html">&larr; Regtest</a><span></span></nav>
+  <nav class="pager"><a href="performance.html">&larr; Performance Settings</a><a href="bx.html">BX Settings &rarr;</a></nav>
 
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>

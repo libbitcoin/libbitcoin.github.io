@@ -3,7 +3,7 @@
 The admin interface streams the node's log and events over websocket,
 served on the `[admin]` binding. The embedded console is a page of this
 interface, and can be replaced with a custom site (see [Configuration
-§5.5](../configuration/index#55-admin-site)).
+§5.5](../configuration/setups#5-admin-site)).
 
 Its protocols share one port, and their secure forms share another:
 
@@ -119,7 +119,7 @@ does not permit, closes the connection. An unknown path is ignored.
 ### 2.6 Credentials
 
 A credential's method list names `log_subscribe` and `event_subscribe`
-(see [Configuration §7.3](../configuration/index#73-authentication)).
+(see [Configuration §7.3](../configuration/services#3-authentication)).
 
 ## 3. Methods
 

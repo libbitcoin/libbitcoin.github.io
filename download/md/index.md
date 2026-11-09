@@ -76,7 +76,7 @@ builds do and the macOS builds do not. The driver is loaded when `bs`
 runs, so a build with CUDA also runs without a GPU. The `cuda ecc` line
 appears only when a device is present, and shows whether it supports
 error correcting memory and whether that is enabled (see
-[GPU error correction](../configuration/#gpu-error-correction)).
+[GPU error correction](../configuration/performance#gpu-error-correction)).
 `bx hardware` prints the same list.
 
 ## 3. Verifying a build
