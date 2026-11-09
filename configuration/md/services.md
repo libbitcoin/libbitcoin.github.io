@@ -17,9 +17,28 @@ connections:
 | `connections` | Maximum concurrent connections. `0` disables the service. |
 
 An address of `0.0.0.0` (or `[::]` for IPv6) listens on all interfaces,
-and `127.0.0.1` (or `[::1]` for IPv6) on the local machine only. Client
-services other than `[admin]` and `[native]` wait until the chain is
-current before accepting connections (`node.delay_inbound`).
+and `127.0.0.1` (or `[::1]` for IPv6) on the local machine only.
+
+### Until current
+
+By default, while the node syncs it accepts no inbound connections other
+than to `[admin]` and `[native]`, the admin site and block explorer. P2P
+peers (`[inbound]`) and the other client services are refused until the
+chain is current: until the confirmed top block is within
+`node.currency_window_minutes` (one day) of the present, or reaches
+`node.maximum_height`. A service that is configured but not yet accepting
+connections is therefore expected during sync.
+
+To accept every inbound connection from the start, while the chain is
+still syncing:
+
+```ini
+[node]
+delay_inbound = false
+```
+
+A client connected before the chain is current sees the chain as of the
+sync, not the network's top.
 
 ## 2. Secure connections
 

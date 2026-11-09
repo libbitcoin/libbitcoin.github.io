@@ -377,9 +377,22 @@ connections:</p>
 </tbody>
 </table></div>
 <p>An address of <code>0.0.0.0</code> (or <code>[::]</code> for IPv6) listens on all interfaces,
-and <code>127.0.0.1</code> (or <code>[::1]</code> for IPv6) on the local machine only. Client
-services other than <code>[admin]</code> and <code>[native]</code> wait until the chain is
-current before accepting connections (<code>node.delay_inbound</code>).</p>
+and <code>127.0.0.1</code> (or <code>[::1]</code> for IPv6) on the local machine only.</p>
+<h3 id="until-current">Until current<a class="anchor" href="#until-current" aria-label="Link to this section">#</a></h3>
+<p>By default, while the node syncs it accepts no inbound connections other
+than to <code>[admin]</code> and <code>[native]</code>, the admin site and block explorer. P2P
+peers (<code>[inbound]</code>) and the other client services are refused until the
+chain is current: until the confirmed top block is within
+<code>node.currency_window_minutes</code> (one day) of the present, or reaches
+<code>node.maximum_height</code>. A service that is configured but not yet accepting
+connections is therefore expected during sync.</p>
+<p>To accept every inbound connection from the start, while the chain is
+still syncing:</p>
+<pre><code class="language-ini"><span class="section">[node]</span>
+delay_inbound = false
+</code></pre>
+<p>A client connected before the chain is current sees the chain as of the
+sync, not the network's top.</p>
 <h2 id="2-secure-connections">2. Secure connections<a class="anchor" href="#2-secure-connections" aria-label="Link to this section">#</a></h2>
 <p>A <code>safe</code> address serves TLS, and requires a server certificate and its
 private key. Without both, the service does not listen on its <code>safe</code>
