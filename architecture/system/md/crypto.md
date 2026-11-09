@@ -74,11 +74,18 @@ Constant time is tested only in part. The secp256k1 secret key operations
 ElligatorSwift key creation and exchange) are tested under Valgrind
 memcheck (`test/crypto/secp256k1/ctime.cpp`): each secret is marked
 undefined, so a branch or memory access that depends on it is reported as
-an error. These tests run in one CI build, a GCC debug build with the
-`--with-valgrind` option, so they cover neither optimized builds, which
-may introduce secret-dependent branches, nor other compilers or platforms.
-The other constant time code, including AES, GHASH and the NIST curves, is
-constant time by construction but not tested for it.
+an error, and public outputs are declassified. Bitcoin Explorer (`bx`)
+runs the same check on its signing commands (`input-sign` for P2PKH and
+P2WPKH, and `message-sign` with compressed and uncompressed keys).
+
+These tests pass in CI on Linux x64 in optimized release builds (`-O3`,
+static) with GCC 14 and Clang 18, with intrinsics off, since Valgrind
+cannot execute SHA-NI or AVX-512. They also pass on Linux arm64 with GCC
+and Clang, outside of CI. They do not cover macOS or Windows, where
+Valgrind is not available, 32-bit builds, or builds with intrinsics on. The other constant time code, including AES, GHASH and the
+NIST curves, is constant time by construction and not tested under
+Valgrind; Welch t-tests of the NIST curves found no measurable timing
+difference with GCC, Clang or MSVC.
 
 ## 3. secp256k1
 

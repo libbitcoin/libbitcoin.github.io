@@ -119,9 +119,11 @@ Actions) is built with `--coverage`, and its lcov output is reported to
 excluding the paths listed in the repository's `coverage` element of the
 build model.
 
-**Constant time.** A libbitcoin-system job in the expanded matrix runs the
-secp256k1 constant-time tests under [valgrind](https://valgrind.org/), which reports any branch or
-memory access that depends on secret data.
+**Constant time.** In the expanded matrix, libbitcoin-system and
+libbitcoin-explorer each run their constant-time tests under
+[valgrind](https://valgrind.org/), in GCC 14 and Clang 18 release builds
+on Linux x64, and they also pass on Linux arm64 outside of CI. Valgrind reports any branch or memory access that depends
+on secret data ([Crypto](../system/crypto#2-native-vector-and-constant-time)).
 
 **Fuzzing.** libbitcoin-system is a module of
 [bitcoinfuzz](https://github.com/bitcoinfuzz/bitcoinfuzz), a differential

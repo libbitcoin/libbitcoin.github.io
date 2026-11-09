@@ -282,7 +282,7 @@ libbitcoin-system:
 | `macos-latest` | Clang | gnu and cmake, debug and release, static and dynamic |
 | `ubuntu-24.04` | Clang 18, 19; GCC 13, 14, 15, 16 | gnu, cmake and presets |
 | `ubuntu-24.04` | GCC 13 | one gnu job with lcov coverage |
-| `ubuntu-24.04` | GCC 14 with valgrind | gnu debug static, `--with-valgrind --build-valgrind=secp256k1_ctime_tests` |
+| `ubuntu-24.04` | GCC 14 and Clang 18 with valgrind | gnu release static, intrinsics off, `--with-valgrind --build-valgrind=secp256k1_ctime_tests` |
 
 Each job checks out the repository and runs its install script with
 `--build-use-local-src` and the job's `--build-config` and `--build-link`.

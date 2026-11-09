@@ -700,9 +700,11 @@ Actions) is built with <code>--coverage</code>, and its lcov output is reported 
 <a href="https://coveralls.io/github/libbitcoin/libbitcoin-system">Coveralls</a>,
 excluding the paths listed in the repository's <code>coverage</code> element of the
 build model.</p>
-<p><strong>Constant time.</strong> A libbitcoin-system job in the expanded matrix runs the
-secp256k1 constant-time tests under <a href="https://valgrind.org/">valgrind</a>, which reports any branch or
-memory access that depends on secret data.</p>
+<p><strong>Constant time.</strong> In the expanded matrix, libbitcoin-system and
+libbitcoin-explorer each run their constant-time tests under
+<a href="https://valgrind.org/">valgrind</a>, in GCC 14 and Clang 18 release builds
+on Linux x64, and they also pass on Linux arm64 outside of CI. Valgrind reports any branch or memory access that depends
+on secret data (<a href="../system/crypto.html#2-native-vector-and-constant-time">Crypto</a>).</p>
 <p><strong>Fuzzing.</strong> libbitcoin-system is a module of
 <a href="https://github.com/bitcoinfuzz/bitcoinfuzz">bitcoinfuzz</a>, a differential
 fuzzer that runs the same inputs through several Bitcoin implementations
