@@ -490,21 +490,21 @@
 <td>58380 / 58343</td>
 </tr>
 <tr>
-<td>Native web and REST</td>
+<td>Native</td>
 <td>8180 / 8143</td>
 <td>18180 / 18143</td>
 <td>48180 / 48143</td>
 <td>58180 / 58143</td>
 </tr>
 <tr>
-<td>Bitcoind RPC and REST</td>
+<td>Bitcoind</td>
 <td>8280 / 8243</td>
 <td>18280 / 18243</td>
 <td>48280 / 48243</td>
 <td>58280 / 58243</td>
 </tr>
 <tr>
-<td>BTCD RPC</td>
+<td>BTCD</td>
 <td>8480 / 8443</td>
 <td>18480 / 18443</td>
 <td>48480 / 48443</td>
@@ -555,7 +555,7 @@
   var scroller = marker.nextElementSibling;
   if (!scroller || !scroller.querySelector("table")) return;
   var hosts = ["wormer.libbitcoin.net", "carmine.libbitcoin.net"];
-  var http = ["Native web and REST", "Bitcoind RPC and REST", "BTCD RPC", "Electrum", "Sparrow", "Esplora"];
+  var http = ["Native", "Bitcoind", "BTCD", "Electrum", "Sparrow", "Esplora"];
   var genesis = {
     mainnet: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
     testnet3: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
@@ -563,8 +563,8 @@
     testnet5: "000000000001bd3ade1e24d07c1a3677d4868c34f2f1696fa419e3b9f061b1e0"
   };
   var paths = {
-    "Native web and REST": "/v1/block/height/0?format=json",
-    "Bitcoind RPC and REST": function (chain) { return "/rest/block/" + genesis[chain] + ".json"; },
+    "Native": "/v1/block/height/0?format=json",
+    "Bitcoind": function (chain) { return "/rest/block/" + genesis[chain] + ".json"; },
     "Esplora": function (chain) { return "/block/" + genesis[chain]; }
   };
   var electrum = [
@@ -574,19 +574,46 @@
   var requests = {
     "Electrum": electrum,
     "Sparrow": electrum,
-    "BTCD RPC": function (chain) { return { jsonrpc: "1.0", id: 1, method: "getblock", params: [genesis[chain], 2] }; }
+    "BTCD": function (chain) { return { jsonrpc: "1.0", id: 1, method: "getblock", params: [genesis[chain], 2] }; }
   };
 
-  function open(target, body) {
-    var view = window.open("about:blank", "_blank");
-    var show = function (text, type) {
+  function popup(target) {
+    return window.open(target, "server-query", "popup,width=540,height=450");
+  }
+
+  function pretty(text) {
+    try {
+      return JSON.stringify(JSON.parse(text), null, 2);
+    } catch (e) {
+      try {
+        return text.split("\n").filter(function (line) { return line.trim(); })
+          .map(function (line) { return JSON.stringify(JSON.parse(line), null, 2); }).join("\n");
+      } catch (e2) {
+        return text;
+      }
+    }
+  }
+
+  function escape(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function open(target, body, title) {
+    var view = popup("about:blank");
+    var show = function (text) {
       if (!view) return;
-      var blob = new Blob([text], { type: type });
+      var page = "<!doctype html><meta charset=\"utf-8\"><title>" + escape(title) +
+        "</title><style>:root{color-scheme:light dark}body{margin:0}" +
+        "pre{margin:0;padding:12px;font:13px/1.4 ui-monospace,Consolas,monospace}</style><pre>" +
+        escape(pretty(text)) + "</pre>";
+      var blob = new Blob([page], { type: "text/html;charset=utf-8" });
       view.location.href = URL.createObjectURL(blob);
     };
-    fetch(target, { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) })
+    var options = body === undefined ? { cache: "no-store" } :
+      { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(body) };
+    fetch(target, options)
       .then(function (response) { return response.text(); })
-      .then(function (text) { show(text, "application/json"); }, function () {
+      .then(show, function () {
         if (view) view.location.href = failure("unreadable", target);
       });
   }
@@ -693,20 +720,17 @@
         ports.forEach(function (port, j) {
           var where = typeof path === "function" ? path(chain) : path;
           var body = typeof request === "function" ? request(chain) : request;
+          var name = host.split(".")[0];
+          var title = name.charAt(0).toUpperCase() + name.slice(1) + " " + service + " " + chain.charAt(0).toUpperCase() + chain.slice(1) + " Genesis" + (port.slice(-2) === "43" ? " (Secure)" : " (Clear)");
           if (j) cells[i].appendChild(document.createTextNode(" / "));
           var span = document.createElement(where || request ? "a" : "span");
           span.textContent = port;
           if (where || request) {
-            span.target = "_blank";
-            span.rel = "noopener";
-          }
-          if (where) span.href = url(host, port, where);
-          if (request) {
-            span.href = url(host, port);
+            span.href = url(host, port, where);
             span.addEventListener("click", function (event) {
               event.preventDefault();
-              if (span.dataset.reason) window.open(failure(span.dataset.reason, url(host, port)), "_blank");
-              else open(url(host, port), body);
+              if (span.dataset.reason) popup(failure(span.dataset.reason, span.href));
+              else open(span.href, body, title);
             });
           }
           cells[i].appendChild(span);
@@ -718,7 +742,6 @@
             var up = state === "up";
             span.className = up ? "scan-up" : "scan-down";
             if (!up) span.dataset.reason = state;
-            if (!up && where) span.href = failure(state, url(host, port, where));
             span.title = up ? "Answered" : "No answer";
           });
         });
