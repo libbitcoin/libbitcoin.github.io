@@ -518,9 +518,9 @@ build systems.</p>
 runners use the current GitHub images, so their exact compiler versions
 follow those images.</p>
 <h2 id="4-release-builds">4. Release builds<a class="anchor" href="#4-release-builds" aria-label="Link to this section">#</a></h2>
-<p>Release binaries are built with CMake on Linux and macOS and with Visual
-Studio on Windows, statically linked to libbitcoin, in
-variants for each set of hardware options, for example:</p>
+<p>Release binaries are cross-compiled with CMake on Linux, in a pinned Guix
+container, statically linked to libbitcoin, in variants for each set of
+hardware options:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -531,60 +531,44 @@ variants for each set of hardware options, for example:</p>
 </thead>
 <tbody>
 <tr>
-<td>Linux x64 (glibc)</td>
-<td>Clang 18</td>
+<td>Linux x64 (glibc 2.31)</td>
+<td>GCC 14</td>
 <td>AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations</td>
 </tr>
 <tr>
-<td>Linux ARM64</td>
+<td>Linux ARM64 (glibc 2.31)</td>
 <td>GCC 14</td>
 <td>Baseline, SHA-2, SHA-3</td>
 </tr>
 <tr>
 <td>macOS ARM64</td>
-<td>Apple clang</td>
+<td>clang 19, Apple SDK</td>
 <td>SHA-2, SHA-3, AES</td>
 </tr>
 <tr>
 <td>macOS x64</td>
-<td>Apple clang</td>
+<td>clang 19, Apple SDK</td>
 <td>AVX2, SSE4.1, AES-NI</td>
 </tr>
 <tr>
 <td>Windows x64</td>
-<td>MSVC v145</td>
+<td>clang-cl 21, MSVC libraries and Windows SDK</td>
 <td>AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations</td>
 </tr>
 <tr>
 <td>Windows ARM64</td>
-<td>MSVC v145</td>
+<td>clang-cl 21, MSVC libraries and Windows SDK</td>
 <td>Baseline, SHA-2, SHA-3</td>
 </tr>
 </tbody>
 </table></div>
 <p>On Linux builds, the C library remains dynamic.</p>
 <h2 id="5-deterministic-builds">5. Deterministic builds<a class="anchor" href="#5-deterministic-builds" aria-label="Link to this section">#</a></h2>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Toolchain</th>
-<th>Builds</th>
-<th>Reference</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Guix</td>
-<td>The release builds, in a Guix environment</td>
-<td><a href="status.html#2-releases">Build Status</a></td>
-</tr>
-<tr>
-<td>Double Build</td>
-<td>A release build, built twice on separate runners and compared by hash</td>
-<td><a href="../architecture/build/deterministic.html">Deterministic builds</a></td>
-</tr>
-</tbody>
-</table></div>
+<p>Every release build is made twice, on separate runners, and is released
+only if both are bit-identical. Anyone can rebuild a release with Guix
+and compare it with the published files. See
+<a href="../architecture/build/deterministic.html">Deterministic builds</a> and
+<a href="status.html#2-releases">Build Status</a>.</p>
 <h2 id="6-cuda">6. CUDA<a class="anchor" href="#6-cuda" aria-label="Link to this section">#</a></h2>
 <p>No CUDA toolchain is required. The GPU verification kernels are part of
 the source, as compressed PTX (<code>src/crypto/secp256k1/cuda/ptx.cpp</code> in

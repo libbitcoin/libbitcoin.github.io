@@ -335,21 +335,26 @@
   </nav>
 
   <article class="doc">
-<p>How release builds of <code>bs</code> are made reproducible, so that anyone building
-the same source gets the same files as those released.</p>
-<p>The first step is the Double Build: two independent builders on GitHub's
-hosted runners build the same commits, and the run passes only if their
-output is bit-identical. Guix, a pinned and bootstrappable toolchain, is
-the later step.</p>
+<p>Every published <code>bs</code> and <code>selector</code> binary is built in a
+<a href="https://guix.gnu.org/">Guix</a> container from a pinned, bootstrappable
+toolchain. Each release build is made twice, by two builders on separate
+runners, and the release continues only if the two are bit-identical.
+Anyone with a Linux machine and Guix can rebuild a release from its tags
+and compare the result with the published files.</p>
 <h2 id="1-double-build">1. Double Build<a class="anchor" href="#1-double-build" aria-label="Link to this section">#</a></h2>
-<p><code>double-build.yml</code>, in libbitcoin-server, runs on push and by hand. Run by
-hand, it takes a branch or tag (<code>ref</code>) for all five repositories, by
-default the branch it runs on.</p>
+<p><code>double-build.yml</code>, in libbitcoin-server, is run by hand or by
+<a href="release.html#2-build-to-release">Build to Release</a>. Run by hand, it takes a
+branch or tag (<code>ref</code>) for all five repositories, by default the branch it
+runs on. Called by the release, it takes the release's tag for each.</p>
 <div class="mermaid">
 flowchart TD
-    trigger["push or by hand"] --&gt; resolve["resolve&lt;br/&gt;commits"]
-    resolve --&gt; a["builder a&lt;br/&gt;build and hash"]
-    resolve --&gt; b["builder b&lt;br/&gt;build and hash"]
+    trigger["by hand or&lt;br/&gt;by the release"] --&gt; resolve["resolve&lt;br/&gt;commits"]
+    resolve --&gt; sdk["sdk&lt;br/&gt;package Apple and&lt;br/&gt;Windows SDKs"]
+    resolve --&gt; toolchain["toolchain&lt;br/&gt;build or restore&lt;br/&gt;Guix toolchains"]
+    sdk --&gt; a["builder a&lt;br/&gt;build and hash"]
+    toolchain --&gt; a
+    sdk --&gt; b["builder b&lt;br/&gt;build and hash"]
+    toolchain --&gt; b
     a --&gt; compare{"compare&lt;br/&gt;identical?"}
     b --&gt; compare
     compare --&gt;|yes| pass["run passes"]
@@ -365,27 +370,156 @@ flowchart TD
 <tbody>
 <tr>
 <td>resolve</td>
-<td>Resolves <code>ref</code> to one commit in each repository (<code>git ls-remote</code>, the tagged commit of an annotated tag), so that both builders build the same commits</td>
+<td>Resolves each <code>ref</code> to one commit in each repository (<code>git ls-remote</code>, the tagged commit of an annotated tag), so that both builders build the same commits</td>
 </tr>
 <tr>
-<td>build</td>
-<td>Two builders, each on its own <code>ubuntu-24.04</code> runner, differing in checkout path, time zone, umask, machine and start time</td>
+<td>sdk</td>
+<td>Packages the macOS SDK from Xcode on <code>macos-latest</code>, and the MSVC headers and libraries and the Windows SDK on <code>windows-latest</code>, as deterministic tar archives, and records their versions and hashes</td>
+</tr>
+<tr>
+<td>toolchain</td>
+<td>Builds each Guix toolchain from the pinned Guix commit, on each runner architecture, and caches its store closure under a hash of the Guix definitions</td>
+</tr>
+<tr>
+<td>guix</td>
+<td>Two builders per build. Each restores the toolchain, checks out the five repositories, builds in the Guix container and hashes its output</td>
 </tr>
 <tr>
 <td>compare</td>
-<td>Tabulates the hashes of both builds; if any differ, writes a diffoscope report per file and fails</td>
+<td>Tabulates the hashes of both builders for every build; if any differ or any is missing, writes a diffoscope report per file and fails</td>
 </tr>
 </tbody>
 </table></div>
-<p>Each builder builds as the release does: CMake, clang 18, static release,
-<code>-march=x86-64-v3 -mtune=generic -g</code> with AVX2 and SSE4.1, static C++ and
-GCC runtimes and a build ID. It then removes RPATH, separates the debug
-symbols into a compressed <code>.debug</code> file, strips the binary and adds a debug
-link. Its artifact holds <code>bs-linux-x64</code>, <code>selector-linux-x64</code>, their
-<code>.debug</code> files, <code>SHA256SUMS</code> and <code>toolchain.txt</code> (the runner image, clang,
-ld and cmake versions, path, time zone and umask).</p>
-<p>The Double Build compares its two builders with each other, not with a
-published release.</p>
+<p>The two builders of a Linux build run on different architectures:
+builder a on <code>ubuntu-24.04</code> (x64) and builder b on <code>ubuntu-24.04-arm</code>
+(arm64), each cross-compiling for its target. The macOS and Windows builds
+run both builders on <code>ubuntu-24.04</code>.</p>
+<h2 id="2-build-environment">2. Build environment<a class="anchor" href="#2-build-environment" aria-label="Link to this section">#</a></h2>
+<p>The build definition is in <code>.github/guix</code> of libbitcoin-server:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Defines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>channels.scm</code></td>
+<td>The Guix commit that pins every package</td>
+</tr>
+<tr>
+<td><code>manifest.scm</code></td>
+<td>The packages in the container for each host</td>
+</tr>
+<tr>
+<td><code>toolchains.scm</code></td>
+<td>The Linux cross toolchains, GCC 14 and binutils 2.46 against glibc 2.31</td>
+</tr>
+<tr>
+<td><code>patches/</code></td>
+<td>Patches to GCC and glibc for reproducible output</td>
+</tr>
+<tr>
+<td><code>guix-build.sh</code></td>
+<td>Starts the container for one build</td>
+</tr>
+<tr>
+<td><code>build.sh</code></td>
+<td>Configures, builds and packages one build inside the container</td>
+</tr>
+<tr>
+<td><code>package-sdk.sh</code></td>
+<td>Packages the Apple or Windows SDK</td>
+</tr>
+</tbody>
+</table></div>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Host</th>
+<th>Compiler</th>
+<th>Linker</th>
+<th>Platform files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x86_64-linux-gnu</code>, <code>aarch64-linux-gnu</code></td>
+<td>GCC 14 (Guix cross)</td>
+<td>binutils 2.46</td>
+<td>glibc 2.31</td>
+</tr>
+<tr>
+<td><code>x86_64-apple-darwin</code>, <code>arm64-apple-darwin</code></td>
+<td>clang 19</td>
+<td>lld 19</td>
+<td>Apple SDK from Xcode, macOS 13.3 minimum</td>
+</tr>
+<tr>
+<td><code>x86_64-pc-windows-msvc</code>, <code>aarch64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td>lld-link 21</td>
+<td>MSVC headers and libraries, Windows SDK</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>guix-build.sh</code> runs <code>guix time-machine</code> at the pinned commit, then
+<code>guix shell --container --pure --no-cwd</code>, so that nothing from the host
+reaches the build except the sources (shared at <code>/distsrc</code>), the output
+directory and the SDK. Inside, <code>build.sh</code>:</p>
+<ul>
+<li>sets <code>LC_ALL=C.UTF-8</code>, <code>TZ=UTC</code>, <code>HOME=/tmp</code> and umask <code>0022</code>,</li>
+<li>maps the source and every Guix store path out of the debug information
+  (<code>-ffile-prefix-map</code>), and omits the compiler command line
+  (<code>-gno-record-gcc-switches</code>),</li>
+<li>builds with <code>builds/cmake/install-cmake.sh</code> of the project, from the
+  local sources, <code>release</code> and <code>static</code>, without tests and without an
+  install RPATH,</li>
+<li>separates and packages the debug symbols, with fixed timestamps, and
+  strips the binary,</li>
+<li>writes <code>SHA256SUMS</code> for the binary and its symbols.</li>
+</ul>
+<p>Windows builds link with <code>-Brepro</code>. The Windows SDK is spelled for a
+case-insensitive filesystem, so the compiler and linker read it through a
+case-insensitive overlay.</p>
+<h2 id="3-reproducing-a-release">3. Reproducing a release<a class="anchor" href="#3-reproducing-a-release" aria-label="Link to this section">#</a></h2>
+<p>A release names the tag of each of the five repositories it was built
+from. Rebuilding it needs a Linux machine, x64 or arm64, that allows
+unprivileged user namespaces.</p>
+<p>First, install Guix 1.5.0 with its
+<a href="https://guix.gnu.org/manual/en/html_node/Binary-Installation.html">binary installer</a>.</p>
+<p>Clone the five repositories side by side in one directory, each at its
+release tag:</p>
+<pre class="console"><code>$ git clone --branch &lt;system tag&gt; https://github.com/libbitcoin/libbitcoin-system src/libbitcoin-system
+$ git clone --branch &lt;database tag&gt; https://github.com/libbitcoin/libbitcoin-database src/libbitcoin-database
+$ git clone --branch &lt;network tag&gt; https://github.com/libbitcoin/libbitcoin-network src/libbitcoin-network
+$ git clone --branch &lt;node tag&gt; https://github.com/libbitcoin/libbitcoin-node src/libbitcoin-node
+$ git clone --branch &lt;server tag&gt; https://github.com/libbitcoin/libbitcoin-server src/libbitcoin-server
+</code></pre>
+<p>Set the variables of the build, from its entry in the <code>guix</code> matrix of
+<code>.github/workflows/double-build.yml</code> at the server tag, and run
+<code>guix-build.sh</code> with the source and output directories. For
+<code>bs-linux-x64</code>:</p>
+<pre class="console"><code>$ HOST=x86_64-linux-gnu BASENAME=bs-linux-x64 \
+  OPTIONS=&quot;-Denable-avx2=ON -Denable-sse41=ON&quot; \
+  FLAGS=&quot;-march=x86-64-v3 -mtune=generic&quot; \
+  LINKFLAGS=&quot;-static-libstdc++ -static-libgcc&quot; \
+  bash src/libbitcoin-server/.github/guix/guix-build.sh src build
+</code></pre>
+<p>A <code>selector</code> build also sets <code>PROJECT=libbitcoin-system</code> and
+<code>PROGRAM=selector</code>. The first run builds the toolchain from source, which
+can take hours; later runs reuse it from the Guix store.</p>
+<p>Then compare <code>build/SHA256SUMS</code> with the hashes of the published files:</p>
+<pre class="console"><code>$ sha256sum bs-linux-x64 bs-linux-x64.debug
+</code></pre>
+<p>The checkout directory and the build machine do not affect the output.</p>
+<p>The macOS and Windows builds also need the SDK the release was built
+with: set <code>SDK</code> to the directory unpacked from the archive that
+<code>package-sdk.sh</code> writes, and <code>DEPLOYMENT_TARGET=13.3</code> for macOS. The
+archive is identical only from the same Xcode, or the same MSVC and
+Windows SDK versions. Each build's <code>toolchain.txt</code>, in the artifacts of
+the Double Build run, records those versions and the archive's hash.</p>
   </article>
 
   <nav class="pager"><a href="index.html">&larr; Build Architecture</a><a href="release.html">Release builds &rarr;</a></nav>

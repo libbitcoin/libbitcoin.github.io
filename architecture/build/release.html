@@ -343,7 +343,7 @@ flowchart TD
     tag["version-tag&lt;br/&gt;in each repository"] --&gt; dispatch["manual-release&lt;br/&gt;with the five tags"]
     dispatch --&gt; validate{"validate-tags&lt;br/&gt;tags exist?"}
     validate --&gt;|no| fail["run fails"]
-    validate --&gt;|yes| build["build-candidates&lt;br/&gt;build, strip, check&lt;br/&gt;each build"]
+    validate --&gt;|yes| build["double-build&lt;br/&gt;build each twice,&lt;br/&gt;compare"]
     build --&gt; approve1{{"approval"}}
     approve1 --&gt; sign["sign&lt;br/&gt;sign each file"]
     sign --&gt; approve2{{"approval"}}
@@ -386,37 +386,16 @@ jobs run in order.</p>
 <h3 id="21-validate-tags">2.1 validate-tags<a class="anchor" href="#21-validate-tags" aria-label="Link to this section">#</a></h3>
 <p>Checks out each repository at its tag, and fails unless each tag exists
 as a tag (not a branch or commit).</p>
-<h3 id="22-build-candidates">2.2 build-candidates<a class="anchor" href="#22-build-candidates" aria-label="Link to this section">#</a></h3>
-<p>One job for each build, all from the same tags. Each checks out the five
-repositories side by side and builds <code>bs</code> with the server's install
-script, using the local sources (<code>--build-use-local-src</code>) and skipping
-the tests (<code>--build-skip-tests</code>):</p>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Toolchain</th>
-<th>Script</th>
-<th>Configuration</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CMake (Linux, macOS)</td>
-<td><code>builds/cmake/install-cmake.sh</code></td>
-<td><code>release</code>, <code>static</code></td>
-</tr>
-<tr>
-<td>Visual Studio (Windows)</td>
-<td><code>builds/msvc/build-msvc.cmd</code></td>
-<td><code>StaticRelease</code>, toolset <code>v145</code>, <code>vs2026</code></td>
-</tr>
-</tbody>
-</table></div>
+<h3 id="22-double-build">2.2 double-build<a class="anchor" href="#22-double-build" aria-label="Link to this section">#</a></h3>
+<p>Runs the <a href="deterministic.html">Double Build</a> with the five tags. Each build is
+made twice in a pinned Guix container, cross-compiled on Linux runners,
+and the job fails unless both builders produce bit-identical files
+(<a href="deterministic.html">Deterministic builds</a>):</p>
 <div class="scroller"><table>
 <thead>
 <tr>
 <th>Build</th>
-<th>Runner</th>
+<th>Host</th>
 <th>Compiler</th>
 <th>Target</th>
 <th>Options</th>
@@ -425,167 +404,139 @@ the tests (<code>--build-skip-tests</code>):</p>
 <tbody>
 <tr>
 <td><code>bs-linux-x64</code></td>
-<td><code>ubuntu-24.04</code></td>
-<td>clang 18</td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
 <td><code>x86-64-v3</code></td>
 <td>avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-shani</code></td>
-<td><code>ubuntu-24.04</code></td>
-<td>clang 18</td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
 <td><code>x86-64-v3</code></td>
 <td>shani, avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avxifma</code></td>
-<td><code>ubuntu-24.04</code></td>
-<td>clang 18</td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
 <td><code>x86-64-v3</code></td>
 <td>avxifma, shani, avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avx512ifma</code></td>
-<td><code>ubuntu-24.04</code></td>
-<td>clang 18</td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
 <td><code>x86-64-v3</code></td>
 <td>avx512ifma, shani, avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64</code></td>
-<td><code>ubuntu-24.04-arm</code></td>
-<td>gcc 14</td>
+<td><code>aarch64-linux-gnu</code></td>
+<td>GCC 14</td>
 <td><code>armv8-a</code></td>
 <td></td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64-sha2</code></td>
-<td><code>ubuntu-24.04-arm</code></td>
-<td>gcc 14</td>
-<td><code>armv8-a+sha2+aes</code></td>
+<td><code>aarch64-linux-gnu</code></td>
+<td>GCC 14</td>
+<td><code>armv8-a+aes+sha2</code></td>
 <td>sha2, aes</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64-sha3</code></td>
-<td><code>ubuntu-24.04-arm</code></td>
-<td>gcc 14</td>
-<td><code>armv8.2-a+sha2+aes+sha3</code></td>
-<td>sha2, sha3, aes</td>
-</tr>
-<tr>
-<td><code>bs-macos-arm64</code></td>
-<td><code>macos-latest</code></td>
-<td>Apple Clang</td>
-<td><code>armv8.2-a+sha2+aes+sha3</code>, macOS 13.3</td>
+<td><code>aarch64-linux-gnu</code></td>
+<td>GCC 14</td>
+<td><code>armv8.2-a+aes+sha2+sha3</code></td>
 <td>sha2, sha3, aes</td>
 </tr>
 <tr>
 <td><code>bs-macos-x64</code></td>
-<td><code>macos-26-intel</code></td>
-<td>Apple Clang</td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
 <td><code>x86-64-v3</code>, macOS 13.3</td>
 <td>avx2, sse41, aesni</td>
 </tr>
 <tr>
+<td><code>bs-macos-arm64</code></td>
+<td><code>arm64-apple-darwin</code></td>
+<td>clang 19</td>
+<td>tuned for Apple M1, macOS 13.3</td>
+<td>sha2, sha3, aes</td>
+</tr>
+<tr>
 <td><code>bs-windows-x64</code></td>
-<td><code>windows-latest</code></td>
-<td>MSVC</td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
 <td>x64</td>
 <td>avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-shani</code></td>
-<td><code>windows-latest</code></td>
-<td>MSVC</td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
 <td>x64</td>
 <td>shani, avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avxifma</code></td>
-<td><code>windows-latest</code></td>
-<td>MSVC</td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
 <td>x64</td>
 <td>avxifma, shani, avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avx512ifma</code></td>
-<td><code>windows-latest</code></td>
-<td>MSVC</td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
 <td>x64</td>
 <td>avx512ifma, shani, avx2, sse41</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64</code></td>
-<td><code>windows-11-vs2026-arm</code></td>
-<td>MSVC</td>
-<td>ARM64</td>
+<td><code>aarch64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>armv8-a</code></td>
 <td></td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64-sha2</code></td>
-<td><code>windows-11-vs2026-arm</code></td>
-<td>MSVC</td>
-<td>ARM64</td>
+<td><code>aarch64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>armv8-a+aes+sha2</code></td>
 <td>sha2, aes</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64-sha3</code></td>
-<td><code>windows-11-vs2026-arm</code></td>
-<td>MSVC</td>
-<td>ARM64</td>
+<td><code>aarch64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>armv8.2-a+aes+sha2+sha3</code></td>
 <td>sha2, sha3, aes</td>
 </tr>
 </tbody>
 </table></div>
-<p>The same job also builds the <code>selector</code> of libbitcoin-system, which reports
-the processor's features, for the packages that choose a variant at install
-(<a href="packaging.html">Packaging</a>):</p>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Build</th>
-<th>Runner</th>
-<th>Compiler</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>selector-linux-x64</code></td>
-<td><code>ubuntu-24.04</code></td>
-<td>clang 18</td>
-</tr>
-<tr>
-<td><code>selector-linux-arm64</code></td>
-<td><code>ubuntu-24.04-arm</code></td>
-<td>gcc 14</td>
-</tr>
-<tr>
-<td><code>selector-windows-x64</code></td>
-<td><code>windows-latest</code></td>
-<td>MSVC (SSE2)</td>
-</tr>
-<tr>
-<td><code>selector-windows-arm64</code></td>
-<td><code>windows-11-vs2026-arm</code></td>
-<td>MSVC</td>
-</tr>
-</tbody>
-</table></div>
-<p>Every x64 build assumes AVX2 and SSE4.1 (<code>x86-64-v3</code>) as the baseline of
-its architecture.</p>
+<p>The same job also builds the <code>selector</code> of libbitcoin-system, which
+reports the processor's features, for the packages that choose a variant
+at install (<a href="packaging.html">Packaging</a>). It is built for each of the six
+hosts with no instruction set options: <code>selector-linux-x64</code>,
+<code>selector-linux-arm64</code>, <code>selector-macos-x64</code>, <code>selector-macos-arm64</code>,
+<code>selector-windows-x64</code> and <code>selector-windows-arm64</code>.</p>
 <p>Linux builds link the C++ and GCC runtimes statically
-(<code>-static-libstdc++ -static-libgcc</code>). Windows builds end in <code>.exe</code>.</p>
-<p>After the build, each job:</p>
+(<code>-static-libstdc++ -static-libgcc</code>) and require glibc 2.31 or later.
+Windows builds end in <code>.exe</code>.</p>
+<p>After the build, each builder:</p>
 <ol>
-<li>copies the program to its build name,</li>
-<li>removes any embedded RPATH/RUNPATH (<code>patchelf</code>, glibc Linux builds),</li>
-<li>separates its debug symbols from the binary and strips it,</li>
-<li>runs <code>--version</code> and <code>--hardware</code>, and shows the linkage (<code>ldd</code>,
-   <code>readelf -d</code>, <code>otool -L</code>),</li>
-<li>uploads the build and its symbols as artifacts, kept for one day.</li>
+<li>separates the debug symbols from the binary and strips it,</li>
+<li>runs <code>--version</code> and <code>--hardware</code> where the runner can execute the
+   build, and shows the linkage (<code>file</code>, and <code>readelf</code> for Linux),</li>
+<li>records the runner image, the Guix commit and any SDK versions in
+   <code>toolchain.txt</code>, and hashes its files,</li>
+<li>uploads its files for the comparison. Builder a also uploads the build
+   and its symbols for signing, kept for one day.</li>
 </ol>
-<p>Every build is compiled with debug information (<code>-g</code>, and a PDB with
-MSVC), and its symbols are published beside it:</p>
+<p>Every build is compiled with debug information, and its symbols are
+published beside it:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -603,7 +554,7 @@ MSVC), and its symbols are published beside it:</p>
 <tr>
 <td>macOS</td>
 <td><code>&lt;build&gt;.dSYM.zip</code></td>
-<td>UUID, which the job fails unless it matches</td>
+<td>UUID</td>
 </tr>
 <tr>
 <td>Windows</td>

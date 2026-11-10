@@ -86,27 +86,28 @@ follow those images.
 
 ## 4. Release builds
 
-Release binaries are built with CMake on Linux and macOS and with Visual
-Studio on Windows, statically linked to libbitcoin, in
-variants for each set of hardware options, for example:
+Release binaries are cross-compiled with CMake on Linux, in a pinned Guix
+container, statically linked to libbitcoin, in variants for each set of
+hardware options:
 
 | Platform | Compiler | Variants |
 | -------- | -------- | -------- |
-| Linux x64 (glibc) | Clang 18 | AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations |
-| Linux ARM64 | GCC 14 | Baseline, SHA-2, SHA-3 |
-| macOS ARM64 | Apple clang | SHA-2, SHA-3, AES |
-| macOS x64 | Apple clang | AVX2, SSE4.1, AES-NI |
-| Windows x64 | MSVC v145 | AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations |
-| Windows ARM64 | MSVC v145 | Baseline, SHA-2, SHA-3 |
+| Linux x64 (glibc 2.31) | GCC 14 | AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations |
+| Linux ARM64 (glibc 2.31) | GCC 14 | Baseline, SHA-2, SHA-3 |
+| macOS ARM64 | clang 19, Apple SDK | SHA-2, SHA-3, AES |
+| macOS x64 | clang 19, Apple SDK | AVX2, SSE4.1, AES-NI |
+| Windows x64 | clang-cl 21, MSVC libraries and Windows SDK | AVX2, with SHA-NI, AVX-IFMA and AVX-512 combinations |
+| Windows ARM64 | clang-cl 21, MSVC libraries and Windows SDK | Baseline, SHA-2, SHA-3 |
 
 On Linux builds, the C library remains dynamic.
 
 ## 5. Deterministic builds
 
-| Toolchain | Builds | Reference |
-| --------- | ------ | --------- |
-| Guix | The release builds, in a Guix environment | [Build Status](status#2-releases) |
-| Double Build | A release build, built twice on separate runners and compared by hash | [Deterministic builds](../architecture/build/deterministic) |
+Every release build is made twice, on separate runners, and is released
+only if both are bit-identical. Anyone can rebuild a release with Guix
+and compare it with the published files. See
+[Deterministic builds](../architecture/build/deterministic) and
+[Build Status](status#2-releases).
 
 ## 6. CUDA
 
