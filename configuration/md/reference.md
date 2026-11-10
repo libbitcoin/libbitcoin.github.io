@@ -9,16 +9,20 @@ area.
 
 ## 1. `[log]`
 
-Logging: which kinds of events are logged (unless changed at the console), and where log files are written.
+Logging: which kinds of events are logged (unless changed at the console), and whether and where log files are written.
 
 ```ini
 [log]
 # Enable application logging, defaults to 'true'.
 application = true
+# Write the console log to the pair of rotated log files, defaults to 'true'.
+console = true
+# Write events to the events log file, defaults to 'true'.
+events = true
 # Enable local fault logging, defaults to 'true'.
 fault = true
 # The maximum byte size of each pair of rotated log files, defaults to '1000000'.
-maximum_size = 1000000
+limit = 1000000
 # Enable news logging, defaults to 'true'.
 news = true
 # The log files directory, defaults to empty.
@@ -521,8 +525,8 @@ minimum_fee_rate = 0.000001
 provide_blocks = true
 # Serve client filters to network connections, defaults to 'false'.
 provide_filters = false
-# Provide opportunistic connection encryption, defaults to 'false'.
-provide_privacy = false
+# Provide opportunistic connection encryption, defaults to 'true'.
+provide_privacy = true
 # Serve witness data to network connections, defaults to 'true'.
 provide_witness = true
 # Require block service of outbound connections, defaults to 'true'.

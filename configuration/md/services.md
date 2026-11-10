@@ -170,7 +170,7 @@ services, and also have:
 | Setting | Purpose |
 | ------- | ------- |
 | `host` | Allowed `Host` header values ([RFC 9110 §7.2](https://www.rfc-editor.org/rfc/rfc9110.txt)). Multiple allowed. |
-| `origin` | Allowed `Origin` header values for cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454.txt)). Multiple allowed. |
+| `origin` | An origin allowed to make cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454.txt)), as a host and port without a scheme, matched against the request's `Origin` header. Multiple allowed. When any are set, the service's own host and port must be listed for the pages it serves to load. |
 | `allow_opaque_origin` | Allow requests with an opaque origin ([RFC 6454 §7.3](https://www.rfc-editor.org/rfc/rfc6454.txt)), such as from a page opened as a local file. |
 
 ## 5. Limits

@@ -536,7 +536,7 @@ the architecture docs refer to:
 | `provide_blocks` / `require_blocks` | `node_network` service bit; attach tree ([06](sessions-and-protocols))              |
 | `provide_witness` / `require_witness` | witness service bits; block/tx serving and requests ([06](sessions-and-protocols), [08](block-out-protocols), [10](transaction-protocols)) |
 | `provide_filters`          | `node_client_filters`; attaches filter serving ([09](filter-out-protocol))                |
-| `provide_privacy`          | silent payment service bit                                         |
+| `provide_privacy`          | `node_encrypted_transport` service bit; BIP324 on peer sockets ([06](sessions-and-protocols)) |
 | `limited_blocks`           | pruned node: bypassed blocks stored without input scripts ([06](sessions-and-protocols), [08](block-out-protocols)) |
 | `use_gpu`, `cpu_batch_verify`, `cpu_batch_silent`, `batch_verify`, `batch_silent` | batching ([04](validation-chaser)) |
 | `allowed_deviation`        | slow-peer detection ([03](download-chaser))                                           |

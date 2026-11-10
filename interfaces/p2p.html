@@ -617,8 +617,8 @@ while <code>node.delay_inbound</code> is set (the default).</p>
 <p><code>node_utxo</code> (bit 1) and <code>node_bloom</code> (bit 2) are never advertised. A peer
 advertising any of <code>peer.invalid_services</code> is refused.</p>
 <h3 id="23-encrypted-transport">2.3 Encrypted transport<a class="anchor" href="#23-encrypted-transport" aria-label="Link to this section">#</a></h3>
-<p>With <code>node.provide_privacy</code>, connections are encrypted (BIP324) where
-both sides support it, on the same port:</p>
+<p>By default (<code>node.provide_privacy</code>), connections are encrypted (BIP324)
+where both sides support it, on the same port:</p>
 <ul>
 <li>An inbound peer is served encrypted or clear, as it begins.</li>
 <li>An outbound connection is encrypted when the peer's address advertises

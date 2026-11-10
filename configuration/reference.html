@@ -355,14 +355,18 @@ marked by a comment. The sections below are the defaults on mainnet, with
 32 GiB or more of memory for the derived table buckets, grouped by
 area.</p>
 <h2 id="1-log">1. <code>[log]</code><a class="anchor" href="#1-log" aria-label="Link to this section">#</a></h2>
-<p>Logging: which kinds of events are logged (unless changed at the console), and where log files are written.</p>
+<p>Logging: which kinds of events are logged (unless changed at the console), and whether and where log files are written.</p>
 <pre><code class="language-ini"><span class="section">[log]</span>
 <span class="comment"># Enable application logging, defaults to 'true'.</span>
 application = true
+<span class="comment"># Write the console log to the pair of rotated log files, defaults to 'true'.</span>
+console = true
+<span class="comment"># Write events to the events log file, defaults to 'true'.</span>
+events = true
 <span class="comment"># Enable local fault logging, defaults to 'true'.</span>
 fault = true
 <span class="comment"># The maximum byte size of each pair of rotated log files, defaults to '1000000'.</span>
-maximum_size = 1000000
+limit = 1000000
 <span class="comment"># Enable news logging, defaults to 'true'.</span>
 news = true
 <span class="comment"># The log files directory, defaults to empty.</span>
@@ -841,8 +845,8 @@ minimum_fee_rate = 0.000001
 provide_blocks = true
 <span class="comment"># Serve client filters to network connections, defaults to 'false'.</span>
 provide_filters = false
-<span class="comment"># Provide opportunistic connection encryption, defaults to 'false'.</span>
-provide_privacy = false
+<span class="comment"># Provide opportunistic connection encryption, defaults to 'true'.</span>
+provide_privacy = true
 <span class="comment"># Serve witness data to network connections, defaults to 'true'.</span>
 provide_witness = true
 <span class="comment"># Require block service of outbound connections, defaults to 'true'.</span>

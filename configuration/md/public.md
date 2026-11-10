@@ -168,9 +168,10 @@ The libbitcoin community maintains two public `bs` servers:
       }, function () {});
       get("/v1/configuration?format=json").then(function (text) {
         var config = JSON.parse(text);
-        yes(row.cells[3], config.address);
-        yes(row.cells[4], config.filter);
-        if (config.pruned) mark(row.cells[5], Number(config.pruned).toLocaleString("en-US"), "scan-some");
+        var store = config.store || config;
+        yes(row.cells[3], store.address);
+        yes(row.cells[4], store.filter);
+        if (store.pruned) mark(row.cells[5], Number(store.pruned).toLocaleString("en-US"), "scan-some");
         else mark(row.cells[5], "Genesis", "scan-up");
       }, function () {});
     });
@@ -353,8 +354,12 @@ To admit only particular sites, list them:
 
 ```ini
 [native]
-origin = https://explorer.example.org
+origin = explorer.example.org:443
 ```
+
+Each `origin` is a host and port, without a scheme. A service with an
+`origin` list also refuses the pages it serves itself, unless its own host
+and port are listed.
 
 A request from any other page is then refused. Requests that carry no
 `Origin`, such as those from wallets and command line tools, are not

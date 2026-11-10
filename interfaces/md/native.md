@@ -195,7 +195,8 @@ new block:
 
 ### configuration
 
-The interface's indexes and relevant settings.
+The store's contents and the node's and network's peer settings. Each is
+also discoverable by interrogating the node over P2P.
 
 ```
 /v1/configuration
@@ -209,27 +210,63 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 
 ```json
 {
-    "network": "mainnet",
-    "address": true,
-    "filter": true,
-    "turbo": false,
-    "witness": true,
-    "retarget": true,
-    "difficult": true,
-    "pruned": 0
+    "store": {
+        "address": true,
+        "filter": true,
+        "silent": null,
+        "turbo": false,
+        "witness": true,
+        "pruned": 0
+    },
+    "node": {
+        "network": "mainnet",
+        "limited": false,
+        "blocks": true,
+        "witness": true,
+        "filters": false,
+        "privacy": true,
+        "fees": false
+    },
+    "network": {
+        "relay": true,
+        "alert": false,
+        "reject": false,
+        "compact": true,
+        "address": true,
+        "witness_tx": false,
+        "memory_pool": false,
+        "not_found": true,
+        "protocol_maximum": 70016,
+        "protocol_minimum": 31800
+    }
 }
 ```
 
 | Field | Meaning |
 | ----- | ------- |
-| `network` | The network whose genesis block is configured (`mainnet`, `testnet3`, `testnet4`, `testnet5`, `regtest` or `signet`), or empty if none |
-| `address` | The address index is enabled |
-| `filter` | Client filters are enabled |
-| `turbo` | `database.turbo` |
-| `witness` | `node.require_witness` |
-| `retarget` | `forks.retarget` |
-| `difficult` | `forks.difficult` |
-| `pruned` | The height above which blocks are not pruned, or `0` |
+| `store.address` | The address index is enabled |
+| `store.filter` | Client filters are enabled |
+| `store.silent` | The height from which the silent payment index starts, or `null` if it is disabled |
+| `store.turbo` | `database.turbo` |
+| `store.witness` | `node.require_witness`, which determines whether witnesses are stored |
+| `store.pruned` | The height above which blocks are not pruned, or `0` |
+| `node.network` | The network whose genesis block is configured (`mainnet`, `testnet3`, `testnet4`, `testnet5`, `regtest` or `signet`), or empty if none |
+| `node.limited` | `node.limited_blocks` |
+| `node.blocks` | `node.provide_blocks` |
+| `node.witness` | `node.provide_witness` |
+| `node.filters` | `node.provide_filters` |
+| `node.privacy` | `node.provide_privacy` |
+| `node.fees` | Fee estimation is enabled (`node.fee_estimate_horizon` is not zero) |
+| `network.relay` | `network.enable_relay` |
+| `network.alert` | `network.enable_alert` |
+| `network.reject` | `network.enable_reject` |
+| `network.compact` | `network.enable_compact` |
+| `network.address` | `network.enable_address` |
+| `network.witness_tx` | `network.enable_witness_tx` |
+| `network.memory_pool` | `network.enable_memory_pool` |
+| `network.not_found` | `network.enable_not_found` |
+| `network.protocol_maximum` | `network.protocol_maximum` |
+| `network.protocol_minimum` | `network.protocol_minimum` |
 
 ### top
 

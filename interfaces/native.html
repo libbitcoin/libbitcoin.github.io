@@ -726,21 +726,43 @@ new block:</p>
 </code></pre>
 <h2 id="3-server">3. Server<a class="anchor" href="#3-server" aria-label="Link to this section">#</a></h2>
 <h3 id="configuration">configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h3>
-<p>The interface's indexes and relevant settings.</p>
+<p>The store's contents and the node's and network's peer settings. Each is
+also discoverable by interrogating the node over P2P.</p>
 <pre><code>/v1/configuration
 </code></pre>
 <p>Formats: <code>json</code>.</p>
 <pre class="console"><code>$ curl &quot;http://localhost:8180/v1/configuration?format=json&quot;
 </code></pre>
 <pre><code class="language-json">{
-    &quot;network&quot;: &quot;mainnet&quot;,
-    &quot;address&quot;: true,
-    &quot;filter&quot;: true,
-    &quot;turbo&quot;: false,
-    &quot;witness&quot;: true,
-    &quot;retarget&quot;: true,
-    &quot;difficult&quot;: true,
-    &quot;pruned&quot;: 0
+    &quot;store&quot;: {
+        &quot;address&quot;: true,
+        &quot;filter&quot;: true,
+        &quot;silent&quot;: null,
+        &quot;turbo&quot;: false,
+        &quot;witness&quot;: true,
+        &quot;pruned&quot;: 0
+    },
+    &quot;node&quot;: {
+        &quot;network&quot;: &quot;mainnet&quot;,
+        &quot;limited&quot;: false,
+        &quot;blocks&quot;: true,
+        &quot;witness&quot;: true,
+        &quot;filters&quot;: false,
+        &quot;privacy&quot;: true,
+        &quot;fees&quot;: false
+    },
+    &quot;network&quot;: {
+        &quot;relay&quot;: true,
+        &quot;alert&quot;: false,
+        &quot;reject&quot;: false,
+        &quot;compact&quot;: true,
+        &quot;address&quot;: true,
+        &quot;witness_tx&quot;: false,
+        &quot;memory_pool&quot;: false,
+        &quot;not_found&quot;: true,
+        &quot;protocol_maximum&quot;: 70016,
+        &quot;protocol_minimum&quot;: 31800
+    }
 }
 </code></pre>
 <div class="scroller"><table>
@@ -752,36 +774,96 @@ new block:</p>
 </thead>
 <tbody>
 <tr>
-<td><code>network</code></td>
-<td>The network whose genesis block is configured (<code>mainnet</code>, <code>testnet3</code>, <code>testnet4</code>, <code>testnet5</code>, <code>regtest</code> or <code>signet</code>), or empty if none</td>
-</tr>
-<tr>
-<td><code>address</code></td>
+<td><code>store.address</code></td>
 <td>The address index is enabled</td>
 </tr>
 <tr>
-<td><code>filter</code></td>
+<td><code>store.filter</code></td>
 <td>Client filters are enabled</td>
 </tr>
 <tr>
-<td><code>turbo</code></td>
+<td><code>store.silent</code></td>
+<td>The height from which the silent payment index starts, or <code>null</code> if it is disabled</td>
+</tr>
+<tr>
+<td><code>store.turbo</code></td>
 <td><code>database.turbo</code></td>
 </tr>
 <tr>
-<td><code>witness</code></td>
-<td><code>node.require_witness</code></td>
+<td><code>store.witness</code></td>
+<td><code>node.require_witness</code>, which determines whether witnesses are stored</td>
 </tr>
 <tr>
-<td><code>retarget</code></td>
-<td><code>forks.retarget</code></td>
-</tr>
-<tr>
-<td><code>difficult</code></td>
-<td><code>forks.difficult</code></td>
-</tr>
-<tr>
-<td><code>pruned</code></td>
+<td><code>store.pruned</code></td>
 <td>The height above which blocks are not pruned, or <code>0</code></td>
+</tr>
+<tr>
+<td><code>node.network</code></td>
+<td>The network whose genesis block is configured (<code>mainnet</code>, <code>testnet3</code>, <code>testnet4</code>, <code>testnet5</code>, <code>regtest</code> or <code>signet</code>), or empty if none</td>
+</tr>
+<tr>
+<td><code>node.limited</code></td>
+<td><code>node.limited_blocks</code></td>
+</tr>
+<tr>
+<td><code>node.blocks</code></td>
+<td><code>node.provide_blocks</code></td>
+</tr>
+<tr>
+<td><code>node.witness</code></td>
+<td><code>node.provide_witness</code></td>
+</tr>
+<tr>
+<td><code>node.filters</code></td>
+<td><code>node.provide_filters</code></td>
+</tr>
+<tr>
+<td><code>node.privacy</code></td>
+<td><code>node.provide_privacy</code></td>
+</tr>
+<tr>
+<td><code>node.fees</code></td>
+<td>Fee estimation is enabled (<code>node.fee_estimate_horizon</code> is not zero)</td>
+</tr>
+<tr>
+<td><code>network.relay</code></td>
+<td><code>network.enable_relay</code></td>
+</tr>
+<tr>
+<td><code>network.alert</code></td>
+<td><code>network.enable_alert</code></td>
+</tr>
+<tr>
+<td><code>network.reject</code></td>
+<td><code>network.enable_reject</code></td>
+</tr>
+<tr>
+<td><code>network.compact</code></td>
+<td><code>network.enable_compact</code></td>
+</tr>
+<tr>
+<td><code>network.address</code></td>
+<td><code>network.enable_address</code></td>
+</tr>
+<tr>
+<td><code>network.witness_tx</code></td>
+<td><code>network.enable_witness_tx</code></td>
+</tr>
+<tr>
+<td><code>network.memory_pool</code></td>
+<td><code>network.enable_memory_pool</code></td>
+</tr>
+<tr>
+<td><code>network.not_found</code></td>
+<td><code>network.enable_not_found</code></td>
+</tr>
+<tr>
+<td><code>network.protocol_maximum</code></td>
+<td><code>network.protocol_maximum</code></td>
+</tr>
+<tr>
+<td><code>network.protocol_minimum</code></td>
+<td><code>network.protocol_minimum</code></td>
 </tr>
 </tbody>
 </table></div>

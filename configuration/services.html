@@ -553,7 +553,7 @@ services, and also have:</p>
 </tr>
 <tr>
 <td><code>origin</code></td>
-<td>Allowed <code>Origin</code> header values for cross-origin requests (<a href="https://www.rfc-editor.org/rfc/rfc6454.txt">RFC 6454</a>). Multiple allowed.</td>
+<td>An origin allowed to make cross-origin requests (<a href="https://www.rfc-editor.org/rfc/rfc6454.txt">RFC 6454</a>), as a host and port without a scheme, matched against the request's <code>Origin</code> header. Multiple allowed. When any are set, the service's own host and port must be listed for the pages it serves to load.</td>
 </tr>
 <tr>
 <td><code>allow_opaque_origin</code></td>

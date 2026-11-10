@@ -664,9 +664,10 @@
       }, function () {});
       get("/v1/configuration?format=json").then(function (text) {
         var config = JSON.parse(text);
-        yes(row.cells[3], config.address);
-        yes(row.cells[4], config.filter);
-        if (config.pruned) mark(row.cells[5], Number(config.pruned).toLocaleString("en-US"), "scan-some");
+        var store = config.store || config;
+        yes(row.cells[3], store.address);
+        yes(row.cells[4], store.filter);
+        if (store.pruned) mark(row.cells[5], Number(store.pruned).toLocaleString("en-US"), "scan-some");
         else mark(row.cells[5], "Genesis", "scan-up");
       }, function () {});
     });
@@ -826,8 +827,11 @@ returns the page's origin in <code>Access-Control-Allow-Origin</code>, so a bloc
 explorer or wallet hosted elsewhere can query the server from a browser.
 To admit only particular sites, list them:</p>
 <pre><code class="language-ini"><span class="section">[native]</span>
-origin = https://explorer.example.org
+origin = explorer.example.org:443
 </code></pre>
+<p>Each <code>origin</code> is a host and port, without a scheme. A service with an
+<code>origin</code> list also refuses the pages it serves itself, unless its own host
+and port are listed.</p>
 <p>A request from any other page is then refused. Requests that carry no
 <code>Origin</code>, such as those from wallets and command line tools, are not
 affected. <code>allow_opaque_origin</code> admits pages opened as local files

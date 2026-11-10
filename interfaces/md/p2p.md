@@ -98,8 +98,8 @@ advertising any of `peer.invalid_services` is refused.
 
 ### 2.3 Encrypted transport
 
-With `node.provide_privacy`, connections are encrypted (BIP324) where
-both sides support it, on the same port:
+By default (`node.provide_privacy`), connections are encrypted (BIP324)
+where both sides support it, on the same port:
 
 - An inbound peer is served encrypted or clear, as it begins.
 - An outbound connection is encrypted when the peer's address advertises

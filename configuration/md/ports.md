@@ -25,7 +25,7 @@ conflict.
 | Stratum v2 | `[stratum_v2]` | 8980 | – |
 
 P2P has no separate secure port. BIP324 encryption is negotiated on the
-same port, and offered when `node.provide_privacy` is set. ZMQ's secure
+same port, and offered by default (`node.provide_privacy`). ZMQ's secure
 port uses CurveZMQ.
 
 On the test chains the service ports move by a fixed offset, and the P2P
