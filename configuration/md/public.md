@@ -69,7 +69,7 @@ The libbitcoin community maintains two public `bs` servers:
   var paths = {
     "Native web and REST": "/v1/block/height/0?format=json",
     "Bitcoind RPC and REST": function (chain) { return "/rest/block/" + genesis[chain] + ".json"; },
-    "Esplora": "/block-height/0"
+    "Esplora": function (chain) { return "/block/" + genesis[chain]; }
   };
   var electrum = [
     { jsonrpc: "2.0", id: 0, method: "server.version", params: ["libbitcoin.org", "1.4"] },
@@ -78,7 +78,7 @@ The libbitcoin community maintains two public `bs` servers:
   var requests = {
     "Electrum": electrum,
     "Sparrow": electrum,
-    "BTCD RPC": { jsonrpc: "1.0", id: 1, method: "getblockhash", params: [0] }
+    "BTCD RPC": function (chain) { return { jsonrpc: "1.0", id: 1, method: "getblock", params: [genesis[chain], 2] }; }
   };
 
   function open(target, body) {
@@ -195,6 +195,7 @@ The libbitcoin community maintains two public `bs` servers:
         var chain = chains[i];
         ports.forEach(function (port, j) {
           var where = typeof path === "function" ? path(chain) : path;
+          var body = typeof request === "function" ? request(chain) : request;
           if (j) cells[i].appendChild(document.createTextNode(" / "));
           var span = document.createElement(where || request ? "a" : "span");
           span.textContent = port;
@@ -208,7 +209,7 @@ The libbitcoin community maintains two public `bs` servers:
             span.addEventListener("click", function (event) {
               event.preventDefault();
               if (span.dataset.reason) window.open(failure(span.dataset.reason, url(host, port)), "_blank");
-              else open(url(host, port), request);
+              else open(url(host, port), body);
             });
           }
           cells[i].appendChild(span);
