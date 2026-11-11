@@ -50,11 +50,11 @@ extension of the build machine's CPU instead.
 | Option | Instructions |
 | ------ | ------------ |
 | `--enable-sse41` | SSE4.1 |
-| `--enable-avx2` | AVX2 |
-| `--enable-avx512` | AVX-512 (F, BW, VL) |
-| `--enable-avxifma` | AVX-IFMA (implies AVX2) |
-| `--enable-avx512ifma` | AVX-512 IFMA (implies AVX-512 VL) |
-| `--enable-shani` | SHA extensions |
+| `--enable-avx2` | AVX2 (implies AES-NI) |
+| `--enable-avx512` | AVX-512 (F, BW, VL) (implies AVX2 and AES-NI) |
+| `--enable-avxifma` | AVX-IFMA (implies AVX2, SHA extensions and AES-NI) |
+| `--enable-avx512ifma` | AVX-512 IFMA (implies AVX-512, AVX2, SHA extensions and AES-NI) |
+| `--enable-shani` | SHA extensions (implies AES-NI) |
 | `--enable-sha512` | SHA512 extensions (implies AVX2) |
 | `--enable-aesni` | AES-NI and PCLMULQDQ |
 | `--enable-vaes` | VAES and VPCLMULQDQ (implies AES-NI and AVX2) |
@@ -63,22 +63,23 @@ extension of the build machine's CPU instead.
 
 | Option | Instructions |
 | ------ | ------------ |
-| `--hardware-sha2` | ARMv8 SHA-1 and SHA-256 |
-| `--hardware-sha3` | ARMv8.2 SHA-3, used for SHA-512 |
+| `--hardware-sha2` | ARMv8 SHA-1 and SHA-256 (implies AES) |
+| `--hardware-sha3` | ARMv8.2 SHA-3, used for SHA-512 (implies SHA-1/SHA-256 and AES) |
 | `--hardware-aes` | ARMv8 AES and PMULL |
 
-The ARM options are install script options. They combine into one target
-flag, `-march=armv8-a+<extensions>` (`armv8.2-a` with `--hardware-sha3`),
-added to `CFLAGS` and `CXXFLAGS`. For example, `--hardware-sha2
---hardware-aes --hardware-sha3` builds with
-`-march=armv8.2-a+aes+sha2+sha3`. They cannot be combined with
-`--hardware-optimized`.
+The ARM options are install script options. Each option and the options
+it implies combine into one target flag, `-march=armv8-a+<extensions>`
+(`armv8.2-a` with `--hardware-sha3`), added to `CFLAGS` and `CXXFLAGS`.
+For example, `--hardware-sha2` builds with `-march=armv8-a+aes+sha2`, and
+`--hardware-sha3` with `-march=armv8.2-a+aes+sha2+sha3`. They cannot be
+combined with `--hardware-optimized`.
 
 The configure and CMake options `--enable-sha2`, `--enable-sha3` and
-`--enable-aes` add no flags. Each checks that the compiler flags enable
-its extension, and configure fails if they do not. When building without
-the install script, give your own `-march` or `-mcpu` in `CFLAGS` and
-`CXXFLAGS`, with the matching `--enable` options.
+`--enable-aes` add no flags, and imply the same options as their install
+script options. Each checks that the compiler flags enable its extension,
+and configure fails if they do not. When building without the install
+script, give your own `-march` or `-mcpu` in `CFLAGS` and `CXXFLAGS`,
+including every implied extension, with the matching `--enable` options.
 
 ### GPU
 

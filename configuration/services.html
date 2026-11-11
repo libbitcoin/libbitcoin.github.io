@@ -381,8 +381,9 @@ connections:</p>
 and <code>127.0.0.1</code> (or <code>[::1]</code> for IPv6) on the local machine only.</p>
 <h3 id="until-current">Until current<a class="anchor" href="#until-current" aria-label="Link to this section">#</a></h3>
 <p>By default, while the node syncs it accepts no inbound connections other
-than to <code>[admin]</code> and <code>[native]</code>, the admin site and block explorer. P2P
-peers (<code>[inbound]</code>) and the other client services are refused until the
+than to <code>[admin]</code>, the admin site, which also serves the native interface.
+P2P peers (<code>[inbound]</code>), <code>[native]</code> (the block explorer) and the other
+client services are refused until the
 chain is current: until the confirmed top block is within
 <code>node.currency_window_minutes</code> (one day) of the present, or reaches
 <code>node.maximum_height</code>. A service that is configured but not yet accepting
@@ -500,7 +501,7 @@ REST interfaces use these names, one for each kind of request path:</p>
 </tr>
 <tr>
 <td><code>[admin]</code></td>
-<td>log_subscribe, event_subscribe</td>
+<td>log_subscribe, event_subscribe, and the <code>[native]</code> names</td>
 </tr>
 </tbody>
 </table></div>
@@ -549,11 +550,11 @@ services, and also have:</p>
 <tbody>
 <tr>
 <td><code>host</code></td>
-<td>Allowed <code>Host</code> header values (<a href="https://www.rfc-editor.org/rfc/rfc9110.txt">RFC 9110 §7.2</a>). Multiple allowed.</td>
+<td>Allowed <code>Host</code> header values (<a href="https://www.rfc-editor.org/rfc/rfc9110.txt">RFC 9110 §7.2</a>). Multiple allowed. With an <code>origin</code> list, a request whose <code>Origin</code> is the same as its <code>Host</code> is admitted only if that <code>Host</code> is listed here.</td>
 </tr>
 <tr>
 <td><code>origin</code></td>
-<td>An origin allowed to make cross-origin requests (<a href="https://www.rfc-editor.org/rfc/rfc6454.txt">RFC 6454</a>), as a host and port without a scheme, matched against the request's <code>Origin</code> header. Multiple allowed. When any are set, the service's own host and port must be listed for the pages it serves to load.</td>
+<td>An origin allowed to make cross-origin requests (<a href="https://www.rfc-editor.org/rfc/rfc6454.txt">RFC 6454</a>), as a host and port without a scheme, matched against the request's <code>Origin</code> header. Multiple allowed. When any are set, the service's own pages are admitted only if the request's <code>Host</code> is in <code>host</code>.</td>
 </tr>
 <tr>
 <td><code>allow_opaque_origin</code></td>
@@ -719,7 +720,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -732,7 +750,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

@@ -259,12 +259,23 @@
       <details class="drop" name="site"><summary>Getting Started</summary><div>
         <a href="../download/index.html">Download BS</a>
         <a href="../start/index.html">Quick Start</a>
-        <a href="../configuration/index.html">Configuration</a>
-        <a href="../configuration/reference.html">Settings Reference</a>
         <a href="../building/platforms.html">Platform Coverage</a>
+        <a href="../configuration/public.html">Community Servers</a>
         <a href="../building/status.html">Build Status</a>
         <a href="../building/index.html">Building</a>
         <a href="../packages/index.html">Packages</a>
+      </div></details>
+      <details class="drop" name="site"><summary>Configuration</summary><div>
+        <a href="../configuration/index.html">Overview</a>
+        <a href="../configuration/command-line.html">Command Line</a>
+        <a href="../configuration/file.html">Configuration File</a>
+        <a href="../configuration/setups.html">Common Setups</a>
+        <a href="../configuration/ports.html">Conventional Ports</a>
+        <a href="../configuration/store.html">Store Settings</a>
+        <a href="../configuration/services.html">Service Settings</a>
+        <a href="../configuration/performance.html">Performance Settings</a>
+        <a href="../configuration/reference.html">Settings Reference</a>
+        <a href="../configuration/bx.html">BX Settings</a>
       </div></details>
       <details class="drop" name="site"><summary>Performance</summary><div>
         <a href="../sync.html">Sync BS</a>
@@ -292,7 +303,7 @@
         <a href="../interfaces/p2p.html">Bitcoin P2P</a>
         <a href="../interfaces/bitcoind-rpc.html">Bitcoind JSON-RPC</a>
         <a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a>
-        <a href="../interfaces/zeromq.html">Bitcoind ZMQ</a>
+        <a href="../interfaces/zeromq.html">ZMQ</a>
         <a href="../interfaces/btcd.html">BTCD</a>
         <a href="../interfaces/esplora.html">Esplora</a>
         <a href="../interfaces/stratum-v1.html">Stratum v1</a>
@@ -325,7 +336,7 @@
     <a href="p2p.html">Bitcoin P2P</a>
     <a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a>
     <a href="bitcoind-rest.html">Bitcoind REST</a>
-    <a href="zeromq.html">Bitcoind ZMQ</a>
+    <a href="zeromq.html">ZMQ</a>
     <a href="btcd.html">BTCD</a>
     <a href="esplora.html">Esplora</a>
     <a href="stratum-v1.html">Stratum v1</a>
@@ -629,7 +640,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -642,7 +670,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

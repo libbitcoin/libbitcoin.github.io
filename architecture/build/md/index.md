@@ -145,6 +145,7 @@ project.
 | `vscode/settings.json.gsl` | `.vscode/settings.json` |
 | `src/include.hpp.gsl` | `include/bitcoin/[suffix].hpp` |
 | `src/version.hpp.in.gsl` | `include/bitcoin/[suffix]/version.hpp.in` |
+| `src/version.cpp.in.gsl` | `src/version.cpp.in` |
 | `git/gitignore.gsl` | `.gitignore` |
 | `git/CODEOWNERS.gsl` | `.github/CODEOWNERS` |
 
@@ -186,27 +187,39 @@ flag in the model carries a short test program, which the generated
 `configure.ac` and `CMakeLists.txt` compile with the flags to verify that
 the compiler supports them.
 
-| Option | GNU and Clang flags | Visual Studio |
-| ------ | ------------------- | ------------- |
-| `sse41` | `-msse4.1` | `/arch:AVX` |
-| `avx2` | `-mavx -mavx2` | `/arch:AVX2` |
-| `avx512` | `-mavx512f -mavx512bw -mavx512vl` | `/arch:AVX512` |
-| `avx512ifma` | `-mavx512ifma -mavx512vl` | `WITH_AVX512IFMA` |
-| `avxifma` | `-mavxifma` | `/arch:AVX2`, `WITH_AVXIFMA` |
-| `shani` | `-msse4 -msha` | `WITH_SHANI` |
-| `sha512` | `-mavx2 -msha512` | `/arch:AVX2`, `WITH_SHA512` |
-| `aesni` | `-msse4.1 -maes -mpclmul` | `WITH_AESNI` |
-| `vaes` | `-mavx2 -maes -mpclmul -mvaes -mvpclmulqdq` | `/arch:AVX2`, `WITH_VAES` |
-| `sha2` | `+sha2` | `WITH_SHA2` |
-| `sha3` | `+sha3` (with `armv8.2-a`) | `WITH_SHA3` |
-| `aes` | `+aes` | `WITH_AES` |
+| Option | Implies | GNU, Clang and clang-cl flags | cl |
+| ------ | ------- | ----------------------------- | -- |
+| `sse41` | | `-msse4.1` | `WITH_SSE41` |
+| `avx2` | `aesni` | `-mavx -mavx2` | `/arch:AVX2` |
+| `avx512` | `avx2`, `aesni` | `-mavx512f -mavx512bw -mavx512vl` | `/arch:AVX512` |
+| `avx512ifma` | `avx512`, `avx2`, `shani`, `aesni` | `-mavx512ifma -mavx512vl` | `WITH_AVX512IFMA` |
+| `avxifma` | `avx2`, `shani`, `aesni` | `-mavxifma` | `/arch:AVX2`, `WITH_AVXIFMA` |
+| `shani` | `aesni` | `-msse4 -msha` | `WITH_SHANI` |
+| `sha512` | | `-mavx2 -msha512` | `/arch:AVX2`, `WITH_SHA512` |
+| `aesni` | | `-msse4.1 -maes -mpclmul` | `WITH_AESNI` |
+| `vaes` | | `-mavx2 -maes -mpclmul -mvaes -mvpclmulqdq` | `/arch:AVX2`, `WITH_VAES` |
+| `sha2` | `aes` | `+sha2` | `WITH_SHA2` |
+| `sha3` | `sha2`, `aes` | `+sha3` (with `armv8.2-a`) | `WITH_SHA3` |
+| `aes` | | `+aes` | `WITH_AES` |
+
+An option also turns on each option it implies, with that option's flags
+and definitions. The implications are emitted into each build system: as
+assignments after the options in `CMakeLists.txt` and `configure.ac`, and
+as conditional properties after the option defaults in the MSBuild
+`.props` files. The implied options are those that every processor with
+the extension is known to have, and the release builds are named for the
+options set, omitting those implied ([Build selection](selection)).
 
 The flags are public. `configure.ac` substitutes them into the pkg-config
 `Cflags`, and `CMakeLists.txt` attaches them to the library target with
 `PUBLIC` visibility, so dependents compile with the same instruction sets.
-In Visual Studio the width options raise an `Option-arch` property (highest
-wins), which `x64.props` and `Win32.props` map to
+The definitions in the cl column are defined for both cl and clang-cl,
+and clang-cl also takes the same flags as Clang. For cl, which has no
+per-extension flags, the width options raise an `Option-arch` property
+(highest wins), which `x64.props` and `Win32.props` map to
 `EnableEnhancedInstructionSet`, defaulting to `AdvancedVectorExtensions2`.
+`EnableEnhancedInstructionSet` is not set for clang-cl, and in CMake
+`/arch` is passed only to cl.
 
 The ARM options combine into one flag, `-march=armv8-a+<extensions>`
 (`armv8.2-a` when `sha3` is on), since ARM extensions are suffixes of a
@@ -295,7 +308,8 @@ Two workflows are generated from the same entries. Jobs marked
 request when source, test or build paths change. `ci-expanded.yml` holds
 every job and runs on manual dispatch. The coverage job sends lcov output
 to Coveralls, excluding the paths in the entry's `coverage` element.
-`version-tag.yml` creates a version tag on manual dispatch.
+`version-tag.yml` creates a version tag on manual dispatch
+([Versioning](#7-versioning)).
 
 ### 6.1 Check-in gate
 
@@ -324,3 +338,113 @@ Every job must pass for the run to pass.
 
 libbitcoin-build has its own CI, which clones all six repositories and runs
 `generate4.sh` on Ubuntu and macOS.
+
+## 7. Versioning
+
+A build's version is `<major>.<minor>.<patch>`. The major and minor numbers
+(`4.0`) are set in the model. The patch number is the commit height of the
+repository's checkout, `git rev-list --count HEAD`, so each repository
+numbers its own builds and every commit raises the number. The version
+carries the full commit hash and a dirty flag, set when `git status
+--porcelain` reports any change. Built outside a git checkout, the hash is
+`unknown`, the patch number `0` and the flag clear.
+
+Each library has two configurable files, named by the `configurable`
+elements of its model:
+
+| File | Generated as | Contents |
+| ---- | ------------ | -------- |
+| `include/bitcoin/[suffix]/version.hpp.in` | `version.hpp` | The `LIBBITCOIN_[SUFFIX]_VERSION` (`"4.0"`), `_MAJOR_VERSION` and `_MINOR_VERSION` macros, and the declaration of `build_version()` |
+| `src/version.cpp.in` | `version.cpp` | `build_version()`, which returns the semantic version, the commit hash and the dirty flag |
+
+`version.hpp` is written when the build is configured, and holds only the
+major and minor numbers, so a new commit does not change it.
+`version.cpp` is written again by every build, from the state of the
+checkout at that build, and is replaced only when its content changes, so
+an unchanged state recompiles nothing:
+
+| Build system | `version.cpp` |
+| ------------ | ------------- |
+| autotools | A `FORCE` rule in `Makefile.am` substitutes the values with `sed` |
+| CMake | A custom target reruns `CMakeLists.txt` in script mode, which calls `configure_file` |
+| Visual Studio | The `ConfigureFiles` target of `Git.props`, before compilation, writes both files under `build/` |
+
+`bs --version` prints each library's version, its hash shortened to
+eight digits, and `-dirty` for a dirty build:
+
+```
+libbitcoin-system.... 4.0.10444 8a3cb4da
+```
+
+`version-tag.yml`, run by manual dispatch on a branch (`master` by default),
+computes the tag `v<major>.<minor>.<patch>` from the same commit count,
+adds an optional suffix, and pushes it as an annotated tag. It fails if the
+tag exists. `maintenance/create-version-tag.sh` in libbitcoin-build does
+the same locally, and pushes only when given a remote.
+
+## 8. Embedded sources
+
+Two kinds of generated source are committed to the repositories, because
+they need tools that a build does not: the CUDA kernels of
+libbitcoin-system and the web sites of libbitcoin-server. Each is made by a
+Python script, run from the repository root: one compiles C++ to PTX, the
+other TypeScript to minified script and stylesheets, and each embeds the
+result in C++ sources that the build compiles like any other. Run the script again after changing the
+sources it reads, and commit what it writes.
+
+### 8.1 CUDA kernels
+
+`tools/generate_cuda_ptx.py` compiles `src/crypto/secp256k1/cuda/kernels.cu`
+to PTX, the portable assembly of NVIDIA GPUs, and writes
+`src/crypto/secp256k1/cuda/ptx.cpp`:
+
+```sh
+python3 tools/generate_cuda_ptx.py
+```
+
+The PTX is generated entirely from the constexpr scalar sources of
+libbitcoin-system. The kernels are compiled by clang for the device only,
+with no CUDA toolkit: `-x cuda --cuda-device-only --cuda-gpu-arch=sm_75 -nocudainc
+-nocudalib -std=c++20 -O3`, defining `WITH_PTX` and `NDEBUG`. They include
+the library headers and the generated `version.hpp`, so a build must have
+run first. On Windows the script uses the clang of Visual Studio (the C++
+Clang Compiler component) under `vcvars64.bat`, and elsewhere `clang++` on
+the path, or the compiler given by `--clang`.
+
+The PTX is raw deflated (level 9) and written as a byte array with its
+inflated size, compiled only when CUDA is enabled (`HAVE_CUDA`). At run
+time the library loads the CUDA driver (`nvcuda.dll` or `libcuda.so.1`),
+inflates the PTX and passes it to `cuModuleLoadData`, and the driver
+compiles it for the GPU. `sm_75` is the oldest GPU architecture the PTX
+supports.
+
+### 8.2 Web sites
+
+`tools/generate_embedded_pages.py` builds the admin site and the block
+explorer and writes them into `console/embedded/`, from which `bs` serves
+them unless `folders.admin` or `folders.native` names a directory
+([Configuration File](../../configuration/file)):
+
+```sh
+python3 tools/generate_embedded_pages.py
+```
+
+| Source | Output |
+| ------ | ------ |
+| `web/admin-dashboard/dist/index.html`, `style.css`, `script.js` | `admin_html.cpp`, `admin_css.cpp`, `admin_ecma.cpp` |
+| `web/blockexplorer/dist/index.html`, `style.css`, `script.js` | `native_html.cpp`, `native_css.cpp`, `native_ecma.cpp` |
+| `web/shared/favicon.svg` | `icon.cpp` |
+
+Each site is a TypeScript and React project built by Vite. The script
+installs its packages exactly as recorded in its `package-lock.json` (`npm
+ci --ignore-scripts`), which requires network access, then runs its build
+(`tsc && vite build`), which writes the three files to `dist/`. A Vite
+plugin (`web/licenses.mjs`) prepends to each script and stylesheet the
+notice of every third-party package it contains. The script uses `npm` on
+the path, or the one given by `--npm`, or on Windows the Node.js bundled
+with Visual Studio. The sites require Node.js 20.19 or later.
+
+Text files are embedded as raw string literals of 8,000 bytes each, and
+the favicon as a byte array. Every page
+is generated before any is written, so a failure leaves the committed pages
+unchanged. `font.cpp` in the same directory is not generated.

@@ -9,14 +9,12 @@ Start the node on testnet3:
 $ bs -n testnet3
 ```
 
-`-n testnet3` applies the built-in testnet3 defaults below, and keeps the store
-in a `testnet3` directory under the working directory, apart from any mainnet
-store. Every run selects the network the same way. Without `-n testnet3`,
-`bs` uses the `mainnet` store.
-
-The log files and the peer address cache (`hosts.cache`) are written by default
-to the working directory and are not separated by network, so run each
-network from its own working directory.
+`-n testnet3` applies the built-in testnet3 defaults below, and keeps its files
+in a `testnet3` directory under the working directory (or `folders.root`),
+apart from any other network's: the store in `testnet3/store`, and the log
+files and the peer address cache (`peers.cache`) in `testnet3`. Every run
+selects the network the same way. Without `-n testnet3`, `bs` uses the
+`mainnet` directory.
 
 ## Defaults
 

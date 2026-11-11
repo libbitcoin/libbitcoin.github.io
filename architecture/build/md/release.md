@@ -51,29 +51,55 @@ made twice in a pinned Guix container, cross-compiled on Linux runners,
 and the job fails unless both builders produce bit-identical files
 ([Deterministic builds](deterministic)):
 
-| Build | Host | Compiler | Target | Options |
-| ----- | ---- | -------- | ------ | ------- |
-| `bs-linux-x64` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v3` | avx2, sse41 |
-| `bs-linux-x64-shani` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v3` | shani, avx2, sse41 |
-| `bs-linux-x64-avxifma` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v3` | avxifma, shani, avx2, sse41 |
-| `bs-linux-x64-avx512ifma` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v3` | avx512ifma, shani, avx2, sse41 |
-| `bs-linux-arm64` | `aarch64-linux-gnu` | GCC 14 | `armv8-a` | |
+| Build | Host | Compiler | Target | Compiles in |
+| ----- | ---- | -------- | ------ | ----------- |
+| `bs-linux-x64` | `x86_64-linux-gnu` | GCC 14 | `x86-64` |  |
+| `bs-linux-x64-sse41` | `x86_64-linux-gnu` | GCC 14 | `x86-64` | sse41 |
+| `bs-linux-x64-shani` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v2` | shani, aesni |
+| `bs-linux-x64-avx2` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v3` | avx2, aesni |
+| `bs-linux-x64-avx2-shani` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v3` | avx2, shani, aesni |
+| `bs-linux-x64-avxifma` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v3` | avxifma, avx2, shani, aesni |
+| `bs-linux-x64-avx512` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v4` | avx512, avx2, aesni |
+| `bs-linux-x64-avx512-shani` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v4` | avx512, avx2, shani, aesni |
+| `bs-linux-x64-avx512-avxifma` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v4` | avx512, avx2, avxifma, shani, aesni |
+| `bs-linux-x64-avx512ifma` | `x86_64-linux-gnu` | GCC 14 | `x86-64-v4` | avx512ifma, avx512, avx2, shani, aesni |
+| `bs-linux-arm64` | `aarch64-linux-gnu` | GCC 14 | `armv8-a` |  |
 | `bs-linux-arm64-sha2` | `aarch64-linux-gnu` | GCC 14 | `armv8-a+aes+sha2` | sha2, aes |
-| `bs-linux-arm64-sha3` | `aarch64-linux-gnu` | GCC 14 | `armv8.2-a+aes+sha2+sha3` | sha2, sha3, aes |
-| `bs-macos-x64` | `x86_64-apple-darwin` | clang 19 | `x86-64-v3`, macOS 13.3 | avx2, sse41, aesni |
-| `bs-macos-arm64` | `arm64-apple-darwin` | clang 19 | tuned for Apple M1, macOS 13.3 | sha2, sha3, aes |
-| `bs-windows-x64` | `x86_64-pc-windows-msvc` | clang-cl 21 | x64 | avx2, sse41 |
-| `bs-windows-x64-shani` | `x86_64-pc-windows-msvc` | clang-cl 21 | x64 | shani, avx2, sse41 |
-| `bs-windows-x64-avxifma` | `x86_64-pc-windows-msvc` | clang-cl 21 | x64 | avxifma, shani, avx2, sse41 |
-| `bs-windows-x64-avx512ifma` | `x86_64-pc-windows-msvc` | clang-cl 21 | x64 | avx512ifma, shani, avx2, sse41 |
-| `bs-windows-arm64` | `aarch64-pc-windows-msvc` | clang-cl 21 | `armv8-a` | |
+| `bs-linux-arm64-sha3` | `aarch64-linux-gnu` | GCC 14 | `armv8.2-a+aes+sha2+sha3` | sha3, sha2, aes |
+| `bs-macos-x64` | `x86_64-apple-darwin` | clang 19 | `x86-64`, macOS 13.3 |  |
+| `bs-macos-x64-sse41` | `x86_64-apple-darwin` | clang 19 | `x86-64`, macOS 13.3 | sse41 |
+| `bs-macos-x64-shani` | `x86_64-apple-darwin` | clang 19 | `x86-64-v2`, macOS 13.3 | shani, aesni |
+| `bs-macos-x64-avx2` | `x86_64-apple-darwin` | clang 19 | `x86-64-v3`, macOS 13.3 | avx2, aesni |
+| `bs-macos-x64-avx2-shani` | `x86_64-apple-darwin` | clang 19 | `x86-64-v3`, macOS 13.3 | avx2, shani, aesni |
+| `bs-macos-x64-avxifma` | `x86_64-apple-darwin` | clang 19 | `x86-64-v3`, macOS 13.3 | avxifma, avx2, shani, aesni |
+| `bs-macos-x64-avx512` | `x86_64-apple-darwin` | clang 19 | `x86-64-v4`, macOS 13.3 | avx512, avx2, aesni |
+| `bs-macos-x64-avx512-shani` | `x86_64-apple-darwin` | clang 19 | `x86-64-v4`, macOS 13.3 | avx512, avx2, shani, aesni |
+| `bs-macos-x64-avx512-avxifma` | `x86_64-apple-darwin` | clang 19 | `x86-64-v4`, macOS 13.3 | avx512, avx2, avxifma, shani, aesni |
+| `bs-macos-x64-avx512ifma` | `x86_64-apple-darwin` | clang 19 | `x86-64-v4`, macOS 13.3 | avx512ifma, avx512, avx2, shani, aesni |
+| `bs-macos-arm64` | `arm64-apple-darwin` | clang 19 | `armv8-a`, tuned for Apple M1, macOS 13.3 |  |
+| `bs-macos-arm64-sha2` | `arm64-apple-darwin` | clang 19 | `armv8-a+aes+sha2`, tuned for Apple M1, macOS 13.3 | sha2, aes |
+| `bs-macos-arm64-sha3` | `arm64-apple-darwin` | clang 19 | `armv8.2-a+aes+sha2+sha3`, tuned for Apple M1, macOS 13.3 | sha3, sha2, aes |
+| `bs-windows-x64` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64` |  |
+| `bs-windows-x64-sse41` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64` | sse41 |
+| `bs-windows-x64-shani` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v2` | shani, aesni |
+| `bs-windows-x64-avx2` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v3` | avx2, aesni |
+| `bs-windows-x64-avx2-shani` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v3` | avx2, shani, aesni |
+| `bs-windows-x64-avxifma` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v3` | avxifma, avx2, shani, aesni |
+| `bs-windows-x64-avx512` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v4` | avx512, avx2, aesni |
+| `bs-windows-x64-avx512-shani` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v4` | avx512, avx2, shani, aesni |
+| `bs-windows-x64-avx512-avxifma` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v4` | avx512, avx2, avxifma, shani, aesni |
+| `bs-windows-x64-avx512ifma` | `x86_64-pc-windows-msvc` | clang-cl 21 | `x86-64-v4` | avx512ifma, avx512, avx2, shani, aesni |
+| `bs-windows-arm64` | `aarch64-pc-windows-msvc` | clang-cl 21 | `armv8-a` |  |
 | `bs-windows-arm64-sha2` | `aarch64-pc-windows-msvc` | clang-cl 21 | `armv8-a+aes+sha2` | sha2, aes |
-| `bs-windows-arm64-sha3` | `aarch64-pc-windows-msvc` | clang-cl 21 | `armv8.2-a+aes+sha2+sha3` | sha2, sha3, aes |
+| `bs-windows-arm64-sha3` | `aarch64-pc-windows-msvc` | clang-cl 21 | `armv8.2-a+aes+sha2+sha3` | sha3, sha2, aes |
+
+Each build is named for the hardware extensions it requires, and runs on
+every processor that has them ([Build selection](selection)).
 
 The same job also builds the `selector` of libbitcoin-system, which
-reports the processor's features, for the packages that choose a variant
-at install ([Packaging](packaging)). It is built for each of the six
-hosts with no instruction set options: `selector-linux-x64`,
+reports the build for the processor, for the packages that choose a
+variant at install ([Packaging](packaging)). It is built for each of the
+six hosts with no instruction set options: `selector-linux-x64`,
 `selector-linux-arm64`, `selector-macos-x64`, `selector-macos-arm64`,
 `selector-windows-x64` and `selector-windows-arm64`.
 

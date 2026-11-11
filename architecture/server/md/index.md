@@ -92,7 +92,7 @@ which completes before the others are attached
 (`sessions/session_handshake.hpp`). A session drops inbound connections
 until the confirmed chain is current if its first protocol is `delayed` and
 the node's `delay_inbound` is set (`enabled()`). `server::protocol` sets
-`delayed`; `protocol_admin` and `protocol_native` clear it.
+`delayed`; `protocol_admin` clears it.
 
 ### 2.2 The interfaces as sessions
 

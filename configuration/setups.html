@@ -395,30 +395,30 @@ However, to do so set a checkpoint to the genesis block:</p>
 checkpoint = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
 </code></pre>
 <h2 id="5-admin-site">5. Admin site<a class="anchor" href="#5-admin-site" aria-label="Link to this section">#</a></h2>
-<p><code>bs</code> serves its own administrative site, which also utilizes its native
-REST interface. Here both are limited to the local machine:</p>
+<p><code>bs</code> serves its own administrative site. The admin interface also serves
+the full native REST interface, which the site uses, so <code>[native]</code> need
+not be enabled. Here it is limited to the local machine:</p>
 <pre><code class="language-ini"><span class="section">[admin]</span>
 bind = 127.0.0.1:8080
 bind = [::1]:8080
 connections = 10
-
-<span class="section">[native]</span>
-bind = 127.0.0.1:8180
-bind = [::1]:8180
-connections = 10
 </code></pre>
-<p>To view the admin site open <code>http://localhost:8080</code> in a browser. Its pages
+<p>To view the admin site open <code>http://localhost:8080</code> in a browser. The site
+makes its admin and native requests over one websocket to the address it
+was loaded from. Its pages
 are admin REST queries rendered as HTML, the default for a browser request.
 The same paths return data when JSON is requested, with <code>format=json</code> or an
 <code>Accept: application/json</code> header.</p>
 <p>To serve a custom admin site from a directory instead of the embedded site,
-set <code>admin.path</code>. A request for <code>/</code> returns <code>admin.default</code>
+set <code>folders.admin</code>. A request for <code>/</code> returns <code>admin.default</code>
 (<code>index.html</code>).</p>
 <p>The admin interface is libbitcoin's own, and provides:</p>
 <ul>
 <li>HTTP and websocket on each port. Over a websocket, each frame is one
   request path, and <code>log_subscribe</code> and <code>event_subscribe</code> stream the
   node's log and events.</li>
+<li>The full <a href="../interfaces/native.html">native interface</a>, under the <code>[admin]</code>
+  settings.</li>
 <li>TLS on its <code>safe</code> addresses (<a href="services.html#2-secure-connections">Secure connections</a>), with optional client certificates
   (<a href="services.html#3-authentication">Authentication</a>).</li>
 <li>Credentials (<a href="services.html#3-authentication">Authentication</a>), restricted by REST method names.</li>
@@ -431,7 +431,9 @@ bind = 127.0.0.1:8180
 bind = [::1]:8180
 connections = 10
 </code></pre>
-<p>To view the block explorer open <code>http://localhost:8180</code> in a browser.</p>
+<p>To view the block explorer open <code>http://localhost:8180</code> in a browser. By
+default it is available once the chain is current
+(<a href="services.html#until-current">Until current</a>).</p>
 <p>The explorer is the native REST interface rendered as HTML, the default for a
 browser request. The same paths return each result in any of four formats,
 chosen with <code>format=</code> or the <code>Accept</code> header:</p>
@@ -510,7 +512,7 @@ chosen with <code>format=</code> or the <code>Accept</code> header:</p>
 </tbody>
 </table></div>
 <p>To serve a custom block explorer from a directory instead of the embedded
-site, set <code>native.path</code>. A request for <code>/</code> returns <code>native.default</code>
+site, set <code>folders.native</code>. A request for <code>/</code> returns <code>native.default</code>
 (<code>index.html</code>).</p>
 <p>The native interface is libbitcoin's own, and provides:</p>
 <ul>
@@ -883,7 +885,7 @@ minimum_fee_rate = 0.000001
   node then serves only blocks above it.</li>
 <li><code>node.provide_filters</code> also requires the client filter tables (<a href="#12-client-filters-bip157158">Client filters (BIP157/158)</a>).</li>
 <li><code>node.delay_inbound</code> refuses inbound peers, and client services other
-  than <code>[admin]</code> and <code>[native]</code>, until the chain is current.</li>
+  than <code>[admin]</code>, until the chain is current.</li>
 <li><code>node.fee_estimate_horizon</code> is the number of recent blocks used for fee
   estimates, at most 1,008 (one week). <code>0</code> disables fee estimation.</li>
 <li><code>node.minimum_fee_rate</code> is the lowest fee rate, in BTC per thousand
@@ -1171,7 +1173,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -1184,7 +1203,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

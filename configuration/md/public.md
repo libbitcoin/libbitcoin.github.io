@@ -28,7 +28,7 @@ The libbitcoin community maintains two public `bs` servers:
 
 | Service | mainnet | testnet3 | testnet4 | testnet5 |
 | ------- | ------- | -------- | -------- | -------- |
-| P2P network | 8333 / 8333 | 18333 / 18333 | 48333 / 48333 | 18353 / 18353 |
+| P2P | 8333 / 8333 | 18333 / 18333 | 48333 / 48333 | 18353 / 18353 |
 | ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 | 58380 / 58343 |
 | Native | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 | 58180 / 58143 |
 | Bitcoind | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 | 58280 / 58243 |
@@ -36,6 +36,15 @@ The libbitcoin community maintains two public `bs` servers:
 | Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 | 58580 / 58543 |
 | Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 | 58680 / 58643 |
 | Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 | 58780 / 58743 |
+
+To connect to a secure ZMQ port, a client must be configured with the server's public key:
+
+<div id="zmq-keys"></div>
+
+| Host | ZMQ base85 public key |
+| ---- | --------------------- |
+| wormer.libbitcoin.net | `>XrBaljAIXUrrCt(y^(i-@2mUY-4]lj=:DSoFWns` |
+| carmine.libbitcoin.net | `ihZy(J.QWwNe(L9uUMyI8GH0<vW=kHJ9PLdBle8:` |
 
 <style>
 .scan-host { margin: 1.4em 0 .4em; font-family: var(--mono); }
@@ -50,7 +59,31 @@ The libbitcoin community maintains two public `bs` servers:
 #server-details + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
 #server-details + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
 .scan-some { color: var(--partial, #ffa022); font-weight: 600; }
+#zmq-keys + .scroller .copy { position: static; margin-left: .6em; padding: 3px; vertical-align: middle; }
 </style>
+
+<script>
+(function () {
+  var marker = document.getElementById("zmq-keys");
+  if (!marker || !navigator.clipboard) return;
+  marker.nextElementSibling.querySelectorAll("td code").forEach(function (code) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "copy";
+    button.title = "Copy";
+    button.setAttribute("aria-label", "Copy");
+    button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+    button.addEventListener("click", function () {
+      navigator.clipboard.writeText(code.textContent).then(function () {
+        button.classList.add("done");
+        button.title = "Copied";
+        setTimeout(function () { button.classList.remove("done"); button.title = "Copy"; }, 1500);
+      });
+    });
+    code.parentNode.appendChild(button);
+  });
+})();
+</script>
 
 <script>
 (function () {
@@ -274,6 +307,7 @@ avx2........ platform:1 compiled:1.
 avx512...... platform:0 compiled:0.
 avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:0 compiled:0.
+build....... platform:bs-linux-x64-avx2-shani compiled:bs-linux-x64-avx2-shani.
 cuda........ platform:0 compiled:1.
 ```
 
@@ -381,8 +415,9 @@ origin = explorer.example.org:443
 ```
 
 Each `origin` is a host and port, without a scheme. A service with an
-`origin` list also refuses the pages it serves itself, unless its own host
-and port are listed.
+`origin` list admits the pages it serves itself only when the request's
+`Host` is in its `host` list, so list the service's own name there, which
+also protects it from DNS rebinding.
 
 A request from any other page is then refused. Requests that carry no
 `Origin`, such as those from wallets and command line tools, are not

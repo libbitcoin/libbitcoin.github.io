@@ -367,8 +367,9 @@ extensions they all have (see <a href="../building/options.html#2-hardware-optio
 <h2 id="2-sync">2. Sync<a class="anchor" href="#2-sync" aria-label="Link to this section">#</a></h2>
 <pre class="console"><code>$ bs
 </code></pre>
-<p>With no configuration, <code>bs</code> syncs mainnet into a <code>mainnet</code> store in the
-current directory, creating it if it does not exist. Progress is logged
+<p>With no configuration, <code>bs</code> syncs mainnet into a <code>mainnet</code> directory in
+the current directory, with the store in <code>mainnet/store</code>, creating it if
+it does not exist. Progress is logged
 to the console. To stop, type <code>c</code> and <code>&lt;enter&gt;</code>, or press <code>&lt;ctrl&gt; c</code>. A
 restart resumes where it stopped. To sync a test chain, or to stop at a
 height, see <a href="../configuration/command-line.html">Command Line</a> and
@@ -415,9 +416,9 @@ connections = 100
 </tr>
 </tbody>
 </table></div>
-<p>The admin console and the block explorer are available at once, and
-show the sync's progress. The other interfaces accept connections once
-the node is current.</p>
+<p>The admin console is available at once, and shows the sync's progress.
+The block explorer and the other interfaces accept connections once the
+node is current.</p>
 <h2 id="4-next">4. Next<a class="anchor" href="#4-next" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="../configuration/index.html">Configuration</a>: the command line and
@@ -523,7 +524,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -536,7 +554,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

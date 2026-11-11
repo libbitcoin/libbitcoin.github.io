@@ -22,8 +22,9 @@ and `127.0.0.1` (or `[::1]` for IPv6) on the local machine only.
 ### Until current
 
 By default, while the node syncs it accepts no inbound connections other
-than to `[admin]` and `[native]`, the admin site and block explorer. P2P
-peers (`[inbound]`) and the other client services are refused until the
+than to `[admin]`, the admin site, which also serves the native interface.
+P2P peers (`[inbound]`), `[native]` (the block explorer) and the other
+client services are refused until the
 chain is current: until the confirmed top block is within
 `node.currency_window_minutes` (one day) of the present, or reaches
 `node.maximum_height`. A service that is configured but not yet accepting
@@ -117,7 +118,7 @@ REST interfaces use these names, one for each kind of request path:
 | `[bitcoind]` | chain_information, block, block_txs, block_hash, block_headers, block_filter, block_filter_headers, block_part, block_spent_tx_outputs, deployment_info, get_utxos, mempool, mempool_information, tx |
 | `[native]` | configuration, top, top_subscribe, block, block_header, block_header_context, block_details, block_tx, block_txs, block_filter, block_filter_hash, block_filter_header, block_subscribe, tx, tx_header, tx_details, tx_subscribe, inputs, input, input_script, input_witness, outputs, output, output_script, output_spender, output_spenders, output_subscribe, address, address_confirmed, address_unconfirmed, address_balance, address_subscribe |
 | `[esplora]` | blocks, block, block_header, block_height, block_status, block_txid, block_txids, block_txs, tip_hash, tip_height, tx, tx_status, tx_merkle_proof, tx_merkleblock_proof, tx_outspend, tx_outspends, address, address_txs, address_txs_chain, address_txs_mempool, address_utxo, mempool, mempool_txids, mempool_recent, fee_estimates, broadcast, broadcast_package |
-| `[admin]` | log_subscribe, event_subscribe |
+| `[admin]` | log_subscribe, event_subscribe, and the `[native]` names |
 
 ### Client certificates
 
@@ -169,8 +170,8 @@ services, and also have:
 
 | Setting | Purpose |
 | ------- | ------- |
-| `host` | Allowed `Host` header values ([RFC 9110 §7.2](https://www.rfc-editor.org/rfc/rfc9110.txt)). Multiple allowed. |
-| `origin` | An origin allowed to make cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454.txt)), as a host and port without a scheme, matched against the request's `Origin` header. Multiple allowed. When any are set, the service's own host and port must be listed for the pages it serves to load. |
+| `host` | Allowed `Host` header values ([RFC 9110 §7.2](https://www.rfc-editor.org/rfc/rfc9110.txt)). Multiple allowed. With an `origin` list, a request whose `Origin` is the same as its `Host` is admitted only if that `Host` is listed here. |
+| `origin` | An origin allowed to make cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454.txt)), as a host and port without a scheme, matched against the request's `Origin` header. Multiple allowed. When any are set, the service's own pages are admitted only if the request's `Host` is in `host`. |
 | `allow_opaque_origin` | Allow requests with an opaque origin ([RFC 6454 §7.3](https://www.rfc-editor.org/rfc/rfc6454.txt)), such as from a page opened as a local file. |
 
 ## 5. Limits

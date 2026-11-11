@@ -18,15 +18,15 @@ signature file of the same name, ending in `.asc`:
 ```
 bs-linux-x64
 bs-linux-x64.asc
-bs-linux-x64-shani
-bs-linux-x64-shani.asc
+bs-linux-x64-avx2-shani
+bs-linux-x64-avx2-shani.asc
 ...
 ```
 
 ## 2. Selecting a build
 
-A build is named `bs-<platform>-<architecture>`, followed by the
-extension level it is built for, if any. Windows builds end in `.exe`.
+A build is named `bs-<platform>-<architecture>`, followed by the tags of
+the hardware extensions it requires, if any. Windows builds end in `.exe`.
 
 | Platform | Runs on |
 | -------- | ------- |
@@ -37,30 +37,52 @@ extension level it is built for, if any. Windows builds end in `.exe`.
 | Build | Also uses |
 | ----- | --------- |
 | `x64` | |
-| `x64-shani` | SHA extensions |
-| `x64-avxifma` | SHA extensions, AVX-IFMA |
-| `x64-avx512ifma` | SHA extensions, AVX-512 IFMA |
+| `x64-sse41` | SSE4.1 |
+| `x64-shani` | SHA extensions, AES-NI |
+| `x64-avx2` | AVX2, AES-NI |
+| `x64-avx2-shani` | AVX2, SHA extensions, AES-NI |
+| `x64-avxifma` | AVX-IFMA, AVX2, SHA extensions, AES-NI |
+| `x64-avx512` | AVX-512, AVX2, AES-NI |
+| `x64-avx512-shani` | AVX-512, AVX2, SHA extensions, AES-NI |
+| `x64-avx512-avxifma` | AVX-512, AVX-IFMA, AVX2, SHA extensions, AES-NI |
+| `x64-avx512ifma` | AVX-512 IFMA, AVX-512, AVX2, SHA extensions, AES-NI |
 | `arm64` | |
 | `arm64-sha2` | ARMv8 SHA-2, AES |
-| `arm64-sha3` | ARMv8 SHA-2, AES, ARMv8.2 SHA-3 |
+| `arm64-sha3` | ARMv8.2 SHA-3 (used for SHA-512), ARMv8 SHA-2, AES |
 
-Linux and Windows have every build above. macOS has one build for each
-architecture: `arm64`, which uses ARMv8 SHA-2, SHA-3 and AES, and `x64`,
-which uses AES-NI.
+Each platform has every build above. A build runs only on a CPU that has
+every extension it uses, and is faster for using them. The `x64` and
+`arm64` builds run on any CPU of their architecture.
 
-A build runs only on a CPU that has every extension it uses, and is
-faster for using them. To select one, run the build without an extension
-level, which runs on any CPU of its architecture, with `--hardware`:
+The `selector`, published beside the builds as
+`selector-<platform>-<architecture>`, prints the name of the build for
+the CPU it runs on:
+
+```
+$ selector-linux-x64 bs
+bs-linux-x64-avx2-shani
+```
+
+Given a release tag, it prints the download address of that build:
+
+```
+$ selector-linux-x64 bs <release>
+https://github.com/libbitcoin/libbitcoin-server/releases/download/<release>/bs-linux-x64-avx2-shani
+```
+
+Any build also prints the name with `--hardware`, after the extensions of
+the CPU (`platform`) and those of the build (`compiled`):
 
 ```
 $ bs-linux-x64 --hardware
+...
+build....... platform:bs-linux-x64-avx2-shani compiled:bs-linux-x64.
 ```
 
-It lists the extensions of the CPU. Use the build whose extensions are
-all among them, preferring `avx512ifma` to `avxifma`, and either to
-`shani`. For example, a CPU with SHA extensions and AVX-512 IFMA uses
-`bs-linux-x64-avx512ifma`. For what each extension does, see
-[Hardware options](../building/options#2-hardware-options).
+`platform` names the build for the CPU, and `compiled` names the build
+being run. For how the name is chosen, see
+[Build selection](../architecture/build/selection), and for what each
+extension does, see [Hardware options](../building/options#2-hardware-options).
 
 The list ends with CUDA, for batch signature verification on an NVIDIA
 GPU:

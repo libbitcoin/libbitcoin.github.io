@@ -23,17 +23,19 @@ All options, grouped by purpose:
 | | `-k`, `--buckets` | Display hashmap bucket fill |
 | | `-l`, `--collisions` | Display hashmap collision statistics (time consuming) |
 
-The store directory is named for the network (`mainnet`, `testnet4` and
-so on). It is under the working directory, or under `database.path` when
-that is configured: `path = bitcoin` puts the mainnet store in
-`bitcoin/mainnet`. `bs` creates the store if it does not exist, and `-m`
-creates it without running. Every run selects the network, by `-n` or by
-`bitcoin.network` in a configuration file. Without either, `bs` uses the
-`mainnet` store.
+Each network's files are in a directory named for the network
+(`mainnet`, `testnet4` and so on), the network directory. It is under the
+working directory, or under `folders.root` when that is configured:
+`root = bitcoin` puts the mainnet directory at `bitcoin/mainnet`. The store
+is in its `store` directory. The console log files (`console_new.log`,
+renamed to `console_old.log` when it reaches `log.limit` bytes), the events log (`events.log`)
+and the peer address cache (`peers.cache`) are in the network directory
+itself, unless `[folders]` places them elsewhere
+([Configuration File](file)). Networks therefore never share files.
 
-The log files and the peer address cache (`hosts.cache`) are written by default
-to the working directory and are not separated by network, so run each
-network from its own working directory.
+`bs` creates the store if it does not exist, and `-m` creates it without
+running. Every run selects the network, by `-n` or by `bitcoin.network` in
+a configuration file. Without either, `bs` uses `mainnet`.
 
 The network can be set in the configuration file instead of by `-n`:
 
@@ -107,6 +109,7 @@ avx2........ platform:1 compiled:1.
 avx512...... platform:1 compiled:1.
 avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:1 compiled:1.
+build....... platform:bs-linux-x64-avx512ifma compiled:bs-linux-x64-avx512ifma.
 cuda........ platform:1 compiled:1.
 cuda ecc.... platform:1 enabled:0.
 ```

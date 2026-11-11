@@ -345,8 +345,10 @@
 
   <article class="doc">
 <p>The admin interface streams the node's log and events over websocket,
-served on the <code>[admin]</code> binding. The embedded console is a page of this
-interface, and can be replaced with a custom site (see <a href="../configuration/setups.html#5-admin-site">Configuration
+served on the <code>[admin]</code> binding. It also serves the full
+<a href="native.html">native interface</a>, so the console needs only this one address.
+The embedded console is a page of this interface, and can be replaced
+with a custom site (see <a href="../configuration/setups.html#5-admin-site">Configuration
 §5.5</a>).</p>
 <p>Its protocols share one port, and their secure forms share another:</p>
 <div class="scroller"><table>
@@ -389,7 +391,12 @@ interface, and can be replaced with a custom site (see <a href="../configuration
 </tr>
 </tbody>
 </table></div>
-<p>Any other path is a page of the console, such as <code>/</code>.</p>
+<p>Every path of the <a href="native.html#1-paths">native interface</a> is also served,
+with the same responses and websocket subscriptions. Any other path is a
+page of the console, such as <code>/</code>.</p>
+<p>Native requests made here are governed by the <code>[admin]</code> settings
+(addresses, hosts, origins, TLS and credentials), not by <code>[native]</code>, and
+are served whether or not <code>[native]</code> is enabled.</p>
 <h2 id="2-calling-pattern">2. Calling pattern<a class="anchor" href="#2-calling-pattern" aria-label="Link to this section">#</a></h2>
 <h3 id="21-enabling">2.1 Enabling<a class="anchor" href="#21-enabling" aria-label="Link to this section">#</a></h3>
 <p>The service starts only with both an address and a connection limit:</p>
@@ -481,7 +488,7 @@ n (§3). To select levels 0 to 6, add their masks:</p>
 </tbody>
 </table></div>
 <h3 id="24-formats">2.4 Formats<a class="anchor" href="#24-formats" aria-label="Link to this section">#</a></h3>
-<p>The interface responds in JSON. A request must ask for it, with
+<p>The admin methods respond in JSON. A request must ask for it, with
 <code>format=json</code> or an <code>Accept: application/json</code> header, or it returns 406.
 A websocket request is JSON by default.</p>
 <pre class="console"><code>$ curl &quot;http://localhost:8080/v1/log/subscribe?filter=0&amp;format=json&quot;
@@ -529,11 +536,17 @@ A websocket request is JSON by default.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Over a websocket, an invalid filter or format, or a method the credential
-does not permit, closes the connection. An unknown path is ignored.</p>
+<p>Over a websocket, an invalid path is answered with 400 and the connection
+is kept. An invalid filter or format, or a method the credential does not
+permit, is answered with an error and closes the connection.</p>
 <h3 id="26-credentials">2.6 Credentials<a class="anchor" href="#26-credentials" aria-label="Link to this section">#</a></h3>
-<p>A credential's method list names <code>log_subscribe</code> and <code>event_subscribe</code>
-(see <a href="../configuration/services.html#3-authentication">Configuration §7.3</a>).</p>
+<p>A credential's method list names <code>log_subscribe</code>, <code>event_subscribe</code> and
+the native method names (see
+<a href="../configuration/services.html#3-authentication">Configuration §7.3</a>). A
+credential with no method list permits every method. One with a list
+permits only those named, so for the console it names <code>log_subscribe</code>,
+<code>event_subscribe</code>, <code>configuration</code>, <code>top</code>, <code>top_subscribe</code>,
+<code>block_header</code> and <code>fees</code>.</p>
 <h2 id="3-methods">3. Methods<a class="anchor" href="#3-methods" aria-label="Link to this section">#</a></h2>
 <h3 id="log_subscribe">log_subscribe<a class="anchor" href="#log_subscribe" aria-label="Link to this section">#</a></h3>
 <p>Streams the node's log messages, of the levels selected by the filter.</p>
@@ -852,7 +865,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -865,7 +895,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

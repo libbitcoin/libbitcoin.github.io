@@ -331,6 +331,7 @@
     <a href="index.html">Build Architecture</a>
     <a href="deterministic.html">Deterministic builds</a>
     <a href="release.html" class="here">Release builds</a>
+    <a href="selection.html">Build selection</a>
     <a href="packaging.html">Packaging</a>
   </nav>
 
@@ -398,7 +399,7 @@ and the job fails unless both builders produce bit-identical files
 <th>Host</th>
 <th>Compiler</th>
 <th>Target</th>
-<th>Options</th>
+<th>Compiles in</th>
 </tr>
 </thead>
 <tbody>
@@ -406,29 +407,71 @@ and the job fails unless both builders produce bit-identical files
 <td><code>bs-linux-x64</code></td>
 <td><code>x86_64-linux-gnu</code></td>
 <td>GCC 14</td>
-<td><code>x86-64-v3</code></td>
-<td>avx2, sse41</td>
+<td><code>x86-64</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>bs-linux-x64-sse41</code></td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
+<td><code>x86-64</code></td>
+<td>sse41</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-shani</code></td>
 <td><code>x86_64-linux-gnu</code></td>
 <td>GCC 14</td>
+<td><code>x86-64-v2</code></td>
+<td>shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-linux-x64-avx2</code></td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
 <td><code>x86-64-v3</code></td>
-<td>shani, avx2, sse41</td>
+<td>avx2, aesni</td>
+</tr>
+<tr>
+<td><code>bs-linux-x64-avx2-shani</code></td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
+<td><code>x86-64-v3</code></td>
+<td>avx2, shani, aesni</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avxifma</code></td>
 <td><code>x86_64-linux-gnu</code></td>
 <td>GCC 14</td>
 <td><code>x86-64-v3</code></td>
-<td>avxifma, shani, avx2, sse41</td>
+<td>avxifma, avx2, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-linux-x64-avx512</code></td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512, avx2, aesni</td>
+</tr>
+<tr>
+<td><code>bs-linux-x64-avx512-shani</code></td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512, avx2, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-linux-x64-avx512-avxifma</code></td>
+<td><code>x86_64-linux-gnu</code></td>
+<td>GCC 14</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512, avx2, avxifma, shani, aesni</td>
 </tr>
 <tr>
 <td><code>bs-linux-x64-avx512ifma</code></td>
 <td><code>x86_64-linux-gnu</code></td>
 <td>GCC 14</td>
-<td><code>x86-64-v3</code></td>
-<td>avx512ifma, shani, avx2, sse41</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512ifma, avx512, avx2, shani, aesni</td>
 </tr>
 <tr>
 <td><code>bs-linux-arm64</code></td>
@@ -449,49 +492,168 @@ and the job fails unless both builders produce bit-identical files
 <td><code>aarch64-linux-gnu</code></td>
 <td>GCC 14</td>
 <td><code>armv8.2-a+aes+sha2+sha3</code></td>
-<td>sha2, sha3, aes</td>
+<td>sha3, sha2, aes</td>
 </tr>
 <tr>
 <td><code>bs-macos-x64</code></td>
 <td><code>x86_64-apple-darwin</code></td>
 <td>clang 19</td>
+<td><code>x86-64</code>, macOS 13.3</td>
+<td></td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-sse41</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64</code>, macOS 13.3</td>
+<td>sse41</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-shani</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64-v2</code>, macOS 13.3</td>
+<td>shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-avx2</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
 <td><code>x86-64-v3</code>, macOS 13.3</td>
-<td>avx2, sse41, aesni</td>
+<td>avx2, aesni</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-avx2-shani</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64-v3</code>, macOS 13.3</td>
+<td>avx2, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-avxifma</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64-v3</code>, macOS 13.3</td>
+<td>avxifma, avx2, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-avx512</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64-v4</code>, macOS 13.3</td>
+<td>avx512, avx2, aesni</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-avx512-shani</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64-v4</code>, macOS 13.3</td>
+<td>avx512, avx2, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-avx512-avxifma</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64-v4</code>, macOS 13.3</td>
+<td>avx512, avx2, avxifma, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-macos-x64-avx512ifma</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>x86-64-v4</code>, macOS 13.3</td>
+<td>avx512ifma, avx512, avx2, shani, aesni</td>
 </tr>
 <tr>
 <td><code>bs-macos-arm64</code></td>
 <td><code>arm64-apple-darwin</code></td>
 <td>clang 19</td>
-<td>tuned for Apple M1, macOS 13.3</td>
-<td>sha2, sha3, aes</td>
+<td><code>armv8-a</code>, tuned for Apple M1, macOS 13.3</td>
+<td></td>
+</tr>
+<tr>
+<td><code>bs-macos-arm64-sha2</code></td>
+<td><code>arm64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>armv8-a+aes+sha2</code>, tuned for Apple M1, macOS 13.3</td>
+<td>sha2, aes</td>
+</tr>
+<tr>
+<td><code>bs-macos-arm64-sha3</code></td>
+<td><code>arm64-apple-darwin</code></td>
+<td>clang 19</td>
+<td><code>armv8.2-a+aes+sha2+sha3</code>, tuned for Apple M1, macOS 13.3</td>
+<td>sha3, sha2, aes</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64</code></td>
 <td><code>x86_64-pc-windows-msvc</code></td>
 <td>clang-cl 21</td>
-<td>x64</td>
-<td>avx2, sse41</td>
+<td><code>x86-64</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>bs-windows-x64-sse41</code></td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>x86-64</code></td>
+<td>sse41</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-shani</code></td>
 <td><code>x86_64-pc-windows-msvc</code></td>
 <td>clang-cl 21</td>
-<td>x64</td>
-<td>shani, avx2, sse41</td>
+<td><code>x86-64-v2</code></td>
+<td>shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-windows-x64-avx2</code></td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>x86-64-v3</code></td>
+<td>avx2, aesni</td>
+</tr>
+<tr>
+<td><code>bs-windows-x64-avx2-shani</code></td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>x86-64-v3</code></td>
+<td>avx2, shani, aesni</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avxifma</code></td>
 <td><code>x86_64-pc-windows-msvc</code></td>
 <td>clang-cl 21</td>
-<td>x64</td>
-<td>avxifma, shani, avx2, sse41</td>
+<td><code>x86-64-v3</code></td>
+<td>avxifma, avx2, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-windows-x64-avx512</code></td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512, avx2, aesni</td>
+</tr>
+<tr>
+<td><code>bs-windows-x64-avx512-shani</code></td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512, avx2, shani, aesni</td>
+</tr>
+<tr>
+<td><code>bs-windows-x64-avx512-avxifma</code></td>
+<td><code>x86_64-pc-windows-msvc</code></td>
+<td>clang-cl 21</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512, avx2, avxifma, shani, aesni</td>
 </tr>
 <tr>
 <td><code>bs-windows-x64-avx512ifma</code></td>
 <td><code>x86_64-pc-windows-msvc</code></td>
 <td>clang-cl 21</td>
-<td>x64</td>
-<td>avx512ifma, shani, avx2, sse41</td>
+<td><code>x86-64-v4</code></td>
+<td>avx512ifma, avx512, avx2, shani, aesni</td>
 </tr>
 <tr>
 <td><code>bs-windows-arm64</code></td>
@@ -512,14 +674,16 @@ and the job fails unless both builders produce bit-identical files
 <td><code>aarch64-pc-windows-msvc</code></td>
 <td>clang-cl 21</td>
 <td><code>armv8.2-a+aes+sha2+sha3</code></td>
-<td>sha2, sha3, aes</td>
+<td>sha3, sha2, aes</td>
 </tr>
 </tbody>
 </table></div>
+<p>Each build is named for the hardware extensions it requires, and runs on
+every processor that has them (<a href="selection.html">Build selection</a>).</p>
 <p>The same job also builds the <code>selector</code> of libbitcoin-system, which
-reports the processor's features, for the packages that choose a variant
-at install (<a href="packaging.html">Packaging</a>). It is built for each of the six
-hosts with no instruction set options: <code>selector-linux-x64</code>,
+reports the build for the processor, for the packages that choose a
+variant at install (<a href="packaging.html">Packaging</a>). It is built for each of the
+six hosts with no instruction set options: <code>selector-linux-x64</code>,
 <code>selector-linux-arm64</code>, <code>selector-macos-x64</code>, <code>selector-macos-arm64</code>,
 <code>selector-windows-x64</code> and <code>selector-windows-arm64</code>.</p>
 <p>Linux builds link the C++ and GCC runtimes statically
@@ -580,7 +744,7 @@ from, and show the public key that signed it.</p>
 <p>The draft is public once a maintainer publishes it.</p>
   </article>
 
-  <nav class="pager"><a href="deterministic.html">&larr; Deterministic builds</a><a href="packaging.html">Packaging &rarr;</a></nav>
+  <nav class="pager"><a href="deterministic.html">&larr; Deterministic builds</a><a href="selection.html">Build selection &rarr;</a></nav>
 
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
@@ -668,7 +832,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -681,7 +862,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

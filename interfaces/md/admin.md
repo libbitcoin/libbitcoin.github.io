@@ -1,8 +1,10 @@
 # Admin Console
 
 The admin interface streams the node's log and events over websocket,
-served on the `[admin]` binding. The embedded console is a page of this
-interface, and can be replaced with a custom site (see [Configuration
+served on the `[admin]` binding. It also serves the full
+[native interface](native), so the console needs only this one address.
+The embedded console is a page of this interface, and can be replaced
+with a custom site (see [Configuration
 §5.5](../configuration/setups#5-admin-site)).
 
 Its protocols share one port, and their secure forms share another:
@@ -19,7 +21,13 @@ Its protocols share one port, and their secure forms share another:
 | `/v1/log/subscribe?filter={levels}` | [`log_subscribe`](#log_subscribe) |
 | `/v1/event/subscribe?filter={events}` | [`event_subscribe`](#event_subscribe) |
 
-Any other path is a page of the console, such as `/`.
+Every path of the [native interface](native#1-paths) is also served,
+with the same responses and websocket subscriptions. Any other path is a
+page of the console, such as `/`.
+
+Native requests made here are governed by the `[admin]` settings
+(addresses, hosts, origins, TLS and credentials), not by `[native]`, and
+are served whether or not `[native]` is enabled.
 
 ## 2. Calling pattern
 
@@ -87,7 +95,7 @@ n (§3). To select levels 0 to 6, add their masks:
 
 ### 2.4 Formats
 
-The interface responds in JSON. A request must ask for it, with
+The admin methods respond in JSON. A request must ask for it, with
 `format=json` or an `Accept: application/json` header, or it returns 406.
 A websocket request is JSON by default.
 
@@ -113,13 +121,19 @@ Each response carries one of these statuses
 | 405 | Any method other than `GET` |
 | 406 | JSON was not requested |
 
-Over a websocket, an invalid filter or format, or a method the credential
-does not permit, closes the connection. An unknown path is ignored.
+Over a websocket, an invalid path is answered with 400 and the connection
+is kept. An invalid filter or format, or a method the credential does not
+permit, is answered with an error and closes the connection.
 
 ### 2.6 Credentials
 
-A credential's method list names `log_subscribe` and `event_subscribe`
-(see [Configuration §7.3](../configuration/services#3-authentication)).
+A credential's method list names `log_subscribe`, `event_subscribe` and
+the native method names (see
+[Configuration §7.3](../configuration/services#3-authentication)). A
+credential with no method list permits every method. One with a list
+permits only those named, so for the console it names `log_subscribe`,
+`event_subscribe`, `configuration`, `top`, `top_subscribe`,
+`block_header` and `fees`.
 
 ## 3. Methods
 

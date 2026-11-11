@@ -109,12 +109,14 @@ Set the variables of the build, from its entry in the `guix` matrix of
 
 ```
 $ HOST=x86_64-linux-gnu BASENAME=bs-linux-x64 \
-  OPTIONS="-Denable-avx2=ON -Denable-sse41=ON" \
-  FLAGS="-march=x86-64-v3 -mtune=generic" \
+  FLAGS="-march=x86-64 -mtune=generic" \
   LINKFLAGS="-static-libstdc++ -static-libgcc" \
   bash src/libbitcoin-server/.github/guix/guix-build.sh src build
 ```
 
+A build with tags also sets `OPTIONS` from its entry, as
+`OPTIONS="-Denable-avx2=ON -Denable-shani=ON"` with
+`FLAGS="-march=x86-64-v3 -mtune=generic"` for `bs-linux-x64-avx2-shani`.
 A `selector` build also sets `PROJECT=libbitcoin-system` and
 `PROGRAM=selector`. The first run builds the toolchain from source, which
 can take hours; later runs reuse it from the Guix store.

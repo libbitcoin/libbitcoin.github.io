@@ -432,8 +432,8 @@ messages (§2.4).</p>
 <li>A request may be a batch, an array of requests answered in order.</li>
 <li>A version 2.0 request without an <code>id</code> is a notification: it is run, and
   answered with HTTP 204 and no body.</li>
-<li>A version 1.0 request (no <code>jsonrpc</code>) must have <code>params</code> as an array and
-  an <code>id</code>, and is answered with both <code>result</code> and <code>error</code>.</li>
+<li>A version 1.0 request (no <code>jsonrpc</code>) must have an <code>id</code>, and is answered
+  with both <code>result</code> and <code>error</code>.</li>
 </ul>
 <h3 id="22-errors">2.2 Errors<a class="anchor" href="#22-errors" aria-label="Link to this section">#</a></h3>
 <p>An error carries bitcoind's code, and its name as the message:</p>
@@ -509,11 +509,16 @@ messages (§2.4).</p>
 </tr>
 </tbody>
 </table></div>
-<p>Errors are sent with HTTP 200. A message that cannot be read, or a
-request with a missing, extra or mistyped parameter, closes the
-connection without a response. bitcoind instead answers these with an
-error, and accepts some types that <code>bs</code> does not, such as a boolean for
-<code>getrawtransaction</code> verbosity or a quoted amount.</p>
+<p>A version 2.0 error, and any error within a batch, is sent with HTTP 200.
+A version 1.0 error is sent, as by bitcoind, with HTTP 404 for
+<code>method_not_found</code>, 400 for an invalid request and 500 for any other.</p>
+<p>A request with a mistyped or null parameter is answered with <code>type_error</code>,
+one with an unknown parameter name with <code>invalid_parameter</code>, and one with
+a missing or extra parameter with <code>misc_error</code>, and the connection is
+kept. A message that cannot be read is answered with -32700 (parse error),
+or -32600 (invalid request) when it is not a valid request, and the
+connection is closed. bitcoind accepts some types that <code>bs</code> does not, such
+as a boolean for <code>getrawtransaction</code> verbosity or a quoted amount.</p>
 <h3 id="23-credentials">2.3 Credentials<a class="anchor" href="#23-credentials" aria-label="Link to this section">#</a></h3>
 <pre><code class="language-ini"><span class="section">[bitcoind]</span>
 bind = 127.0.0.1:8280
@@ -1158,7 +1163,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -1171,7 +1193,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

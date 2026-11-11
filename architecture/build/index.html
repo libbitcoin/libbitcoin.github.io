@@ -331,6 +331,7 @@
     <a href="index.html" class="here">Build Architecture</a>
     <a href="deterministic.html">Deterministic builds</a>
     <a href="release.html">Release builds</a>
+    <a href="selection.html">Build selection</a>
     <a href="packaging.html">Packaging</a>
   </nav>
 
@@ -589,6 +590,10 @@ project.</p>
 <td><code>include/bitcoin/[suffix]/version.hpp.in</code></td>
 </tr>
 <tr>
+<td><code>src/version.cpp.in.gsl</code></td>
+<td><code>src/version.cpp.in</code></td>
+</tr>
+<tr>
 <td><code>git/gitignore.gsl</code></td>
 <td><code>.gitignore</code></td>
 </tr>
@@ -632,79 +637,103 @@ the compiler supports them.</p>
 <thead>
 <tr>
 <th>Option</th>
-<th>GNU and Clang flags</th>
-<th>Visual Studio</th>
+<th>Implies</th>
+<th>GNU, Clang and clang-cl flags</th>
+<th>cl</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>sse41</code></td>
+<td></td>
 <td><code>-msse4.1</code></td>
-<td><code>/arch:AVX</code></td>
+<td><code>WITH_SSE41</code></td>
 </tr>
 <tr>
 <td><code>avx2</code></td>
+<td><code>aesni</code></td>
 <td><code>-mavx -mavx2</code></td>
 <td><code>/arch:AVX2</code></td>
 </tr>
 <tr>
 <td><code>avx512</code></td>
+<td><code>avx2</code>, <code>aesni</code></td>
 <td><code>-mavx512f -mavx512bw -mavx512vl</code></td>
 <td><code>/arch:AVX512</code></td>
 </tr>
 <tr>
 <td><code>avx512ifma</code></td>
+<td><code>avx512</code>, <code>avx2</code>, <code>shani</code>, <code>aesni</code></td>
 <td><code>-mavx512ifma -mavx512vl</code></td>
 <td><code>WITH_AVX512IFMA</code></td>
 </tr>
 <tr>
 <td><code>avxifma</code></td>
+<td><code>avx2</code>, <code>shani</code>, <code>aesni</code></td>
 <td><code>-mavxifma</code></td>
 <td><code>/arch:AVX2</code>, <code>WITH_AVXIFMA</code></td>
 </tr>
 <tr>
 <td><code>shani</code></td>
+<td><code>aesni</code></td>
 <td><code>-msse4 -msha</code></td>
 <td><code>WITH_SHANI</code></td>
 </tr>
 <tr>
 <td><code>sha512</code></td>
+<td></td>
 <td><code>-mavx2 -msha512</code></td>
 <td><code>/arch:AVX2</code>, <code>WITH_SHA512</code></td>
 </tr>
 <tr>
 <td><code>aesni</code></td>
+<td></td>
 <td><code>-msse4.1 -maes -mpclmul</code></td>
 <td><code>WITH_AESNI</code></td>
 </tr>
 <tr>
 <td><code>vaes</code></td>
+<td></td>
 <td><code>-mavx2 -maes -mpclmul -mvaes -mvpclmulqdq</code></td>
 <td><code>/arch:AVX2</code>, <code>WITH_VAES</code></td>
 </tr>
 <tr>
 <td><code>sha2</code></td>
+<td><code>aes</code></td>
 <td><code>+sha2</code></td>
 <td><code>WITH_SHA2</code></td>
 </tr>
 <tr>
 <td><code>sha3</code></td>
+<td><code>sha2</code>, <code>aes</code></td>
 <td><code>+sha3</code> (with <code>armv8.2-a</code>)</td>
 <td><code>WITH_SHA3</code></td>
 </tr>
 <tr>
 <td><code>aes</code></td>
+<td></td>
 <td><code>+aes</code></td>
 <td><code>WITH_AES</code></td>
 </tr>
 </tbody>
 </table></div>
+<p>An option also turns on each option it implies, with that option's flags
+and definitions. The implications are emitted into each build system: as
+assignments after the options in <code>CMakeLists.txt</code> and <code>configure.ac</code>, and
+as conditional properties after the option defaults in the MSBuild
+<code>.props</code> files. The implied options are those that every processor with
+the extension is known to have, and the release builds are named for the
+options set, omitting those implied (<a href="selection.html">Build selection</a>).</p>
 <p>The flags are public. <code>configure.ac</code> substitutes them into the pkg-config
 <code>Cflags</code>, and <code>CMakeLists.txt</code> attaches them to the library target with
 <code>PUBLIC</code> visibility, so dependents compile with the same instruction sets.
-In Visual Studio the width options raise an <code>Option-arch</code> property (highest
-wins), which <code>x64.props</code> and <code>Win32.props</code> map to
-<code>EnableEnhancedInstructionSet</code>, defaulting to <code>AdvancedVectorExtensions2</code>.</p>
+The definitions in the cl column are defined for both cl and clang-cl,
+and clang-cl also takes the same flags as Clang. For cl, which has no
+per-extension flags, the width options raise an <code>Option-arch</code> property
+(highest wins), which <code>x64.props</code> and <code>Win32.props</code> map to
+<code>EnableEnhancedInstructionSet</code>, defaulting to <code>AdvancedVectorExtensions2</code>.
+<code>EnableEnhancedInstructionSet</code> is not set for clang-cl, and in CMake
+<code>/arch</code> is passed only to cl.</p>
 <p>The ARM options combine into one flag, <code>-march=armv8-a+&lt;extensions&gt;</code>
 (<code>armv8.2-a</code> when <code>sha3</code> is on), since ARM extensions are suffixes of a
 single <code>-march</code> or <code>-mcpu</code> value. The build fails if an ARM option is on
@@ -855,7 +884,8 @@ its tests, and prints the test logs.</p>
 request when source, test or build paths change. <code>ci-expanded.yml</code> holds
 every job and runs on manual dispatch. The coverage job sends lcov output
 to Coveralls, excluding the paths in the entry's <code>coverage</code> element.
-<code>version-tag.yml</code> creates a version tag on manual dispatch.</p>
+<code>version-tag.yml</code> creates a version tag on manual dispatch
+(<a href="#7-versioning">Versioning</a>).</p>
 <h3 id="61-check-in-gate">6.1 Check-in gate<a class="anchor" href="#61-check-in-gate" aria-label="Link to this section">#</a></h3>
 <p><code>ci.yml</code> of libbitcoin-server, as run on GitHub Actions:</p>
 <div class="mermaid">
@@ -879,6 +909,142 @@ flowchart TD
 <p>Every job must pass for the run to pass.</p>
 <p>libbitcoin-build has its own CI, which clones all six repositories and runs
 <code>generate4.sh</code> on Ubuntu and macOS.</p>
+<h2 id="7-versioning">7. Versioning<a class="anchor" href="#7-versioning" aria-label="Link to this section">#</a></h2>
+<p>A build's version is <code>&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code>. The major and minor numbers
+(<code>4.0</code>) are set in the model. The patch number is the commit height of the
+repository's checkout, <code>git rev-list --count HEAD</code>, so each repository
+numbers its own builds and every commit raises the number. The version
+carries the full commit hash and a dirty flag, set when <code>git status
+--porcelain</code> reports any change. Built outside a git checkout, the hash is
+<code>unknown</code>, the patch number <code>0</code> and the flag clear.</p>
+<p>Each library has two configurable files, named by the <code>configurable</code>
+elements of its model:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Generated as</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>include/bitcoin/[suffix]/version.hpp.in</code></td>
+<td><code>version.hpp</code></td>
+<td>The <code>LIBBITCOIN_[SUFFIX]_VERSION</code> (<code>"4.0"</code>), <code>_MAJOR_VERSION</code> and <code>_MINOR_VERSION</code> macros, and the declaration of <code>build_version()</code></td>
+</tr>
+<tr>
+<td><code>src/version.cpp.in</code></td>
+<td><code>version.cpp</code></td>
+<td><code>build_version()</code>, which returns the semantic version, the commit hash and the dirty flag</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>version.hpp</code> is written when the build is configured, and holds only the
+major and minor numbers, so a new commit does not change it.
+<code>version.cpp</code> is written again by every build, from the state of the
+checkout at that build, and is replaced only when its content changes, so
+an unchanged state recompiles nothing:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Build system</th>
+<th><code>version.cpp</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>autotools</td>
+<td>A <code>FORCE</code> rule in <code>Makefile.am</code> substitutes the values with <code>sed</code></td>
+</tr>
+<tr>
+<td>CMake</td>
+<td>A custom target reruns <code>CMakeLists.txt</code> in script mode, which calls <code>configure_file</code></td>
+</tr>
+<tr>
+<td>Visual Studio</td>
+<td>The <code>ConfigureFiles</code> target of <code>Git.props</code>, before compilation, writes both files under <code>build/</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>bs --version</code> prints each library's version, its hash shortened to
+eight digits, and <code>-dirty</code> for a dirty build:</p>
+<pre><code>libbitcoin-system.... 4.0.10444 8a3cb4da
+</code></pre>
+<p><code>version-tag.yml</code>, run by manual dispatch on a branch (<code>master</code> by default),
+computes the tag <code>v&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code> from the same commit count,
+adds an optional suffix, and pushes it as an annotated tag. It fails if the
+tag exists. <code>maintenance/create-version-tag.sh</code> in libbitcoin-build does
+the same locally, and pushes only when given a remote.</p>
+<h2 id="8-embedded-sources">8. Embedded sources<a class="anchor" href="#8-embedded-sources" aria-label="Link to this section">#</a></h2>
+<p>Two kinds of generated source are committed to the repositories, because
+they need tools that a build does not: the CUDA kernels of
+libbitcoin-system and the web sites of libbitcoin-server. Each is made by a
+Python script, run from the repository root: one compiles C++ to PTX, the
+other TypeScript to minified script and stylesheets, and each embeds the
+result in C++ sources that the build compiles like any other. Run the script again after changing the
+sources it reads, and commit what it writes.</p>
+<h3 id="81-cuda-kernels">8.1 CUDA kernels<a class="anchor" href="#81-cuda-kernels" aria-label="Link to this section">#</a></h3>
+<p><code>tools/generate_cuda_ptx.py</code> compiles <code>src/crypto/secp256k1/cuda/kernels.cu</code>
+to PTX, the portable assembly of NVIDIA GPUs, and writes
+<code>src/crypto/secp256k1/cuda/ptx.cpp</code>:</p>
+<pre><code class="language-sh">python3 tools/generate_cuda_ptx.py
+</code></pre>
+<p>The PTX is generated entirely from the constexpr scalar sources of
+libbitcoin-system. The kernels are compiled by clang for the device only,
+with no CUDA toolkit: <code>-x cuda --cuda-device-only --cuda-gpu-arch=sm_75 -nocudainc
+-nocudalib -std=c++20 -O3</code>, defining <code>WITH_PTX</code> and <code>NDEBUG</code>. They include
+the library headers and the generated <code>version.hpp</code>, so a build must have
+run first. On Windows the script uses the clang of Visual Studio (the C++
+Clang Compiler component) under <code>vcvars64.bat</code>, and elsewhere <code>clang++</code> on
+the path, or the compiler given by <code>--clang</code>.</p>
+<p>The PTX is raw deflated (level 9) and written as a byte array with its
+inflated size, compiled only when CUDA is enabled (<code>HAVE_CUDA</code>). At run
+time the library loads the CUDA driver (<code>nvcuda.dll</code> or <code>libcuda.so.1</code>),
+inflates the PTX and passes it to <code>cuModuleLoadData</code>, and the driver
+compiles it for the GPU. <code>sm_75</code> is the oldest GPU architecture the PTX
+supports.</p>
+<h3 id="82-web-sites">8.2 Web sites<a class="anchor" href="#82-web-sites" aria-label="Link to this section">#</a></h3>
+<p><code>tools/generate_embedded_pages.py</code> builds the admin site and the block
+explorer and writes them into <code>console/embedded/</code>, from which <code>bs</code> serves
+them unless <code>folders.admin</code> or <code>folders.native</code> names a directory
+(<a href="../../configuration/file.html">Configuration File</a>):</p>
+<pre><code class="language-sh">python3 tools/generate_embedded_pages.py
+</code></pre>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>web/admin-dashboard/dist/index.html</code>, <code>style.css</code>, <code>script.js</code></td>
+<td><code>admin_html.cpp</code>, <code>admin_css.cpp</code>, <code>admin_ecma.cpp</code></td>
+</tr>
+<tr>
+<td><code>web/blockexplorer/dist/index.html</code>, <code>style.css</code>, <code>script.js</code></td>
+<td><code>native_html.cpp</code>, <code>native_css.cpp</code>, <code>native_ecma.cpp</code></td>
+</tr>
+<tr>
+<td><code>web/shared/favicon.svg</code></td>
+<td><code>icon.cpp</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Each site is a TypeScript and React project built by Vite. The script
+installs its packages exactly as recorded in its <code>package-lock.json</code> (<code>npm
+ci --ignore-scripts</code>), which requires network access, then runs its build
+(<code>tsc &amp;&amp; vite build</code>), which writes the three files to <code>dist/</code>. A Vite
+plugin (<code>web/licenses.mjs</code>) prepends to each script and stylesheet the
+notice of every third-party package it contains. The script uses <code>npm</code> on
+the path, or the one given by <code>--npm</code>, or on Windows the Node.js bundled
+with Visual Studio. The sites require Node.js 20.19 or later.</p>
+<p>Text files are embedded as raw string literals of 8,000 bytes each, and
+the favicon as a byte array. Every page
+is generated before any is written, so a failure leaves the committed pages
+unchanged. <code>font.cpp</code> in the same directory is not generated.</p>
   </article>
 
   <nav class="pager"><span></span><a href="deterministic.html">Deterministic builds &rarr;</a></nav>
@@ -969,7 +1135,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -982,7 +1165,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

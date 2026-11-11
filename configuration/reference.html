@@ -354,8 +354,28 @@ value. With <code>--config</code>, a setting configured to other than its defaul
 marked by a comment. The sections below are the defaults on mainnet, with
 32 GiB or more of memory for the derived table buckets, grouped by
 area.</p>
-<h2 id="1-log">1. <code>[log]</code><a class="anchor" href="#1-log" aria-label="Link to this section">#</a></h2>
-<p>Logging: which kinds of events are logged (unless changed at the console), and whether and where log files are written.</p>
+<h2 id="1-folders-and-log">1. <code>[folders]</code> and <code>[log]</code><a class="anchor" href="#1-folders-and-log" aria-label="Link to this section">#</a></h2>
+<p>Files: the network directory and the directory of each kind of file, printed as resolved for the run
+(<a href="file.html">Configuration File</a>). <code>symbols</code> is present on Windows builds only.</p>
+<pre><code class="language-ini"><span class="section">[folders]</span>
+<span class="comment"># The admin web site directory, relative to the network directory, defaults to embedded pages.</span>
+admin =
+<span class="comment"># The console log files directory, relative to the network directory, defaults to it.</span>
+console = mainnet
+<span class="comment"># The events log directory, relative to the network directory, defaults to it.</span>
+events = mainnet
+<span class="comment"># The native web site directory, relative to the network directory, defaults to embedded pages.</span>
+native =
+<span class="comment"># The peer address cache directory, relative to the network directory, defaults to it.</span>
+peers = mainnet
+<span class="comment"># The base of the network-named directory, defaults to the working directory.</span>
+root =
+<span class="comment"># The store directory, relative to the network directory, defaults to 'store'.</span>
+store = mainnet/store
+<span class="comment"># The windows symbols (.pdb) directory, relative to the network directory, defaults to 'symbols'.</span>
+symbols = mainnet/symbols
+</code></pre>
+<p>Logging: which kinds of events are logged (unless changed at the console), and whether log files are written.</p>
 <pre><code class="language-ini"><span class="section">[log]</span>
 <span class="comment"># Enable application logging, defaults to 'true'.</span>
 application = true
@@ -369,8 +389,6 @@ fault = true
 limit = 1000000
 <span class="comment"># Enable news logging, defaults to 'true'.</span>
 news = true
-<span class="comment"># The log files directory, defaults to empty.</span>
-path =
 <span class="comment"># Enable protocol logging, defaults to 'false'.</span>
 protocol = false
 <span class="comment"># Enable proxy logging, defaults to 'false'.</span>
@@ -381,13 +399,11 @@ quitting = false
 remote = true
 <span class="comment"># Enable session logging, defaults to 'true'.</span>
 session = true
-<span class="comment"># Path to a directory containing windows symbols (.pdb) files, defaults to empty.</span>
-symbols =
 <span class="comment"># Enable verbose logging, defaults to 'false'.</span>
 verbose = false
 </code></pre>
 <h2 id="2-database">2. <code>[database]</code><a class="anchor" href="#2-database" aria-label="Link to this section">#</a></h2>
-<p>The store: its directory and store-wide options.</p>
+<p>The store: store-wide options.</p>
 <pre><code class="language-ini"><span class="section">[database]</span>
 <span class="comment"># Minimum transactions for a silent payment scan to use the GPU, defaults to '65536'.</span>
 gpu_scan_minimum = 65536
@@ -395,8 +411,6 @@ gpu_scan_minimum = 65536
 interval_depth = 11
 <span class="comment"># Save unconfirmable block state (prevents revalidation), defaults to 'true'.</span>
 mark_unconfirmable = true
-<span class="comment"># The base of the network-named blockchain database directory, defaults to the working directory.</span>
-path = mainnet
 <span class="comment"># Allow individual non-validation queries to use all CPUs, defaults to 'true'.</span>
 turbo = true
 </code></pre>
@@ -825,7 +839,7 @@ compact_missing_percent = 50
 compact_timeout_seconds = 10
 <span class="comment"># Time from present that blocks are considered current, defaults to '1440' (0 disables).</span>
 currency_window_minutes = 1440
-<span class="comment"># Block inbound peer/client (excluding admin/native) until current, defaults to 'true'.</span>
+<span class="comment"># Block inbound peer/client (excluding admin) until current, defaults to 'true'.</span>
 delay_inbound = true
 <span class="comment"># Fee estimation horizon, limited to 1008, defaults to '0' (0 disables).</span>
 fee_estimate_horizon = 0
@@ -923,8 +937,6 @@ identifier = 3652501241
 invalid_services = 268435632
 <span class="comment"># The maximum allowable channel clock skew, defaults to '120'.</span>
 maximum_skew_minutes = 120
-<span class="comment"># The peer address cache file directory, defaults to empty.</span>
-path =
 <span class="comment"># The maximum network protocol version, defaults to '70016'.</span>
 protocol_maximum = 70016
 <span class="comment"># The minimum network protocol version, defaults to '31800'.</span>
@@ -1080,8 +1092,6 @@ maximum_request = 4000000
 minimum_buffer = 4096
 <span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#origin =</span>
-<span class="comment"># The required root path of source files to be served, defaults to empty.</span>
-path =
 <span class="comment"># The send rate limit in bytes per second, defaults to '0' (network controls).</span>
 rate_limit = 0
 <span class="comment"># IP address to secure bind, multiple allowed, defaults to empty (disabled).</span>
@@ -1128,8 +1138,6 @@ maximum_request = 4000000
 minimum_buffer = 4096
 <span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#origin =</span>
-<span class="comment"># The required root path of source files to be served, defaults to empty.</span>
-path =
 <span class="comment"># The send rate limit in bytes per second, defaults to '0' (network controls).</span>
 rate_limit = 0
 <span class="comment"># IP address to secure bind, multiple allowed, defaults to empty (disabled).</span>
@@ -1525,7 +1533,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -1538,7 +1563,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

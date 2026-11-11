@@ -11,14 +11,12 @@ Start the node on regtest:
 $ bs -n regtest
 ```
 
-`-n regtest` applies the built-in regtest defaults below, and keeps the store
-in a `regtest` directory under the working directory, apart from any mainnet
-store. Every run selects the network the same way. Without `-n regtest`,
-`bs` uses the `mainnet` store.
-
-The log files and the peer address cache (`hosts.cache`) are written by default
-to the working directory and are not separated by network, so run each
-network from its own working directory.
+`-n regtest` applies the built-in regtest defaults below, and keeps its files
+in a `regtest` directory under the working directory (or `folders.root`),
+apart from any other network's: the store in `regtest/store`, and the log
+files and the peer address cache (`peers.cache`) in `regtest`. Every run
+selects the network the same way. Without `-n regtest`, `bs` uses the
+`mainnet` directory.
 
 ## Defaults
 

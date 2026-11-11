@@ -331,6 +331,7 @@
     <a href="index.html">Build Architecture</a>
     <a href="deterministic.html" class="here">Deterministic builds</a>
     <a href="release.html">Release builds</a>
+    <a href="selection.html">Build selection</a>
     <a href="packaging.html">Packaging</a>
   </nav>
 
@@ -502,12 +503,14 @@ $ git clone --branch &lt;server tag&gt; https://github.com/libbitcoin/libbitcoin
 <code>guix-build.sh</code> with the source and output directories. For
 <code>bs-linux-x64</code>:</p>
 <pre class="console"><code>$ HOST=x86_64-linux-gnu BASENAME=bs-linux-x64 \
-  OPTIONS=&quot;-Denable-avx2=ON -Denable-sse41=ON&quot; \
-  FLAGS=&quot;-march=x86-64-v3 -mtune=generic&quot; \
+  FLAGS=&quot;-march=x86-64 -mtune=generic&quot; \
   LINKFLAGS=&quot;-static-libstdc++ -static-libgcc&quot; \
   bash src/libbitcoin-server/.github/guix/guix-build.sh src build
 </code></pre>
-<p>A <code>selector</code> build also sets <code>PROJECT=libbitcoin-system</code> and
+<p>A build with tags also sets <code>OPTIONS</code> from its entry, as
+<code>OPTIONS="-Denable-avx2=ON -Denable-shani=ON"</code> with
+<code>FLAGS="-march=x86-64-v3 -mtune=generic"</code> for <code>bs-linux-x64-avx2-shani</code>.
+A <code>selector</code> build also sets <code>PROJECT=libbitcoin-system</code> and
 <code>PROGRAM=selector</code>. The first run builds the toolchain from source, which
 can take hours; later runs reuse it from the Guix store.</p>
 <p>Then compare <code>build/SHA256SUMS</code> with the hashes of the published files:</p>
@@ -610,7 +613,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -623,7 +643,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

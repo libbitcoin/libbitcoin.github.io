@@ -476,7 +476,7 @@
 </thead>
 <tbody>
 <tr>
-<td>P2P network</td>
+<td>P2P</td>
 <td>8333 / 8333</td>
 <td>18333 / 18333</td>
 <td>48333 / 48333</td>
@@ -533,6 +533,27 @@
 </tr>
 </tbody>
 </table></div>
+<p>To connect to a secure ZMQ port, a client must be configured with the server's public key:</p>
+<div id="zmq-keys"></div>
+
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Host</th>
+<th>ZMQ base85 public key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wormer.libbitcoin.net</td>
+<td><code>&gt;XrBaljAIXUrrCt(y^(i-@2mUY-4]lj=:DSoFWns</code></td>
+</tr>
+<tr>
+<td>carmine.libbitcoin.net</td>
+<td><code>ihZy(J.QWwNe(L9uUMyI8GH0&lt;vW=kHJ9PLdBle8:</code></td>
+</tr>
+</tbody>
+</table></div>
 <style>
 .scan-host { margin: 1.4em 0 .4em; font-family: var(--mono); }
 #server-scan a { color: inherit; }
@@ -546,7 +567,31 @@
 #server-details + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
 #server-details + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
 .scan-some { color: var(--partial, #ffa022); font-weight: 600; }
+#zmq-keys + .scroller .copy { position: static; margin-left: .6em; padding: 3px; vertical-align: middle; }
 </style>
+
+<script>
+(function () {
+  var marker = document.getElementById("zmq-keys");
+  if (!marker || !navigator.clipboard) return;
+  marker.nextElementSibling.querySelectorAll("td code").forEach(function (code) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "copy";
+    button.title = "Copy";
+    button.setAttribute("aria-label", "Copy");
+    button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+    button.addEventListener("click", function () {
+      navigator.clipboard.writeText(code.textContent).then(function () {
+        button.classList.add("done");
+        button.title = "Copied";
+        setTimeout(function () { button.classList.remove("done"); button.title = "Copy"; }, 1500);
+      });
+    });
+    code.parentNode.appendChild(button);
+  });
+})();
+</script>
 
 <script>
 (function () {
@@ -767,6 +812,7 @@ avx2........ platform:1 compiled:1.
 avx512...... platform:0 compiled:0.
 avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:0 compiled:0.
+build....... platform:bs-linux-x64-avx2-shani compiled:bs-linux-x64-avx2-shani.
 cuda........ platform:0 compiled:1.
 </code></pre>
 <h2 id="2-running-a-community-server">2. Running a community server<a class="anchor" href="#2-running-a-community-server" aria-label="Link to this section">#</a></h2>
@@ -853,8 +899,9 @@ To admit only particular sites, list them:</p>
 origin = explorer.example.org:443
 </code></pre>
 <p>Each <code>origin</code> is a host and port, without a scheme. A service with an
-<code>origin</code> list also refuses the pages it serves itself, unless its own host
-and port are listed.</p>
+<code>origin</code> list admits the pages it serves itself only when the request's
+<code>Host</code> is in its <code>host</code> list, so list the service's own name there, which
+also protects it from DNS rebinding.</p>
 <p>A request from any other page is then refused. Requests that carry no
 <code>Origin</code>, such as those from wallets and command line tools, are not
 affected. <code>allow_opaque_origin</code> admits pages opened as local files
@@ -953,7 +1000,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -966,7 +1030,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

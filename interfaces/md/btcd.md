@@ -291,4 +291,3 @@ btcd deprecates this method in favor of `loadtxfilter` with
 | `rescan` | Not implemented, except with no addresses or outputs, which finishes at once | Searches past blocks, notifying each match |
 | Watches per connection | `btcd.maximum_filters` | No limit |
 | Invalid argument | Error -8 | Error -5 or -22 |
-| Mistyped parameter | Connection closed | Error |

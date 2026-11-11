@@ -3,8 +3,11 @@
 ## 1. The configuration file
 
 Paths take the platform's form, for example `/data/bitcoin` or
-`D:\bitcoin`. A relative path is relative to the working directory,
-not to the configuration file.
+`D:\bitcoin`. A relative `folders.root` is relative to the working
+directory, not to the configuration file. Every other relative path, of
+the other `[folders]` settings and of the TLS certificate and key files,
+is relative to the network directory, `<folders.root>/<network>`. An
+absolute path is used as is.
 
 Integer values may use commas as thousands separators, for example
 `node.maximum_height = 900,000`.
@@ -13,6 +16,7 @@ Section map:
 
 | Area | Sections |
 | ---- | -------- |
+| Files | `[folders]` |
 | Logging | `[log]` |
 | Store | `[database]`, `[table.*]` |
 | Chain | `[bitcoin]`, `[forks]`, `[wallet]` |
@@ -23,20 +27,38 @@ Section map:
 Simple example config file:
 
 ```ini
-[database]
-path = bitcoin
-
-[log]
-path = log
+[folders]
+root = bitcoin
+console = log
+events = log
 ```
 
 The same settings can be written without section headers, by prefixing
 each name with its section:
 
 ```ini
-database.path = bitcoin
-log.path = log
+folders.root = bitcoin
+folders.console = log
+folders.events = log
 ```
+
+On mainnet this puts the store in `bitcoin/mainnet/store` and the log
+files in `bitcoin/mainnet/log`. The `[folders]` settings:
+
+| Setting | Directory of | Default |
+| ------- | ------------ | ------- |
+| `root` | The network directory, `<root>/<network>` | The working directory |
+| `store` | The store | `store` |
+| `console` | `console_new.log` and `console_old.log` | The network directory |
+| `events` | `events.log` | The network directory |
+| `peers` | `peers.cache` | The network directory |
+| `admin` | A custom admin site | None, the embedded site |
+| `native` | A custom block explorer | None, the embedded site |
+| `symbols` | Windows symbols (`.pdb`), Windows builds only | `symbols` |
+
+`bs` creates the store, console, events and peers directories. The admin,
+native and symbols directories are used only when they are set (symbols
+by default) and are not created.
 
 ## 2. Displaying settings
 

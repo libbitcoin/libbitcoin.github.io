@@ -65,28 +65,26 @@ checkpoint = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
 
 ## 5. Admin site
 
-`bs` serves its own administrative site, which also utilizes its native
-REST interface. Here both are limited to the local machine:
+`bs` serves its own administrative site. The admin interface also serves
+the full native REST interface, which the site uses, so `[native]` need
+not be enabled. Here it is limited to the local machine:
 
 ```ini
 [admin]
 bind = 127.0.0.1:8080
 bind = [::1]:8080
 connections = 10
-
-[native]
-bind = 127.0.0.1:8180
-bind = [::1]:8180
-connections = 10
 ```
 
-To view the admin site open `http://localhost:8080` in a browser. Its pages
+To view the admin site open `http://localhost:8080` in a browser. The site
+makes its admin and native requests over one websocket to the address it
+was loaded from. Its pages
 are admin REST queries rendered as HTML, the default for a browser request.
 The same paths return data when JSON is requested, with `format=json` or an
 `Accept: application/json` header.
 
 To serve a custom admin site from a directory instead of the embedded site,
-set `admin.path`. A request for `/` returns `admin.default`
+set `folders.admin`. A request for `/` returns `admin.default`
 (`index.html`).
 
 The admin interface is libbitcoin's own, and provides:
@@ -94,6 +92,8 @@ The admin interface is libbitcoin's own, and provides:
 - HTTP and websocket on each port. Over a websocket, each frame is one
   request path, and `log_subscribe` and `event_subscribe` stream the
   node's log and events.
+- The full [native interface](../interfaces/native), under the `[admin]`
+  settings.
 - TLS on its `safe` addresses ([Secure connections](services#2-secure-connections)), with optional client certificates
   ([Authentication](services#3-authentication)).
 - Credentials ([Authentication](services#3-authentication)), restricted by REST method names.
@@ -110,7 +110,9 @@ bind = [::1]:8180
 connections = 10
 ```
 
-To view the block explorer open `http://localhost:8180` in a browser.
+To view the block explorer open `http://localhost:8180` in a browser. By
+default it is available once the chain is current
+([Until current](services#until-current)).
 
 The explorer is the native REST interface rendered as HTML, the default for a
 browser request. The same paths return each result in any of four formats,
@@ -155,7 +157,7 @@ Query options, besides `format`:
 | `stop=true` | subscribe paths | End the subscription |
 
 To serve a custom block explorer from a directory instead of the embedded
-site, set `native.path`. A request for `/` returns `native.default`
+site, set `folders.native`. A request for `/` returns `native.default`
 (`index.html`).
 
 The native interface is libbitcoin's own, and provides:
@@ -577,7 +579,7 @@ minimum_fee_rate = 0.000001
   node then serves only blocks above it.
 - `node.provide_filters` also requires the client filter tables ([Client filters (BIP157/158)](#12-client-filters-bip157158)).
 - `node.delay_inbound` refuses inbound peers, and client services other
-  than `[admin]` and `[native]`, until the chain is current.
+  than `[admin]`, until the chain is current.
 - `node.fee_estimate_horizon` is the number of recent blocks used for fee
   estimates, at most 1,008 (one week). `0` disables fee estimation.
 - `node.minimum_fee_rate` is the lowest fee rate, in BTC per thousand

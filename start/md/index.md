@@ -48,8 +48,9 @@ The result is `~/libbitcoin/bin/bs`. On Windows, see
 $ bs
 ```
 
-With no configuration, `bs` syncs mainnet into a `mainnet` store in the
-current directory, creating it if it does not exist. Progress is logged
+With no configuration, `bs` syncs mainnet into a `mainnet` directory in
+the current directory, with the store in `mainnet/store`, creating it if
+it does not exist. Progress is logged
 to the console. To stop, type `c` and `<enter>`, or press `<ctrl> c`. A
 restart resumes where it stopped. To sync a test chain, or to stop at a
 height, see [Command Line](../configuration/command-line) and
@@ -88,9 +89,9 @@ $ bs --config bs.cfg
 | Block explorer | `http://localhost:8180` in a browser |
 | Electrum, Sparrow | The server's address and port 8580, without SSL |
 
-The admin console and the block explorer are available at once, and
-show the sync's progress. The other interfaces accept connections once
-the node is current.
+The admin console is available at once, and shows the sync's progress.
+The block explorer and the other interfaces accept connections once the
+node is current.
 
 ## 4. Next
 

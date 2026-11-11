@@ -27,14 +27,12 @@ Start the node on testnet5:
 $ bs -n testnet5
 ```
 
-`-n testnet5` applies the built-in testnet5 defaults below, and keeps the store
-in a `testnet5` directory under the working directory, apart from any mainnet
-store. Every run selects the network the same way. Without `-n testnet5`,
-`bs` uses the `mainnet` store.
-
-The log files and the peer address cache (`hosts.cache`) are written by default
-to the working directory and are not separated by network, so run each
-network from its own working directory.
+`-n testnet5` applies the built-in testnet5 defaults below, and keeps its files
+in a `testnet5` directory under the working directory (or `folders.root`),
+apart from any other network's: the store in `testnet5/store`, and the log
+files and the peer address cache (`peers.cache`) in `testnet5`. Every run
+selects the network the same way. Without `-n testnet5`, `bs` uses the
+`mainnet` directory.
 
 ## Defaults
 

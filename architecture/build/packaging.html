@@ -331,6 +331,7 @@
     <a href="index.html">Build Architecture</a>
     <a href="deterministic.html">Deterministic builds</a>
     <a href="release.html">Release builds</a>
+    <a href="selection.html">Build selection</a>
     <a href="packaging.html" class="here">Packaging</a>
   </nav>
 
@@ -362,7 +363,7 @@ contain the signed builds of a release (<a href="release.html">Release builds</a
 <td>macOS</td>
 <td>x64, arm64</td>
 <td>Formula <code>libbitcoin-server.rb</code></td>
-<td><code>bs-macos-arm64</code> or <code>bs-macos-x64</code>, as <code>bs</code></td>
+<td><code>bs-macos-arm64-sha3</code> or <code>bs-macos-x64-avx2</code>, as <code>bs</code></td>
 </tr>
 <tr>
 <td>winget</td>
@@ -396,17 +397,19 @@ contain the signed builds of a release (<a href="release.html">Release builds</a
 </table></div>
 <h2 id="2-variants">2. Variants<a class="anchor" href="#2-variants" aria-label="Link to this section">#</a></h2>
 <p>The deb packages, the Windows installers and the Docker image each hold
-two variants of <code>bs</code> and the <code>selector</code>, which reports the processor's
-features. The first variant whose required features the processor has is
-used, at install for a deb or an installer, and at each start for the
-image; the install or start fails if neither is supported.</p>
+two variants of <code>bs</code> and the <code>selector</code>, which prints the tags of the
+processor (<a href="selection.html#5-selection">Build selection</a>). The optimized
+variant is used if the <code>selector</code> prints each of its required tags, and
+the baseline variant otherwise, at install for a deb or an installer, and
+at each start for the image. The baseline variant is built for the
+architecture's floor and requires no tags, so it runs on every processor
+of its architecture.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
 <th>Platform</th>
 <th>Architecture</th>
 <th>Baseline</th>
-<th>Requires</th>
 <th>Optimized</th>
 <th>Requires</th>
 </tr>
@@ -416,58 +419,37 @@ image; the install or start fails if neither is supported.</p>
 <td>Linux, Docker</td>
 <td>x64</td>
 <td><code>bs-linux-x64</code></td>
-<td>avx2</td>
-<td><code>bs-linux-x64-shani</code></td>
-<td>shani, avx2, sse41</td>
+<td><code>bs-linux-x64-avx2-shani</code></td>
+<td><code>avx2</code>, <code>shani</code></td>
 </tr>
 <tr>
 <td>Linux, Docker</td>
 <td>arm64</td>
 <td><code>bs-linux-arm64</code></td>
-<td>neon</td>
 <td><code>bs-linux-arm64-sha2</code></td>
-<td>neon, aes, sha2</td>
+<td><code>sha2</code></td>
 </tr>
 <tr>
 <td>Windows</td>
 <td>x64</td>
 <td><code>bs-windows-x64.exe</code></td>
-<td>avx2</td>
-<td><code>bs-windows-x64-shani.exe</code></td>
-<td>shani, avx2, sse41</td>
+<td><code>bs-windows-x64-avx2-shani.exe</code></td>
+<td><code>avx2</code>, <code>shani</code></td>
 </tr>
 <tr>
 <td>Windows</td>
 <td>arm64</td>
 <td><code>bs-windows-arm64.exe</code></td>
-<td>neon</td>
 <td><code>bs-windows-arm64-sha2.exe</code></td>
-<td>neon, aes, sha2</td>
-</tr>
-<tr>
-<td>macOS</td>
-<td>x64</td>
-<td><code>bs-macos-x64</code></td>
-<td>aesni, avx2, sse41</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>macOS</td>
-<td>arm64</td>
-<td><code>bs-macos-arm64</code></td>
-<td>neon, aes, sha2, sha3</td>
-<td></td>
-<td></td>
+<td><code>sha2</code></td>
 </tr>
 </tbody>
 </table></div>
-<p>Every arm64 processor has NEON (Advanced SIMD is required by
-ARMv8-A), so the arm64 baseline is not checked.</p>
-<p>The Homebrew formula holds one build per architecture, with no selector.
-Both builds require macOS 13.3, and every Mac that runs it has the
-features of its build: every Apple silicon processor, and every Intel
-processor of a Mac supported by macOS 13 (2017 and later).</p>
+<p>The Homebrew formula holds one build per architecture, with no selector:
+<code>bs-macos-arm64-sha3</code> and <code>bs-macos-x64-avx2</code>. Both builds require macOS
+13.3, and every Mac that runs it has the tags of its build: every Apple
+silicon processor, and every Intel processor of a Mac supported by
+macOS 13 (2017 and later).</p>
 <h2 id="3-package-release">3. Package Release<a class="anchor" href="#3-package-release" aria-label="Link to this section">#</a></h2>
 <p><code>package-release.yml</code>, in libbitcoin-server, is run by hand with a release
 tag. Each job that takes builds from the release downloads them with their
@@ -612,11 +594,10 @@ URLs, so each is submitted once the release is published.</p>
 volume and its configuration in <code>/data/bs.cfg</code>. On first start, when
 <code>/data/bs.cfg</code> does not exist, the image copies its default configuration
 there:</p>
-<pre><code class="language-ini"><span class="section">[database]</span>
-path = bitcoin
-
-<span class="section">[log]</span>
-path = log
+<pre><code class="language-ini"><span class="section">[folders]</span>
+root = bitcoin
+console = log
+events = log
 
 <span class="section">[admin]</span>
 bind = 0.0.0.0:8080
@@ -676,7 +657,8 @@ kills the node, so run the container with <code>--stop-timeout 600</code>.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Backups exclude the store (<code>bitcoin/</code>) and the logs (<code>log/</code>). The stop
+<p>Backups exclude <code>bitcoin/</code>, which holds the network directory with the
+store, logs and peer address cache. The stop
 grace period is 5 minutes 30 seconds, for the store to close.</p>
 <h3 id="53-startos">5.3 StartOS<a class="anchor" href="#53-startos" aria-label="Link to this section">#</a></h3>
 <p>The package runs the image, pinned by digest, on x86_64 and aarch64.</p>
@@ -708,14 +690,14 @@ grace period is 5 minutes 30 seconds, for the store to close.</p>
 </table></div>
 <p>StartOS serves the web interfaces over HTTPS, with its own certificate
 authority. Its health check is that the admin port is listening. The stop
-timeout is 5 minutes, and backups exclude <code>bitcoin/</code> and <code>log/</code>.</p>
+timeout is 5 minutes, and backups exclude <code>bitcoin/</code>.</p>
 <p>The package requires 15 GiB of RAM as StartOS reports it, which admits a
 16 GB machine (StartOS compares against the total the kernel reports,
 about 2.3% under the installed RAM). StartOS does not offer the package on
 a smaller machine.</p>
   </article>
 
-  <nav class="pager"><a href="release.html">&larr; Release builds</a><span></span></nav>
+  <nav class="pager"><a href="selection.html">&larr; Build selection</a><span></span></nav>
 
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>
@@ -803,7 +785,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -816,7 +815,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

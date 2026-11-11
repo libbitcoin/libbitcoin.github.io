@@ -52,8 +52,8 @@ $ curl --user user:pass -d '{"jsonrpc":"2.0","id":1,"method":"getblockcount","pa
 - A request may be a batch, an array of requests answered in order.
 - A version 2.0 request without an `id` is a notification: it is run, and
   answered with HTTP 204 and no body.
-- A version 1.0 request (no `jsonrpc`) must have `params` as an array and
-  an `id`, and is answered with both `result` and `error`.
+- A version 1.0 request (no `jsonrpc`) must have an `id`, and is answered
+  with both `result` and `error`.
 
 ### 2.2 Errors
 
@@ -81,11 +81,17 @@ An error carries bitcoind's code, and its name as the message:
 | -32602 | `invalid_params` |
 | -32603 | `internal_error` |
 
-Errors are sent with HTTP 200. A message that cannot be read, or a
-request with a missing, extra or mistyped parameter, closes the
-connection without a response. bitcoind instead answers these with an
-error, and accepts some types that `bs` does not, such as a boolean for
-`getrawtransaction` verbosity or a quoted amount.
+A version 2.0 error, and any error within a batch, is sent with HTTP 200.
+A version 1.0 error is sent, as by bitcoind, with HTTP 404 for
+`method_not_found`, 400 for an invalid request and 500 for any other.
+
+A request with a mistyped or null parameter is answered with `type_error`,
+one with an unknown parameter name with `invalid_parameter`, and one with
+a missing or extra parameter with `misc_error`, and the connection is
+kept. A message that cannot be read is answered with -32700 (parse error),
+or -32600 (invalid request) when it is not a valid request, and the
+connection is closed. bitcoind accepts some types that `bs` does not, such
+as a boolean for `getrawtransaction` verbosity or a quoted amount.
 
 ### 2.3 Credentials
 

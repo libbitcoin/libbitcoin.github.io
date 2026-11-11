@@ -7,9 +7,32 @@ marked by a comment. The sections below are the defaults on mainnet, with
 32 GiB or more of memory for the derived table buckets, grouped by
 area.
 
-## 1. `[log]`
+## 1. `[folders]` and `[log]`
 
-Logging: which kinds of events are logged (unless changed at the console), and whether and where log files are written.
+Files: the network directory and the directory of each kind of file, printed as resolved for the run
+([Configuration File](file)). `symbols` is present on Windows builds only.
+
+```ini
+[folders]
+# The admin web site directory, relative to the network directory, defaults to embedded pages.
+admin =
+# The console log files directory, relative to the network directory, defaults to it.
+console = mainnet
+# The events log directory, relative to the network directory, defaults to it.
+events = mainnet
+# The native web site directory, relative to the network directory, defaults to embedded pages.
+native =
+# The peer address cache directory, relative to the network directory, defaults to it.
+peers = mainnet
+# The base of the network-named directory, defaults to the working directory.
+root =
+# The store directory, relative to the network directory, defaults to 'store'.
+store = mainnet/store
+# The windows symbols (.pdb) directory, relative to the network directory, defaults to 'symbols'.
+symbols = mainnet/symbols
+```
+
+Logging: which kinds of events are logged (unless changed at the console), and whether log files are written.
 
 ```ini
 [log]
@@ -25,8 +48,6 @@ fault = true
 limit = 1000000
 # Enable news logging, defaults to 'true'.
 news = true
-# The log files directory, defaults to empty.
-path =
 # Enable protocol logging, defaults to 'false'.
 protocol = false
 # Enable proxy logging, defaults to 'false'.
@@ -37,15 +58,13 @@ quitting = false
 remote = true
 # Enable session logging, defaults to 'true'.
 session = true
-# Path to a directory containing windows symbols (.pdb) files, defaults to empty.
-symbols =
 # Enable verbose logging, defaults to 'false'.
 verbose = false
 ```
 
 ## 2. `[database]`
 
-The store: its directory and store-wide options.
+The store: store-wide options.
 
 ```ini
 [database]
@@ -55,8 +74,6 @@ gpu_scan_minimum = 65536
 interval_depth = 11
 # Save unconfirmable block state (prevents revalidation), defaults to 'true'.
 mark_unconfirmable = true
-# The base of the network-named blockchain database directory, defaults to the working directory.
-path = mainnet
 # Allow individual non-validation queries to use all CPUs, defaults to 'true'.
 turbo = true
 ```
@@ -505,7 +522,7 @@ compact_missing_percent = 50
 compact_timeout_seconds = 10
 # Time from present that blocks are considered current, defaults to '1440' (0 disables).
 currency_window_minutes = 1440
-# Block inbound peer/client (excluding admin/native) until current, defaults to 'true'.
+# Block inbound peer/client (excluding admin) until current, defaults to 'true'.
 delay_inbound = true
 # Fee estimation horizon, limited to 1008, defaults to '0' (0 disables).
 fee_estimate_horizon = 0
@@ -611,8 +628,6 @@ identifier = 3652501241
 invalid_services = 268435632
 # The maximum allowable channel clock skew, defaults to '120'.
 maximum_skew_minutes = 120
-# The peer address cache file directory, defaults to empty.
-path =
 # The maximum network protocol version, defaults to '70016'.
 protocol_maximum = 70016
 # The minimum network protocol version, defaults to '31800'.
@@ -784,8 +799,6 @@ maximum_request = 4000000
 minimum_buffer = 4096
 # The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
 #origin =
-# The required root path of source files to be served, defaults to empty.
-path =
 # The send rate limit in bytes per second, defaults to '0' (network controls).
 rate_limit = 0
 # IP address to secure bind, multiple allowed, defaults to empty (disabled).
@@ -836,8 +849,6 @@ maximum_request = 4000000
 minimum_buffer = 4096
 # The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
 #origin =
-# The required root path of source files to be served, defaults to empty.
-path =
 # The send rate limit in bytes per second, defaults to '0' (network controls).
 rate_limit = 0
 # IP address to secure bind, multiple allowed, defaults to empty (disabled).

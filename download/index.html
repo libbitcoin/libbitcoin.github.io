@@ -349,13 +349,13 @@ key that signed its builds. Its assets are the builds, each with a
 signature file of the same name, ending in <code>.asc</code>:</p>
 <pre><code>bs-linux-x64
 bs-linux-x64.asc
-bs-linux-x64-shani
-bs-linux-x64-shani.asc
+bs-linux-x64-avx2-shani
+bs-linux-x64-avx2-shani.asc
 ...
 </code></pre>
 <h2 id="2-selecting-a-build">2. Selecting a build<a class="anchor" href="#2-selecting-a-build" aria-label="Link to this section">#</a></h2>
-<p>A build is named <code>bs-&lt;platform&gt;-&lt;architecture&gt;</code>, followed by the
-extension level it is built for, if any. Windows builds end in <code>.exe</code>.</p>
+<p>A build is named <code>bs-&lt;platform&gt;-&lt;architecture&gt;</code>, followed by the tags of
+the hardware extensions it requires, if any. Windows builds end in <code>.exe</code>.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -391,16 +391,40 @@ extension level it is built for, if any. Windows builds end in <code>.exe</code>
 <td></td>
 </tr>
 <tr>
+<td><code>x64-sse41</code></td>
+<td>SSE4.1</td>
+</tr>
+<tr>
 <td><code>x64-shani</code></td>
-<td>SHA extensions</td>
+<td>SHA extensions, AES-NI</td>
+</tr>
+<tr>
+<td><code>x64-avx2</code></td>
+<td>AVX2, AES-NI</td>
+</tr>
+<tr>
+<td><code>x64-avx2-shani</code></td>
+<td>AVX2, SHA extensions, AES-NI</td>
 </tr>
 <tr>
 <td><code>x64-avxifma</code></td>
-<td>SHA extensions, AVX-IFMA</td>
+<td>AVX-IFMA, AVX2, SHA extensions, AES-NI</td>
+</tr>
+<tr>
+<td><code>x64-avx512</code></td>
+<td>AVX-512, AVX2, AES-NI</td>
+</tr>
+<tr>
+<td><code>x64-avx512-shani</code></td>
+<td>AVX-512, AVX2, SHA extensions, AES-NI</td>
+</tr>
+<tr>
+<td><code>x64-avx512-avxifma</code></td>
+<td>AVX-512, AVX-IFMA, AVX2, SHA extensions, AES-NI</td>
 </tr>
 <tr>
 <td><code>x64-avx512ifma</code></td>
-<td>SHA extensions, AVX-512 IFMA</td>
+<td>AVX-512 IFMA, AVX-512, AVX2, SHA extensions, AES-NI</td>
 </tr>
 <tr>
 <td><code>arm64</code></td>
@@ -412,23 +436,33 @@ extension level it is built for, if any. Windows builds end in <code>.exe</code>
 </tr>
 <tr>
 <td><code>arm64-sha3</code></td>
-<td>ARMv8 SHA-2, AES, ARMv8.2 SHA-3</td>
+<td>ARMv8.2 SHA-3 (used for SHA-512), ARMv8 SHA-2, AES</td>
 </tr>
 </tbody>
 </table></div>
-<p>Linux and Windows have every build above. macOS has one build for each
-architecture: <code>arm64</code>, which uses ARMv8 SHA-2, SHA-3 and AES, and <code>x64</code>,
-which uses AES-NI.</p>
-<p>A build runs only on a CPU that has every extension it uses, and is
-faster for using them. To select one, run the build without an extension
-level, which runs on any CPU of its architecture, with <code>--hardware</code>:</p>
-<pre class="console"><code>$ bs-linux-x64 --hardware
+<p>Each platform has every build above. A build runs only on a CPU that has
+every extension it uses, and is faster for using them. The <code>x64</code> and
+<code>arm64</code> builds run on any CPU of their architecture.</p>
+<p>The <code>selector</code>, published beside the builds as
+<code>selector-&lt;platform&gt;-&lt;architecture&gt;</code>, prints the name of the build for
+the CPU it runs on:</p>
+<pre class="console"><code>$ selector-linux-x64 bs
+bs-linux-x64-avx2-shani
 </code></pre>
-<p>It lists the extensions of the CPU. Use the build whose extensions are
-all among them, preferring <code>avx512ifma</code> to <code>avxifma</code>, and either to
-<code>shani</code>. For example, a CPU with SHA extensions and AVX-512 IFMA uses
-<code>bs-linux-x64-avx512ifma</code>. For what each extension does, see
-<a href="../building/options.html#2-hardware-options">Hardware options</a>.</p>
+<p>Given a release tag, it prints the download address of that build:</p>
+<pre class="console"><code>$ selector-linux-x64 bs &lt;release&gt;
+https://github.com/libbitcoin/libbitcoin-server/releases/download/&lt;release&gt;/bs-linux-x64-avx2-shani
+</code></pre>
+<p>Any build also prints the name with <code>--hardware</code>, after the extensions of
+the CPU (<code>platform</code>) and those of the build (<code>compiled</code>):</p>
+<pre class="console"><code>$ bs-linux-x64 --hardware
+...
+build....... platform:bs-linux-x64-avx2-shani compiled:bs-linux-x64.
+</code></pre>
+<p><code>platform</code> names the build for the CPU, and <code>compiled</code> names the build
+being run. For how the name is chosen, see
+<a href="../architecture/build/selection.html">Build selection</a>, and for what each
+extension does, see <a href="../building/options.html#2-hardware-options">Hardware options</a>.</p>
 <p>The list ends with CUDA, for batch signature verification on an NVIDIA
 GPU:</p>
 <pre><code>cuda........ platform:1 compiled:1.
@@ -628,7 +662,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -641,7 +692,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);

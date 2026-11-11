@@ -212,8 +212,11 @@ An error response carries a code and a message:
 | -101 | Too many subscriptions (`electrum.maximum_subscriptions`) |
 | -32601 | Method not found |
 
-A malformed message, or a request with missing, extra or mistyped
-parameters, closes the connection without a response.
+A request with missing, extra or mistyped parameters is answered with
+-32602 (invalid params), and the connection is kept, except at
+`server.version`, where it is then closed. A message that cannot be read
+is answered with -32700 (parse error), or -32600 (invalid request) when it
+is not a valid request, and the connection is closed.
 
 ### 2.8 Configuration
 

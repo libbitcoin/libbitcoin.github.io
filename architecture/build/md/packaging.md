@@ -9,7 +9,7 @@ contain the signed builds of a release ([Release builds](release)).
 | Manager | Platform | Architectures | Package | Installs |
 | ------- | -------- | ------------- | ------- | -------- |
 | apt (deb) | Linux | x64, arm64 | `libbitcoin-server_<version>_<arch>.deb` (`amd64`, `arm64`) | The best variant the processor supports, linked as `/usr/bin/bs` |
-| Homebrew | macOS | x64, arm64 | Formula `libbitcoin-server.rb` | `bs-macos-arm64` or `bs-macos-x64`, as `bs` |
+| Homebrew | macOS | x64, arm64 | Formula `libbitcoin-server.rb` | `bs-macos-arm64-sha3` or `bs-macos-x64-avx2`, as `bs` |
 | winget | Windows | x64, arm64 | `Libbitcoin.Server`, an Inno Setup installer (`libbitcoin-server-<version>-windows-<arch>-setup.exe`) | The best variant the processor supports, as `bs.exe`, with its directory added to the system `PATH` unless that installer task is unchecked |
 | Docker | Linux | x64, arm64 | Image `ghcr.io/libbitcoin/libbitcoin-server:<version>` (`linux/amd64`, `linux/arm64`) | Runs the best variant the processor supports ([§5](#5-containers)) |
 | Umbrel | umbrelOS | x64, arm64 | App `bitcoin-server` (`libbitcoin-server-<version>-umbrel.tar.gz`), on the Docker image | As Docker ([§5.2](#52-umbrel)) |
@@ -18,27 +18,26 @@ contain the signed builds of a release ([Release builds](release)).
 ## 2. Variants
 
 The deb packages, the Windows installers and the Docker image each hold
-two variants of `bs` and the `selector`, which reports the processor's
-features. The first variant whose required features the processor has is
-used, at install for a deb or an installer, and at each start for the
-image; the install or start fails if neither is supported.
+two variants of `bs` and the `selector`, which prints the tags of the
+processor ([Build selection](selection#5-selection)). The optimized
+variant is used if the `selector` prints each of its required tags, and
+the baseline variant otherwise, at install for a deb or an installer, and
+at each start for the image. The baseline variant is built for the
+architecture's floor and requires no tags, so it runs on every processor
+of its architecture.
 
-| Platform | Architecture | Baseline | Requires | Optimized | Requires |
-| -------- | ------------ | -------- | -------- | --------- | -------- |
-| Linux, Docker | x64 | `bs-linux-x64` | avx2 | `bs-linux-x64-shani` | shani, avx2, sse41 |
-| Linux, Docker | arm64 | `bs-linux-arm64` | neon | `bs-linux-arm64-sha2` | neon, aes, sha2 |
-| Windows | x64 | `bs-windows-x64.exe` | avx2 | `bs-windows-x64-shani.exe` | shani, avx2, sse41 |
-| Windows | arm64 | `bs-windows-arm64.exe` | neon | `bs-windows-arm64-sha2.exe` | neon, aes, sha2 |
-| macOS | x64 | `bs-macos-x64` | aesni, avx2, sse41 | | |
-| macOS | arm64 | `bs-macos-arm64` | neon, aes, sha2, sha3 | | |
+| Platform | Architecture | Baseline | Optimized | Requires |
+| -------- | ------------ | -------- | --------- | -------- |
+| Linux, Docker | x64 | `bs-linux-x64` | `bs-linux-x64-avx2-shani` | `avx2`, `shani` |
+| Linux, Docker | arm64 | `bs-linux-arm64` | `bs-linux-arm64-sha2` | `sha2` |
+| Windows | x64 | `bs-windows-x64.exe` | `bs-windows-x64-avx2-shani.exe` | `avx2`, `shani` |
+| Windows | arm64 | `bs-windows-arm64.exe` | `bs-windows-arm64-sha2.exe` | `sha2` |
 
-Every arm64 processor has NEON (Advanced SIMD is required by
-ARMv8-A), so the arm64 baseline is not checked.
-
-The Homebrew formula holds one build per architecture, with no selector.
-Both builds require macOS 13.3, and every Mac that runs it has the
-features of its build: every Apple silicon processor, and every Intel
-processor of a Mac supported by macOS 13 (2017 and later).
+The Homebrew formula holds one build per architecture, with no selector:
+`bs-macos-arm64-sha3` and `bs-macos-x64-avx2`. Both builds require macOS
+13.3, and every Mac that runs it has the tags of its build: every Apple
+silicon processor, and every Intel processor of a Mac supported by
+macOS 13 (2017 and later).
 
 ## 3. Package Release
 
@@ -109,11 +108,10 @@ volume and its configuration in `/data/bs.cfg`. On first start, when
 there:
 
 ```ini
-[database]
-path = bitcoin
-
-[log]
-path = log
+[folders]
+root = bitcoin
+console = log
+events = log
 
 [admin]
 bind = 0.0.0.0:8080
@@ -145,7 +143,8 @@ The app runs the image, pinned by digest, with its data under the app's
 | 8187 | Native (block explorer) |
 | 8334 | P2P (`inbound.bind`), since Umbrel's Bitcoin Node app holds 8333 |
 
-Backups exclude the store (`bitcoin/`) and the logs (`log/`). The stop
+Backups exclude `bitcoin/`, which holds the network directory with the
+store, logs and peer address cache. The stop
 grace period is 5 minutes 30 seconds, for the store to close.
 
 ### 5.3 StartOS
@@ -160,7 +159,7 @@ The package runs the image, pinned by digest, on x86_64 and aarch64.
 
 StartOS serves the web interfaces over HTTPS, with its own certificate
 authority. Its health check is that the admin port is listening. The stop
-timeout is 5 minutes, and backups exclude `bitcoin/` and `log/`.
+timeout is 5 minutes, and backups exclude `bitcoin/`.
 
 The package requires 15 GiB of RAM as StartOS reports it, which admits a
 16 GB machine (StartOS compares against the total the kernel reports,

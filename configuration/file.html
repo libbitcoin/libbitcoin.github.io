@@ -350,8 +350,11 @@
   <article class="doc">
 <h2 id="1-the-configuration-file">1. The configuration file<a class="anchor" href="#1-the-configuration-file" aria-label="Link to this section">#</a></h2>
 <p>Paths take the platform's form, for example <code>/data/bitcoin</code> or
-<code>D:\bitcoin</code>. A relative path is relative to the working directory,
-not to the configuration file.</p>
+<code>D:\bitcoin</code>. A relative <code>folders.root</code> is relative to the working
+directory, not to the configuration file. Every other relative path, of
+the other <code>[folders]</code> settings and of the TLS certificate and key files,
+is relative to the network directory, <code>&lt;folders.root&gt;/&lt;network&gt;</code>. An
+absolute path is used as is.</p>
 <p>Integer values may use commas as thousands separators, for example
 <code>node.maximum_height = 900,000</code>.</p>
 <p>Section map:</p>
@@ -363,6 +366,10 @@ not to the configuration file.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>Files</td>
+<td><code>[folders]</code></td>
+</tr>
 <tr>
 <td>Logging</td>
 <td><code>[log]</code></td>
@@ -390,17 +397,73 @@ not to the configuration file.</p>
 </tbody>
 </table></div>
 <p>Simple example config file:</p>
-<pre><code class="language-ini"><span class="section">[database]</span>
-path = bitcoin
-
-<span class="section">[log]</span>
-path = log
+<pre><code class="language-ini"><span class="section">[folders]</span>
+root = bitcoin
+console = log
+events = log
 </code></pre>
 <p>The same settings can be written without section headers, by prefixing
 each name with its section:</p>
-<pre><code class="language-ini">database.path = bitcoin
-log.path = log
+<pre><code class="language-ini">folders.root = bitcoin
+folders.console = log
+folders.events = log
 </code></pre>
+<p>On mainnet this puts the store in <code>bitcoin/mainnet/store</code> and the log
+files in <code>bitcoin/mainnet/log</code>. The <code>[folders]</code> settings:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Directory of</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>root</code></td>
+<td>The network directory, <code>&lt;root&gt;/&lt;network&gt;</code></td>
+<td>The working directory</td>
+</tr>
+<tr>
+<td><code>store</code></td>
+<td>The store</td>
+<td><code>store</code></td>
+</tr>
+<tr>
+<td><code>console</code></td>
+<td><code>console_new.log</code> and <code>console_old.log</code></td>
+<td>The network directory</td>
+</tr>
+<tr>
+<td><code>events</code></td>
+<td><code>events.log</code></td>
+<td>The network directory</td>
+</tr>
+<tr>
+<td><code>peers</code></td>
+<td><code>peers.cache</code></td>
+<td>The network directory</td>
+</tr>
+<tr>
+<td><code>admin</code></td>
+<td>A custom admin site</td>
+<td>None, the embedded site</td>
+</tr>
+<tr>
+<td><code>native</code></td>
+<td>A custom block explorer</td>
+<td>None, the embedded site</td>
+</tr>
+<tr>
+<td><code>symbols</code></td>
+<td>Windows symbols (<code>.pdb</code>), Windows builds only</td>
+<td><code>symbols</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>bs</code> creates the store, console, events and peers directories. The admin,
+native and symbols directories are used only when they are set (symbols
+by default) and are not created.</p>
 <h2 id="2-displaying-settings">2. Displaying settings<a class="anchor" href="#2-displaying-settings" aria-label="Link to this section">#</a></h2>
 <p><code>bs -s</code> (<code>--settings</code>) prints every setting with the value in effect for
 that run, each under its section and preceded by its description and
@@ -513,7 +576,24 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') document.querySelectorAll('nav.site details[open]').forEach(function (d) { d.removeAttribute('open'); });
 });
-document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code) {
+function copyText(code) {
+  if (!code.parentNode.classList.contains('console')) return code.innerText;
+  var out = [], more = false;
+  code.innerText.split('\n').forEach(function (line) {
+    if (more || line.indexOf('$ ') === 0) {
+      out.push(more ? line : line.slice(2));
+      more = /\\$/.test(line);
+    }
+  });
+  return out.join('\n');
+}
+var article = location.pathname.indexOf('/architecture/') < 0;
+document.querySelectorAll('.doc pre > code').forEach(function (code) {
+  var copyable = code.classList.contains('language-ini') || (article &&
+    (code.classList.contains('language-python') || code.classList.contains('language-sh') ||
+    code.classList.contains('language-xml') || code.parentNode.classList.contains('console') ||
+    code.textContent.indexOf('-----BEGIN PGP PUBLIC KEY BLOCK-----') === 0));
+  if (!copyable) return;
   var pre = code.parentNode;
   var box = document.createElement('div');
   box.className = 'codebox';
@@ -526,7 +606,7 @@ document.querySelectorAll('.doc pre > code.language-ini').forEach(function (code
   button.setAttribute('aria-label', 'Copy');
   button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 5.5V3.5a1.5 1.5 0 0 0-1.5-1.5H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   button.addEventListener('click', function () {
-    navigator.clipboard.writeText(code.innerText).then(function () {
+    navigator.clipboard.writeText(copyText(code)).then(function () {
       button.classList.add('done');
       button.title = 'Copied';
       setTimeout(function () { button.classList.remove('done'); button.title = 'Copy'; }, 1500);
