@@ -230,7 +230,7 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "witness": true,
         "filters": false,
         "privacy": true,
-        "fees": false
+        "fees": true
     },
     "network": {
         "relay": true,
@@ -238,8 +238,8 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "reject": false,
         "compact": true,
         "address": true,
-        "witness_tx": false,
-        "memory_pool": false,
+        "witness_tx": true,
+        "memory_pool": true,
         "not_found": true,
         "protocol_maximum": 70016,
         "protocol_minimum": 31800

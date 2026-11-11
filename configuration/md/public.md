@@ -2,7 +2,9 @@
 
 ## 1. Libbitcoin servers
 
-The libbitcoin community maintains two public `bs` servers:
+The libbitcoin community maintains two public `bs` servers. Both have
+two AMD EPYC 7F32 processors (Zen 2), 16 cores and 32 threads in all,
+and no GPU.
 
 <div id="server-status"></div>
 
@@ -13,16 +15,29 @@ The libbitcoin community maintains two public `bs` servers:
 
 <div id="server-details"></div>
 
-| Host | Chain | Top | Address index | Client filters | Unpruned Above |
-| ---- | ----- | --- | ------------- | -------------- | ------------ |
-| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:8143) | mainnet | – | – | – | – |
-| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:18143) | testnet3 | – | – | – | – |
-| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:48143) | testnet4 | – | – | – | – |
-| [wormer.libbitcoin.net](https://wormer.libbitcoin.net:58143) | testnet5 | – | – | – | – |
-| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:8143) | mainnet | – | – | – | – |
-| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:18143) | testnet3 | – | – | – | – |
-| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:48143) | testnet4 | – | – | – | – |
-| [carmine.libbitcoin.net](https://carmine.libbitcoin.net:58143) | testnet5 | – | – | – | – |
+| Host | Network | Top | Turbo<br>(parallel queries) | Address index (Genesis) | Client filters (Genesis) | Silent Payments From | Whole Blocks<br>From |
+| ---- | ----- | --- | ----- | ------------- | -------------- | --------------- | ------------ |
+| [wormer](https://wormer.libbitcoin.net:8143) | mainnet | – | – | – | – | – | – |
+| [wormer](https://wormer.libbitcoin.net:18143) | testnet3 | – | – | – | – | – | – |
+| [wormer](https://wormer.libbitcoin.net:48143) | testnet4 | – | – | – | – | – | – |
+| [wormer](https://wormer.libbitcoin.net:58143) | testnet5 | – | – | – | – | – | – |
+| [carmine](https://carmine.libbitcoin.net:8143) | mainnet | – | – | – | – | – | – |
+| [carmine](https://carmine.libbitcoin.net:18143) | testnet3 | – | – | – | – | – | – |
+| [carmine](https://carmine.libbitcoin.net:48143) | testnet4 | – | – | – | – | – | – |
+| [carmine](https://carmine.libbitcoin.net:58143) | testnet5 | – | – | – | – | – | – |
+
+<div id="server-p2p"></div>
+
+| Host | Network | Protocol version | Serves blocks from | Tx relay (BIP37) | Witness node (BIP144) | Address gossip (BIP155) | Compact blocks (BIP152) | Client filters (BIP157) | P2P encryption (BIP324) | Mempool message (BIP35) | Wtxid relay (BIP339) |
+| ---- | ------- | ---------------- | ----------------- | -------------- | ------ | ------- | ----------------------- | ------------------- | ----------------------- | -------------------- | --------------- |
+| wormer | mainnet | – | – | – | – | – | – | – | – | – | – |
+| wormer | testnet3 | – | – | – | – | – | – | – | – | – | – |
+| wormer | testnet4 | – | – | – | – | – | – | – | – | – | – |
+| wormer | testnet5 | – | – | – | – | – | – | – | – | – | – |
+| carmine | mainnet | – | – | – | – | – | – | – | – | – | – |
+| carmine | testnet3 | – | – | – | – | – | – | – | – | – | – |
+| carmine | testnet4 | – | – | – | – | – | – | – | – | – | – |
+| carmine | testnet5 | – | – | – | – | – | – | – | – | – | – |
 
 <div id="server-scan"></div>
 
@@ -47,17 +62,35 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
 | carmine.libbitcoin.net | `ihZy(J.QWwNe(L9uUMyI8GH0<vW=kHJ9PLdBle8:` |
 
 <style>
-.scan-host { margin: 1.4em 0 .4em; font-family: var(--mono); }
-#server-scan a { color: inherit; }
-#server-scan .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
-#server-scan .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
+#server-scan .scroller th { white-space: normal; vertical-align: bottom; }
+#server-scan .scroller th, #server-scan .scroller td { padding-left: 5px; padding-right: 5px; white-space: nowrap; }
+#server-scan .scroller th:first-child { position: relative; padding-top: 2.4em; }
+#server-scan .scroller td:nth-child(n+3) { font-family: var(--mono); font-size: 12px; font-weight: 300; line-height: 18px; text-align: center; }
+#server-scan .scroller th:nth-child(n+3) { text-align: center; }
+#server-scan .scroller td:nth-child(n+3) > :is(a, span) { display: inline-block; width: 5ch; text-align: right; vertical-align: top; }
+#server-scan .table-title { position: absolute; top: 10px; left: 8px; color: var(--ink); }
+.doc .tip, #server-scan span[title]:not([title=""]) { cursor: default; text-decoration: underline dotted; text-underline-offset: 3px; }
+#server-scan a { color: inherit; text-decoration: none; }
+#server-scan a:hover { text-decoration: underline; }
+#server-scan .scan-up { color: var(--yes, #00bb7f); }
+#server-scan .scan-down { color: var(--rejected, #ff2357); }
 #server-scan .scan-wait, #server-status + .scroller .scan-wait { color: var(--ink-3); }
 #server-status + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
 #server-status + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
 #server-details + .scroller table { table-layout: fixed; min-width: 640px; }
-#server-details + .scroller th:first-child { width: 25%; }
+#server-details + .scroller th { white-space: normal; vertical-align: bottom; }
+#server-details + .scroller th:first-child, #server-p2p + .scroller th:first-child, #server-scan .scroller th:first-child { width: 72px; }
+#server-details + .scroller th:nth-child(2), #server-p2p + .scroller th:nth-child(2), #server-scan .scroller th:nth-child(2) { width: 72px; }
+#server-details + .scroller :is(th, td):nth-child(-n+2), #server-p2p + .scroller :is(th, td):nth-child(-n+2), #server-scan .scroller :is(th, td):nth-child(-n+2) { padding-left: 8px; padding-right: 8px; }
+#server-p2p + .scroller td:first-child { white-space: nowrap; }
 #server-details + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
 #server-details + .scroller .scan-down { color: var(--rejected, #ff2357); font-weight: 600; }
+#server-p2p + .scroller table { min-width: 760px; }
+#server-p2p + .scroller th { white-space: normal; vertical-align: bottom; }
+#server-p2p + .scroller th, #server-p2p + .scroller td { padding-left: 8px; padding-right: 8px; }
+#server-p2p + .scroller .scan-up { color: var(--yes, #00bb7f); font-weight: 600; }
+#server-details + .scroller th:first-child, #server-p2p + .scroller th:first-child { position: relative; }
+#server-details + .scroller .table-title, #server-p2p + .scroller .table-title { position: absolute; top: 10px; left: 8px; color: var(--ink); }
 .scan-some { color: var(--partial, #ffa022); font-weight: 600; }
 #zmq-keys + .scroller .copy { position: static; margin-left: .6em; padding: 3px; vertical-align: middle; }
 </style>
@@ -87,6 +120,20 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
 
 <script>
 (function () {
+  function hint(cell, text) {
+    var span = cell.querySelector(".tip");
+    if (!text) {
+      if (span) cell.textContent = span.textContent;
+      return;
+    }
+    if (!span) {
+      span = document.createElement("span");
+      span.className = "tip";
+      while (cell.firstChild) span.appendChild(cell.firstChild);
+      cell.appendChild(span);
+    }
+    span.title = text;
+  }
   var marker = document.getElementById("server-scan");
   if (!marker || !window.fetch || !window.AbortController) return;
   var scroller = marker.nextElementSibling;
@@ -136,6 +183,10 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
   }
 
   function open(target, body, title) {
+    if (target.indexOf("http:") === 0) {
+      popup(body === undefined ? target : failure("insecure", target));
+      return;
+    }
     var view = popup("about:blank");
     var show = function (text) {
       if (!view) return;
@@ -203,7 +254,7 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
       cell.textContent = entry.up + " of " + entry.total;
       cell.className = entry.done < entry.total ? "scan-wait" :
         entry.up === entry.total ? "scan-up" : entry.up ? "scan-some" : "scan-down";
-      cell.title = entry.up + " of " + entry.total + " checked ports answered";
+      hint(cell, entry.up + " of " + entry.total + " checked ports answered");
     });
   }
 
@@ -211,10 +262,67 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
   var table = details && details.nextElementSibling;
   if (table) {
     var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000, testnet5: 50000 };
-    var mark = function (cell, text, state) { cell.textContent = text; cell.className = state; };
-    var yes = function (cell, value) { mark(cell, value ? "Yes" : "No", value ? "scan-up" : "scan-down"); };
+    var mark = function (cell, text, state, tip) { cell.textContent = text; cell.className = state; hint(cell, tip); };
+    var taproot = { mainnet: 709632, testnet3: 2011968, testnet4: 0, testnet5: 0 };
+    var window_ = 24 * 60 * 60 * 1000;
+    var tops = {};
+    var agree = function (chain, row, hash) {
+      var seen = tops[chain] || (tops[chain] = []);
+      seen.push({ row: row, hash: hash });
+      if (!seen.some(function (top) { return top.hash !== seen[0].hash; })) return;
+      var tip = "The hosts have different top blocks: " + seen.map(function (top) {
+        return top.row.cells[0].textContent.trim() + " " + top.hash.slice(0, 16) + "…";
+      }).join(", ");
+      seen.forEach(function (top) { top.row.cells[1].className = "scan-down"; hint(top.row.cells[1], tip); });
+    };
+    var yes = function (cell, value, name) { mark(cell, value ? "Yes" : "No", value ? "scan-up" : "scan-down", value ? "" : "The " + name + " is not enabled"); };
+    var title = function (scroller, text) {
+      var cell = scroller && scroller.querySelector("thead th");
+      if (!cell) return;
+      var label = document.createElement("span");
+      label.className = "table-title";
+      label.textContent = text;
+      cell.insertBefore(label, cell.firstChild);
+    };
+    title(table, "Store");
+    title(document.getElementById("server-p2p").nextElementSibling, "P2P");
+    var p2p = document.getElementById("server-p2p");
+    var peers = {};
+    if (p2p && p2p.nextElementSibling) p2p.nextElementSibling.querySelectorAll("tbody tr").forEach(function (row) {
+      peers[row.cells[0].textContent.trim() + ".libbitcoin.net " + row.cells[1].textContent.trim()] = row;
+    });
+    var feature = function (cell, value) { mark(cell, value ? "Yes" : "No", value ? "scan-up" : "scan-some"); };
+    var currency = {};
+    var gated = [3, 4, 5, 7, 8, 10, 11];
+    var settle = function (key, current) {
+      var entry = currency[key] || (currency[key] = {});
+      if (current !== undefined) entry.current = current;
+      else entry.features = true;
+      if (!entry.features || entry.current !== false || !peers[key]) return;
+      gated.forEach(function (index) {
+        var cell = peers[key].cells[index];
+        if (cell.className !== "scan-up") return;
+        cell.className = "scan-some";
+        hint(cell, "Inactive until current");
+      });
+    };
+    var features = function (row, node, network, store) {
+      mark(row.cells[2], String(network.protocol_maximum), "");
+      hint(row.cells[2], "Protocol versions " + network.protocol_minimum + " to " + network.protocol_maximum);
+      if (!node.blocks) mark(row.cells[3], "No", "scan-some");
+      else if (node.limited) mark(row.cells[3], (Number(store.pruned) + 1).toLocaleString("en-US"), "scan-some");
+      else mark(row.cells[3], "Genesis", "scan-up");
+      feature(row.cells[4], network.relay);
+      feature(row.cells[5], node.witness);
+      feature(row.cells[6], network.address);
+      feature(row.cells[7], network.compact);
+      feature(row.cells[8], node.filters);
+      feature(row.cells[9], node.privacy);
+      feature(row.cells[10], network.memory_pool);
+      feature(row.cells[11], network.witness_tx);
+    };
     table.querySelectorAll("tbody tr").forEach(function (row) {
-      var host = row.cells[0].textContent.trim();
+      var host = row.cells[0].textContent.trim() + ".libbitcoin.net";
       var chain = row.cells[1].textContent.trim();
       var base = "https://" + host + ":" + (8143 + offsets[chain]);
       var get = function (target) {
@@ -225,41 +333,73 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
       };
       get("/v1/top?format=json").then(function (text) {
         row.cells[2].textContent = Number(text).toLocaleString("en-US");
+        return get("/v1/block/height/" + Number(text) + "/header?format=json");
+      }).then(function (text) {
+        var header = JSON.parse(text);
+        var current = header.timestamp * 1000 >= Date.now() - window_;
+        settle(host + " " + chain, current);
+        row.cells[2].className = current ? "scan-up" : "scan-some";
+        hint(row.cells[2], "Top block time " + new Date(header.timestamp * 1000).toISOString());
+        agree(chain, row, header.hash);
       }, function () {});
       get("/v1/configuration?format=json").then(function (text) {
         var config = JSON.parse(text);
         var store = config.store || config;
-        yes(row.cells[3], store.address);
-        yes(row.cells[4], store.filter);
-        if (store.pruned) mark(row.cells[5], Number(store.pruned).toLocaleString("en-US"), "scan-some");
-        else mark(row.cells[5], "Genesis", "scan-up");
+        if (peers[host + " " + chain]) {
+          features(peers[host + " " + chain], config.node || {}, config.network || {}, store);
+          settle(host + " " + chain);
+        }
+        mark(row.cells[3], store.turbo ? "Yes" : "No", store.turbo ? "scan-up" : "scan-some");
+        yes(row.cells[4], store.address, "address index");
+        yes(row.cells[5], store.filter, "client filter index");
+        if (store.silent === null) mark(row.cells[6], "No", "scan-some", "The silent payment index is not enabled");
+        else {
+          var silent = Math.max(Number(store.silent), taproot[chain]);
+          mark(row.cells[6], silent ? silent.toLocaleString("en-US") : "Genesis", silent === taproot[chain] ? "scan-up" : "scan-some");
+        }
+        if (store.pruned) mark(row.cells[7], (Number(store.pruned) + 1).toLocaleString("en-US"), "scan-some");
+        else mark(row.cells[7], "Genesis", "scan-up");
       }, function () {});
     });
   }
 
+  var services = [].map.call(scroller.querySelectorAll("tbody tr"), function (row) {
+    return [].map.call(row.cells, function (cell) { return cell.textContent.trim(); });
+  });
+  var merged = scroller.cloneNode(true);
+  var head = merged.querySelector("thead tr");
+  var body = merged.querySelector("tbody");
+  head.innerHTML = "";
+  body.innerHTML = "";
+  ["Host", "Network"].concat(services.map(function (row) { return row[0]; })).forEach(function (text) {
+    var th = document.createElement("th");
+    th.textContent = text;
+    head.appendChild(th);
+  });
+  var label = document.createElement("span");
+  label.className = "table-title";
+  label.textContent = "Ports";
+  head.cells[0].insertBefore(label, head.cells[0].firstChild);
+  marker.appendChild(merged);
   hosts.forEach(function (host) {
-    var heading = document.createElement("p");
-    heading.className = "scan-host";
-    heading.textContent = host;
-    var copy = scroller.cloneNode(true);
-    marker.appendChild(heading);
-    marker.appendChild(copy);
-    copy.querySelectorAll("tbody tr").forEach(function (row) {
-      var cells = row.querySelectorAll("td");
-      var service = cells[0].textContent.trim();
-      var checked = http.indexOf(service) >= 0;
-      var path = paths[service];
-      var request = requests[service];
-      for (var i = 1; i < cells.length; i++) {
-        var ports = cells[i].textContent.split("/").map(function (t) { return t.trim(); });
-        cells[i].textContent = "";
+    for (var i = 1; i < chains.length; i++) {
+      var row = body.insertRow();
+      row.insertCell().textContent = host.split(".")[0];
+      row.insertCell().textContent = chains[i];
+      services.forEach(function (entry) {
+        var cell = row.insertCell();
+        var service = entry[0];
+        var checked = http.indexOf(service) >= 0;
+        var path = paths[service];
+        var request = requests[service];
         var chain = chains[i];
+        var ports = entry[i].split("/").map(function (t) { return t.trim(); });
         ports.forEach(function (port, j) {
           var where = typeof path === "function" ? path(chain) : path;
-          var body = typeof request === "function" ? request(chain) : request;
+          var payload = typeof request === "function" ? request(chain) : request;
           var name = host.split(".")[0];
           var title = name.charAt(0).toUpperCase() + name.slice(1) + " " + service + " " + chain.charAt(0).toUpperCase() + chain.slice(1) + " Genesis" + (port.slice(-2) === "43" ? " (Secure)" : " (Clear)");
-          if (j) cells[i].appendChild(document.createTextNode(" / "));
+          if (j) cell.appendChild(document.createTextNode(" / "));
           var span = document.createElement(where || request ? "a" : "span");
           span.textContent = port;
           if (where || request) {
@@ -267,32 +407,29 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
             span.addEventListener("click", function (event) {
               event.preventDefault();
               if (span.dataset.reason) popup(failure(span.dataset.reason, span.href));
-              else open(span.href, body, title);
+              else open(span.href, payload, title);
             });
           }
-          cells[i].appendChild(span);
+          cell.appendChild(span);
           if (!checked || port.slice(-2) !== "43") return;
           span.className = "scan-wait";
           var result = probe(host, port, where);
-          count(host, chains[i], result);
+          count(host, chain, result);
           result.then(function (state) {
             var up = state === "up";
             span.className = up ? "scan-up" : "scan-down";
             if (!up) span.dataset.reason = state;
-            span.title = up ? "Answered" : "No answer";
+            span.title = up ? "Answered" : state === "timeout" ? "No answer within 8 seconds" : "The connection failed or was refused";
           });
         });
-      }
-    });
+      });
+    }
   });
   scroller.style.display = "none";
 })();
 </script>
 
-Both have two AMD EPYC 7F32 processors (Zen 2), 16 cores and 32
-threads in all, and no GPU.
-
-A `--hardware-optimized` build on either reports
+A `--hardware-optimized` build on either server reports
 ([Command Line](command-line)):
 
 ```

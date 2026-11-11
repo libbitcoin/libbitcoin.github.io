@@ -524,8 +524,8 @@ compact_timeout_seconds = 10
 currency_window_minutes = 1440
 # Block inbound peer/client (excluding admin) until current, defaults to 'true'.
 delay_inbound = true
-# Fee estimation horizon, limited to 1008, defaults to '0' (0 disables).
-fee_estimate_horizon = 0
+# Fee estimation horizon, limited to 1008, defaults to '1008' (0 disables).
+fee_estimate_horizon = 1008
 # Limit block service to recent blocks, defaults to 'false'.
 limited_blocks = false
 # Maximum number of blocks to download concurrently, defaults to '50000' (0 disables).
@@ -602,16 +602,16 @@ enable_address_v2 = true
 enable_alert = false
 # Enable compact block messages, defaults to 'true'.
 enable_compact = true
-# Enable memory pool messages, defaults to 'false'.
-enable_memory_pool = false
+# Enable memory pool messages, defaults to 'true'.
+enable_memory_pool = true
 # Enable not found messages, defaults to 'true'.
 enable_not_found = true
 # Enable reject messages, defaults to 'false'.
 enable_reject = false
 # Enable transaction relay, defaults to 'true'.
 enable_relay = true
-# Enable witness transaction identifier relay, defaults to 'false'.
-enable_witness_tx = false
+# Enable witness transaction identifier relay, defaults to 'true'.
+enable_witness_tx = true
 # Gossip i2p addresses, defaults to 'false'.
 gossip_i2p = false
 # Gossip internet protocol version 4 (IPv4) addresses, defaults to 'true'.

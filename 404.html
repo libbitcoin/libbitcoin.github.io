@@ -299,7 +299,8 @@
   var reasons = {
     failed: ['502 Connection Failed', 'The browser could not connect to %s. The server refused the connection, or could not be reached.'],
     timeout: ['504 No Response', '%s did not answer within 8 seconds.'],
-    unreadable: ['403 Response Blocked', '%s answered, but did not allow this page to read its response.']
+    unreadable: ['403 Response Blocked', '%s answered, but did not allow this page to read its response.'],
+    insecure: ['Clear Port Blocked', 'The site is served over HTTPS, so the browser does not allow it to send a request to the clear port %s. Query the secure port instead.']
   };
   var reason = reasons[query.get('reason')];
   if (!reason || !target) return;
