@@ -81,6 +81,7 @@ SITE_MENU = [
     ]),
     ("Developers", [
         ("developers/index.html", "Overview"),
+        ("lib/index.html", "Libraries"),
         ("developers/contributing.html", "Contributing"),
         ("developers/style.html", "Style Guide"),
         ("developers/testing.html", "Test Practices"),
@@ -234,6 +235,22 @@ SECTIONS = {
             ("contributing", "Contributing"),
             ("style", "Style guide"),
             ("testing", "Test practices"),
+        ],
+    },
+    "lib": {
+        "title": "Libraries",
+        "h1": "Libraries",
+        "description": "The libbitcoin libraries: system, database, network, node, server and explorer.",
+        "lede": "The <strong>libbitcoin</strong> libraries: system, database,\n      network, node, server and explorer.",
+        "foot": "",
+        "pages": [
+            ("index", "Libraries"),
+            ("system", "System"),
+            ("database", "Database"),
+            ("network", "Network"),
+            ("node", "Node"),
+            ("server", "Server"),
+            ("explorer", "Explorer"),
         ],
     },
     "download": {
