@@ -444,8 +444,8 @@ avx2........ platform:1 compiled:1.
 avx512...... platform:0 compiled:0.
 avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:0 compiled:0.
-build....... platform:bs-linux-x64-avx2-shani compiled:bs-linux-x64-avx2-shani.
 cuda........ platform:0 compiled:1.
+build....... bs-linux-x64-avx2-shani
 ```
 
 ## 2. Running a community server

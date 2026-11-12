@@ -344,12 +344,28 @@
   <article class="doc">
 <p>The current status of the libbitcoin builds, tests, releases and packages.</p>
 <h2 id="1-continuous-integration">1. Continuous integration<a class="anchor" href="#1-continuous-integration" aria-label="Link to this section">#</a></h2>
+<p>The gate builds and tests each repository on every push and pull request,
+across its platforms and build systems, and reports test coverage to
+<a href="https://coveralls.io/github/libbitcoin">Coveralls</a>.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Continuous Integration (<code>ci.yml</code>)</td>
+<td>Push, pull request or manual</td>
+</tr>
+</tbody>
+</table></div>
 <div class="scroller"><table>
 <thead>
 <tr>
 <th>Repository</th>
-<th>Gate</th>
-<th>Expanded</th>
+<th>Status</th>
 <th>Coverage</th>
 </tr>
 </thead>
@@ -357,49 +373,101 @@
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-system?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-system/master" /></a></td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-database">libbitcoin-database</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-database?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-database/master" /></a></td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-network">libbitcoin-network</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-network?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-network/master" /></a></td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-node">libbitcoin-node</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-node?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-node/master" /></a></td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server">libbitcoin-server</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-server?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-server/master" /></a></td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
-<td><a href="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-explorer?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-explorer/master" /></a></td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-build">libbitcoin-build</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td></td>
-<td></td>
 </tr>
 </tbody>
 </table></div>
 <p>See <a href="../architecture/test/index.html">Test Architecture</a>.</p>
-<h2 id="2-releases">2. Releases<a class="anchor" href="#2-releases" aria-label="Link to this section">#</a></h2>
+<h2 id="2-expanded-continuous-integration">2. Expanded continuous integration<a class="anchor" href="#2-expanded-continuous-integration" aria-label="Link to this section">#</a></h2>
+<p>The expanded matrix is run on demand. It covers every compiler in all
+combinations of debug or release and static or shared, and adds the
+constant-time and cross-architecture tests.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Expanded Continuous Integration (<code>ci-expanded.yml</code>)</td>
+<td>Manual</td>
+</tr>
+</tbody>
+</table></div>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Repository</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></td>
+<td><a href="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/libbitcoin/libbitcoin-database">libbitcoin-database</a></td>
+<td><a href="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/libbitcoin/libbitcoin-network">libbitcoin-network</a></td>
+<td><a href="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/libbitcoin/libbitcoin-node">libbitcoin-node</a></td>
+<td><a href="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/libbitcoin/libbitcoin-server">libbitcoin-server</a></td>
+<td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer</a></td>
+<td><a href="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/libbitcoin/libbitcoin-build">libbitcoin-build</a></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="3-releases">3. Releases<a class="anchor" href="#3-releases" aria-label="Link to this section">#</a></h2>
+<p>The release workflow builds <code>bs</code> from the version tags of the five
+repositories, builds each target twice and compares the results, then signs
+the files and publishes them as a draft release.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -416,7 +484,11 @@
 </table></div>
 <p>See <a href="../architecture/build/release.html">Release builds</a> and
 <a href="../architecture/build/deterministic.html">Deterministic builds</a>.</p>
-<h2 id="3-packaging">3. Packaging<a class="anchor" href="#3-packaging" aria-label="Link to this section">#</a></h2>
+<h2 id="4-packaging">4. Packaging<a class="anchor" href="#4-packaging" aria-label="Link to this section">#</a></h2>
+<p>The packaging workflow packages the signed builds of a published release
+for each package manager, as a container image and as node platform apps.
+The image is pushed to the container registry and the other packages are
+attached to the release.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -431,48 +503,73 @@
 </tr>
 </tbody>
 </table></div>
+<p>See <a href="../architecture/build/packaging.html">Packaging</a>.</p>
+<h2 id="5-deployment">5. Deployment<a class="anchor" href="#5-deployment" aria-label="Link to this section">#</a></h2>
+<p>The distribution workflow submits the packages of a published release to
+their distribution repositories. Latest shows the version each one
+currently offers.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Distribute Release (<code>distribute.yml</code>)</td>
+<td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/distribute.yml"><img alt="Distribute Release" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/distribute.yml/badge.svg" /></a></td>
+</tr>
+</tbody>
+</table></div>
 <div class="scroller"><table>
 <thead>
 <tr>
 <th>Package</th>
-<th>Distribution</th>
 <th>Latest</th>
+<th>Distribution</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>deb</td>
-<td>apt repository</td>
 <td><a href="https://github.com/libbitcoin/apt"><img alt="apt" src="https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Flibbitcoin%2Fapt%2Fmain%2Fdists%2Fstable%2Fmain%2Fbinary-amd64%2FPackages&amp;search=Version%3A%20%28%5CS%2B%29&amp;replace=%241&amp;label=apt" /></a></td>
+<td>apt repository</td>
 </tr>
 <tr>
 <td>Homebrew formula</td>
-<td>tap</td>
 <td><a href="https://github.com/libbitcoin/homebrew-tap"><img alt="Homebrew" src="https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Flibbitcoin%2Fhomebrew-tap%2Fmain%2FFormula%2Flibbitcoin-server.rb&amp;search=version%20%22%28%5B%5E%22%5D%2B%29%22&amp;replace=%241&amp;label=tap" /></a></td>
+<td>tap</td>
 </tr>
 <tr>
 <td>winget</td>
-<td><code>winget-pkgs</code></td>
 <td><a href="https://github.com/microsoft/winget-pkgs/tree/master/manifests/l/Libbitcoin/Server"><img alt="winget" src="https://img.shields.io/winget/v/Libbitcoin.Server" /></a></td>
+<td><code>winget-pkgs</code></td>
 </tr>
 <tr>
 <td>Docker image</td>
-<td><code>ghcr.io</code></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server/pkgs/container/libbitcoin-server"><img alt="Docker" src="https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fgithub.com%2Flibbitcoin%2Flibbitcoin-server%2Fpkgs%2Fcontainer%2Flibbitcoin-server&amp;search=%5C%3Ftag%3D%28%5Cd%5B%5E%22%5D%2A%29%22&amp;replace=%241&amp;label=ghcr" /></a></td>
+<td><code>ghcr.io</code></td>
 </tr>
 <tr>
 <td>Umbrel app</td>
-<td>app store</td>
 <td><a href="https://github.com/getumbrel/umbrel-apps/tree/master/bitcoin-server"><img alt="Umbrel" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fgetumbrel%2Fumbrel-apps%2Fmaster%2Fbitcoin-server%2Fumbrel-app.yml&amp;query=%24.version&amp;label=umbrel" /></a></td>
+<td>app store</td>
 </tr>
 <tr>
 <td>StartOS package</td>
-<td>registry</td>
 <td><a href="https://marketplace.start9.com/?id=bitcoin-server"><img alt="StartOS" src="https://img.shields.io/badge/startos-resource%20not%20found-red" /></a></td>
+<td>registry</td>
 </tr>
 </tbody>
 </table></div>
-<p>See <a href="../architecture/build/packaging.html">Packaging</a>.</p>
+<p>See <a href="../architecture/build/packaging.html#4-distribution">Distribution</a>.</p>
+<style>
+.scroller table { table-layout: fixed; width: 100%; }
+.scroller th { box-sizing: border-box; }
+.scroller th:first-child { width: 43%; }
+.scroller th:nth-child(2):not(:last-child) { width: 34%; }
+</style>
   </article>
 
   <nav class="pager"><a href="platforms.html">&larr; Platform Coverage</a><span></span></nav>

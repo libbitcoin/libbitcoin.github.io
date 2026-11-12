@@ -107,7 +107,7 @@ Every release build is made twice, on separate runners, and is released
 only if both are bit-identical. Anyone can rebuild a release with Guix
 and compare it with the published files. See
 [Deterministic builds](../architecture/build/deterministic) and
-[Build Status](status#2-releases).
+[Build Status](status#3-releases).
 
 ## 6. CUDA
 

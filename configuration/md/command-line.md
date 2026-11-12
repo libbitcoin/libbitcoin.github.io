@@ -109,9 +109,9 @@ avx2........ platform:1 compiled:1.
 avx512...... platform:1 compiled:1.
 avxifma..... platform:0 compiled:0.
 avx512ifma.. platform:1 compiled:1.
-build....... platform:bs-linux-x64-avx512ifma compiled:bs-linux-x64-avx512ifma.
 cuda........ platform:1 compiled:1.
 cuda ecc.... platform:1 enabled:0.
+build....... bs-linux-x64-avx512ifma
 ```
 
 `platform` shows whether the machine supports a feature and `compiled`
@@ -121,6 +121,11 @@ improves performance. Do not compile options that the hardware does not
 support, as the build will not run. The largest gains in initial block
 download come from `shani` (or `sha2` on Arm), and otherwise from
 `avx`.
+
+`build` names the release build that matches the extensions compiled
+into this binary. When the machine supports a different set, a
+`platform` line follows, naming the release build that matches the
+machine.
 
 CUDA (GPU) support is compiled by default, except on macOS. `cuda ecc`
 reports whether the GPU's error correcting code (ECC) memory is enabled,
