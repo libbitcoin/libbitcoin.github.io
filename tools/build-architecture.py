@@ -240,8 +240,8 @@ SECTIONS = {
     "lib": {
         "title": "Libraries",
         "h1": "Libraries",
-        "description": "The libbitcoin libraries: system, database, network, node, server and explorer.",
-        "lede": "The <strong>libbitcoin</strong> libraries: system, database,\n      network, node, server and explorer.",
+        "description": "The libbitcoin libraries: system, database, network, node, server and explorer, and the build.",
+        "lede": "The <strong>libbitcoin</strong> libraries: system, database,\n      network, node, server and explorer, and the build.",
         "foot": "",
         "pages": [
             ("index", "Libraries"),
@@ -251,6 +251,7 @@ SECTIONS = {
             ("node", "Node"),
             ("server", "Server"),
             ("explorer", "Explorer"),
+            ("build", "Build"),
         ],
     },
     "download": {
