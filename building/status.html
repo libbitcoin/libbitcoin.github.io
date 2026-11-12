@@ -343,11 +343,16 @@
   </nav>
 
   <article class="doc">
-<p>The current status of the libbitcoin builds, tests, releases and packages.</p>
+<p>The current status of the libbitcoin builds, tests, releases and packages.
+Builds is the number of jobs in each workflow's build matrices.</p>
 <h2 id="1-continuous-integration">1. Continuous integration<a class="anchor" href="#1-continuous-integration" aria-label="Link to this section">#</a></h2>
 <p>The gate builds and tests each repository on every push and pull request,
 across its platforms and build systems, and reports test coverage to
-<a href="https://coveralls.io/github/libbitcoin">Coveralls</a>.</p>
+<a href="https://coveralls.io/github/libbitcoin">Coveralls</a>.
+Across all repositories, a run builds libbitcoin-system 120 times,
+libbitcoin-database 60, libbitcoin-network 80, libbitcoin-node 40,
+libbitcoin-server 20, and libbitcoin-explorer 20. Tests are run only for
+the last repository in each build.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -368,6 +373,8 @@ across its platforms and build systems, and reports test coverage to
 <th>Repository</th>
 <th>Status</th>
 <th>Coverage</th>
+<th style="text-align: right;">Libraries</th>
+<th style="text-align: right;">Builds</th>
 </tr>
 </thead>
 <tbody>
@@ -375,36 +382,50 @@ across its platforms and build systems, and reports test coverage to
 <td><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-system?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-system/master" /></a></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-database">libbitcoin-database</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-database?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-database/master" /></a></td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-network">libbitcoin-network</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-network?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-network/master" /></a></td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-node">libbitcoin-node</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-node?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-node/master" /></a></td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server">libbitcoin-server</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-server?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-server/master" /></a></td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td><a href="https://coveralls.io/github/libbitcoin/libbitcoin-explorer?branch=master"><img alt="Coverage" src="https://img.shields.io/coveralls/github/libbitcoin/libbitcoin-explorer/master" /></a></td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-build">libbitcoin-build</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml"><img alt="Gate" src="https://github.com/libbitcoin/libbitcoin-build/actions/workflows/ci.yml/badge.svg?branch=master&amp;event=push" /></a></td>
 <td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">2</td>
 </tr>
 </tbody>
 </table></div>
@@ -412,7 +433,12 @@ across its platforms and build systems, and reports test coverage to
 <h2 id="2-expanded-continuous-integration">2. Expanded continuous integration<a class="anchor" href="#2-expanded-continuous-integration" aria-label="Link to this section">#</a></h2>
 <p>The expanded matrix is run on demand. It covers every compiler in all
 combinations of debug or release and static or shared, and adds the
-constant-time and cross-architecture tests.</p>
+constant-time and cross-architecture tests. libbitcoin-system and
+libbitcoin-explorer each run 4 additional constant-time test builds.
+Across all repositories, a run builds libbitcoin-system 674 times,
+libbitcoin-database 333, libbitcoin-network 448, libbitcoin-node 222,
+libbitcoin-server 111, and libbitcoin-explorer 115. Tests are run only for
+the last repository in each build.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -432,54 +458,76 @@ constant-time and cross-architecture tests.</p>
 <tr>
 <th>Repository</th>
 <th>Status</th>
+<th style="text-align: right;">Libraries</th>
+<th style="text-align: right;">Builds</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-system">libbitcoin-system</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-system/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">115</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-database">libbitcoin-database</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-database/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">111</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-network">libbitcoin-network</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-network/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">111</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-node">libbitcoin-node</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">111</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server">libbitcoin-server</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">111</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-explorer">libbitcoin-explorer</a></td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml"><img alt="Expanded" src="https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml/badge.svg" /></a></td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">115</td>
 </tr>
 <tr>
 <td><a href="https://github.com/libbitcoin/libbitcoin-build">libbitcoin-build</a></td>
 <td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
 </tr>
 </tbody>
 </table></div>
 <h2 id="3-releases">3. Releases<a class="anchor" href="#3-releases" aria-label="Link to this section">#</a></h2>
-<p>The release workflow builds <code>bs</code> from the version tags of the five
-repositories, builds each target twice and compares the results, then signs
-the files and publishes them as a draft release.</p>
+<p>The release workflow builds, from the version tags, <code>bs</code> (libbitcoin-server
+and the four libraries it depends on) and <code>selector</code> (built on
+libbitcoin-system). It builds each target twice and compares the results,
+then signs the files and publishes them as a draft release. Builds counts
+both builds of each target, and the toolchain and SDK jobs.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
 <th>Workflow</th>
 <th>Status</th>
+<th style="text-align: right;">Libraries</th>
+<th style="text-align: right;">Builds</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Release Build (<code>manual-release.yml</code>)</td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml"><img alt="Release Build" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/manual-release.yml/badge.svg" /></a></td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">98</td>
 </tr>
 </tbody>
 </table></div>
@@ -495,12 +543,14 @@ attached to the release.</p>
 <tr>
 <th>Workflow</th>
 <th>Status</th>
+<th style="text-align: right;">Builds</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Package Release (<code>package-release.yml</code>)</td>
 <td><a href="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/package-release.yml"><img alt="Package Release" src="https://github.com/libbitcoin/libbitcoin-server/actions/workflows/package-release.yml/badge.svg" /></a></td>
+<td style="text-align: right;">6</td>
 </tr>
 </tbody>
 </table></div>
@@ -570,6 +620,7 @@ currently offers.</p>
 .scroller th { box-sizing: border-box; }
 .scroller th:first-child { width: 43%; }
 .scroller th:nth-child(2):not(:last-child) { width: 34%; }
+.scroller th:nth-child(2):nth-last-child(4) { width: 22%; }
 </style>
   </article>
 
