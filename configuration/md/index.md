@@ -26,8 +26,7 @@ directory named for the network:
 $ bs -n testnet4
 ```
 
-Until the chain is current, only the admin site accepts connections, when
-configured. P2P peers, the block explorer and the other client services
+Until the chain is current, only the admin site accepts connections. P2P peers, the block explorer and the other client services
 wait ([Until current](services#until-current)).
 
 ## 2. Pages

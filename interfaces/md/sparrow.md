@@ -39,7 +39,7 @@ Silent payments are indexed from a height set when the store is created,
 silent_start_height = 709632
 
 [sparrow]
-bind = 127.0.0.1:8680
+bind = 127.0.0.1
 connections = 10
 ```
 

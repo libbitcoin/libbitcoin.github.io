@@ -29,8 +29,8 @@ The service starts only with both an address and a connection limit:
 
 ```ini
 [zmq]
-bind = 127.0.0.1:8380
-bind = [::1]:8380
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 ```
 
@@ -97,7 +97,7 @@ server's secret key:
 
 ```ini
 [zmq]
-safe = 127.0.0.1:8343
+safe = 127.0.0.1
 key = <server secret key, Z85>
 cert = <client public key, Z85>
 connections = 10

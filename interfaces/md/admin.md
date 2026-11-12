@@ -7,7 +7,9 @@ The embedded console is a page of this interface, and can be replaced
 with a custom site (see [Configuration
 §5.5](../configuration/setups#5-admin-site)).
 
-Its protocols share one port, and their secure forms share another:
+The admin interface is enabled by default, on the local machine only
+(`127.0.0.1`, clear port). Its protocols share one port, and their secure
+forms share another:
 
 | Port | Default | Protocols |
 | ---- | ------- | --------- |
@@ -33,14 +35,17 @@ are served whether or not `[native]` is enabled.
 
 ### 2.1 Enabling
 
-The service starts only with both an address and a connection limit:
+The service is enabled by default, on `127.0.0.1` with `connections = 10`.
+Setting `bind` replaces the default address. To also listen on the IPv6
+loopback:
 
 ```ini
 [admin]
-bind = 127.0.0.1:8080
-bind = [::1]:8080
-connections = 10
+bind = 127.0.0.1
+bind = [::1]
 ```
+
+`connections = 0` disables it.
 
 Unlike the other services, it starts before the node is current.
 

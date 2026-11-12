@@ -1144,29 +1144,44 @@ when either key contains one, and the coin must be flipped again. Quote
 the keys on the command line, as they contain shell characters.</p>
 <p><strong>4. Configure the services.</strong> Bind each service on every adapter, clear
 and secure, with the certificate and key from step 1 and the ZMQ secret
-key from step 3:</p>
+key from step 3. An address without a port takes the service's port on
+the selected network (<a href="ports.html">Conventional Ports</a>):</p>
 <pre><code class="language-ini"><span class="section">[inbound]</span>
-bind = 0.0.0.0:8333
-bind = [::]:8333
+bind = 0.0.0.0
+bind = [::]
 
 <span class="section">[electrum]</span>
-bind = 0.0.0.0:8580
-bind = [::]:8580
-safe = 0.0.0.0:8543
-safe = [::]:8543
+bind = 0.0.0.0
+bind = [::]
+safe = 0.0.0.0
+safe = [::]
 cert_path = fullchain.pem
 key_path = privkey.pem
 
 <span class="section">[zmq]</span>
-bind = 0.0.0.0:8380
-bind = [::]:8380
-safe = 0.0.0.0:8343
-safe = [::]:8343
+bind = 0.0.0.0
+bind = [::]
+safe = 0.0.0.0
+safe = [::]
 key = &lt;secret key&gt;
 </code></pre>
-<p>The other client services follow <code>[electrum]</code>, each on its own ports
-(<a href="ports.html">Conventional Ports</a>). With no <code>zmq.cert</code> lines, any ZMQ client may connect.
-Leave <code>[admin]</code> on the local machine (<a href="setups.html#5-admin-site">Admin site</a>).</p>
+<p>The other client services follow <code>[electrum]</code>. With no <code>zmq.cert</code> lines,
+any ZMQ client may connect. Leave <code>[admin]</code> on the local machine
+(<a href="setups.html#5-admin-site">Admin site</a>).</p>
+<p><strong>One file for every network.</strong> With no ports in it, the same
+configuration file serves each network. On mainnet the Electrum service
+above listens on 8580 and 8543, on testnet4 on 48580 and 48543, and
+<code>[inbound]</code> on 8333 and 48333. Each network keeps its own store and logs
+(<a href="command-line.html">Command Line</a>), so one <code>bs</code> per network can run from the
+one file at the same time:</p>
+<pre class="console"><code>$ bs -c bs.cfg -n mainnet
+$ bs -c bs.cfg -n testnet4
+</code></pre>
+<p>The other address settings follow the same rule. <code>inbound.self</code>,
+<code>manual.peer</code> and <code>outbound.seed</code> without a port take the network's P2P
+port. A <code>manual.peer</code> without a port also matches its address on any
+port, so the address cache does not keep it as another peer. A port
+written into any of these settings is used as given on every network.</p>
 <p><strong>5. Allow web pages.</strong> The HTTP services accept cross-origin requests
 from web pages on other sites (<a href="https://fetch.spec.whatwg.org/#http-cors-protocol">CORS</a>).
 With no <code>origin</code> setting, a service accepts a request from any page and
@@ -1176,10 +1191,18 @@ To admit only particular sites, list them:</p>
 <pre><code class="language-ini"><span class="section">[native]</span>
 origin = explorer.example.org:443
 </code></pre>
-<p>Each <code>origin</code> is a host and port, without a scheme. A service with an
-<code>origin</code> list admits the pages it serves itself only when the request's
-<code>Host</code> is in its <code>host</code> list, so list the service's own name there, which
-also protects it from DNS rebinding.</p>
+<p>Each <code>origin</code> is a host, with an optional port, and no scheme. A
+service with an <code>origin</code> list admits the pages it serves itself only when
+the request's <code>Host</code> is in its <code>host</code> list, so list the service's own name
+there, which also protects it from DNS rebinding:</p>
+<pre><code class="language-ini"><span class="section">[native]</span>
+host = node.example.com
+origin = explorer.example.org
+</code></pre>
+<p>An <code>origin</code> or <code>host</code> without a port matches that name on any port, so
+the lists above hold on every network. With a port, it matches only that
+port; a request that names no port is compared with the service's default
+port, 80 in the clear and 443 secure.</p>
 <p>A request from any other page is then refused. Requests that carry no
 <code>Origin</code>, such as those from wallets and command line tools, are not
 affected. <code>allow_opaque_origin</code> admits pages opened as local files

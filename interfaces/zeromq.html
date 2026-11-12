@@ -411,8 +411,8 @@ socket can subscribe.</p>
 <h3 id="21-enabling">2.1 Enabling<a class="anchor" href="#21-enabling" aria-label="Link to this section">#</a></h3>
 <p>The service starts only with both an address and a connection limit:</p>
 <pre><code class="language-ini"><span class="section">[zmq]</span>
-bind = 127.0.0.1:8380
-bind = [::1]:8380
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 </code></pre>
 <p>Notifications begin once the node is current. Before that, connections
@@ -477,7 +477,7 @@ sequence numbers, which is how a subscriber detects it.</p>
 <p>The <code>safe</code> addresses (default port 8343) use CurveZMQ, enabled by the
 server's secret key:</p>
 <pre><code class="language-ini"><span class="section">[zmq]</span>
-safe = 127.0.0.1:8343
+safe = 127.0.0.1
 key = &lt;server secret key, Z85&gt;
 cert = &lt;client public key, Z85&gt;
 connections = 10

@@ -61,21 +61,18 @@ The time a sync takes and the space its store needs are shown on the
 
 ## 3. Serve
 
-Each interface is enabled by an address and a connection limit. This
-configuration serves the admin console and the block explorer locally,
-and Electrum wallets on the network:
+The admin console is served by default, on the local machine only. Each
+other interface is enabled by an address and a connection limit. This
+configuration also serves the block explorer locally, and Electrum
+wallets on the network:
 
 ```ini
-[admin]
-bind = 127.0.0.1:8080
-connections = 10
-
 [native]
-bind = 127.0.0.1:8180
+bind = 127.0.0.1
 connections = 10
 
 [electrum]
-bind = 0.0.0.0:8580
+bind = 0.0.0.0
 connections = 100
 ```
 

@@ -475,19 +475,16 @@ buckets = 10001
 mine, and the regtest defaults make no outbound connections, so blocks
 come from a local node that generates them. This recommended file
 connects to one on port 18445, since <code>bs</code> listens on 18444, and serves the
-admin console and block explorer locally, which are off by default:</p>
+block explorer locally, which is off by default. The admin console is
+served locally by default, on port 28080:</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = regtest
 
 <span class="section">[manual]</span>
 peer = 127.0.0.1:18445
 
-<span class="section">[admin]</span>
-bind = 127.0.0.1:28080
-connections = 10
-
 <span class="section">[native]</span>
-bind = 127.0.0.1:28180
+bind = 127.0.0.1
 connections = 10
 </code></pre>
 <p>Save it as <code>regtest.cfg</code> and start the node with it:</p>

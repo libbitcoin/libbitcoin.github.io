@@ -351,7 +351,9 @@ served on the <code>[admin]</code> binding. It also serves the full
 The embedded console is a page of this interface, and can be replaced
 with a custom site (see <a href="../configuration/setups.html#5-admin-site">Configuration
 §5.5</a>).</p>
-<p>Its protocols share one port, and their secure forms share another:</p>
+<p>The admin interface is enabled by default, on the local machine only
+(<code>127.0.0.1</code>, clear port). Its protocols share one port, and their secure
+forms share another:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -400,12 +402,14 @@ page of the console, such as <code>/</code>.</p>
 are served whether or not <code>[native]</code> is enabled.</p>
 <h2 id="2-calling-pattern">2. Calling pattern<a class="anchor" href="#2-calling-pattern" aria-label="Link to this section">#</a></h2>
 <h3 id="21-enabling">2.1 Enabling<a class="anchor" href="#21-enabling" aria-label="Link to this section">#</a></h3>
-<p>The service starts only with both an address and a connection limit:</p>
+<p>The service is enabled by default, on <code>127.0.0.1</code> with <code>connections = 10</code>.
+Setting <code>bind</code> replaces the default address. To also listen on the IPv6
+loopback:</p>
 <pre><code class="language-ini"><span class="section">[admin]</span>
-bind = 127.0.0.1:8080
-bind = [::1]:8080
-connections = 10
+bind = 127.0.0.1
+bind = [::1]
 </code></pre>
+<p><code>connections = 0</code> disables it.</p>
 <p>Unlike the other services, it starts before the node is current.</p>
 <h3 id="22-subscribing">2.2 Subscribing<a class="anchor" href="#22-subscribing" aria-label="Link to this section">#</a></h3>
 <p>A subscription is made over a websocket, which connects on the same port.</p>

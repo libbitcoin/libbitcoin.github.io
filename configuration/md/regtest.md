@@ -136,7 +136,8 @@ A configuration file is needed only to change a default. `bs` does not
 mine, and the regtest defaults make no outbound connections, so blocks
 come from a local node that generates them. This recommended file
 connects to one on port 18445, since `bs` listens on 18444, and serves the
-admin console and block explorer locally, which are off by default:
+block explorer locally, which is off by default. The admin console is
+served locally by default, on port 28080:
 
 ```ini
 [bitcoin]
@@ -145,12 +146,8 @@ network = regtest
 [manual]
 peer = 127.0.0.1:18445
 
-[admin]
-bind = 127.0.0.1:28080
-connections = 10
-
 [native]
-bind = 127.0.0.1:28180
+bind = 127.0.0.1
 connections = 10
 ```
 

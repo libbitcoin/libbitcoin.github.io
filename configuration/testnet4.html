@@ -472,17 +472,14 @@ buckets = 150001
 </ul>
 <h2 id="configuration">Configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h2>
 <p>A configuration file is needed only to change a default. Network
-operation needs none, but the admin console and block explorer are off by
-default. This recommended file serves both locally:</p>
+operation needs none, but the block explorer is off by default. The
+admin console is served locally by default, on port 48080. This
+recommended file serves the block explorer locally:</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = testnet4
 
-<span class="section">[admin]</span>
-bind = 127.0.0.1:48080
-connections = 10
-
 <span class="section">[native]</span>
-bind = 127.0.0.1:48180
+bind = 127.0.0.1
 connections = 10
 </code></pre>
 <p>Save it as <code>testnet4.cfg</code> and start the node with it:</p>

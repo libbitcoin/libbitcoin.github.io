@@ -378,19 +378,16 @@ height, see <a href="../configuration/command-line.html">Command Line</a> and
 <p>The time a sync takes and the space its store needs are shown on the
 <a href="../sync.html">Sync BS</a> and <a href="../footprint.html">Footprint</a> pages.</p>
 <h2 id="3-serve">3. Serve<a class="anchor" href="#3-serve" aria-label="Link to this section">#</a></h2>
-<p>Each interface is enabled by an address and a connection limit. This
-configuration serves the admin console and the block explorer locally,
-and Electrum wallets on the network:</p>
-<pre><code class="language-ini"><span class="section">[admin]</span>
-bind = 127.0.0.1:8080
-connections = 10
-
-<span class="section">[native]</span>
-bind = 127.0.0.1:8180
+<p>The admin console is served by default, on the local machine only. Each
+other interface is enabled by an address and a connection limit. This
+configuration also serves the block explorer locally, and Electrum
+wallets on the network:</p>
+<pre><code class="language-ini"><span class="section">[native]</span>
+bind = 127.0.0.1
 connections = 10
 
 <span class="section">[electrum]</span>
-bind = 0.0.0.0:8580
+bind = 0.0.0.0
 connections = 100
 </code></pre>
 <pre class="console"><code>$ bs --config bs.cfg

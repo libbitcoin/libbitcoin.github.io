@@ -8,6 +8,8 @@ connections using CurveZMQ rather than TLS ([Secure connections](#2-secure-conne
 ## 1. Listening
 
 A service runs only when it has somewhere to listen and is allowed
+connections. Only `[admin]` runs by default, bound to `127.0.0.1` (the
+local machine) with `connections = 10`; the others have no address and no
 connections:
 
 | Setting | Purpose |
@@ -58,8 +60,8 @@ The same certificate and key may be used by every service. For example,
 
 ```ini
 [admin]
-safe = 127.0.0.1:8043
-safe = [::1]:8043
+safe = 127.0.0.1
+safe = [::1]
 connections = 10
 cert_path = server.pem
 key_path = server.key
@@ -135,8 +137,8 @@ $ bx tls-cert --name alice < client.key > client.pem
 
 ```ini
 [admin]
-safe = 127.0.0.1:8043
-safe = [::1]:8043
+safe = 127.0.0.1
+safe = [::1]
 cert_path = server.pem
 key_path = server.key
 cert_auth = clients
@@ -157,8 +159,8 @@ client makes its own key pair with `bx curve-new` and `bx curve-public`
 
 ```ini
 [zmq]
-safe = 127.0.0.1:8343
-safe = [::1]:8343
+safe = 127.0.0.1
+safe = [::1]
 key = <server secret key>
 cert = <client public key>
 ```

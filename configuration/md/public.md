@@ -512,32 +512,51 @@ the keys on the command line, as they contain shell characters.
 
 **4. Configure the services.** Bind each service on every adapter, clear
 and secure, with the certificate and key from step 1 and the ZMQ secret
-key from step 3:
+key from step 3. An address without a port takes the service's port on
+the selected network ([Conventional Ports](ports)):
 
 ```ini
 [inbound]
-bind = 0.0.0.0:8333
-bind = [::]:8333
+bind = 0.0.0.0
+bind = [::]
 
 [electrum]
-bind = 0.0.0.0:8580
-bind = [::]:8580
-safe = 0.0.0.0:8543
-safe = [::]:8543
+bind = 0.0.0.0
+bind = [::]
+safe = 0.0.0.0
+safe = [::]
 cert_path = fullchain.pem
 key_path = privkey.pem
 
 [zmq]
-bind = 0.0.0.0:8380
-bind = [::]:8380
-safe = 0.0.0.0:8343
-safe = [::]:8343
+bind = 0.0.0.0
+bind = [::]
+safe = 0.0.0.0
+safe = [::]
 key = <secret key>
 ```
 
-The other client services follow `[electrum]`, each on its own ports
-([Conventional Ports](ports)). With no `zmq.cert` lines, any ZMQ client may connect.
-Leave `[admin]` on the local machine ([Admin site](setups#5-admin-site)).
+The other client services follow `[electrum]`. With no `zmq.cert` lines,
+any ZMQ client may connect. Leave `[admin]` on the local machine
+([Admin site](setups#5-admin-site)).
+
+**One file for every network.** With no ports in it, the same
+configuration file serves each network. On mainnet the Electrum service
+above listens on 8580 and 8543, on testnet4 on 48580 and 48543, and
+`[inbound]` on 8333 and 48333. Each network keeps its own store and logs
+([Command Line](command-line)), so one `bs` per network can run from the
+one file at the same time:
+
+```
+$ bs -c bs.cfg -n mainnet
+$ bs -c bs.cfg -n testnet4
+```
+
+The other address settings follow the same rule. `inbound.self`,
+`manual.peer` and `outbound.seed` without a port take the network's P2P
+port. A `manual.peer` without a port also matches its address on any
+port, so the address cache does not keep it as another peer. A port
+written into any of these settings is used as given on every network.
 
 **5. Allow web pages.** The HTTP services accept cross-origin requests
 from web pages on other sites ([CORS](https://fetch.spec.whatwg.org/#http-cors-protocol)).
@@ -551,10 +570,21 @@ To admit only particular sites, list them:
 origin = explorer.example.org:443
 ```
 
-Each `origin` is a host and port, without a scheme. A service with an
-`origin` list admits the pages it serves itself only when the request's
-`Host` is in its `host` list, so list the service's own name there, which
-also protects it from DNS rebinding.
+Each `origin` is a host, with an optional port, and no scheme. A
+service with an `origin` list admits the pages it serves itself only when
+the request's `Host` is in its `host` list, so list the service's own name
+there, which also protects it from DNS rebinding:
+
+```ini
+[native]
+host = node.example.com
+origin = explorer.example.org
+```
+
+An `origin` or `host` without a port matches that name on any port, so
+the lists above hold on every network. With a port, it matches only that
+port; a request that names no port is compared with the service's default
+port, 80 in the clear and 443 secure.
 
 A request from any other page is then refused. Requests that carry no
 `Origin`, such as those from wallets and command line tools, are not

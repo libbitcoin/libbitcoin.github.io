@@ -513,21 +513,18 @@ buckets = 150001
 <code>forks.block_storm_patch</code> off, since BIP 54 replaces the testnet4 rules.</p>
 <h2 id="configuration">Configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h2>
 <p>A configuration file is needed only to change a default. With no seeds,
-testnet5 needs at least one peer named in <code>[manual]</code>. The admin console
-and block explorer are off by default. This recommended file connects to
-a peer and serves both locally:</p>
+testnet5 needs at least one peer named in <code>[manual]</code>. The block explorer
+is off by default, and the admin console is served locally by default, on
+port 58080. This recommended file connects to a peer and serves the block
+explorer locally:</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = testnet5
 
 <span class="section">[manual]</span>
 peer = &lt;host&gt;:18353
 
-<span class="section">[admin]</span>
-bind = 127.0.0.1:58080
-connections = 10
-
 <span class="section">[native]</span>
-bind = 127.0.0.1:58180
+bind = 127.0.0.1
 connections = 10
 </code></pre>
 <p>Save it as <code>testnet5.cfg</code> and start the node with it:</p>

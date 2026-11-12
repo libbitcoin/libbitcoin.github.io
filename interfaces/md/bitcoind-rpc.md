@@ -97,7 +97,7 @@ as a boolean for `getrawtransaction` verbosity or a quoted amount.
 
 ```ini
 [bitcoind]
-bind = 127.0.0.1:8280
+bind = 127.0.0.1
 connections = 10
 credential = user:pass
 credential = monitor:secret:getblockcount,getblockchaininfo
@@ -146,6 +146,43 @@ a port. A WS/S connection is authorized by its upgrade request.
 Addresses, keys and descriptors in requests and responses are encoded
 with the [`[wallet]`](../configuration/reference#6-wallet) prefixes, so a
 test chain uses its own. An address of another chain is rejected.
+
+### 2.6 Versions
+
+The interface follows bitcoind releases 30.0, 31.0 and 32.0. A
+connection is served at one of them, and a method introduced by a later
+release is answered with `method_not_found` (-32601), as by that release
+of bitcoind.
+
+| Version | Methods introduced |
+| ------- | ------------------ |
+| 30.0 | All others |
+| 31.0 | `getmempoolcluster`, `getmempoolfeeratediagram`, `abortprivatebroadcast`, `getprivatebroadcastinfo` |
+| 32.0 | `rpc.discover`, `getopenrpcinfo`, `exportasmap`, `addhdkey`, `derivehdkey`, `exportwatchonlywallet` |
+
+A version is numbered as bitcoind's `version`, 10000 × major + 100 ×
+minor + patch, so 32.0 is 320000. `bitcoind.protocol_minimum` and
+`bitcoind.protocol_maximum` set the server's range (default 300000 and
+320000). A value between releases stands for the release below it, and a
+range that contains no release is a configuration error.
+
+A connection is served at the highest release in the range, unless its
+first request is `negotiateversion`, a `bs` extension:
+
+```
+$ curl -d '{"jsonrpc":"2.0","id":1,"method":"negotiateversion","params":[300000,310000]}' "http://localhost:8280/"
+```
+
+```json
+{"jsonrpc": "2.0", "id": 1, "result": 310000}
+```
+
+**Parameters:** `minimum`, `maximum` (each unbounded if null or omitted).
+The server answers with the highest release in both ranges, and serves
+the connection at it from then on. With none in both ranges, it answers
+`invalid_parameter` and closes the connection. `negotiateversion`
+requires no credential, and is answered with -32600 (invalid request)
+after the first request. The version lasts as long as the connection.
 
 ## 3. Blockchain
 
@@ -527,8 +564,9 @@ Submits a block header. **Parameters:** `hexdata`. **Result:** `null`.
 
 ### getnetworkinfo
 
-The state of the network. **Parameters:** none. `version` and
-`subversion` are `bitcoind.version` and `bitcoind.subversion`.
+The state of the network. **Parameters:** none. `version` is the
+version of the connection (§2.6), and `subversion` its bitcoind user
+agent, such as `/Satoshi:32.0.0/`.
 
 ### getconnectioncount
 
@@ -617,8 +655,8 @@ basic block filter index when client filters are stored.
 
 ### help
 
-The served methods, as one line, or the usage of a method.
-**Parameters:** `command`.
+The served methods, as one line, or the usage of a method, at the
+version of the connection (§2.6). **Parameters:** `command`.
 
 ### rpc.discover
 

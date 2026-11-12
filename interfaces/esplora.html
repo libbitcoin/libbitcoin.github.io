@@ -649,6 +649,52 @@ asyncio.run(main())
 </code></pre>
 <pre><code>9
 </code></pre>
+<h3 id="26-versions">2.6 Versions<a class="anchor" href="#26-versions" aria-label="Link to this section">#</a></h3>
+<p>The interface follows Esplora versions 2.10 and 3.0. A version is
+numbered 10000 × major + 100 × minor + patch, so 3.0 is 30000.
+<code>esplora.protocol_version</code> sets the version served (default 30000). A
+value between versions stands for the version below it, and a value
+below 21000 or above 30000 is a configuration error. There is no
+negotiation.</p>
+<p>At 2.10, the paths introduced by 3.0 are answered with 404:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/tx/{txid}/raw</code></td>
+<td><a href="#tx"><code>tx</code></a></td>
+</tr>
+<tr>
+<td><code>/tx/{txid}/merkleblock-proof</code></td>
+<td><a href="#tx_merkleblock_proof"><code>tx_merkleblock_proof</code></a></td>
+</tr>
+<tr>
+<td><code>POST /tx</code></td>
+<td><a href="#broadcast"><code>broadcast</code></a></td>
+</tr>
+<tr>
+<td><code>POST /txs/package</code></td>
+<td><a href="#broadcast_package"><code>broadcast_package</code></a></td>
+</tr>
+<tr>
+<td><code>/block/{hash}/raw</code></td>
+<td><a href="#block"><code>block</code></a></td>
+</tr>
+<tr>
+<td><code>/block/{hash}/header</code></td>
+<td><a href="#block_header"><code>block_header</code></a></td>
+</tr>
+<tr>
+<td><code>/block/{hash}/txid/{index}</code></td>
+<td><a href="#block_txid"><code>block_txid</code></a></td>
+</tr>
+</tbody>
+</table></div>
 <h2 id="3-transactions">3. Transactions<a class="anchor" href="#3-transactions" aria-label="Link to this section">#</a></h2>
 <h3 id="tx">tx<a class="anchor" href="#tx" aria-label="Link to this section">#</a></h3>
 <p>A transaction, confirmed or unconfirmed.</p>

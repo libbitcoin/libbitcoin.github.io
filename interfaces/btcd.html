@@ -407,7 +407,7 @@ over every transport. btcd serves the notification methods over WS/S
 only.</p>
 <h2 id="2-configuration">2. Configuration<a class="anchor" href="#2-configuration" aria-label="Link to this section">#</a></h2>
 <pre><code class="language-ini"><span class="section">[btcd]</span>
-bind = 127.0.0.1:8480
+bind = 127.0.0.1
 connections = 10
 credential = user:pass
 </code></pre>
@@ -433,6 +433,10 @@ credential = user:pass
 </tr>
 </tbody>
 </table></div>
+<p>The bitcoind methods are versioned as on the bitcoind interface
+(<a href="bitcoind-rpc.html#26-versions">Bitcoind JSON-RPC §2.6</a>), over releases 30.0
+to 32.0, and <code>negotiateversion</code> is served without <code>authenticate</code>. The
+range is not configurable on <code>[btcd]</code>.</p>
 <p>Address search and address watches require the address index, and return
 -1 without it. Addresses are encoded with the
 <a href="../configuration/reference.html#6-wallet"><code>[wallet]</code></a> prefixes.</p>

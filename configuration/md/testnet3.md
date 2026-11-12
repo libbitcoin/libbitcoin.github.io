@@ -125,19 +125,16 @@ buckets = 5100001
 ## Configuration
 
 A configuration file is needed only to change a default. Network
-operation needs none, but the admin console and block explorer are off by
-default. This recommended file serves both locally:
+operation needs none, but the block explorer is off by default. The
+admin console is served locally by default, on port 18080. This
+recommended file serves the block explorer locally:
 
 ```ini
 [bitcoin]
 network = testnet3
 
-[admin]
-bind = 127.0.0.1:18080
-connections = 10
-
 [native]
-bind = 127.0.0.1:18180
+bind = 127.0.0.1
 connections = 10
 ```
 

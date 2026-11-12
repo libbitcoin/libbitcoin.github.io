@@ -1059,16 +1059,16 @@ username =
 <pre><code class="language-ini"><span class="section">[admin]</span>
 <span class="comment"># Allow requests from opaque origin (see CORS), defaults to 'false'.</span>
 allow_opaque_origin = false
-<span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
-<span class="comment">#bind =</span>
+<span class="comment"># IP address to bind, multiple allowed, defaults to '127.0.0.1' (loopback).</span>
+bind = 127.0.0.1
 <span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
 cert_auth =
 <span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
 cert_path =
 <span class="comment"># The time limit for connection establishment, defaults to '0' (network controls).</span>
 connect_timeout_seconds = 0
-<span class="comment"># The required maximum number of connections, defaults to '0'.</span>
-connections = 0
+<span class="comment"># The required maximum number of connections, defaults to '10'.</span>
+connections = 10
 <span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
 <span class="comment">#credential =</span>
 <span class="comment"># The path of the default source page, defaults to 'index.html'.</span>
@@ -1185,16 +1185,16 @@ maximum_request = 8004096
 minimum_buffer = 4096
 <span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#origin =</span>
+<span class="comment"># The maximum interface version (bitcoind version encoding), defaults to '320000'.</span>
+protocol_maximum = 320000
+<span class="comment"># The minimum interface version (bitcoind version encoding), defaults to '300000'.</span>
+protocol_minimum = 300000
 <span class="comment"># The send rate limit in bytes per second, defaults to '0' (network controls).</span>
 rate_limit = 0
 <span class="comment"># IP address to secure bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#safe =</span>
 <span class="comment"># The server name (http header), defaults to 'libbitcoin/4'.</span>
 server = libbitcoin/4
-<span class="comment"># The subversion identity (getnetworkinfo), defaults to '/libbitcoin:server/'.</span>
-subversion = /libbitcoin:server/
-<span class="comment"># The version identity (getnetworkinfo), defaults to '0.0'.</span>
-version = 0.0
 </code></pre>
 <h2 id="16-zmq">16. <code>[zmq]</code><a class="anchor" href="#16-zmq" aria-label="Link to this section">#</a></h2>
 <p>The ZMQ notification interface (bitcoind compatible).</p>
@@ -1437,6 +1437,8 @@ maximum_request = 8004096
 minimum_buffer = 4096
 <span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#origin =</span>
+<span class="comment"># The interface version (10000 major, 100 minor, patch), defaults to '30000'.</span>
+protocol_version = 30000
 <span class="comment"># The send rate limit in bytes per second, defaults to '0' (network controls).</span>
 rate_limit = 0
 <span class="comment"># IP address to secure bind, multiple allowed, defaults to empty (disabled).</span>

@@ -3,6 +3,7 @@
 Every service has an assigned port on each chain, clear and secure. A
 service listens only on the addresses given by its `bind` and `safe`
 settings ([Listening](services#1-listening)), so the examples on this page give them explicitly.
+Only `[admin]` has a default address, `127.0.0.1` on its clear port.
 
 The P2P network uses its convention on each chain, so peers find the
 node without configuration. Each libbitcoin service uses its own block,

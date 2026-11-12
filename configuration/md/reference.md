@@ -765,16 +765,16 @@ The administrative web and websocket interface.
 [admin]
 # Allow requests from opaque origin (see CORS), defaults to 'false'.
 allow_opaque_origin = false
-# IP address to bind, multiple allowed, defaults to empty (disabled).
-#bind =
+# IP address to bind, multiple allowed, defaults to '127.0.0.1' (loopback).
+bind = 127.0.0.1
 # The trusted client certificate directory (*.PEM), enables client authentication.
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
-# The required maximum number of connections, defaults to '0'.
-connections = 0
+# The required maximum number of connections, defaults to '10'.
+connections = 10
 # The 'username:password[:method,...]' authorization (not secure), multiple allowed.
 #credential =
 # The path of the default source page, defaults to 'index.html'.
@@ -899,16 +899,16 @@ maximum_request = 8004096
 minimum_buffer = 4096
 # The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
 #origin =
+# The maximum interface version (bitcoind version encoding), defaults to '320000'.
+protocol_maximum = 320000
+# The minimum interface version (bitcoind version encoding), defaults to '300000'.
+protocol_minimum = 300000
 # The send rate limit in bytes per second, defaults to '0' (network controls).
 rate_limit = 0
 # IP address to secure bind, multiple allowed, defaults to empty (disabled).
 #safe =
 # The server name (http header), defaults to 'libbitcoin/4'.
 server = libbitcoin/4
-# The subversion identity (getnetworkinfo), defaults to '/libbitcoin:server/'.
-subversion = /libbitcoin:server/
-# The version identity (getnetworkinfo), defaults to '0.0'.
-version = 0.0
 ```
 
 ## 16. `[zmq]`
@@ -1171,6 +1171,8 @@ maximum_request = 8004096
 minimum_buffer = 4096
 # The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).
 #origin =
+# The interface version (10000 major, 100 minor, patch), defaults to '30000'.
+protocol_version = 30000
 # The send rate limit in bytes per second, defaults to '0' (network controls).
 rate_limit = 0
 # IP address to secure bind, multiple allowed, defaults to empty (disabled).

@@ -398,12 +398,16 @@ checkpoint = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
 <h2 id="5-admin-site">5. Admin site<a class="anchor" href="#5-admin-site" aria-label="Link to this section">#</a></h2>
 <p><code>bs</code> serves its own administrative site. The admin interface also serves
 the full native REST interface, which the site uses, so <code>[native]</code> need
-not be enabled. Here it is limited to the local machine:</p>
+not be enabled. It is enabled by default, for the local machine only
+(<code>127.0.0.1</code>), on port 8080 on mainnet (<a href="ports.html">Conventional Ports</a>). Setting <code>bind</code>
+replaces the default address. To also listen on the IPv6 loopback:</p>
 <pre><code class="language-ini"><span class="section">[admin]</span>
-bind = 127.0.0.1:8080
-bind = [::1]:8080
-connections = 10
+bind = 127.0.0.1
+bind = [::1]
 </code></pre>
+<p>To disable the admin site, set <code>connections = 0</code>. To reach it from
+other machines, bind an external address such as <code>0.0.0.0</code>, and
+secure it (<a href="services.html#2-secure-connections">Secure connections</a>).</p>
 <p>To view the admin site open <code>http://localhost:8080</code> in a browser. The site
 makes its admin and native requests over one websocket to the address it
 was loaded from. Its pages
@@ -428,8 +432,8 @@ set <code>folders.admin</code>. A request for <code>/</code> returns <code>admin
 <p>The native REST interface serves the block explorer. Here it is limited
 to the local machine:</p>
 <pre><code class="language-ini"><span class="section">[native]</span>
-bind = 127.0.0.1:8180
-bind = [::1]:8180
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 </code></pre>
 <p>To view the block explorer open <code>http://localhost:8180</code> in a browser. By
@@ -528,8 +532,8 @@ site, set <code>folders.native</code>. A request for <code>/</code> returns <cod
 <h2 id="7-electrum-server">7. Electrum server<a class="anchor" href="#7-electrum-server" aria-label="Link to this section">#</a></h2>
 <p>Electrum on its assigned ports (<a href="ports.html">Conventional Ports</a>), clear and secure (<a href="services.html#2-secure-connections">Secure connections</a>):</p>
 <pre><code class="language-ini"><span class="section">[electrum]</span>
-bind = 0.0.0.0:8580
-safe = 0.0.0.0:8543
+bind = 0.0.0.0
+safe = 0.0.0.0
 connections = 100
 cert_path = server.pem
 key_path = server.key
@@ -547,8 +551,8 @@ key_path = server.key
 <p>The RPC interface listens on its default port, 8280, here limited to
 the local machine.</p>
 <pre><code class="language-ini"><span class="section">[bitcoind]</span>
-bind = 127.0.0.1:8280
-bind = [::1]:8280
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 credential = user:password
 </code></pre>
@@ -570,8 +574,8 @@ credential = reader:password:getblockcount,getblockhash,getblock,block
 <p>The btcd RPC interface listens on its default port, 8480, here limited
 to the local machine:</p>
 <pre><code class="language-ini"><span class="section">[btcd]</span>
-bind = 127.0.0.1:8480
-bind = [::1]:8480
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 credential = user:password
 </code></pre>
@@ -594,8 +598,8 @@ an invalid parameters error.</p>
 <p>ZMQ publishes on its default port, 8380, here limited to the local
 machine.</p>
 <pre><code class="language-ini"><span class="section">[zmq]</span>
-bind = 127.0.0.1:8380
-bind = [::1]:8380
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 </code></pre>
 <p>Beyond the standard bitcoind notifications, <code>bs</code> provides CurveZMQ on its
@@ -604,7 +608,7 @@ the client keys listed in <code>zmq.cert</code>.</p>
 <h2 id="11-esplora">11. Esplora<a class="anchor" href="#11-esplora" aria-label="Link to this section">#</a></h2>
 <p>The Esplora interface, on its assigned port:</p>
 <pre><code class="language-ini"><span class="section">[esplora]</span>
-bind = 0.0.0.0:8780
+bind = 0.0.0.0
 connections = 100
 </code></pre>
 <p>To serve existing Esplora clients, bind it to the port they expect
@@ -661,8 +665,8 @@ extensions:</p>
 silent_start_height = 0
 
 <span class="section">[sparrow]</span>
-bind = 0.0.0.0:8680
-safe = 0.0.0.0:8643
+bind = 0.0.0.0
+safe = 0.0.0.0
 connections = 100
 cert_path = server.pem
 key_path = server.key
@@ -686,11 +690,11 @@ can bridge between them.</p>
 listening port, and onion address gossip:</p>
 <pre><code class="language-ini"><span class="section">[outbound]</span>
 socks = 127.0.0.1:9050
-seed = &lt;first seed onion address&gt;.onion:8333
-seed = &lt;second seed onion address&gt;.onion:8333
+seed = &lt;first seed onion address&gt;.onion
+seed = &lt;second seed onion address&gt;.onion
 
 <span class="section">[inbound]</span>
-self = &lt;hidden service onion address&gt;.onion:8333
+self = &lt;hidden service onion address&gt;.onion
 
 <span class="section">[peer]</span>
 gossip_tor = true
@@ -791,9 +795,9 @@ such as a server, since bridging gives up the anonymity of its onion or
 I2P address. Clear outbound and inbound, with Tor peers accepted through a
 hidden service:</p>
 <pre><code class="language-ini"><span class="section">[inbound]</span>
-bind = 0.0.0.0:8333
-self = &lt;public IP address&gt;:8333
-self = &lt;hidden service onion address&gt;.onion:8333
+bind = 0.0.0.0
+self = &lt;public IP address&gt;
+self = &lt;hidden service onion address&gt;.onion
 
 <span class="section">[peer]</span>
 gossip_ipv4 = true
@@ -818,12 +822,12 @@ through Tor exit relays.</p>
 <p>A Tor-only node:</p>
 <pre><code class="language-ini"><span class="section">[outbound]</span>
 socks = 127.0.0.1:9050
-seed = &lt;first seed onion address&gt;.onion:8333
-seed = &lt;second seed onion address&gt;.onion:8333
+seed = &lt;first seed onion address&gt;.onion
+seed = &lt;second seed onion address&gt;.onion
 
 <span class="section">[inbound]</span>
-bind = 127.0.0.1:8333
-self = &lt;hidden service onion address&gt;.onion:8333
+bind = 127.0.0.1
+self = &lt;hidden service onion address&gt;.onion
 
 <span class="section">[peer]</span>
 gossip_ipv4 = false
@@ -851,8 +855,8 @@ them through the proxy fail. Advertising both addresses links them, as
 with a clear address.</p>
 <h2 id="16-fixed-peers">16. Fixed peers<a class="anchor" href="#16-fixed-peers" aria-label="Link to this section">#</a></h2>
 <pre><code class="language-ini"><span class="section">[manual]</span>
-peer = 192.168.0.10:8333
-peer = 192.168.0.11:8333
+peer = 192.168.0.10
+peer = 192.168.0.11
 
 <span class="section">[outbound]</span>
 connections = 0
@@ -973,8 +977,8 @@ on the <code>inbound.bind</code> addresses. Inbound defaults to <code>0.0.0.0:83
 accepts connections on every IPv4 adapter. To accept peers only on the same adapters, bind
 inbound to the same addresses:</p>
 <pre><code class="language-ini"><span class="section">[inbound]</span>
-bind = 192.168.0.20:8333
-bind = 192.168.0.21:8333
+bind = 192.168.0.20
+bind = 192.168.0.21
 </code></pre>
 <p>Whether a bound connection actually leaves through its adapter depends on
 the operating system:</p>
@@ -1071,8 +1075,8 @@ block ranges differ, and the later blocks are larger.</p>
 chooses which address to connect to. <code>bs</code> can make each connection
 reachable and advertise it:</p>
 <pre><code class="language-ini"><span class="section">[inbound]</span>
-self = 203.0.113.10:8333
-self = 198.51.100.20:8333
+self = 203.0.113.10
+self = 198.51.100.20
 </code></pre>
 <ul>
 <li>Each provider's router forwards port 8333 to its adapter's address.</li>

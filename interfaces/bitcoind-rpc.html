@@ -522,7 +522,7 @@ connection is closed. bitcoind accepts some types that <code>bs</code> does not,
 as a boolean for <code>getrawtransaction</code> verbosity or a quoted amount.</p>
 <h3 id="23-credentials">2.3 Credentials<a class="anchor" href="#23-credentials" aria-label="Link to this section">#</a></h3>
 <pre><code class="language-ini"><span class="section">[bitcoind]</span>
-bind = 127.0.0.1:8280
+bind = 127.0.0.1
 connections = 10
 credential = user:pass
 credential = monitor:secret:getblockcount,getblockchaininfo
@@ -596,6 +596,50 @@ a port. A WS/S connection is authorized by its upgrade request.</p>
 <p>Addresses, keys and descriptors in requests and responses are encoded
 with the <a href="../configuration/reference.html#6-wallet"><code>[wallet]</code></a> prefixes, so a
 test chain uses its own. An address of another chain is rejected.</p>
+<h3 id="26-versions">2.6 Versions<a class="anchor" href="#26-versions" aria-label="Link to this section">#</a></h3>
+<p>The interface follows bitcoind releases 30.0, 31.0 and 32.0. A
+connection is served at one of them, and a method introduced by a later
+release is answered with <code>method_not_found</code> (-32601), as by that release
+of bitcoind.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Methods introduced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30.0</td>
+<td>All others</td>
+</tr>
+<tr>
+<td>31.0</td>
+<td><code>getmempoolcluster</code>, <code>getmempoolfeeratediagram</code>, <code>abortprivatebroadcast</code>, <code>getprivatebroadcastinfo</code></td>
+</tr>
+<tr>
+<td>32.0</td>
+<td><code>rpc.discover</code>, <code>getopenrpcinfo</code>, <code>exportasmap</code>, <code>addhdkey</code>, <code>derivehdkey</code>, <code>exportwatchonlywallet</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>A version is numbered as bitcoind's <code>version</code>, 10000 × major + 100 ×
+minor + patch, so 32.0 is 320000. <code>bitcoind.protocol_minimum</code> and
+<code>bitcoind.protocol_maximum</code> set the server's range (default 300000 and
+320000). A value between releases stands for the release below it, and a
+range that contains no release is a configuration error.</p>
+<p>A connection is served at the highest release in the range, unless its
+first request is <code>negotiateversion</code>, a <code>bs</code> extension:</p>
+<pre class="console"><code>$ curl -d '{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;negotiateversion&quot;,&quot;params&quot;:[300000,310000]}' &quot;http://localhost:8280/&quot;
+</code></pre>
+<pre><code class="language-json">{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;result&quot;: 310000}
+</code></pre>
+<p><strong>Parameters:</strong> <code>minimum</code>, <code>maximum</code> (each unbounded if null or omitted).
+The server answers with the highest release in both ranges, and serves
+the connection at it from then on. With none in both ranges, it answers
+<code>invalid_parameter</code> and closes the connection. <code>negotiateversion</code>
+requires no credential, and is answered with -32600 (invalid request)
+after the first request. The version lasts as long as the connection.</p>
 <h2 id="3-blockchain">3. Blockchain<a class="anchor" href="#3-blockchain" aria-label="Link to this section">#</a></h2>
 <h3 id="getbestblockhash">getbestblockhash<a class="anchor" href="#getbestblockhash" aria-label="Link to this section">#</a></h3>
 <p>The hash of the top confirmed block. <strong>Parameters:</strong> none.</p>
@@ -935,8 +979,9 @@ the difficulty. <code>pooledtx</code> is 0, and <code>blockmintxfee</code> is th
 <p>Submits a block header. <strong>Parameters:</strong> <code>hexdata</code>. <strong>Result:</strong> <code>null</code>.</p>
 <h2 id="7-network">7. Network<a class="anchor" href="#7-network" aria-label="Link to this section">#</a></h2>
 <h3 id="getnetworkinfo">getnetworkinfo<a class="anchor" href="#getnetworkinfo" aria-label="Link to this section">#</a></h3>
-<p>The state of the network. <strong>Parameters:</strong> none. <code>version</code> and
-<code>subversion</code> are <code>bitcoind.version</code> and <code>bitcoind.subversion</code>.</p>
+<p>The state of the network. <strong>Parameters:</strong> none. <code>version</code> is the
+version of the connection (§2.6), and <code>subversion</code> its bitcoind user
+agent, such as <code>/Satoshi:32.0.0/</code>.</p>
 <h3 id="getconnectioncount">getconnectioncount<a class="anchor" href="#getconnectioncount" aria-label="Link to this section">#</a></h3>
 <p>The number of peer connections. <strong>Parameters:</strong> none.</p>
 <h3 id="getpeerinfo">getpeerinfo<a class="anchor" href="#getpeerinfo" aria-label="Link to this section">#</a></h3>
@@ -987,8 +1032,8 @@ returns only <code>{"isvalid": false}</code>.</p>
 basic block filter index when client filters are stored.</p>
 <h2 id="9-control">9. Control<a class="anchor" href="#9-control" aria-label="Link to this section">#</a></h2>
 <h3 id="help">help<a class="anchor" href="#help" aria-label="Link to this section">#</a></h3>
-<p>The served methods, as one line, or the usage of a method.
-<strong>Parameters:</strong> <code>command</code>.</p>
+<p>The served methods, as one line, or the usage of a method, at the
+version of the connection (§2.6). <strong>Parameters:</strong> <code>command</code>.</p>
 <h3 id="rpcdiscover">rpc.discover<a class="anchor" href="#rpcdiscover" aria-label="Link to this section">#</a></h3>
 <p>The OpenRPC description of the methods. <strong>Parameters:</strong> <code>show_hidden</code>.</p>
 <h3 id="getopenrpcinfo">getopenrpcinfo<a class="anchor" href="#getopenrpcinfo" aria-label="Link to this section">#</a></h3>

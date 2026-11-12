@@ -222,8 +222,8 @@ is not a valid request, and the connection is closed.
 
 ```ini
 [electrum]
-bind = 0.0.0.0:8580
-safe = 0.0.0.0:8543
+bind = 0.0.0.0
+safe = 0.0.0.0
 connections = 100
 ```
 

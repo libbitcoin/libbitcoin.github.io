@@ -139,6 +139,27 @@ asyncio.run(main())
 9
 ```
 
+### 2.6 Versions
+
+The interface follows Esplora versions 2.10 and 3.0. A version is
+numbered 10000 × major + 100 × minor + patch, so 3.0 is 30000.
+`esplora.protocol_version` sets the version served (default 30000). A
+value between versions stands for the version below it, and a value
+below 21000 or above 30000 is a configuration error. There is no
+negotiation.
+
+At 2.10, the paths introduced by 3.0 are answered with 404:
+
+| Path | Method |
+| ---- | ------ |
+| `/tx/{txid}/raw` | [`tx`](#tx) |
+| `/tx/{txid}/merkleblock-proof` | [`tx_merkleblock_proof`](#tx_merkleblock_proof) |
+| `POST /tx` | [`broadcast`](#broadcast) |
+| `POST /txs/package` | [`broadcast_package`](#broadcast_package) |
+| `/block/{hash}/raw` | [`block`](#block) |
+| `/block/{hash}/header` | [`block_header`](#block_header) |
+| `/block/{hash}/txid/{index}` | [`block_txid`](#block_txid) |
+
 ## 3. Transactions
 
 ### tx

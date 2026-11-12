@@ -355,6 +355,8 @@
 connections using CurveZMQ rather than TLS (<a href="#2-secure-connections">Secure connections</a>).</p>
 <h2 id="1-listening">1. Listening<a class="anchor" href="#1-listening" aria-label="Link to this section">#</a></h2>
 <p>A service runs only when it has somewhere to listen and is allowed
+connections. Only <code>[admin]</code> runs by default, bound to <code>127.0.0.1</code> (the
+local machine) with <code>connections = 10</code>; the others have no address and no
 connections:</p>
 <div class="scroller"><table>
 <thead>
@@ -425,8 +427,8 @@ addresses.</p>
 <p>The same certificate and key may be used by every service. For example,
 <code>[admin]</code> over TLS only:</p>
 <pre><code class="language-ini"><span class="section">[admin]</span>
-safe = 127.0.0.1:8043
-safe = [::1]:8043
+safe = 127.0.0.1
+safe = [::1]
 connections = 10
 cert_path = server.pem
 key_path = server.key
@@ -516,8 +518,8 @@ server operator, who places it in the <code>cert_auth</code> directory:</p>
 $ bx tls-cert --name alice &lt; client.key &gt; client.pem
 </code></pre>
 <pre><code class="language-ini"><span class="section">[admin]</span>
-safe = 127.0.0.1:8043
-safe = [::1]:8043
+safe = 127.0.0.1
+safe = [::1]
 cert_path = server.pem
 key_path = server.key
 cert_auth = clients
@@ -533,8 +535,8 @@ that client when <code>bs</code> next starts.</p>
 client makes its own key pair with <code>bx curve-new</code> and <code>bx curve-public</code>
 (<a href="public.html#2-running-a-community-server">Running a community server</a>, step 3), and gives only the public key to the server operator:</p>
 <pre><code class="language-ini"><span class="section">[zmq]</span>
-safe = 127.0.0.1:8343
-safe = [::1]:8343
+safe = 127.0.0.1
+safe = [::1]
 key = &lt;server secret key&gt;
 cert = &lt;client public key&gt;
 </code></pre>

@@ -67,14 +67,19 @@ checkpoint = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
 
 `bs` serves its own administrative site. The admin interface also serves
 the full native REST interface, which the site uses, so `[native]` need
-not be enabled. Here it is limited to the local machine:
+not be enabled. It is enabled by default, for the local machine only
+(`127.0.0.1`), on port 8080 on mainnet ([Conventional Ports](ports)). Setting `bind`
+replaces the default address. To also listen on the IPv6 loopback:
 
 ```ini
 [admin]
-bind = 127.0.0.1:8080
-bind = [::1]:8080
-connections = 10
+bind = 127.0.0.1
+bind = [::1]
 ```
+
+To disable the admin site, set `connections = 0`. To reach it from
+other machines, bind an external address such as `0.0.0.0`, and
+secure it ([Secure connections](services#2-secure-connections)).
 
 To view the admin site open `http://localhost:8080` in a browser. The site
 makes its admin and native requests over one websocket to the address it
@@ -105,8 +110,8 @@ to the local machine:
 
 ```ini
 [native]
-bind = 127.0.0.1:8180
-bind = [::1]:8180
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 ```
 
@@ -176,8 +181,8 @@ Electrum on its assigned ports ([Conventional Ports](ports)), clear and secure (
 
 ```ini
 [electrum]
-bind = 0.0.0.0:8580
-safe = 0.0.0.0:8543
+bind = 0.0.0.0
+safe = 0.0.0.0
 connections = 100
 cert_path = server.pem
 key_path = server.key
@@ -199,8 +204,8 @@ the local machine.
 
 ```ini
 [bitcoind]
-bind = 127.0.0.1:8280
-bind = [::1]:8280
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 credential = user:password
 ```
@@ -229,8 +234,8 @@ to the local machine:
 
 ```ini
 [btcd]
-bind = 127.0.0.1:8480
-bind = [::1]:8480
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 credential = user:password
 ```
@@ -259,8 +264,8 @@ machine.
 
 ```ini
 [zmq]
-bind = 127.0.0.1:8380
-bind = [::1]:8380
+bind = 127.0.0.1
+bind = [::1]
 connections = 10
 ```
 
@@ -274,7 +279,7 @@ The Esplora interface, on its assigned port:
 
 ```ini
 [esplora]
-bind = 0.0.0.0:8780
+bind = 0.0.0.0
 connections = 100
 ```
 
@@ -342,8 +347,8 @@ extensions:
 silent_start_height = 0
 
 [sparrow]
-bind = 0.0.0.0:8680
-safe = 0.0.0.0:8643
+bind = 0.0.0.0
+safe = 0.0.0.0
 connections = 100
 cert_path = server.pem
 key_path = server.key
@@ -373,11 +378,11 @@ listening port, and onion address gossip:
 ```ini
 [outbound]
 socks = 127.0.0.1:9050
-seed = <first seed onion address>.onion:8333
-seed = <second seed onion address>.onion:8333
+seed = <first seed onion address>.onion
+seed = <second seed onion address>.onion
 
 [inbound]
-self = <hidden service onion address>.onion:8333
+self = <hidden service onion address>.onion
 
 [peer]
 gossip_tor = true
@@ -469,9 +474,9 @@ hidden service:
 
 ```ini
 [inbound]
-bind = 0.0.0.0:8333
-self = <public IP address>:8333
-self = <hidden service onion address>.onion:8333
+bind = 0.0.0.0
+self = <public IP address>
+self = <hidden service onion address>.onion
 
 [peer]
 gossip_ipv4 = true
@@ -501,12 +506,12 @@ A Tor-only node:
 ```ini
 [outbound]
 socks = 127.0.0.1:9050
-seed = <first seed onion address>.onion:8333
-seed = <second seed onion address>.onion:8333
+seed = <first seed onion address>.onion
+seed = <second seed onion address>.onion
 
 [inbound]
-bind = 127.0.0.1:8333
-self = <hidden service onion address>.onion:8333
+bind = 127.0.0.1
+self = <hidden service onion address>.onion
 
 [peer]
 gossip_ipv4 = false
@@ -539,8 +544,8 @@ with a clear address.
 
 ```ini
 [manual]
-peer = 192.168.0.10:8333
-peer = 192.168.0.11:8333
+peer = 192.168.0.10
+peer = 192.168.0.11
 
 [outbound]
 connections = 0
@@ -690,8 +695,8 @@ inbound to the same addresses:
 
 ```ini
 [inbound]
-bind = 192.168.0.20:8333
-bind = 192.168.0.21:8333
+bind = 192.168.0.20
+bind = 192.168.0.21
 ```
 
 Whether a bound connection actually leaves through its adapter depends on
@@ -815,8 +820,8 @@ reachable and advertise it:
 
 ```ini
 [inbound]
-self = 203.0.113.10:8333
-self = 198.51.100.20:8333
+self = 203.0.113.10
+self = 198.51.100.20
 ```
 
 - Each provider's router forwards port 8333 to its adapter's address.

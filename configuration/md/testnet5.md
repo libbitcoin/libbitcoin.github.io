@@ -154,9 +154,10 @@ The `[forks]` settings are those of mainnet: `forks.difficult = true`
 ## Configuration
 
 A configuration file is needed only to change a default. With no seeds,
-testnet5 needs at least one peer named in `[manual]`. The admin console
-and block explorer are off by default. This recommended file connects to
-a peer and serves both locally:
+testnet5 needs at least one peer named in `[manual]`. The block explorer
+is off by default, and the admin console is served locally by default, on
+port 58080. This recommended file connects to a peer and serves the block
+explorer locally:
 
 ```ini
 [bitcoin]
@@ -165,12 +166,8 @@ network = testnet5
 [manual]
 peer = <host>:18353
 
-[admin]
-bind = 127.0.0.1:58080
-connections = 10
-
 [native]
-bind = 127.0.0.1:58180
+bind = 127.0.0.1
 connections = 10
 ```
 

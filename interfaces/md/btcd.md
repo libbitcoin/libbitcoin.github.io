@@ -34,7 +34,7 @@ only.
 
 ```ini
 [btcd]
-bind = 127.0.0.1:8480
+bind = 127.0.0.1
 connections = 10
 credential = user:pass
 ```
@@ -45,6 +45,11 @@ credential = user:pass
 | ------- | ------- | ------- |
 | `btcd.maximum_filters` | 1,000,000 | Addresses and outputs one connection may watch, by all notification methods together |
 | `btcd.maximum_history` | 1,000,000 | History read for one address |
+
+The bitcoind methods are versioned as on the bitcoind interface
+([Bitcoind JSON-RPC §2.6](bitcoind-rpc#26-versions)), over releases 30.0
+to 32.0, and `negotiateversion` is served without `authenticate`. The
+range is not configurable on `[btcd]`.
 
 Address search and address watches require the address index, and return
 -1 without it. Addresses are encoded with the
