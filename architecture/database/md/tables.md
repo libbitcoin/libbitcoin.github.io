@@ -1,6 +1,6 @@
 # 03 — Tables
 
-> Companion to [`02-primitives`](primitives) and [`05-queries`](queries).
+> Companion to [`02-primitives`](primitives) and [`06-queries`](queries).
 >
 > Each table is declared in `tables/<category>/<name>.hpp` with its schema
 > in `tables/schema.hpp`. The store owns them (`store.hpp:367-406`) and
@@ -78,7 +78,7 @@ Sources: `tables/archives/*.hpp`, `tables/schema.hpp:105-289`.
   stored (`tables/archives/outs.hpp:277-291`).
 - **txs** is written once per block, after the header and every tx are
   archived. Its presence is the block's association
-  ([`05 §2.3`](queries)).
+  ([`06 §2.3`](queries)).
 
 ---
 
@@ -98,7 +98,7 @@ Sources: `tables/archives/*.hpp`, `tables/schema.hpp:105-289`.
 Sources: `tables/indexes/*.hpp`, `tables/schema.hpp:298-443`.
 
 - **candidate** and **confirmed** are the two chains. Push and truncate
-  change only the head's logical size ([`05 §4`](queries)).
+  change only the head's logical size ([`06 §4`](queries)).
 - **strong** associates each tx with the block that makes it strong, so
   confirmation of a spend is a cell read, not a search. A zero cell is a
   negative association, so an unset tx is never strong
@@ -133,10 +133,10 @@ Sources: `tables/caches/*.hpp`, `tables/schema.hpp:336-516`.
 
 - **prevout** caches, per block, the parent tx and sequence of every
   spent output, and the txs that conflict with it, so confirmation reads
-  one row instead of one search per input ([`05 §5`](queries)).
+  one row instead of one search per input ([`06 §5`](queries)).
 - **pool**, **spends** and **wtxid** are the transaction pool index over
   archived transactions; a pooled tx is archived exactly like a
-  confirmed one ([`05 §6`](queries)).
+  confirmed one ([`06 §6`](queries)).
 - The **batch** tables come in two banks so one can be filled while the
   other is verified. Each is truncated to zero when its batch completes,
   and all are dropped at restore.
@@ -197,4 +197,4 @@ the body ([`02 §2.1`](primitives)).
 ## Cross-references
 
 - [`02-primitives`](primitives) — the templates behind each map type
-- [`05-queries`](queries) — how the tables are written and read
+- [`06-queries`](queries) — how the tables are written and read

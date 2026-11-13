@@ -1,4 +1,4 @@
-# 05 — Queries
+# 06 — Queries
 
 > Companion to [`03-tables`](tables) and [`04-storage`](storage).
 >

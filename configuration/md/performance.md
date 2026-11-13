@@ -54,7 +54,25 @@ is nothing to enable.
 | `outbound.connections` | `100` | Outgoing peer connections while syncing. More peers may be required to saturate a high bandwidth network connection. |
 | `outbound.current_connections` | `10` | Outgoing peer connections once the chain is current, when fewer are needed. `0` keeps `outbound.connections`. |
 
-## 4. NUMA balancing (multi-socket Linux)
+## 4. Memory
+
+| Setting | Default | Purpose |
+| ------- | ------- | ------- |
+| `database.cold_reads` | `0` | Blocks read from disk at once. A block read that is not in memory prefetches the whole block in large reads; this limits how many may prefetch together. `0` is unlimited, which keeps the most requests queued at the disk. |
+| `database.memory_reserve` | `0` | Free memory, in bytes, kept for other programs once the store is caught up. While free memory is below it, `bs` releases cached block data. `0` disables. |
+| `database.memory_ceiling` | `0` | Resident memory, in bytes, that `bs` stays under once the store is caught up. While above it, `bs` releases cached block data. `0` disables. Not available on BSD. |
+
+The reserve and ceiling act only on block and transaction data (table
+bodies), never on the indexes (table heads). They act only while the
+store is caught up: every candidate block is confirmed and the top block
+is at most 20 minutes old. This is stricter than the node being current
+(`node.currency_window_minutes`), which tests only the age of the top
+block. A released page is read again from disk when it is next needed
+(on Windows, from the system cache while it remains there). They are
+controls for sharing a machine with other programs, not a speedup
+([Database Memory](../architecture/database/memory.html#8-cache-release)).
+
+## 5. NUMA balancing (multi-socket Linux)
 
 On a Linux machine with more than one NUMA node (usually a machine with
 more than one CPU socket), disable the kernel's automatic NUMA balancing

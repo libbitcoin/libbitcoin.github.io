@@ -335,6 +335,7 @@
     <a href="primitives.html">Primitives</a>
     <a href="tables.html">Tables</a>
     <a href="storage.html">Storage</a>
+    <a href="memory.html">Memory</a>
     <a href="queries.html">Queries</a>
   </nav>
 
@@ -389,7 +390,12 @@ at commit <code>d29fa3df</code> (2026-10-20). Paths are relative to
 </tr>
 <tr>
 <td>05</td>
-<td><a href="queries.html"><code>05-queries</code></a></td>
+<td><a href="memory.html"><code>05-memory</code></a></td>
+<td>Backends, staged bodies, managed heads, cold block reads, cache release</td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="queries.html"><code>06-queries</code></a></td>
 <td>Query families, archival commit order, block state, confirmation, pool</td>
 </tr>
 </tbody>
@@ -397,17 +403,18 @@ at commit <code>d29fa3df</code> (2026-10-20). Paths are relative to
 <hr />
 <h2 id="recommended-reading-orders">Recommended reading orders<a class="anchor" href="#recommended-reading-orders" aria-label="Link to this section">#</a></h2>
 <h3 id="for-a-new-contributor">For a new contributor<a class="anchor" href="#for-a-new-contributor" aria-label="Link to this section">#</a></h3>
-<p><strong>00 → 01 → 02 → 03</strong>, then <strong>05 §2–§3</strong> for how a block is written and
-confirmed. Read <strong>04</strong> when working on store lifecycle or performance.</p>
+<p><strong>00 → 01 → 02 → 03</strong>, then <strong>06 §2–§3</strong> for how a block is written and
+confirmed. Read <strong>04</strong> when working on store lifecycle or performance,
+and <strong>05</strong> for memory use on each platform.</p>
 <h3 id="for-a-formal-verification-reader">For a formal-verification reader<a class="anchor" href="#for-a-formal-verification-reader" aria-label="Link to this section">#</a></h3>
 <p><strong>01</strong> states the reliability model. <strong>02 §5</strong> and <strong>04 §5</strong> give the publication model: every write becomes
 visible through a single atomic cell or size store, and recovery is a head
-snapshot over append-only bodies. <strong>05 §2</strong> is the archival commit order
+snapshot over append-only bodies. <strong>06 §2</strong> is the archival commit order
 that the node's <code>organizeN</code>/<code>validateN</code>/<code>confirmN</code> faults rely on. The
 numbered invariants are listed below.</p>
 <h3 id="for-a-node-reader">For a node reader<a class="anchor" href="#for-a-node-reader" aria-label="Link to this section">#</a></h3>
 <p>The <a href="../node/index.html">node architecture</a> treats the store as an
-oracle. <strong>05</strong> is the interface it calls, and <strong>04 §4–§6</strong> are the
+oracle. <strong>06</strong> is the interface it calls, and <strong>04 §4–§6</strong> are the
 suspend, disk-full and snapshot behaviours that <code>chaser_storage</code> and
 <code>chaser_snapshot</code> drive.</p>
 <hr />
@@ -467,12 +474,12 @@ after source changes and update the commit above.</p>
 </tr>
 <tr>
 <td><code>Archive-*</code></td>
-<td>05</td>
+<td>06</td>
 <td>Archival commit order</td>
 </tr>
 <tr>
 <td><code>Confirm-*</code></td>
-<td>05</td>
+<td>06</td>
 <td>Strong and height indexes</td>
 </tr>
 </tbody>
@@ -490,7 +497,7 @@ after source changes and update the commit above.</p>
    and state as "record hashmap"). These pages follow the type
    declarations in <code>tables/</code>.</li>
 <li><strong>Consensus rules</strong> (script, BIP30/34/68 checks) live in
-   libbitcoin-system. <a href="queries.html"><code>05-queries</code></a> describes the store
+   libbitcoin-system. <a href="queries.html"><code>06-queries</code></a> describes the store
    reads behind them, not the rules.</li>
 </ol>
   </article>

@@ -335,12 +335,13 @@
     <a href="primitives.html">Primitives</a>
     <a href="tables.html">Tables</a>
     <a href="storage.html" class="here">Storage</a>
+    <a href="memory.html">Memory</a>
     <a href="queries.html">Queries</a>
   </nav>
 
   <article class="doc">
 <blockquote>
-<p>Companion to <a href="primitives.html"><code>02-primitives</code></a> and <a href="queries.html"><code>05-queries</code></a>.</p>
+<p>Companion to <a href="primitives.html"><code>02-primitives</code></a> and <a href="queries.html"><code>06-queries</code></a>.</p>
 <p>Heads and bodies sit on the <code>storage</code> interface
 (<code>memory/interfaces/storage.hpp:31-143</code>), implemented by
 <code>mmap&lt;Widths...&gt;</code> (<code>memory/mmap.hpp:43-551</code>): one memory-mapped file, or
@@ -459,7 +460,7 @@ for fixed-size heads that never remap
 </tbody>
 </table></div>
 <p>Bodies are staged because they are append-only, and heads stay resident
-because they update in place. The strong head is the exception: it is
+because they update in place. <a href="memory.html"><code>05-memory</code></a> describes each mode. The strong head is the exception: it is
 appended in tx order and goes cold behind its top, so it maps its file
 and its pages can be dropped (<code>store.hpp:338-344</code>).</p>
 <hr />
@@ -562,7 +563,7 @@ that can still confirm are compacted and kept.</p>
 <hr />
 <h2 id="7-dirty">7. Dirty<a class="anchor" href="#7-dirty" aria-label="Link to this section">#</a></h2>
 <p><code>dirty</code> means the archive may hold a point spent more than once, so
-tx archival must detect duplicates (<a href="queries.html"><code>05 §2.1</code></a>). It is set at
+tx archival must detect duplicates (<a href="queries.html"><code>06 §2.1</code></a>). It is set at
 open when the header table holds more than genesis, by a candidate pop
 (reorganization), by <code>set_pooling</code>, and by a reload after disk full
 (<code>impl/store/store.ipp:233-243</code>, <code>impl/store/store_reload.ipp:42-47</code>,
@@ -809,13 +810,13 @@ guarantee.</p>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
-<li><a href="queries.html"><code>05-queries</code></a> — the writes these locks protect</li>
+<li><a href="queries.html"><code>06-queries</code></a> — the writes these locks protect</li>
 <li><a href="../node/periphery-chasers.html">Node periphery chasers</a> —
   <code>chaser_snapshot</code> and <code>chaser_storage</code>, which drive snapshot and reload</li>
 </ul>
   </article>
 
-  <nav class="pager"><a href="tables.html">&larr; Tables</a><a href="queries.html">Queries &rarr;</a></nav>
+  <nav class="pager"><a href="tables.html">&larr; Tables</a><a href="memory.html">Memory &rarr;</a></nav>
 
   <p class="foot">
     <span>Copyright &copy; 2011-2026 libbitcoin developers</span>

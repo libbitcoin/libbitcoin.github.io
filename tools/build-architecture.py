@@ -211,6 +211,7 @@ SECTIONS = {
             ("primitives", "Primitives"),
             ("tables", "Tables"),
             ("storage", "Storage"),
+            ("memory", "Memory"),
             ("queries", "Queries"),
         ],
     },

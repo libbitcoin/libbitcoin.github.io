@@ -1,6 +1,6 @@
 # 04 — Storage
 
-> Companion to [`02-primitives`](primitives) and [`05-queries`](queries).
+> Companion to [`02-primitives`](primitives) and [`06-queries`](queries).
 >
 > Heads and bodies sit on the `storage` interface
 > (`memory/interfaces/storage.hpp:31-143`), implemented by
@@ -81,7 +81,7 @@ On macOS the shared mutex is a `pthread_rwlock_t`, because the libc++
 | shared  | Linux, macOS | the strong head | A file-backed shared mapping (`impl/store/store.ipp:76`). |
 
 Bodies are staged because they are append-only, and heads stay resident
-because they update in place. The strong head is the exception: it is
+because they update in place. [`05-memory`](memory) describes each mode. The strong head is the exception: it is
 appended in tx order and goes cold behind its top, so it maps its file
 and its pages can be dropped (`store.hpp:338-344`).
 
@@ -202,7 +202,7 @@ that can still confirm are compacted and kept.
 ## 7. Dirty
 
 `dirty` means the archive may hold a point spent more than once, so
-tx archival must detect duplicates ([`05 §2.1`](queries)). It is set at
+tx archival must detect duplicates ([`06 §2.1`](queries)). It is set at
 open when the header table holds more than genesis, by a candidate pop
 (reorganization), by `set_pooling`, and by a reload after disk full
 (`impl/store/store.ipp:233-243`, `impl/store/store_reload.ipp:42-47`,
@@ -338,6 +338,6 @@ guarantee.
 
 ## Cross-references
 
-- [`05-queries`](queries) — the writes these locks protect
+- [`06-queries`](queries) — the writes these locks protect
 - [Node periphery chasers](../node/periphery-chasers.html) —
   `chaser_snapshot` and `chaser_storage`, which drive snapshot and reload

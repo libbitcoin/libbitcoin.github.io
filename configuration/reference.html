@@ -406,12 +406,18 @@ verbose = false
 <h2 id="2-database">2. <code>[database]</code><a class="anchor" href="#2-database" aria-label="Link to this section">#</a></h2>
 <p>The store: store-wide options.</p>
 <pre><code class="language-ini"><span class="section">[database]</span>
+<span class="comment"># Limit of concurrent prefetched block reads from disk, defaults to '0' (0 unlimited).</span>
+cold_reads = 0
 <span class="comment"># Minimum transactions for a silent payment scan to use the GPU, defaults to '65536'.</span>
 gpu_scan_minimum = 65536
 <span class="comment"># The interval depth for merkle proof optimization, defaults to '11'.</span>
 interval_depth = 11
 <span class="comment"># Save unconfirmable block state (prevents revalidation), defaults to 'true'.</span>
 mark_unconfirmable = true
+<span class="comment"># Bytes of process memory above which cache is released when current, defaults to '0' (0 disables).</span>
+memory_ceiling = 0
+<span class="comment"># Bytes of unused memory restored by cache release when current, defaults to '0' (0 disables).</span>
+memory_reserve = 0
 <span class="comment"># Allow individual non-validation queries to use all CPUs, defaults to 'true'.</span>
 turbo = true
 </code></pre>

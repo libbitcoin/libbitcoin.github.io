@@ -68,12 +68,18 @@ The store: store-wide options.
 
 ```ini
 [database]
+# Limit of concurrent prefetched block reads from disk, defaults to '0' (0 unlimited).
+cold_reads = 0
 # Minimum transactions for a silent payment scan to use the GPU, defaults to '65536'.
 gpu_scan_minimum = 65536
 # The interval depth for merkle proof optimization, defaults to '11'.
 interval_depth = 11
 # Save unconfirmable block state (prevents revalidation), defaults to 'true'.
 mark_unconfirmable = true
+# Bytes of process memory above which cache is released when current, defaults to '0' (0 disables).
+memory_ceiling = 0
+# Bytes of unused memory restored by cache release when current, defaults to '0' (0 disables).
+memory_reserve = 0
 # Allow individual non-validation queries to use all CPUs, defaults to 'true'.
 turbo = true
 ```

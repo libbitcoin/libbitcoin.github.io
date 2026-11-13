@@ -1,7 +1,7 @@
 # 00 — Overview
 
 > Companion to [`02-primitives`](primitives), [`03-tables`](tables),
-> [`04-storage`](storage) and [`05-queries`](queries).
+> [`04-storage`](storage) and [`06-queries`](queries).
 
 ---
 
@@ -86,7 +86,7 @@ Bodies are append-only. A row is allocated, written, and only then made
 reachable: by a head push (search), an array or headmap cell (index), or a
 foreign key written into a row that is itself published later. A reader
 therefore never reaches a partly written row, without any read lock on the
-row ([`02 §4.1`](primitives), [`05 §2`](queries)).
+row ([`02 §4.1`](primitives), [`06 §2`](queries)).
 
 This one property gives both concurrency (readers and the single writer
 of each row do not coordinate) and recovery: a consistent state is a copy

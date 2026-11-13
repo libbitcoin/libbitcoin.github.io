@@ -335,12 +335,13 @@
     <a href="primitives.html">Primitives</a>
     <a href="tables.html" class="here">Tables</a>
     <a href="storage.html">Storage</a>
+    <a href="memory.html">Memory</a>
     <a href="queries.html">Queries</a>
   </nav>
 
   <article class="doc">
 <blockquote>
-<p>Companion to <a href="primitives.html"><code>02-primitives</code></a> and <a href="queries.html"><code>05-queries</code></a>.</p>
+<p>Companion to <a href="primitives.html"><code>02-primitives</code></a> and <a href="queries.html"><code>06-queries</code></a>.</p>
 <p>Each table is declared in <code>tables/&lt;category&gt;/&lt;name&gt;.hpp</code> with its schema
 in <code>tables/schema.hpp</code>. The store owns them (<code>store.hpp:367-406</code>) and
 binds them to storages and settings (<code>impl/store/store.ipp:42-198</code>).
@@ -471,7 +472,7 @@ and <code>outs_fk</code> with the two counts determine them exactly
   stored (<code>tables/archives/outs.hpp:277-291</code>).</li>
 <li><strong>txs</strong> is written once per block, after the header and every tx are
   archived. Its presence is the block's association
-  (<a href="queries.html"><code>05 §2.3</code></a>).</li>
+  (<a href="queries.html"><code>06 §2.3</code></a>).</li>
 </ul>
 <hr />
 <h2 id="3-index-tables">3. Index tables<a class="anchor" href="#3-index-tables" aria-label="Link to this section">#</a></h2>
@@ -556,7 +557,7 @@ and <code>outs_fk</code> with the two counts determine them exactly
 <p>Sources: <code>tables/indexes/*.hpp</code>, <code>tables/schema.hpp:298-443</code>.</p>
 <ul>
 <li><strong>candidate</strong> and <strong>confirmed</strong> are the two chains. Push and truncate
-  change only the head's logical size (<a href="queries.html"><code>05 §4</code></a>).</li>
+  change only the head's logical size (<a href="queries.html"><code>06 §4</code></a>).</li>
 <li><strong>strong</strong> associates each tx with the block that makes it strong, so
   confirmation of a spend is a cell read, not a search. A zero cell is a
   negative association, so an unset tx is never strong
@@ -659,10 +660,10 @@ and <code>outs_fk</code> with the two counts determine them exactly
 <ul>
 <li><strong>prevout</strong> caches, per block, the parent tx and sequence of every
   spent output, and the txs that conflict with it, so confirmation reads
-  one row instead of one search per input (<a href="queries.html"><code>05 §5</code></a>).</li>
+  one row instead of one search per input (<a href="queries.html"><code>06 §5</code></a>).</li>
 <li><strong>pool</strong>, <strong>spends</strong> and <strong>wtxid</strong> are the transaction pool index over
   archived transactions; a pooled tx is archived exactly like a
-  confirmed one (<a href="queries.html"><code>05 §6</code></a>).</li>
+  confirmed one (<a href="queries.html"><code>06 §6</code></a>).</li>
 <li>The <strong>batch</strong> tables come in two banks so one can be filled while the
   other is verified. Each is truncated to zero when its batch completes,
   and all are dropped at restore.</li>
@@ -820,7 +821,7 @@ the body (<a href="primitives.html"><code>02 §2.1</code></a>).</p>
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="primitives.html"><code>02-primitives</code></a> — the templates behind each map type</li>
-<li><a href="queries.html"><code>05-queries</code></a> — how the tables are written and read</li>
+<li><a href="queries.html"><code>06-queries</code></a> — how the tables are written and read</li>
 </ul>
   </article>
 
