@@ -183,8 +183,9 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
   }
 
   function open(target, body, title) {
-    if (target.indexOf("http:") === 0) {
-      popup(body === undefined ? target : failure("insecure", target));
+    var clear = target.indexOf("http:") === 0;
+    if (clear && body === undefined) {
+      popup(target);
       return;
     }
     var view = popup("about:blank");
@@ -202,7 +203,7 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
     fetch(target, options)
       .then(function (response) { return response.text(); })
       .then(show, function () {
-        if (view) view.location.href = failure("unreadable", target);
+        if (view) view.location.href = failure(clear ? "insecure" : "unreadable", target);
       });
   }
   var missing = new URL("../404.html", location.href).href;
