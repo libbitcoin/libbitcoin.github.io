@@ -22,9 +22,11 @@ block 1.
 The genesis block, checkpoint and milestone below change when the
 testnet5 genesis block is mined, and a store made with the placeholder
 must then be made again. The bootstrap chain has its own genesis block,
-so a store of it must also be made again, and it is served only with its
-genesis block in `bitcoin.genesis_block` and a peer such as
-`lapis.erisian.com.au:18353` in `[manual]`.
+so a store of it must also be made again. It is served with its genesis
+block in `bitcoin.genesis_block`, a peer such as
+`lapis.erisian.com.au:18353` in `[manual]`, and `-n testnet5` or
+`bitcoin.network = testnet5`, since its genesis block is not the
+built-in one.
 
 Start the node on testnet5:
 
@@ -36,8 +38,10 @@ $ bs -n testnet5
 in a `testnet5` directory under the working directory (or `folders.root`),
 apart from any other network's: the store in `testnet5/store`, and the log
 files and the peer address cache (`peers.cache`) in `testnet5`. Every run
-selects the network the same way. Without `-n testnet5`, `bs` uses the
-`mainnet` directory.
+selects the network the same way. Without `-n testnet5`,
+`bitcoin.network = testnet5`, or the testnet5 genesis block in
+`bitcoin.genesis_block`, `bs` uses mainnet defaults and the `mainnet`
+directory.
 
 ## Defaults
 

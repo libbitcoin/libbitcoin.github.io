@@ -358,8 +358,10 @@ blocks.</p>
 in a <code>testnet3</code> directory under the working directory (or <code>folders.root</code>),
 apart from any other network's: the store in <code>testnet3/store</code>, and the log
 files and the peer address cache (<code>peers.cache</code>) in <code>testnet3</code>. Every run
-selects the network the same way. Without <code>-n testnet3</code>, <code>bs</code> uses the
-<code>mainnet</code> directory.</p>
+selects the network the same way. Without <code>-n testnet3</code>,
+<code>bitcoin.network = testnet3</code>, or the testnet3 genesis block in
+<code>bitcoin.genesis_block</code>, <code>bs</code> uses mainnet defaults and the <code>mainnet</code>
+directory.</p>
 <h2 id="defaults">Defaults<a class="anchor" href="#defaults" aria-label="Link to this section">#</a></h2>
 <p>These are the settings in which the testnet3 defaults differ from mainnet, as
 displayed by <code>bs -n testnet3 --settings</code>. The derived bucket counts of the

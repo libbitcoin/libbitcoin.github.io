@@ -391,9 +391,11 @@ block 1.</p>
 <p>The genesis block, checkpoint and milestone below change when the
 testnet5 genesis block is mined, and a store made with the placeholder
 must then be made again. The bootstrap chain has its own genesis block,
-so a store of it must also be made again, and it is served only with its
-genesis block in <code>bitcoin.genesis_block</code> and a peer such as
-<code>lapis.erisian.com.au:18353</code> in <code>[manual]</code>.</p>
+so a store of it must also be made again. It is served with its genesis
+block in <code>bitcoin.genesis_block</code>, a peer such as
+<code>lapis.erisian.com.au:18353</code> in <code>[manual]</code>, and <code>-n testnet5</code> or
+<code>bitcoin.network = testnet5</code>, since its genesis block is not the
+built-in one.</p>
 <p>Start the node on testnet5:</p>
 <pre class="console"><code>$ bs -n testnet5
 </code></pre>
@@ -401,8 +403,10 @@ genesis block in <code>bitcoin.genesis_block</code> and a peer such as
 in a <code>testnet5</code> directory under the working directory (or <code>folders.root</code>),
 apart from any other network's: the store in <code>testnet5/store</code>, and the log
 files and the peer address cache (<code>peers.cache</code>) in <code>testnet5</code>. Every run
-selects the network the same way. Without <code>-n testnet5</code>, <code>bs</code> uses the
-<code>mainnet</code> directory.</p>
+selects the network the same way. Without <code>-n testnet5</code>,
+<code>bitcoin.network = testnet5</code>, or the testnet5 genesis block in
+<code>bitcoin.genesis_block</code>, <code>bs</code> uses mainnet defaults and the <code>mainnet</code>
+directory.</p>
 <h2 id="defaults">Defaults<a class="anchor" href="#defaults" aria-label="Link to this section">#</a></h2>
 <p>These are the settings in which the testnet5 defaults differ from mainnet, as
 displayed by <code>bs -n testnet5 --settings</code>. The derived bucket counts of the

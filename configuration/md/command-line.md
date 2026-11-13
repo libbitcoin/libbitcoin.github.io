@@ -7,7 +7,7 @@ All options, grouped by purpose:
 | Group | Option | Purpose |
 | ----- | ------ | ------- |
 | Configuration | `-c`, `--config <path>` | Read settings from a configuration file |
-| | `-n`, `--net <network>` | Select the network (`mainnet`, `testnet3`, `testnet4`, `testnet5`, `regtest` or `signet`), by default the configured `bitcoin.network` (`mainnet`) |
+| | `-n`, `--net <network>` | Select the network (`mainnet`, `testnet3`, `testnet4`, `testnet5`, `regtest` or `signet`), by default the configured `bitcoin.network`, otherwise the network of a configured `bitcoin.genesis_block`, otherwise `mainnet` |
 | Prompts | `-a`, `--accept` | Accept startup prompts without interaction |
 | Information | `-h`, `--help` | Display command line options |
 | | `-s`, `--settings` | Display the settings in effect, with their descriptions and defaults ([Displaying settings](file#2-displaying-settings)) |

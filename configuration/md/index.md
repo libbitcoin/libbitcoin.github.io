@@ -26,6 +26,12 @@ directory named for the network:
 $ bs -n testnet4
 ```
 
+The network is the one given by `-n`, otherwise `bitcoin.network` in the
+configuration file, otherwise the network whose built-in genesis block is
+the configured `bitcoin.genesis_block`, otherwise mainnet. It sets the
+defaults and the directory, and any setting in the configuration file
+replaces its default.
+
 Until the chain is current, only the admin site accepts connections. P2P peers, the block explorer and the other client services
 wait ([Until current](services#until-current)).
 

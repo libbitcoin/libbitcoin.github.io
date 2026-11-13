@@ -14,8 +14,10 @@ $ bs -n signet
 in a `signet` directory under the working directory (or `folders.root`),
 apart from any other network's: the store in `signet/store`, and the log
 files and the peer address cache (`peers.cache`) in `signet`. Every run
-selects the network the same way. Without `-n signet`, `bs` uses the
-`mainnet` directory.
+selects the network the same way. Without `-n signet`,
+`bitcoin.network = signet`, or the signet genesis block in
+`bitcoin.genesis_block`, `bs` uses mainnet defaults and the `mainnet`
+directory.
 
 ## Defaults
 

@@ -13,8 +13,10 @@ $ bs -n testnet3
 in a `testnet3` directory under the working directory (or `folders.root`),
 apart from any other network's: the store in `testnet3/store`, and the log
 files and the peer address cache (`peers.cache`) in `testnet3`. Every run
-selects the network the same way. Without `-n testnet3`, `bs` uses the
-`mainnet` directory.
+selects the network the same way. Without `-n testnet3`,
+`bitcoin.network = testnet3`, or the testnet3 genesis block in
+`bitcoin.genesis_block`, `bs` uses mainnet defaults and the `mainnet`
+directory.
 
 ## Defaults
 

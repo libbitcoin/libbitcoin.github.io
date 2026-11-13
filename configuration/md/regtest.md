@@ -15,8 +15,10 @@ $ bs -n regtest
 in a `regtest` directory under the working directory (or `folders.root`),
 apart from any other network's: the store in `regtest/store`, and the log
 files and the peer address cache (`peers.cache`) in `regtest`. Every run
-selects the network the same way. Without `-n regtest`, `bs` uses the
-`mainnet` directory.
+selects the network the same way. Without `-n regtest`,
+`bitcoin.network = regtest`, or the regtest genesis block in
+`bitcoin.genesis_block`, `bs` uses mainnet defaults and the `mainnet`
+directory.
 
 ## Defaults
 
