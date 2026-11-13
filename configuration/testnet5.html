@@ -349,6 +349,8 @@
   </nav>
 
   <article class="doc">
+<div class="banner"><strong>Testnet5 is running on a rehearsal <a href="https://lapis.erisian.com.au/chain.html">bootstrap chain</a>.</strong> The chain is discarded when the testnet5 genesis block is mined, planned at mainnet block 975,744 (expected 2026-11-14 02:00 UTC), and a store of it must then be made again.</div>
+
 <p>Testnet5 is a public test network defined by
 <a href="https://github.com/bitcoin/bips/blob/master/bip-0095.md">BIP 95</a>, to
 replace testnet4. It runs mainnet consensus with none of the testnet
@@ -370,11 +372,11 @@ block 1.</p>
 </tr>
 <tr>
 <td>Genesis block</td>
-<td>Not yet mined; the BIP 95 placeholder is used below</td>
+<td>Not yet mined, planned at mainnet block 975,744 (expected 2026-11-14 02:00 UTC); the BIP 95 placeholder is used below</td>
 </tr>
 <tr>
 <td>Network</td>
-<td>Not yet started; no DNS seeds</td>
+<td>A rehearsal <a href="https://lapis.erisian.com.au/chain.html">bootstrap chain</a>, discarded when the genesis block is mined; no DNS seeds</td>
 </tr>
 <tr>
 <td><code>bs</code></td>
@@ -382,13 +384,16 @@ block 1.</p>
 </tr>
 <tr>
 <td><a href="public.html">Community servers</a></td>
-<td>Ports assigned (<a href="#ports">Ports</a>), not yet serving</td>
+<td>Serving the bootstrap chain, with its genesis block configured</td>
 </tr>
 </tbody>
 </table></div>
 <p>The genesis block, checkpoint and milestone below change when the
 testnet5 genesis block is mined, and a store made with the placeholder
-must then be made again.</p>
+must then be made again. The bootstrap chain has its own genesis block,
+so a store of it must also be made again, and it is served only with its
+genesis block in <code>bitcoin.genesis_block</code> and a peer such as
+<code>lapis.erisian.com.au:18353</code> in <code>[manual]</code>.</p>
 <p>Start the node on testnet5:</p>
 <pre class="console"><code>$ bs -n testnet5
 </code></pre>

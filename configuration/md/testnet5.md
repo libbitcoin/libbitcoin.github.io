@@ -1,5 +1,7 @@
 # Testnet5
 
+<div class="banner"><strong>Testnet5 is running on a rehearsal <a href="https://lapis.erisian.com.au/chain.html">bootstrap chain</a>.</strong> The chain is discarded when the testnet5 genesis block is mined, planned at mainnet block 975,744 (expected 2026-11-14 02:00 UTC), and a store of it must then be made again.</div>
+
 Testnet5 is a public test network defined by
 [BIP 95](https://github.com/bitcoin/bips/blob/master/bip-0095.md), to
 replace testnet4. It runs mainnet consensus with none of the testnet
@@ -12,14 +14,17 @@ block 1.
 | Item | Status |
 | ---- | ------ |
 | [BIP 95](https://github.com/bitcoin/bips/blob/master/bip-0095.md) | Draft (version 0.3.0) |
-| Genesis block | Not yet mined; the BIP 95 placeholder is used below |
-| Network | Not yet started; no DNS seeds |
+| Genesis block | Not yet mined, planned at mainnet block 975,744 (expected 2026-11-14 02:00 UTC); the BIP 95 placeholder is used below |
+| Network | A rehearsal [bootstrap chain](https://lapis.erisian.com.au/chain.html), discarded when the genesis block is mined; no DNS seeds |
 | `bs` | `-n testnet5`, with the defaults below; not yet released |
-| [Community servers](public) | Ports assigned ([Ports](#ports)), not yet serving |
+| [Community servers](public) | Serving the bootstrap chain, with its genesis block configured |
 
 The genesis block, checkpoint and milestone below change when the
 testnet5 genesis block is mined, and a store made with the placeholder
-must then be made again.
+must then be made again. The bootstrap chain has its own genesis block,
+so a store of it must also be made again, and it is served only with its
+genesis block in `bitcoin.genesis_block` and a peer such as
+`lapis.erisian.com.au:18353` in `[manual]`.
 
 Start the node on testnet5:
 

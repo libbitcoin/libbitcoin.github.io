@@ -6,6 +6,8 @@ The libbitcoin community maintains two public `bs` servers. Both have
 two AMD EPYC 7F32 processors (Zen 2), 16 cores and 32 threads in all,
 and no GPU.
 
+<div class="banner"><strong>Testnet5 is served on its rehearsal <a href="https://lapis.erisian.com.au/chain.html">bootstrap chain</a>.</strong> The chain is discarded when the testnet5 genesis block is mined, planned at mainnet block 975,744 (expected 2026-11-14 02:00 UTC), and the testnet5 stores are then made again (see <a href="testnet5.html">Testnet5</a>).</div>
+
 <div id="server-status"></div>
 
 | Host | Address | mainnet | testnet3 | testnet4 | testnet5 |
