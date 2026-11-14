@@ -957,7 +957,7 @@ def index_site():
             if not file.endswith(".html"):
                 continue
             page = read(os.path.join(directory, file))
-            if 'http-equiv="refresh"' in page or file == "404.html":
+            if 'http-equiv="refresh"' in page or 'content="noindex"' in page or file == "404.html":
                 continue
             url = posixpath.relpath(os.path.join(directory, file).replace(os.sep, "/"), ROOT.replace(os.sep, "/"))
             indexer = Indexer(file == "index.html" or "/" not in url)
