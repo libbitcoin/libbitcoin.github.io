@@ -499,15 +499,6 @@
     </div>
   </article>
   <article class="first">
-    <div class="when">2022<span>v4</span></div>
-    <div>
-      <h2>First narrowcast transaction relay</h2>
-      <p>Narrowcast replaces transaction broadcast. A node automatically constructs tx relay packages for each of its peers, and does not relay txs that it knows the peer cannot accept. So an orphan is never received and child-pays-for-parent fee bumping is inherent.</p>
-      <div class="refs"><a href="about/narrowcast-relay.pdf">Voskuil and Mienk, Narrowcast Transaction Relay</a>
-        <a href="https://mailing-list.bitcoindevs.xyz/bitcoindev/009a01d8dcf4$6e913290$4bb397b0$@voskuil.org/t/">bitcoin-dev, June 2022</a></div>
-    </div>
-  </article>
-  <article class="first">
     <div class="when">2024<span>v4</span></div>
     <div>
       <h2>First milestone sync</h2>
@@ -583,30 +574,6 @@
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/3697e6efc">system 3697e6ef</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/bb7e5f51d">system bb7e5f51</a>
         <a href="https://github.com/libbitcoin/libbitcoin-network/commit/7b82d49c5">network 7b82d49c</a></div>
-    </div>
-  </article>
-  <article class="first">
-    <div class="when">2026<span>v4</span></div>
-    <div>
-      <h2>First all-conflicts transaction pool</h2>
-      <p>Tidal Pool keeps every conflicting transaction that pays for its own block space, independent of arrival order, and leaves the choice among conflicts to the miner.</p>
-      <div class="refs"><a href="about/tidal-pool.pdf">Voskuil, Tidal Pool</a></div>
-    </div>
-  </article>
-  <article class="first">
-    <div class="when">2026<span>v4</span></div>
-    <div>
-      <h2>First precise fee prediction</h2>
-      <p>A fee estimate is a projection of the blocks the node would build from its own pool, not a statistic over past blocks.</p>
-      <div class="refs"><a href="about/tidal-pool.pdf">Voskuil, Tidal Pool</a></div>
-    </div>
-  </article>
-  <article class="first">
-    <div class="when">2026<span>v4</span></div>
-    <div>
-      <h2>First hardware-accelerated block templates</h2>
-      <p>Tidal Wave builds a block template from whole-column passes over the pool, on SIMD lanes or a GPU, from nothing at every new top.</p>
-      <div class="refs"><a href="about/tidal-wave.pdf">Voskuil, Tidal Wave</a></div>
     </div>
   </article>
   <article class="first">
