@@ -123,6 +123,11 @@
   .first h2 { color: var(--ink); font-family: var(--mono); font-size: 16px; font-weight: 600; margin: 0 0 6px; }
   .first p { max-width: 72ch; color: var(--ink-2); font-size: 15px; margin: 0 0 6px; }
   .first .refs { font-family: var(--mono); font-size: 12px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .first .anchor { margin-left: .45em; color: var(--ink-3); text-decoration: none; opacity: 0; transition: opacity .15s; }
+  .first h2:hover .anchor, .first .anchor:focus { opacity: 1; }
+  .first .anchor:hover { color: var(--accent); }
+  @media (hover: none) { .first .anchor { opacity: .6; } }
+  .first { scroll-margin-top: 16px; }
   .first .refs.follow { margin-top: 4px; }
   .first .refs.follow span { color: var(--ink-2); }
   @media (max-width: 760px) {
@@ -294,48 +299,57 @@
   </header>
 
   <section class="firsts">
-  <article class="first">
+  <article class="first" id="first-full-node-independent-of-the-satoshi-node">
     <div class="when">2011<span>v1</span></div>
     <div>
-      <h2>First full node independent of the Satoshi node</h2>
+      <h2>First full node independent of the Satoshi node<a class="anchor" href="#first-full-node-independent-of-the-satoshi-node" aria-label="Link to this entry">#</a></h2>
       <p>Libbitcoin was announced in July 2011 and validated blocks, including the search for double spends, by October 2011, in code written from scratch rather than derived from the Satoshi node. Earlier alternatives, such as BitcoinJ (March 2011), were not nodes but simplified payment verification clients (wallets).</p>
       <div class="refs"><a href="https://bitcointalk.org/index.php?topic=30646.0">announcement, July 2011</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/497e66821">system 497e6682</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-in-cpp11">
     <div class="when">2011<span>v1</span></div>
     <div>
-      <h2>First full stack development toolkit for a full node</h2>
+      <h2>First node in C++11<a class="anchor" href="#first-node-in-cpp11" aria-label="Link to this entry">#</a></h2>
+      <p>Libbitcoin was written in C++11 from its first commit in May 2011, as C++0x, before the standard was ratified that August. Bitcoin Core moved from C++03 to C++11 in 0.13 (2016).</p>
+      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/9dea4682b">system 9dea4682</a></div>
+      <div class="refs follow"><span>Followed by</span><a href="https://github.com/bitcoin/bitcoin/pull/7165">Bitcoin Core 0.13 (#7165), 2016</a></div>
+    </div>
+  </article>
+  <article class="first" id="first-full-stack-development-toolkit-for-a-full-node">
+    <div class="when">2011<span>v1</span></div>
+    <div>
+      <h2>First full stack development toolkit for a full node<a class="anchor" href="#first-full-stack-development-toolkit-for-a-full-node" aria-label="Link to this entry">#</a></h2>
       <p>Libbitcoin is a set of libraries, from primitives and cryptography through the store, network and node to the server, on which its own full node is built and on which others can build theirs. Bitcoin Core's libbitcoinconsensus (2015), now libbitcoinkernel, is a partial counterpart, limited to consensus.</p>
       <div class="refs"><a href="https://bitcointalk.org/index.php?topic=30646.0">announcement, July 2011</a>
         <a href="architecture/index.html">Architecture Overview</a></div>
       <div class="refs follow"><span>Followed by</span><a href="https://bitcoincore.org/en/releases/0.10.0/">Bitcoin Core 0.10 (libbitcoinconsensus, partial), 2015</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-with-a-spender-index">
     <div class="when">2011<span>v1</span></div>
     <div>
-      <h2>First node with a spender index</h2>
+      <h2>First node with a spender index<a class="anchor" href="#first-node-with-a-spender-index" aria-label="Link to this entry">#</a></h2>
       <p>Every output is indexed by the inputs that spend it, by default and since 2011. The Satoshi node internally recorded the transaction that spent each output, as its test for spent, until it replaced that with a set of unspent outputs in 2012 (Bitcoin Core 0.8). Bitcoin Core added an optional spender index in 2026.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/67a839583">system 67a83958</a></div>
       <div class="refs follow"><span>Followed by</span><a href="https://bitcoincore.org/en/releases/31.0/">Bitcoin Core 31.0 (-txospenderindex), 2026</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-with-an-address-index">
     <div class="when">2012<span>v1</span></div>
     <div>
-      <h2>First node with an address index</h2>
+      <h2>First node with an address index<a class="anchor" href="#first-node-with-an-address-index" aria-label="Link to this entry">#</a></h2>
       <p>The store indexes outputs by the address that receives them, and so the history of an address, since January 2012. Bitcoin Core has no address index; one has been proposed in 2026.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/29b6f622c">system 29b6f622</a></div>
       <div class="refs follow"><span>Followed by</span><a href="https://github.com/btcsuite/btcd/commit/ecdffda7">btcd addrindex, 2015</a>
         <a href="https://github.com/bitcoin/bitcoin/pull/36629">Bitcoin Core #36629 (proposed), 2026</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-with-a-zeromq-interface">
     <div class="when">2013<span>v1</span></div>
     <div>
-      <h2>First node with a ZeroMQ interface</h2>
+      <h2>First node with a ZeroMQ interface<a class="anchor" href="#first-node-with-a-zeromq-interface" aria-label="Link to this entry">#</a></h2>
       <p>Obelisk, the query server that became Bitcoin Server, answered queries and published blocks and transactions over ZeroMQ from 2013. Bitcoin Core added ZeroMQ notifications in 2016.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-server/commit/3cce06e1">server 3cce06e1</a>
         <a href="https://github.com/libbitcoin/libbitcoin-server/commit/ef94bd5a">server ef94bd5a</a>
@@ -343,10 +357,10 @@
       <div class="refs follow"><span>Followed by</span><a href="https://bitcoincore.org/en/releases/0.12.0/">Bitcoin Core 0.12 (ZMQ notifications), 2016</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-stealth-payments-indexation-and-scanning">
     <div class="when">2014<span>v2</span></div>
     <div>
-      <h2>First stealth payments indexation and scanning</h2>
+      <h2>First stealth payments indexation and scanning<a class="anchor" href="#first-stealth-payments-indexation-and-scanning" aria-label="Link to this entry">#</a></h2>
       <p>A stealth address lets a payer derive a new output key for each payment from the recipient's published key, so payments to one address cannot be linked on chain. Libbitcoin implemented them in February 2014, a month after the design was posted, and Dark Wallet was built on them. The server indexed stealth outputs and scanned them by prefix for clients, through version 3. Silent payments (BIP 352) are the same model: a one-time output key for each payment, found by a client through a server that indexes and scans for it.</p>
       <div class="refs"><a href="https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2014-January/004020.html">Todd, stealth addresses, January 2014</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/ff2f364b6">system ff2f364b</a>
@@ -355,172 +369,191 @@
       <div class="refs follow"><span>Followed by</span><a href="https://github.com/bitcoin/bips/blob/master/bip-0352.mediawiki">BIP 352 silent payments, 2023</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="only-node-with-curvezmq-encryption">
     <div class="when">2014<span>v2</span></div>
     <div>
-      <h2>Only node with CurveZMQ encryption</h2>
+      <h2>Only node with CurveZMQ encryption<a class="anchor" href="#only-node-with-curvezmq-encryption" aria-label="Link to this entry">#</a></h2>
       <p>The server encrypts and authenticates its ZeroMQ services with CurveZMQ, the ZeroMQ form of CurveCP, from 2014 through version 3, and natively in version 4.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-server/commit/885c56e4">server 885c56e4</a>
         <a href="https://github.com/libbitcoin/libbitcoin-network/commit/eaa48c3bc">network eaa48c3b</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-to-adopt-libsecp256k1">
     <div class="when">2014<span>v2</span></div>
     <div>
-      <h2>First node to adopt libsecp256k1</h2>
+      <h2>First node to adopt libsecp256k1<a class="anchor" href="#first-node-to-adopt-libsecp256k1" aria-label="Link to this entry">#</a></h2>
       <p>Libbitcoin integrated libsecp256k1 in April 2014. Bitcoin Core adopted it for signing in 0.10 (February 2015) and for verification in 0.12 (February 2016).</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/382fa8c5a">system 382fa8c5</a></div>
       <div class="refs follow"><span>Followed by</span><a href="https://bitcoincore.org/en/releases/0.10.0/">Bitcoin Core 0.10, 2015</a>
         <a href="https://bitcoincore.org/en/releases/0.12.0/">Bitcoin Core 0.12, 2016</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-to-drop-openssl">
     <div class="when">2014<span>v2</span></div>
     <div>
-      <h2>First node to drop OpenSSL</h2>
+      <h2>First node to drop OpenSSL<a class="anchor" href="#first-node-to-drop-openssl" aria-label="Link to this entry">#</a></h2>
       <p>Libbitcoin completed the removal of OpenSSL in August 2014. OpenSSL signature parsing had been implicitly part of consensus: when OpenSSL 1.0.0p and 1.0.1k (January 2015) stopped accepting signatures that deviate from DER, nodes linked to them rejected the chain, and BIP 66 made strict DER a consensus rule. Bitcoin Core removed OpenSSL in 0.20 (June 2020).</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/a5ce30167">system a5ce3016</a>
         <a href="https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki">BIP 66, strict DER signatures</a></div>
       <div class="refs follow"><span>Followed by</span><a href="https://github.com/bitcoin/bitcoin/pull/17265">Bitcoin Core 0.20 (#17265), 2020</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-to-replace-third-party-databases-with-a-purpose-built-store">
     <div class="when">2014<span>v2</span></div>
     <div>
-      <h2>First to replace third-party databases with a purpose-built store</h2>
+      <h2>First to replace third-party databases with a purpose-built store<a class="anchor" href="#first-to-replace-third-party-databases-with-a-purpose-built-store" aria-label="Link to this entry">#</a></h2>
       <p>In 2014 libbitcoin replaced LevelDB, which had replaced BerkeleyDB, with memory-mapped hash tables designed for the chain's own data, first released in Bitcoin Server 2.0 (2015). Bitcoin Core embeds LevelDB. Its earlier use of BerkeleyDB split the chain in March 2013, when the database's lock limit became an unintended consensus rule.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-blockchain/commit/3418d746">blockchain 3418d746</a>
         <a href="https://github.com/libbitcoin/libbitcoin-blockchain/commit/dd9dd142">blockchain dd9dd142</a>
         <a href="https://github.com/bitcoin/bips/blob/master/bip-0050.mediawiki">BIP 50, March 2013 chain fork</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="only-node-to-integrate-libbitcoinconsensus">
     <div class="when">2015<span>v2</span></div>
     <div>
-      <h2>Only node to integrate libbitcoinconsensus</h2>
-      <p>Libbitcoin-consensus packages the consensus code of Bitcoin Core, which became libbitcoinconsensus and later libbitcoinkernel, and the node could validate scripts with it in place of its own. Version 4 dropped it in 2024, after Bitcoin Core deprecated it in 27.0, and Bitcoin Core removed it in 28.0.</p>
+      <h2>Only node to integrate libbitcoinconsensus<a class="anchor" href="#only-node-to-integrate-libbitcoinconsensus" aria-label="Link to this entry">#</a></h2>
+      <p>Libbitcoin-consensus packages the consensus code of Bitcoin Core, which became libbitcoinconsensus and later libbitcoinkernel, and the node could validate scripts with it in place of its own. Version 4 dropped it in 2024, after Bitcoin Core deprecated it in 27.0, and Bitcoin Core removed it in 28.0. Given the inflation consensus soft fork (2018, <a href="https://bitcoincore.org/en/2018/09/20/notice/">CVE-2018-17144</a>) and its removal hard fork, the BIP 90 hard fork, and several similar undocumented hard forks since, as well as performance, dependency and complexity considerations, libbitcoinkernel is not incorporated.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-consensus/commit/5b819ae6">consensus 5b819ae6</a>
         <a href="https://github.com/libbitcoin/libbitcoin-blockchain/commit/591cf627">blockchain 591cf627</a>
         <a href="https://github.com/libbitcoin/libbitcoin-node/commit/402b4f4c">node 402b4f4c</a>
-        <a href="https://bitcoincore.org/en/releases/28.0/">Bitcoin Core 28.0</a></div>
+        <a href="https://bitcoincore.org/en/releases/28.0/">Bitcoin Core 28.0</a>
+        <a href="https://github.com/bitcoin/bips/blob/master/bip-0090.mediawiki">BIP 90</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-consensus-rules-factored-into-verifiable-rules">
     <div class="when">2016<span>v3</span></div>
     <div>
-      <h2>First consensus rules factored into verifiable rules</h2>
+      <h2>First consensus rules factored into verifiable rules<a class="anchor" href="#first-consensus-rules-factored-into-verifiable-rules" aria-label="Link to this entry">#</a></h2>
       <p>Each consensus rule is a distinct check with its own error code, partitioned by what it requires: check (the block alone), accept (chain context and previous output values) and connect (previous output scripts).</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/19f23fbd2">system 19f23fbd</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/9faade6e7">system 9faade6e</a>
         <a href="architecture/system/chain.html">Chain</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-unit-testable-script-implementation">
     <div class="when">2016<span>v3</span></div>
     <div>
-      <h2>First unit-testable script implementation</h2>
+      <h2>First unit-testable script implementation<a class="anchor" href="#first-unit-testable-script-implementation" aria-label="Link to this entry">#</a></h2>
       <p>The script interpreter dispatches each opcode to its own function, so each operation is tested in isolation.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/6b330c0a8">system 6b330c0a</a>
         <a href="architecture/system/machine.html">Machine</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-without-a-transaction-memory-pool">
     <div class="when">2017<span>v3</span></div>
     <div>
-      <h2>First node without a transaction memory pool</h2>
+      <h2>First node without a transaction memory pool<a class="anchor" href="#first-node-without-a-transaction-memory-pool" aria-label="Link to this entry">#</a></h2>
       <p>Version 3 archived unconfirmed transactions in the transaction table beside confirmed ones, in place of a memory pool. Version 4 makes the tx pool an index over the archive, store tables that are not bound by RAM and that outlive the process.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-database/commit/ed9d7e70">database ed9d7e70</a>
         <a href="architecture/node/transaction-chaser.html">Transaction Chaser</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="only-node-with-fail-stop-reliability">
     <div class="when">2021<span>v4</span></div>
     <div>
-      <h2>Only node with fail-stop reliability</h2>
+      <h2>Only node with fail-stop reliability<a class="anchor" href="#only-node-with-fail-stop-reliability" aria-label="Link to this entry">#</a></h2>
       <p>Fail-stop is the highest integrity a single component can provide: when it fails, it stops detectably, and it never returns wrong data as good. The store decides whether it closed cleanly, never whether its contents are valid. A lock held while the store is open is removed only by a close in which no storage faulted, and a store that still holds the lock is never opened or repaired. Bitcoin Core's store is fail-partial: after a crash it cannot reliably detect a fault, and cannot reliably repair an inconsistency it detects.</p>
       <div class="refs"><a href="architecture/database/libbitcoin-v4-relational-database.pdf">v4 relational database, 2021</a>
         <a href="architecture/database/reliability.html">Reliability</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-concurrent-block-validation">
     <div class="when">2021<span>v4</span></div>
     <div>
-      <h2>First concurrent block validation</h2>
+      <h2>First concurrent block validation<a class="anchor" href="#first-concurrent-block-validation" aria-label="Link to this entry">#</a></h2>
       <p>Blocks are validated many at a time, across all cores and in any order, as soon as their previous outputs are known to be archived. Confirmation follows in chain order. All other nodes validate one block at a time, in order. This is why libbitcoin is the only node that can validate at a network-limited rate.</p>
       <div class="refs"><a href="architecture/node/libbitcoin-v4-node-design.pdf">v4 node design, 2021</a>
         <a href="https://github.com/libbitcoin/libbitcoin-node/commit/e8fe8671">node e8fe8671</a>
         <a href="architecture/node/validation-chaser.html">Validation Chaser</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-generalized-hardware-acceleration">
     <div class="when">2022<span>v4</span></div>
     <div>
-      <h2>Only node with store recovery</h2>
+      <h2>First generalized hardware acceleration<a class="anchor" href="#first-generalized-hardware-acceleration" aria-label="Link to this entry">#</a></h2>
+      <p>Hashing and cryptography use, on x86, SSE4.1, AVX2, AVX-512, AVX-IFMA, AVX-512 IFMA, SHA-NI, the SHA-512 extensions, AES-NI and VAES; on ARM, NEON and its SHA-2, SHA-512 and SHA-3, and AES extensions; and CUDA on NVIDIA GPUs. Each cascades from the widest available vector to scalar code. Bitcoin Core accelerates SHA-256 (SSE4, SSE4.1, AVX2, SHA-NI and the ARM SHA-2 extensions) and the CRC32C checksums of LevelDB (SSE4.2 and the ARM CRC extension).</p>
+      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/558458761">system 55845876</a>
+        <a href="architecture/system/hash.html">Hash</a></div>
+    </div>
+  </article>
+  <article class="first" id="first-node-in-cpp20">
+    <div class="when">2022<span>v4</span></div>
+    <div>
+      <h2>First node in C++20<a class="anchor" href="#first-node-in-cpp20" aria-label="Link to this entry">#</a></h2>
+      <p>Libbitcoin moved from C++11 to C++20 in 2022. Bitcoin Core moved from C++11 to C++17 in 0.21 (2021) and to C++20 in 27.0 (2024).</p>
+      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/36d46724f">system 36d46724</a>
+        <a href="https://github.com/libbitcoin/libbitcoin-system/commit/449b54b26">system 449b54b2</a></div>
+      <div class="refs follow"><span>Followed by</span><a href="https://github.com/bitcoin/bitcoin/pull/28349">Bitcoin Core 27.0 (#28349), 2024</a></div>
+    </div>
+  </article>
+  <article class="first" id="first-variant-script-stack">
+    <div class="when">2022<span>v4</span></div>
+    <div>
+      <h2>First variant script stack<a class="anchor" href="#first-variant-script-stack" aria-label="Link to this entry">#</a></h2>
+      <p>Each element of the script machine's stack is held as a boolean, number or byte vector, as it was produced, so standard scripts execute without type conversions.</p>
+      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/608e04f25">system 608e04f2</a>
+        <a href="architecture/system/machine.html">Machine</a></div>
+    </div>
+  </article>
+  <article class="first" id="first-no-copy-script-stack">
+    <div class="when">2022<span>v4</span></div>
+    <div>
+      <h2>First no-copy script stack<a class="anchor" href="#first-no-copy-script-stack" aria-label="Link to this entry">#</a></h2>
+      <p>No data element is copied during script evaluation. The stack refers to the bytes of the script and witness in place, a value computed by an operation is stored once, and operations that duplicate an element duplicate only its reference. This eliminates costly heap allocations in the performance-critical phase of validation.</p>
+      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/aa988b265">system aa988b26</a>
+        <a href="architecture/system/machine.html">Machine</a></div>
+    </div>
+  </article>
+  <article class="first" id="only-node-to-resolve-the-rock-and-roll-quadratic-script-delay">
+    <div class="when">2022<span>v4</span></div>
+    <div>
+      <h2>Only node to resolve the Rock and Roll quadratic script delay<a class="anchor" href="#only-node-to-resolve-the-rock-and-roll-quadratic-script-delay" aria-label="Link to this entry">#</a></h2>
+      <p>Rolling an element from deep in the stack moves every element above it, so a script of repeated OP_ROLL costs time quadratic in its size, about 5.6 seconds for one block (Lerner, 2017). Libbitcoin executes any script that contains OP_ROLL on a linked stack, on which a roll is constant time.</p>
+      <div class="refs"><a href="https://bitslog.com/2017/04/17/new-quadratic-delays-in-bitcoin-scripts/">Lerner, April 2017</a>
+        <a href="https://github.com/libbitcoin/libbitcoin-system/commit/a56311301">system a5631130</a></div>
+    </div>
+  </article>
+  <article class="first" id="only-node-with-store-recovery">
+    <div class="when">2022<span>v4</span></div>
+    <div>
+      <h2>Only node with store recovery<a class="anchor" href="#only-node-with-store-recovery" aria-label="Link to this entry">#</a></h2>
       <p>A store that did not close cleanly is restored to its last snapshot and resumes. Bodies are append only and head snapshots are replaced by one atomic operation, so truncating each body to the counts each head recorded returns the store exactly to a state that existed. Snapshots are taken while the node runs, from the console or the command line.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-database/commit/172d41a0">database 172d41a0</a>
         <a href="https://github.com/libbitcoin/libbitcoin-node/commit/daff81aa">node daff81aa</a>
         <a href="architecture/database/reliability.html#4-recovery">Reliability: recovery</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-with-a-full-electrum-address-index">
     <div class="when">2022<span>v4</span></div>
     <div>
-      <h2>First variant script stack</h2>
-      <p>Each element of the script machine's stack is held as a boolean, number or byte vector, as it was produced, so standard scripts execute without type conversions.</p>
-      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/608e04f25">system 608e04f2</a>
-        <a href="architecture/system/machine.html">Machine</a></div>
+      <h2>First node with a full Electrum address index<a class="anchor" href="#first-node-with-a-full-electrum-address-index" aria-label="Link to this entry">#</a></h2>
+      <p>Version 4 indexes every output by the SHA-256 of its script, the script hash of the Electrum protocol, so the node itself holds the history of any address. Electrum servers otherwise build this index outside the node. Floresta's Electrum index (Nov 2022) predates Libbitcoin's by one month, but indexes only the addresses its wallet watches, so it is a wallet capability, not a full node capability.</p>
+      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-database/commit/08b98c21">database 08b98c21</a></div>
     </div>
   </article>
-  <article class="first">
-    <div class="when">2022<span>v4</span></div>
-    <div>
-      <h2>First no-copy script stack</h2>
-      <p>No data element is copied during script evaluation. The stack refers to the bytes of the script and witness in place, a value computed by an operation is stored once, and operations that duplicate an element duplicate only its reference. This eliminates costly heap allocations in the performance-critical phase of validation.</p>
-      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/aa988b265">system aa988b26</a>
-        <a href="architecture/system/machine.html">Machine</a></div>
-    </div>
-  </article>
-  <article class="first">
-    <div class="when">2022<span>v4</span></div>
-    <div>
-      <h2>Only node to resolve the Rock and Roll quadratic script delay</h2>
-      <p>Rolling an element from deep in the stack moves every element above it, so a script of repeated OP_ROLL costs time quadratic in its size, about 5.6 seconds for one block (Lerner, 2017). Libbitcoin executes any script that contains OP_ROLL on a linked stack, on which a roll is constant time.</p>
-      <div class="refs"><a href="https://bitslog.com/2017/04/17/new-quadratic-delays-in-bitcoin-scripts/">Lerner, April 2017</a>
-        <a href="https://github.com/libbitcoin/libbitcoin-system/commit/a56311301">system a5631130</a></div>
-    </div>
-  </article>
-  <article class="first">
-    <div class="when">2022<span>v4</span></div>
-    <div>
-      <h2>First generalized hardware acceleration</h2>
-      <p>Hashing and cryptography use the SHA, AES and AVX-512 IFMA extensions and the vector units (SSE4.1, AVX2, AVX-512, NEON), cascading from the widest available vector to scalar code.</p>
-      <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/558458761">system 55845876</a>
-        <a href="architecture/system/hash.html">Hash</a></div>
-    </div>
-  </article>
-  <article class="first">
+  <article class="first" id="first-milestone-sync">
     <div class="when">2024<span>v4</span></div>
     <div>
-      <h2>First milestone sync</h2>
+      <h2>First milestone sync<a class="anchor" href="#first-milestone-sync" aria-label="Link to this entry">#</a></h2>
       <p>Blocks at or under a configured milestone on the candidate chain are archived with identity checks, not partial validation. Identity is based on the operator's assertion of having validated to the milestone block previously. Bitcoin Core's assumevalid skips part of validation under the presumption that partial validation provides good enough security for the operator and the network, though fundamentally this is incoherent. These are distinct trust models.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/2399024ce">system 2399024c</a>
         <a href="https://github.com/libbitcoin/libbitcoin-node/commit/76c9e122">node 76c9e122</a>
         <a href="architecture/node/validation-chaser.html">Validation Chaser</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-hot-backup-of-a-node-store">
     <div class="when">2024<span>v4</span></div>
     <div>
-      <h2>First hot backup of a node store</h2>
+      <h2>First hot backup of a node store<a class="anchor" href="#first-hot-backup-of-a-node-store" aria-label="Link to this entry">#</a></h2>
       <p>An external backup system can copy the store's files while Bitcoin Server runs. Restored from that copy, the store recovers to its most recent snapshot, with its fail-stop guarantee intact, which a hot backup of a general-purpose database cannot provide.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-node/commit/daff81aa">node daff81aa</a>
         <a href="architecture/database/reliability.html">Reliability</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-unified-network-stack">
     <div class="when">2025<span>v4</span></div>
     <div>
-      <h2>First unified network stack</h2>
+      <h2>First unified network stack<a class="anchor" href="#first-unified-network-stack" aria-label="Link to this entry">#</a></h2>
       <p>One network library serves P2P, TCP, HTTP, WebSocket, ZMTP (ZeroMQ) and JSON-RPC 1.0 and 2.0, each in clear and secure forms, on one I/O model.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-network/commit/e45e239fa">network e45e239f</a>
         <a href="https://github.com/libbitcoin/libbitcoin-network/commit/eaa48c3bc">network eaa48c3b</a>
@@ -528,66 +561,66 @@
         <a href="interfaces.html">BS Interfaces</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-gpu-batched-signature-validation">
     <div class="when">2026<span>v4</span></div>
     <div>
-      <h2>First GPU-batched signature validation</h2>
+      <h2>First GPU-batched signature validation<a class="anchor" href="#first-gpu-batched-signature-validation" aria-label="Link to this entry">#</a></h2>
       <p>Block validation batches signatures and verifies each batch on a GPU when one is present.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/adbee2296">system adbee229</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/490235bd3">system 490235bd</a>
         <a href="computation.html">Computation</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-signature-batch-capture-for-initial-block-download">
     <div class="when">2026<span>v4</span></div>
     <div>
-      <h2>First signature batch capture for initial block download</h2>
+      <h2>First signature batch capture for initial block download<a class="anchor" href="#first-signature-batch-capture-for-initial-block-download" aria-label="Link to this entry">#</a></h2>
       <p>Validation captures the signatures of standard scripts into a store-side batch, more than 99% of them, so they are verified in bulk rather than one at a time.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/4d4144793">system 4d414479</a>
         <a href="https://github.com/libbitcoin/libbitcoin-database/commit/76773a13">database 76773a13</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-hardware-accelerated-compact-block-resolution">
     <div class="when">2026<span>v4</span></div>
     <div>
-      <h2>First hardware-accelerated compact block resolution</h2>
+      <h2>First hardware-accelerated compact block resolution<a class="anchor" href="#first-hardware-accelerated-compact-block-resolution" aria-label="Link to this entry">#</a></h2>
       <p>A compact block names its transactions by short identifiers keyed to that block, so no index can hold them. The node hashes the witness hash columns of its whole pool across vector lanes to match each block's identifiers.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-database/commit/82fa184c">database 82fa184c</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/18f801715">system 18f80171</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="second-gpu-batched-silent-payment-scanning">
     <div class="when">2026<span>v4</span></div>
     <div>
-      <h2>Second GPU-batched silent payment scanning</h2>
+      <h2>Second GPU-batched silent payment scanning<a class="anchor" href="#second-gpu-batched-silent-payment-scanning" aria-label="Link to this entry">#</a></h2>
       <p>The node computes silent payment scan data in batches on a GPU when one is present, and in vector lanes otherwise. Frigate was first, in 2025.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/bec16b81f">system bec16b81</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/45583aed2">system 45583aed</a>
         <a href="https://github.com/sparrowwallet/frigate/commit/ff34bb6">Frigate, October 2025</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="first-node-free-of-dependencies">
     <div class="when">2026<span>v4</span></div>
     <div>
-      <h2>First node free of dependencies</h2>
+      <h2>First node free of dependencies<a class="anchor" href="#first-node-free-of-dependencies" aria-label="Link to this entry">#</a></h2>
       <p>Bitcoin Server builds on the C++ standard library and the operating system alone.</p>
       <div class="refs"><a href="https://github.com/libbitcoin/libbitcoin-system/commit/3697e6efc">system 3697e6ef</a>
         <a href="https://github.com/libbitcoin/libbitcoin-system/commit/bb7e5f51d">system bb7e5f51</a>
         <a href="https://github.com/libbitcoin/libbitcoin-network/commit/7b82d49c5">network 7b82d49c</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="only-node-to-sync-with-milestone-in-under-one-hour">
     <div class="when">2026<span>v4</span></div>
     <div>
-      <h2>Only node to sync with milestone in under one hour</h2>
+      <h2>Only node to sync with milestone in under one hour<a class="anchor" href="#only-node-to-sync-with-milestone-in-under-one-hour" aria-label="Link to this entry">#</a></h2>
       <p>Bitcoin Server syncs to a milestone, over the P2P network, in 14 minutes.</p>
       <div class="refs"><a href="sync.html">Sync BS</a></div>
     </div>
   </article>
-  <article class="first">
+  <article class="first" id="only-node-to-fully-validate-in-under-one-hour">
     <div class="when">2026<span>v4</span></div>
     <div>
-      <h2>Only node to fully validate in under one hour</h2>
+      <h2>Only node to fully validate in under one hour<a class="anchor" href="#only-node-to-fully-validate-in-under-one-hour" aria-label="Link to this entry">#</a></h2>
       <p>Bitcoin Server syncs with full validation, over the P2P network, in 26 minutes.</p>
       <div class="refs"><a href="sync.html">Sync BS</a></div>
     </div>
