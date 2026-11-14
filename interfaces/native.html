@@ -732,8 +732,9 @@ new block:</p>
 </code></pre>
 <h2 id="3-server">3. Server<a class="anchor" href="#3-server" aria-label="Link to this section">#</a></h2>
 <h3 id="configuration">configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h3>
-<p>The store's contents and the node's and network's peer settings. Each is
-also discoverable by interrogating the node over P2P.</p>
+<p>The store's contents, the node's and network's peer settings, the wallet
+prefixes and the consensus rules. The node and network settings are also
+discoverable by interrogating the node over P2P.</p>
 <pre><code>/v1/configuration
 </code></pre>
 <p>Formats: <code>json</code>.</p>
@@ -744,7 +745,7 @@ also discoverable by interrogating the node over P2P.</p>
         &quot;address&quot;: true,
         &quot;filter&quot;: true,
         &quot;silent&quot;: null,
-        &quot;turbo&quot;: false,
+        &quot;turbo&quot;: true,
         &quot;witness&quot;: true,
         &quot;pruned&quot;: 0
     },
@@ -757,6 +758,15 @@ also discoverable by interrogating the node over P2P.</p>
         &quot;privacy&quot;: true,
         &quot;fees&quot;: true
     },
+    &quot;wallet&quot;: {
+        &quot;p2kh&quot;: 0,
+        &quot;p2sh&quot;: 5,
+        &quot;wif&quot;: 128,
+        &quot;witness&quot;: &quot;bc&quot;,
+        &quot;silent&quot;: &quot;sp&quot;,
+        &quot;hd_private&quot;: 76066276,
+        &quot;hd_public&quot;: 76067358
+    },
     &quot;network&quot;: {
         &quot;relay&quot;: true,
         &quot;alert&quot;: false,
@@ -768,6 +778,36 @@ also discoverable by interrogating the node over P2P.</p>
         &quot;not_found&quot;: true,
         &quot;protocol_maximum&quot;: 70016,
         &quot;protocol_minimum&quot;: 31800
+    },
+    &quot;forks&quot;: {
+        &quot;bip16&quot;: true,
+        &quot;bip90&quot;: false,
+        &quot;bip30&quot;: true,
+        &quot;bip42&quot;: true,
+        &quot;bip34&quot;: true,
+        &quot;bip65&quot;: true,
+        &quot;bip66&quot;: true,
+        &quot;bip68&quot;: true,
+        &quot;bip112&quot;: true,
+        &quot;bip113&quot;: true,
+        &quot;bip141&quot;: true,
+        &quot;bip143&quot;: true,
+        &quot;bip147&quot;: true,
+        &quot;bip341&quot;: true,
+        &quot;bip342&quot;: true,
+        &quot;bip54_timewarp&quot;: true,
+        &quot;bip54_timespan&quot;: true,
+        &quot;bip54_sigops&quot;: true,
+        &quot;bip54_txsize&quot;: true,
+        &quot;bip54_coinbase&quot;: true,
+        &quot;retarget&quot;: true,
+        &quot;difficult&quot;: true,
+        &quot;time_warp_patch&quot;: false,
+        &quot;block_storm_patch&quot;: false,
+        &quot;signet&quot;: false,
+        &quot;ltc_time_warp_patch&quot;: false,
+        &quot;ltc_retarget_overflow_patch&quot;: false,
+        &quot;ltc_scrypt_proof_of_work&quot;: false
     }
 }
 </code></pre>
@@ -829,47 +869,79 @@ also discoverable by interrogating the node over P2P.</p>
 </tr>
 <tr>
 <td><code>node.fees</code></td>
-<td>Fee estimation is enabled (<code>node.fee_estimate_horizon</code> is not zero)</td>
+<td>Fee estimation is enabled (<code>peer.enable_relay</code>)</td>
+</tr>
+<tr>
+<td><code>wallet.p2kh</code></td>
+<td><code>wallet.p2kh_prefix</code></td>
+</tr>
+<tr>
+<td><code>wallet.p2sh</code></td>
+<td><code>wallet.p2sh_prefix</code></td>
+</tr>
+<tr>
+<td><code>wallet.wif</code></td>
+<td><code>wallet.wif_prefix</code></td>
+</tr>
+<tr>
+<td><code>wallet.witness</code></td>
+<td><code>wallet.witness_prefix</code></td>
+</tr>
+<tr>
+<td><code>wallet.silent</code></td>
+<td><code>wallet.silent_prefix</code></td>
+</tr>
+<tr>
+<td><code>wallet.hd_private</code></td>
+<td><code>wallet.hd_private_prefix</code></td>
+</tr>
+<tr>
+<td><code>wallet.hd_public</code></td>
+<td><code>wallet.hd_public_prefix</code></td>
 </tr>
 <tr>
 <td><code>network.relay</code></td>
-<td><code>network.enable_relay</code></td>
+<td><code>peer.enable_relay</code></td>
 </tr>
 <tr>
 <td><code>network.alert</code></td>
-<td><code>network.enable_alert</code></td>
+<td><code>peer.enable_alert</code></td>
 </tr>
 <tr>
 <td><code>network.reject</code></td>
-<td><code>network.enable_reject</code></td>
+<td><code>peer.enable_reject</code></td>
 </tr>
 <tr>
 <td><code>network.compact</code></td>
-<td><code>network.enable_compact</code></td>
+<td><code>peer.enable_compact</code></td>
 </tr>
 <tr>
 <td><code>network.address</code></td>
-<td><code>network.enable_address</code></td>
+<td><code>peer.enable_address</code></td>
 </tr>
 <tr>
 <td><code>network.witness_tx</code></td>
-<td><code>network.enable_witness_tx</code></td>
+<td><code>peer.enable_witness_tx</code></td>
 </tr>
 <tr>
 <td><code>network.memory_pool</code></td>
-<td><code>network.enable_memory_pool</code></td>
+<td><code>peer.enable_memory_pool</code></td>
 </tr>
 <tr>
 <td><code>network.not_found</code></td>
-<td><code>network.enable_not_found</code></td>
+<td><code>peer.enable_not_found</code></td>
 </tr>
 <tr>
 <td><code>network.protocol_maximum</code></td>
-<td><code>network.protocol_maximum</code></td>
+<td><code>peer.protocol_maximum</code></td>
 </tr>
 <tr>
 <td><code>network.protocol_minimum</code></td>
-<td><code>network.protocol_minimum</code></td>
+<td><code>peer.protocol_minimum</code></td>
+</tr>
+<tr>
+<td><code>forks.*</code></td>
+<td>Each <code>[forks]</code> setting of the same name</td>
 </tr>
 </tbody>
 </table></div>

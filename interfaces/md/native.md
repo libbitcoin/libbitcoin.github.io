@@ -200,8 +200,9 @@ new block:
 
 ### configuration
 
-The store's contents and the node's and network's peer settings. Each is
-also discoverable by interrogating the node over P2P.
+The store's contents, the node's and network's peer settings, the wallet
+prefixes and the consensus rules. The node and network settings are also
+discoverable by interrogating the node over P2P.
 
 ```
 /v1/configuration
@@ -219,7 +220,7 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "address": true,
         "filter": true,
         "silent": null,
-        "turbo": false,
+        "turbo": true,
         "witness": true,
         "pruned": 0
     },
@@ -232,6 +233,15 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "privacy": true,
         "fees": true
     },
+    "wallet": {
+        "p2kh": 0,
+        "p2sh": 5,
+        "wif": 128,
+        "witness": "bc",
+        "silent": "sp",
+        "hd_private": 76066276,
+        "hd_public": 76067358
+    },
     "network": {
         "relay": true,
         "alert": false,
@@ -243,6 +253,36 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "not_found": true,
         "protocol_maximum": 70016,
         "protocol_minimum": 31800
+    },
+    "forks": {
+        "bip16": true,
+        "bip90": false,
+        "bip30": true,
+        "bip42": true,
+        "bip34": true,
+        "bip65": true,
+        "bip66": true,
+        "bip68": true,
+        "bip112": true,
+        "bip113": true,
+        "bip141": true,
+        "bip143": true,
+        "bip147": true,
+        "bip341": true,
+        "bip342": true,
+        "bip54_timewarp": true,
+        "bip54_timespan": true,
+        "bip54_sigops": true,
+        "bip54_txsize": true,
+        "bip54_coinbase": true,
+        "retarget": true,
+        "difficult": true,
+        "time_warp_patch": false,
+        "block_storm_patch": false,
+        "signet": false,
+        "ltc_time_warp_patch": false,
+        "ltc_retarget_overflow_patch": false,
+        "ltc_scrypt_proof_of_work": false
     }
 }
 ```
@@ -261,17 +301,25 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 | `node.witness` | `node.provide_witness` |
 | `node.filters` | `node.provide_filters` |
 | `node.privacy` | `node.provide_privacy` |
-| `node.fees` | Fee estimation is enabled (`node.fee_estimate_horizon` is not zero) |
-| `network.relay` | `network.enable_relay` |
-| `network.alert` | `network.enable_alert` |
-| `network.reject` | `network.enable_reject` |
-| `network.compact` | `network.enable_compact` |
-| `network.address` | `network.enable_address` |
-| `network.witness_tx` | `network.enable_witness_tx` |
-| `network.memory_pool` | `network.enable_memory_pool` |
-| `network.not_found` | `network.enable_not_found` |
-| `network.protocol_maximum` | `network.protocol_maximum` |
-| `network.protocol_minimum` | `network.protocol_minimum` |
+| `node.fees` | Fee estimation is enabled (`peer.enable_relay`) |
+| `wallet.p2kh` | `wallet.p2kh_prefix` |
+| `wallet.p2sh` | `wallet.p2sh_prefix` |
+| `wallet.wif` | `wallet.wif_prefix` |
+| `wallet.witness` | `wallet.witness_prefix` |
+| `wallet.silent` | `wallet.silent_prefix` |
+| `wallet.hd_private` | `wallet.hd_private_prefix` |
+| `wallet.hd_public` | `wallet.hd_public_prefix` |
+| `network.relay` | `peer.enable_relay` |
+| `network.alert` | `peer.enable_alert` |
+| `network.reject` | `peer.enable_reject` |
+| `network.compact` | `peer.enable_compact` |
+| `network.address` | `peer.enable_address` |
+| `network.witness_tx` | `peer.enable_witness_tx` |
+| `network.memory_pool` | `peer.enable_memory_pool` |
+| `network.not_found` | `peer.enable_not_found` |
+| `network.protocol_maximum` | `peer.protocol_maximum` |
+| `network.protocol_minimum` | `peer.protocol_minimum` |
+| `forks.*` | Each `[forks]` setting of the same name |
 
 ### top
 
