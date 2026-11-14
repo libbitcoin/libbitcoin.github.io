@@ -349,8 +349,6 @@
   </nav>
 
   <article class="doc">
-<div class="banner"><strong>Testnet5 is running on a rehearsal <a href="https://lapis.erisian.com.au/chain.html">bootstrap chain</a>.</strong> The chain is discarded when the testnet5 genesis block is mined, planned at mainnet block 975,744 (expected 2026-11-14 02:00 UTC), and a store of it must then be made again.</div>
-
 <p>Testnet5 is a public test network defined by
 <a href="https://github.com/bitcoin/bips/blob/master/bip-0095.md">BIP 95</a>, to
 replace testnet4. It runs mainnet consensus with none of the testnet
@@ -372,11 +370,11 @@ block 1.</p>
 </tr>
 <tr>
 <td>Genesis block</td>
-<td>Not yet mined, planned at mainnet block 975,744 (expected 2026-11-14 02:00 UTC); the BIP 95 placeholder is used below</td>
+<td>Mined 2026-11-14 05:03 UTC, committing to mainnet block 975,744; hash <code>00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497</code> (<a href="https://github.com/bitcoin/bips/pull/2356">BIP 95 parameters</a>, pending merge)</td>
 </tr>
 <tr>
 <td>Network</td>
-<td>A rehearsal <a href="https://lapis.erisian.com.au/chain.html">bootstrap chain</a>, discarded when the genesis block is mined; no DNS seeds</td>
+<td>Live; no DNS seeds</td>
 </tr>
 <tr>
 <td><code>bs</code></td>
@@ -384,18 +382,12 @@ block 1.</p>
 </tr>
 <tr>
 <td><a href="public.html">Community servers</a></td>
-<td>Serving the bootstrap chain, with its genesis block configured</td>
+<td>Serving testnet5</td>
 </tr>
 </tbody>
 </table></div>
-<p>The genesis block, checkpoint and milestone below change when the
-testnet5 genesis block is mined, and a store made with the placeholder
-must then be made again. The bootstrap chain has its own genesis block,
-so a store of it must also be made again. It is served with its genesis
-block in <code>bitcoin.genesis_block</code>, a peer such as
-<code>lapis.erisian.com.au:18353</code> in <code>[manual]</code>, and <code>-n testnet5</code> or
-<code>bitcoin.network = testnet5</code>, since its genesis block is not the
-built-in one.</p>
+<p>A store made with the BIP 95 placeholder genesis block, or on the
+rehearsal bootstrap chain that preceded the network, must be made again.</p>
 <p>Start the node on testnet5:</p>
 <pre class="console"><code>$ bs -n testnet5
 </code></pre>
@@ -437,9 +429,9 @@ bip9_bit2_speedy_trial = false
 bip9_bit2_start = 4294967295
 bip9_bit2_threshold = 0
 bip9_bit2_timeout = 0
-checkpoint = 000000000001bd3ade1e24d07c1a3677d4868c34f2f1696fa419e3b9f061b1e0:0
-genesis_block = 00401c200000000000000000000000000000000000000000000000000000000000000000de48bbaa869592873fc4e5042f2931f9b42bb7e8ddeccd373df845d80983409b9663e96af8ff071b9916ba730101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff5b04ffff001d01044c52323032362d31312d3033203937343334332030303030303030303030303030303030303030306138366436646132633135363364303836363864396563313863636535386362386338363564346133316338ffffffff0100f2052a010000000a6a089763e96a0000000000000000
-milestone = 000000000001bd3ade1e24d07c1a3677d4868c34f2f1696fa419e3b9f061b1e0:0
+checkpoint = 00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497:0
+genesis_block = 00c0302200000000000000000000000000000000000000000000000000000000000000008de2a6b556ecb56779c34481ede767f09b2ae214f37ab1ad34085b5cb699588c91ebf76affff0f1a31913d650101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff5b04ffff001d01044c52323032362d31312d3134203937353734342030303030303030303030303030303030303030313233653236383165326638326163646362393433306131356565633234636338356234303036393164343739ffffffff0100f2052a010000000a6a0895ebf76a0200000000000000
+milestone = 00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497:0
 minimum_work = 0000000000000000000000000000000000000000000000000000000000000000
 proof_of_work_limit = 437256191
 
