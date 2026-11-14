@@ -1032,8 +1032,11 @@ target in blocks.</p>
     &quot;1008&quot;: 1
 }
 </code></pre>
-<p>The targets are 1 to 25, 144, 504 and 1008. A target without an estimate
-is omitted, so a node without fee history returns <code>{}</code>.</p>
+<p>The targets are 1 to 25, 144, 504 and 1008. Each estimate is from the
+memory pool alone, as Electrum's <code>basic</code> mode
+(<a href="electrum.html#blockchainestimatefee"><code>blockchain.estimatefee</code></a>). A target
+without an estimate is omitted, so a node with <code>peer.enable_relay</code> off
+returns <code>{}</code>.</p>
   </article>
 
   <nav class="pager"><a href="btcd.html">&larr; BTCD</a><a href="stratum-v1.html">Stratum v1 &rarr;</a></nav>

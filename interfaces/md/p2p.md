@@ -285,7 +285,7 @@ requested is disconnected.
 ### feefilter
 
 The minimum fee rate of transactions to announce (BIP133). `bs` sends
-`node.minimum_fee_rate` while current, and the maximum otherwise. It does
+`pool.minimum_fee_rate` while current, and the maximum otherwise. It does
 not announce transactions below a peer's rate.
 
 ### mempool

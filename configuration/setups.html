@@ -882,8 +882,13 @@ require_witness = true      # requires witnesses (bip144)
 provide_filters = false     # serves client filters (bip157)
 provide_privacy = true      # opportunistic encryption (bip324)
 delay_inbound = true
-fee_estimate_horizon = 1008
+
+<span class="section">[pool]</span>
 minimum_fee_rate = 0.000001
+bytes_per_sigop = 20
+maximum_outcomes = 1024
+coinbase_weight = 2000
+maximum_chunk_depth = 25
 </code></pre>
 <ul>
 <li><code>node.limited_blocks</code> prunes blocks under the milestone (<a href="#2-milestone-sync">Milestone sync</a>), and the
@@ -891,12 +896,27 @@ minimum_fee_rate = 0.000001
 <li><code>node.provide_filters</code> also requires the client filter tables (<a href="#12-client-filters-bip157158">Client filters (BIP157/158)</a>).</li>
 <li><code>node.delay_inbound</code> refuses inbound peers, and client services other
   than <code>[admin]</code>, until the chain is current.</li>
-<li><code>node.fee_estimate_horizon</code> is the number of recent blocks used for fee
-  estimates, at most 1,008 (one week). <code>0</code> disables fee estimation.</li>
-<li><code>node.minimum_fee_rate</code> is the lowest fee rate, in BTC per thousand
+<li><code>pool.minimum_fee_rate</code> is the lowest fee rate, in BTC per thousand
   virtual bytes, of an unconfirmed transaction the node accepts. It is
-  also reported to clients as the relay fee.</li>
+  reported to clients as the relay fee and as the incremental relay fee,
+  and no fee estimate is below it.</li>
+<li><code>pool.bytes_per_sigop</code> is the virtual size charged for each signature
+  operation. A transaction's size for its fee rate is the greater of its
+  virtual size and its signature operations times this value.</li>
+<li><code>pool.maximum_outcomes</code> limits the outcomes evaluated for a set of
+  conflicting transactions, where each outcome is one choice of which
+  conflicting transactions to keep. A transaction whose conflicts with
+  pooled transactions have more outcomes is not accepted. A block template
+  or fee estimate uses the best outcome among at most this many.</li>
+<li><code>pool.coinbase_weight</code> is the weight reserved in a block template for
+  the miner's coinbase transaction.</li>
+<li><code>pool.maximum_chunk_depth</code> limits the generations of ancestors that
+  enter a block template together with a transaction (its ancestors not
+  already in the template). A transaction with more generations of such
+  ancestors is not taken until enough of them are in the template.</li>
 </ul>
+<p>Fee estimates are available while <code>peer.enable_relay</code> is <code>true</code>, once the
+transaction pool has started. A target is at most 1,008 blocks.</p>
 <p>Which peer messages the node sends and accepts:</p>
 <pre><code class="language-ini"><span class="section">[peer]</span>
 enable_relay = true         # in/out transaction announcements

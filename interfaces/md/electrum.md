@@ -436,7 +436,19 @@ The fee rate for a transaction to confirm within a number of blocks.
 **Result:** BTC per 1000 virtual bytes, or `-1` without an estimate.
 
 `mode` is `economical` or `conservative`, and `bs` adds `basic` (the
-default) and `geometric`. Estimates require `node.fee_estimate_horizon`.
+default) and `geometric`. The estimate is the lowest fee rate at which a
+transaction is projected into a block within the target, from the memory
+pool and, except in `basic` mode, the fee rates of recent arrivals:
+
+| Mode | Arrivals |
+| ---- | -------- |
+| `basic` | None, the memory pool alone |
+| `geometric` | Each block's arrivals weighted half those of the next newer block |
+| `economical` | Their mean over the last 12 blocks |
+| `conservative` | Their peak over the last 144 blocks |
+
+An estimate is never below `pool.minimum_fee_rate`. Estimates require
+`peer.enable_relay`.
 
 ### blockchain.relayfee
 
@@ -444,7 +456,7 @@ The minimum fee rate for relay, in BTC per 1000 virtual bytes.
 
 **Versions:** 1.0–1.4.2, replaced in 1.6 by
 [`mempool.get_info`](#mempoolget_info). **Parameters:** none. `bs` returns
-`node.minimum_fee_rate`.
+`pool.minimum_fee_rate`.
 
 ### mempool.get_fee_histogram
 
@@ -464,8 +476,7 @@ The fee policy of the memory pool, in BTC per 1000 virtual bytes.
 {"mempoolminfee": 0.000001, "minrelaytxfee": 0.000001, "incrementalrelayfee": 0.000001}
 ```
 
-`bs` returns the configured rates, `node.minimum_fee_rate` and
-`node.minimum_bump_rate`.
+`bs` returns `pool.minimum_fee_rate` for each rate.
 
 ### mempool.recent
 

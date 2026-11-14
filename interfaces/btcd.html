@@ -514,7 +514,10 @@ other than mainnet.</p>
 <h3 id="estimatefee">estimatefee<a class="anchor" href="#estimatefee" aria-label="Link to this section">#</a></h3>
 <p>The fee rate for a transaction to confirm within a number of blocks, in
 BTC per 1000 virtual bytes. <strong>Parameters:</strong> <code>numblocks</code> (1 to 1008).
-Returns -1 without an estimate. Requires <code>node.fee_estimate_horizon</code>.</p>
+Returns -1 without an estimate. The estimate is from the memory pool
+alone, as Electrum's <code>basic</code> mode
+(<a href="electrum.html#blockchainestimatefee"><code>blockchain.estimatefee</code></a>). Requires
+<code>peer.enable_relay</code>.</p>
 <h3 id="getblockchaininfo">getblockchaininfo<a class="anchor" href="#getblockchaininfo" aria-label="Link to this section">#</a></h3>
 <p>As the <a href="bitcoind-rpc.html#getblockchaininfo">bitcoind method</a>, including
 <code>bip9_softforks</code>, which btcd clients such as lnd read.</p>

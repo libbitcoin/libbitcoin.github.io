@@ -811,6 +811,9 @@ addresses, keys and descriptors in client requests and responses:</p>
   and descriptors.</li>
 <li>The Electrum and Esplora interfaces use the address prefixes.</li>
 <li>The Sparrow interface uses the silent payment prefix.</li>
+<li>The Native interface reports all of them in its
+  <a href="../interfaces/native.html#configuration">configuration</a>, which the native
+  web site uses to read and write addresses.</li>
 </ul>
 <p>They do not affect the node or the store. The defaults are mainnet, and a
 test chain sets its own, as on the <a href="testnet3.html">Testnet3</a>,
@@ -831,8 +834,8 @@ wif_prefix = 128
 <span class="comment"># The witness address prefix, defaults to 'bc' (use 'tb' for testnet).</span>
 witness_prefix = bc
 </code></pre>
-<h2 id="7-node">7. <code>[node]</code><a class="anchor" href="#7-node" aria-label="Link to this section">#</a></h2>
-<p>The node: validation threads, batching and GPU use, the download window, fee policy, and what is served to peers.</p>
+<h2 id="7-node-and-pool">7. <code>[node]</code> and <code>[pool]</code><a class="anchor" href="#7-node-and-pool" aria-label="Link to this section">#</a></h2>
+<p>The node: validation threads, batching and GPU use, the download window, and what is served to peers.</p>
 <pre><code class="language-ini"><span class="section">[node]</span>
 <span class="comment"># Allowable underperformance standard deviation, defaults to '1.5' (0 disables).</span>
 allowed_deviation = 1.5
@@ -848,20 +851,12 @@ compact_timeout_seconds = 10
 currency_window_minutes = 1440
 <span class="comment"># Block inbound peer/client (excluding admin) until current, defaults to 'true'.</span>
 delay_inbound = true
-<span class="comment"># Fee estimation horizon, limited to 1008, defaults to '1008' (0 disables).</span>
-fee_estimate_horizon = 1008
 <span class="comment"># Limit block service to recent blocks, defaults to 'false'.</span>
 limited_blocks = false
 <span class="comment"># Maximum number of blocks to download concurrently, defaults to '50000' (0 disables).</span>
 maximum_concurrency = 50000
 <span class="comment"># Maximum block height to populate, defaults to '0' (unlimited).</span>
 maximum_height = 0
-<span class="comment"># Set the process to high memory priority, defaults to 'true'.</span>
-memory_priority = true
-<span class="comment"># Minimum fee rate increment for conflicting tx acceptance, defaults to '0.0'.</span>
-minimum_bump_rate = 0.0
-<span class="comment"># Minimum fee rate for non-conflicting tx acceptance, defaults to '0.000001'.</span>
-minimum_fee_rate = 0.000001
 <span class="comment"># Serve blocks to network connections, defaults to 'true'.</span>
 provide_blocks = true
 <span class="comment"># Serve client filters to network connections, defaults to 'false'.</span>
@@ -884,6 +879,19 @@ thread_priority = true
 threads = 0
 <span class="comment"># Use the GPU where available, defaults to 'true'.</span>
 use_gpu = true
+</code></pre>
+<p>The transaction pool: fee policy, conflict resolution, and the block template.</p>
+<pre><code class="language-ini"><span class="section">[pool]</span>
+<span class="comment"># Virtual bytes charged per signature operation, defaults to '20'.</span>
+bytes_per_sigop = 20
+<span class="comment"># Declared weight of the miner's coinbase transaction, defaults to '2000'.</span>
+coinbase_weight = 2000
+<span class="comment"># Maximum ancestor depth of a block template chunk, defaults to '25'.</span>
+maximum_chunk_depth = 25
+<span class="comment"># Maximum conflict outcomes evaluated to accept a transaction, defaults to '1024'.</span>
+maximum_outcomes = 1024
+<span class="comment"># Minimum fee rate for non-conflicting tx acceptance, defaults to '0.000001'.</span>
+minimum_fee_rate = 0.000001
 </code></pre>
 <h2 id="8-network">8. <code>[network]</code><a class="anchor" href="#8-network" aria-label="Link to this section">#</a></h2>
 <p>Settings shared by all P2P connections: threads, connection timing, send rate, and address allow and deny lists.</p>

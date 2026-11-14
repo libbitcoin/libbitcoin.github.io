@@ -670,5 +670,8 @@ target in blocks.
 }
 ```
 
-The targets are 1 to 25, 144, 504 and 1008. A target without an estimate
-is omitted, so a node without fee history returns `{}`.
+The targets are 1 to 25, 144, 504 and 1008. Each estimate is from the
+memory pool alone, as Electrum's `basic` mode
+([`blockchain.estimatefee`](electrum#blockchainestimatefee)). A target
+without an estimate is omitted, so a node with `peer.enable_relay` off
+returns `{}`.

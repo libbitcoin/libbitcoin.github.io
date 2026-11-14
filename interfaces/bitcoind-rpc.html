@@ -851,15 +851,15 @@ confirmed.</p>
 </tr>
 <tr>
 <td><code>mempoolminfee</code></td>
-<td><code>node.minimum_fee_rate</code>, or the maximum while the node is not current</td>
+<td><code>pool.minimum_fee_rate</code>, or the maximum while the node is not current</td>
 </tr>
 <tr>
 <td><code>minrelaytxfee</code></td>
-<td><code>node.minimum_fee_rate</code></td>
+<td><code>pool.minimum_fee_rate</code></td>
 </tr>
 <tr>
 <td><code>incrementalrelayfee</code></td>
-<td><code>node.minimum_bump_rate</code></td>
+<td><code>pool.minimum_fee_rate</code></td>
 </tr>
 <tr>
 <td><code>unbroadcastcount</code></td>
@@ -1025,8 +1025,14 @@ returns only <code>{"isvalid": false}</code>.</p>
 <code>message</code>.</p>
 <h3 id="estimatesmartfee">estimatesmartfee<a class="anchor" href="#estimatesmartfee" aria-label="Link to this section">#</a></h3>
 <p>The fee rate for a transaction to confirm within a number of blocks.
-<strong>Parameters:</strong> <code>conf_target</code> (1 to 1008), <code>estimate_mode</code>
-(<code>economical</code>). Requires <code>node.fee_estimate_horizon</code>.</p>
+<strong>Parameters:</strong> <code>conf_target</code> (1 to 1008), <code>estimate_mode</code> (<code>economical</code>,
+the default, or <code>conservative</code>). <strong>Result:</strong> <code>feerate</code>, in BTC per 1000
+virtual bytes, and <code>blocks</code>, or <code>errors</code> and <code>blocks</code> without an estimate.</p>
+<p>The estimate is the lowest fee rate at which a transaction is projected
+into a block within the target, from the memory pool and the fee rates of
+recent arrivals: their mean over the last 12 blocks (<code>economical</code>) or their
+peak over the last 144 (<code>conservative</code>). It is never below
+<code>pool.minimum_fee_rate</code>. Estimates require <code>peer.enable_relay</code>.</p>
 <h3 id="getindexinfo">getindexinfo<a class="anchor" href="#getindexinfo" aria-label="Link to this section">#</a></h3>
 <p>The indexes. <strong>Parameters:</strong> <code>index_name</code>. <strong>Result:</strong> <code>txindex</code>, and the
 basic block filter index when client filters are stored.</p>

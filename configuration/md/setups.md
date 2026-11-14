@@ -576,8 +576,13 @@ require_witness = true      # requires witnesses (bip144)
 provide_filters = false     # serves client filters (bip157)
 provide_privacy = true      # opportunistic encryption (bip324)
 delay_inbound = true
-fee_estimate_horizon = 1008
+
+[pool]
 minimum_fee_rate = 0.000001
+bytes_per_sigop = 20
+maximum_outcomes = 1024
+coinbase_weight = 2000
+maximum_chunk_depth = 25
 ```
 
 - `node.limited_blocks` prunes blocks under the milestone ([Milestone sync](#2-milestone-sync)), and the
@@ -585,11 +590,27 @@ minimum_fee_rate = 0.000001
 - `node.provide_filters` also requires the client filter tables ([Client filters (BIP157/158)](#12-client-filters-bip157158)).
 - `node.delay_inbound` refuses inbound peers, and client services other
   than `[admin]`, until the chain is current.
-- `node.fee_estimate_horizon` is the number of recent blocks used for fee
-  estimates, at most 1,008 (one week). `0` disables fee estimation.
-- `node.minimum_fee_rate` is the lowest fee rate, in BTC per thousand
+- `pool.minimum_fee_rate` is the lowest fee rate, in BTC per thousand
   virtual bytes, of an unconfirmed transaction the node accepts. It is
-  also reported to clients as the relay fee.
+  reported to clients as the relay fee and as the incremental relay fee,
+  and no fee estimate is below it.
+- `pool.bytes_per_sigop` is the virtual size charged for each signature
+  operation. A transaction's size for its fee rate is the greater of its
+  virtual size and its signature operations times this value.
+- `pool.maximum_outcomes` limits the outcomes evaluated for a set of
+  conflicting transactions, where each outcome is one choice of which
+  conflicting transactions to keep. A transaction whose conflicts with
+  pooled transactions have more outcomes is not accepted. A block template
+  or fee estimate uses the best outcome among at most this many.
+- `pool.coinbase_weight` is the weight reserved in a block template for
+  the miner's coinbase transaction.
+- `pool.maximum_chunk_depth` limits the generations of ancestors that
+  enter a block template together with a transaction (its ancestors not
+  already in the template). A transaction with more generations of such
+  ancestors is not taken until enough of them are in the template.
+
+Fee estimates are available while `peer.enable_relay` is `true`, once the
+transaction pool has started. A target is at most 1,008 blocks.
 
 Which peer messages the node sends and accepts:
 

@@ -487,6 +487,9 @@ addresses, keys and descriptors in client requests and responses:
   and descriptors.
 - The Electrum and Esplora interfaces use the address prefixes.
 - The Sparrow interface uses the silent payment prefix.
+- The Native interface reports all of them in its
+  [configuration](../interfaces/native#configuration), which the native
+  web site uses to read and write addresses.
 
 They do not affect the node or the store. The defaults are mainnet, and a
 test chain sets its own, as on the [Testnet3](testnet3),
@@ -510,9 +513,9 @@ wif_prefix = 128
 witness_prefix = bc
 ```
 
-## 7. `[node]`
+## 7. `[node]` and `[pool]`
 
-The node: validation threads, batching and GPU use, the download window, fee policy, and what is served to peers.
+The node: validation threads, batching and GPU use, the download window, and what is served to peers.
 
 ```ini
 [node]
@@ -530,20 +533,12 @@ compact_timeout_seconds = 10
 currency_window_minutes = 1440
 # Block inbound peer/client (excluding admin) until current, defaults to 'true'.
 delay_inbound = true
-# Fee estimation horizon, limited to 1008, defaults to '1008' (0 disables).
-fee_estimate_horizon = 1008
 # Limit block service to recent blocks, defaults to 'false'.
 limited_blocks = false
 # Maximum number of blocks to download concurrently, defaults to '50000' (0 disables).
 maximum_concurrency = 50000
 # Maximum block height to populate, defaults to '0' (unlimited).
 maximum_height = 0
-# Set the process to high memory priority, defaults to 'true'.
-memory_priority = true
-# Minimum fee rate increment for conflicting tx acceptance, defaults to '0.0'.
-minimum_bump_rate = 0.0
-# Minimum fee rate for non-conflicting tx acceptance, defaults to '0.000001'.
-minimum_fee_rate = 0.000001
 # Serve blocks to network connections, defaults to 'true'.
 provide_blocks = true
 # Serve client filters to network connections, defaults to 'false'.
@@ -566,6 +561,22 @@ thread_priority = true
 threads = 0
 # Use the GPU where available, defaults to 'true'.
 use_gpu = true
+```
+
+The transaction pool: fee policy, conflict resolution, and the block template.
+
+```ini
+[pool]
+# Virtual bytes charged per signature operation, defaults to '20'.
+bytes_per_sigop = 20
+# Declared weight of the miner's coinbase transaction, defaults to '2000'.
+coinbase_weight = 2000
+# Maximum ancestor depth of a block template chunk, defaults to '25'.
+maximum_chunk_depth = 25
+# Maximum conflict outcomes evaluated to accept a transaction, defaults to '1024'.
+maximum_outcomes = 1024
+# Minimum fee rate for non-conflicting tx acceptance, defaults to '0.000001'.
+minimum_fee_rate = 0.000001
 ```
 
 ## 8. `[network]`

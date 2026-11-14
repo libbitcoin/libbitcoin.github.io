@@ -1256,12 +1256,42 @@ integer. The notification's parameter is the height.</p>
 </table></div>
 <p><strong>Result:</strong> BTC per 1000 virtual bytes, or <code>-1</code> without an estimate.</p>
 <p><code>mode</code> is <code>economical</code> or <code>conservative</code>, and <code>bs</code> adds <code>basic</code> (the
-default) and <code>geometric</code>. Estimates require <code>node.fee_estimate_horizon</code>.</p>
+default) and <code>geometric</code>. The estimate is the lowest fee rate at which a
+transaction is projected into a block within the target, from the memory
+pool and, except in <code>basic</code> mode, the fee rates of recent arrivals:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Arrivals</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>basic</code></td>
+<td>None, the memory pool alone</td>
+</tr>
+<tr>
+<td><code>geometric</code></td>
+<td>Each block's arrivals weighted half those of the next newer block</td>
+</tr>
+<tr>
+<td><code>economical</code></td>
+<td>Their mean over the last 12 blocks</td>
+</tr>
+<tr>
+<td><code>conservative</code></td>
+<td>Their peak over the last 144 blocks</td>
+</tr>
+</tbody>
+</table></div>
+<p>An estimate is never below <code>pool.minimum_fee_rate</code>. Estimates require
+<code>peer.enable_relay</code>.</p>
 <h3 id="blockchainrelayfee">blockchain.relayfee<a class="anchor" href="#blockchainrelayfee" aria-label="Link to this section">#</a></h3>
 <p>The minimum fee rate for relay, in BTC per 1000 virtual bytes.</p>
 <p><strong>Versions:</strong> 1.0–1.4.2, replaced in 1.6 by
 <a href="#mempoolget_info"><code>mempool.get_info</code></a>. <strong>Parameters:</strong> none. <code>bs</code> returns
-<code>node.minimum_fee_rate</code>.</p>
+<code>pool.minimum_fee_rate</code>.</p>
 <h3 id="mempoolget_fee_histogram">mempool.get_fee_histogram<a class="anchor" href="#mempoolget_fee_histogram" aria-label="Link to this section">#</a></h3>
 <p>The fee rates of the memory pool.</p>
 <p><strong>Versions:</strong> 1.2+. <strong>Parameters:</strong> none. <strong>Result:</strong> <code>[[fee_rate,
@@ -1272,8 +1302,7 @@ vsize], ...]</code>, by descending fee rate in satoshis per virtual byte, where
 <p><strong>Versions:</strong> 1.6+. <strong>Parameters:</strong> none.</p>
 <pre><code class="language-json">{&quot;mempoolminfee&quot;: 0.000001, &quot;minrelaytxfee&quot;: 0.000001, &quot;incrementalrelayfee&quot;: 0.000001}
 </code></pre>
-<p><code>bs</code> returns the configured rates, <code>node.minimum_fee_rate</code> and
-<code>node.minimum_bump_rate</code>.</p>
+<p><code>bs</code> returns <code>pool.minimum_fee_rate</code> for each rate.</p>
 <h3 id="mempoolrecent">mempool.recent<a class="anchor" href="#mempoolrecent" aria-label="Link to this section">#</a></h3>
 <p>The 10 transactions most recently added to the memory pool.</p>
 <p><strong>Versions:</strong> 1.7. <strong>Parameters:</strong> none.</p>

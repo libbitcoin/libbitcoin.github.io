@@ -921,8 +921,8 @@ with <code>mempool_sequence=true</code> returns 400.</p>
 }
 </code></pre>
 <p><code>usage</code> is the size of the pool's tables in the store, and <code>maxmempool</code> the
-free space on the store's volume. The fee rates are those of the node's
-configuration.</p>
+free space on the store's volume. Each fee rate is <code>pool.minimum_fee_rate</code>,
+except <code>mempoolminfee</code>, which is the maximum while the node is not current.</p>
   </article>
 
   <nav class="pager"><a href="bitcoind-rpc.html">&larr; Bitcoind JSON-RPC</a><a href="zeromq.html">ZMQ &rarr;</a></nav>

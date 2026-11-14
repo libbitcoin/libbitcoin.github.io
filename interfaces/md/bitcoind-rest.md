@@ -517,5 +517,5 @@ Extensions: `.json`.
 ```
 
 `usage` is the size of the pool's tables in the store, and `maxmempool` the
-free space on the store's volume. The fee rates are those of the node's
-configuration.
+free space on the store's volume. Each fee rate is `pool.minimum_fee_rate`,
+except `mempoolminfee`, which is the maximum while the node is not current.

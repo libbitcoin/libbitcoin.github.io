@@ -145,7 +145,10 @@ other than mainnet.
 
 The fee rate for a transaction to confirm within a number of blocks, in
 BTC per 1000 virtual bytes. **Parameters:** `numblocks` (1 to 1008).
-Returns -1 without an estimate. Requires `node.fee_estimate_horizon`.
+Returns -1 without an estimate. The estimate is from the memory pool
+alone, as Electrum's `basic` mode
+([`blockchain.estimatefee`](electrum#blockchainestimatefee)). Requires
+`peer.enable_relay`.
 
 ### getblockchaininfo
 

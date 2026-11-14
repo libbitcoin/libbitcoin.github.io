@@ -409,9 +409,9 @@ The size and fee policy of the pool. **Parameters:** none.
 | `size`, `bytes`, `total_fee` | The count, virtual size and fees of the pool |
 | `usage` | The size of the pool's tables in the store |
 | `maxmempool` | The free space of the store's volume |
-| `mempoolminfee` | `node.minimum_fee_rate`, or the maximum while the node is not current |
-| `minrelaytxfee` | `node.minimum_fee_rate` |
-| `incrementalrelayfee` | `node.minimum_bump_rate` |
+| `mempoolminfee` | `pool.minimum_fee_rate`, or the maximum while the node is not current |
+| `minrelaytxfee` | `pool.minimum_fee_rate` |
+| `incrementalrelayfee` | `pool.minimum_fee_rate` |
 | `unbroadcastcount` | `0` |
 | `fullrbf` | `false` |
 
@@ -643,8 +643,15 @@ Verifies a signed message. **Parameters:** `address`, `signature`,
 ### estimatesmartfee
 
 The fee rate for a transaction to confirm within a number of blocks.
-**Parameters:** `conf_target` (1 to 1008), `estimate_mode`
-(`economical`). Requires `node.fee_estimate_horizon`.
+**Parameters:** `conf_target` (1 to 1008), `estimate_mode` (`economical`,
+the default, or `conservative`). **Result:** `feerate`, in BTC per 1000
+virtual bytes, and `blocks`, or `errors` and `blocks` without an estimate.
+
+The estimate is the lowest fee rate at which a transaction is projected
+into a block within the target, from the memory pool and the fee rates of
+recent arrivals: their mean over the last 12 blocks (`economical`) or their
+peak over the last 144 (`conservative`). It is never below
+`pool.minimum_fee_rate`. Estimates require `peer.enable_relay`.
 
 ### getindexinfo
 

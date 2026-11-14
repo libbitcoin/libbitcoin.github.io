@@ -775,7 +775,7 @@ adds them to its memory pool. A peer that sends a transaction that was not
 requested is disconnected.</p>
 <h3 id="feefilter">feefilter<a class="anchor" href="#feefilter" aria-label="Link to this section">#</a></h3>
 <p>The minimum fee rate of transactions to announce (BIP133). <code>bs</code> sends
-<code>node.minimum_fee_rate</code> while current, and the maximum otherwise. It does
+<code>pool.minimum_fee_rate</code> while current, and the maximum otherwise. It does
 not announce transactions below a peer's rate.</p>
 <h3 id="mempool">mempool<a class="anchor" href="#mempool" aria-label="Link to this section">#</a></h3>
 <p>Requests the hashes of the memory pool (BIP35), answered by <code>inv</code>.
