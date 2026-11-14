@@ -639,7 +639,7 @@ during the channel's lifetime.</p>
 </blockquote>
 <hr />
 <h2 id="3-nodeprotocol-base--sibling-pattern">3. <code>node::protocol</code> base — sibling pattern<a class="anchor" href="#3-nodeprotocol-base--sibling-pattern" aria-label="Link to this section">#</a></h2>
-<p><code>include/bitcoin/node/protocols/protocol.hpp:33-52</code>:</p>
+<p><code>include/bitcoin/node/protocols/protocol.hpp:32-51</code>:</p>
 <p><code>node::protocol</code> does <strong>not</strong> inherit from <code>network::protocol</code>. Instead,
 concrete protocols multiply-inherit from <code>network::protocol_peer</code> (the
 wire-level base) <em>and</em> <code>node::protocol</code> (via <code>node::protocol_peer</code>,
@@ -649,7 +649,7 @@ wire-level base) <em>and</em> <code>node::protocol</code> (via <code>node::proto
 <p>The base forwards the node surface to the session: organizers
 (<code>organize</code>, <code>organize_compact</code>, <code>prioritize</code>, <code>get_minimum_work</code>,
 <code>submit</code>, <code>submit_compact</code>), currency predicates, <code>minimum_fee_rate()</code>
-(the configured rate when current, <code>max_money</code> otherwise, <code>:74-78</code>),
+(<code>pool.minimum_fee_rate</code> when current, <code>max_money</code> otherwise, <code>:74-78</code>),
 <code>estimate</code>, connection and suspension passthroughs, and channel/address
 counts (<code>protocol.cpp:34-181</code>).</p>
 <h3 id="31-event-subscription-protocol">3.1 Event subscription protocol<a class="anchor" href="#31-event-subscription-protocol" aria-label="Link to this section">#</a></h3>

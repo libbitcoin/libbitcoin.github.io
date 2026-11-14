@@ -5,7 +5,7 @@
 > sites, handler sites, and known discrepancies with the inline
 > `chase.hpp` documentation.
 >
-> Every fact below is grep-derived against master at `a5173475`.
+> Every fact below is grep-derived against master at `79eeac6a`.
 > Methodology and queries are in [§4](#4-methodology) so any future change
 > can be re-verified mechanically.
 
@@ -16,8 +16,8 @@
 ### 1.1 Storage
 
 ```
-event_subscriber_ : full_node                     // include/bitcoin/node/full_node.hpp:219
-   = network::desubscriber<object_key, event_value>   // define.hpp:84
+event_subscriber_ : full_node                     // include/bitcoin/node/full_node.hpp:223
+   = network::desubscriber<object_key, event_value>   // define.hpp:78
 ```
 
 A `desubscriber` is the libbitcoin-network primitive that combines pub/sub
@@ -58,15 +58,15 @@ There are two subscribe APIs, both eventually owning state on the
 | `subscribe_chase(notifier) → object_key` (sync)           | chasers, `session_outbound` | Caller must already be on `full_node` strand |
 | `subscribe_chase(notifier, completer)` (async)            | protocols | Posts to `full_node` strand internally; completer fires there  |
 
-Chaser subscription path (`include/bitcoin/node/chasers/chaser.hpp:100-101`,
-`src/chasers/chaser.cpp:91-94`):
+Chaser subscription path (`include/bitcoin/node/chasers/chaser.hpp:106-107`,
+`src/chasers/chaser.cpp:96-99`):
 ```
 chaser::subscribe_chase
-  → full_node::subscribe_chase(handler)          // src/full_node.cpp:247-253
+  → full_node::subscribe_chase(handler)          // src/full_node.cpp:252-258
     → event_subscriber_.subscribe(handler, key)
 ```
 Each chaser subscribes exactly once, in its `start()`, via
-`SUBSCRIBE_CHASE(handle_chase, _1, _2)` (`chaser.hpp:166-167`). The
+`SUBSCRIBE_CHASE(handle_chase, _1, _2)` (`chaser.hpp:188-189`). The
 `handle_chase` body runs on the node strand and `POST`s the work to the
 chaser's own strand.
 
@@ -74,7 +74,7 @@ Protocol subscription path (`src/protocols/protocol.cpp:183-232`):
 ```
 protocol::subscribe_chase
   → session::subscribe_chase(handler, complete)  // src/sessions/session.cpp:114-118
-    → full_node::subscribe_chase(handler, complete) // src/full_node.cpp:255-270
+    → full_node::subscribe_chase(handler, complete) // src/full_node.cpp:260-275
       → posts to strand → do_subscribe_chase
         → event_subscriber_.subscribe(handler, key)
         → complete(ec, key)   → protocol::handle_subscribe stores key_
@@ -89,12 +89,12 @@ asynchronous, so a protocol may miss events emitted before it completes
 
 ```
 chaser/protocol calls notify(ec, chases::X{...})
-   → full_node::notify posts to strand           // src/full_node.cpp:217-222
+   → full_node::notify posts to strand           // src/full_node.cpp:222-227
      → do_notify on strand
-        → event_subscriber_.notify(ec, value)     // :225-229
+        → event_subscriber_.notify(ec, value)     // :230-234
            → each subscriber's handle_chase runs here and POSTs to its own strand
 ```
-`notify_one(key, ...)` (`:231-245`) delivers to a single subscriber by key;
+`notify_one(key, ...)` (`:236-250`) delivers to a single subscriber by key;
 it is used for `chase::split` (targeting the slowest channel) and for
 `chase::stop` on unsubscribe.
 
@@ -102,7 +102,7 @@ it is used for `chase::split` (targeting the slowest channel) and for
 
 `full_node::unsubscribe_chase(key)` does not remove the entry; it sends a
 single `chases::stop` to that subscriber only
-(`src/full_node.cpp:272-275`). The subscriber's `handle_chase` returns
+(`src/full_node.cpp:277-280`). The subscriber's `handle_chase` returns
 `false` on `chase::stop`, and the `desubscriber` interprets that as
 removal. So:
 
@@ -112,7 +112,7 @@ removal. So:
 
 > **Invariant (Bus-2).** The bus is torn down only in `full_node::do_close`,
 > which broadcasts `chases::stop` to all subscribers
-> (`src/full_node.cpp:154`). After that point no further `notify` will
+> (`src/full_node.cpp:149`). After that point no further `notify` will
 > deliver.
 
 ---
@@ -131,83 +131,86 @@ Notation:
 
 | Event       | Issuer (file:line)                                                                                   | Handler (file:line)                                                                                    |
 | ----------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `start`     | `src/full_node.cpp:115` (`do_run`, direct `do_notify`)                                               | `chaser_download.cpp:136`, `chaser_validate.cpp:113`, `chaser_confirm.cpp:90`                             |
-| `space`     | `src/full_node.cpp:314` (`fault` when `query_.is_full()`)                                            | `chaser_storage.cpp:83`                                                                                |
-| `snap`      | **none** ⚠ — chase.hpp says issued by `confirm`; no live issuer                                      | `chaser_snapshot.cpp:149`                                                                              |
-| `bump`      | `chaser_header.cpp:378` (first current strong header, and first after each regression); `chaser_validate_batch.cpp:416` (silent batch drained) ⚠; *self*: `chaser_validate.cpp:288`, `chaser_confirm.cpp:290` | `chaser_download.cpp:137`, `chaser_validate.cpp:114`, `chaser_confirm.cpp:91` |
-| `suspend`   | `src/full_node.cpp:305` (`suspend`, with `error::suspended_channel`); `chaser_header.cpp:549` (after `do_disorganize`) ⚠ | `protocol_observer.cpp:77` (only)                                                  |
-| `resume`    | `src/full_node.cpp:296` (after `net::resume`)                                                        | `chaser_download.cpp:135`, `chaser_validate.cpp:119`, `chaser_confirm.cpp:89`                             |
-| `unfull`    | `chaser_storage.cpp:168` (reload from disk full succeeded, before `resume`)                           | `chaser_validate.cpp:93` (latched before the suspension gate)                                          |
-| `starved`   | `protocol_block_in_31800.cpp:426`                                                                    | `chaser_download.cpp:127`                                                                                 |
-| `split`     | `chaser_download.cpp:247` (via `notify_one` to the slowest channel)                                     | `protocol_block_in_31800.cpp:107`                                                                      |
-| `stall`     | `chaser_download.cpp:252`                                                                               | `protocol_block_in_31800.cpp:114`                                                                      |
-| `purge`     | `chaser_download.cpp:363`                                                                               | `protocol_block_in_31800.cpp:122`                                                                      |
+| `start`     | `src/full_node.cpp:112` (`do_run`, direct `do_notify`)                                               | `chaser_download.cpp:132`, `chaser_validate.cpp:122`, `chaser_confirm.cpp:92`                             |
+| `space`     | `src/full_node.cpp:319` (`fault` when `query_.is_full()`)                                            | `chaser_storage.cpp:83`                                                                                |
+| `snap`      | **none** ⚠ — chase.hpp says issued by `confirm`; no live issuer                                      | `chaser_snapshot.cpp:123`                                                                              |
+| `bump`      | `chaser_header.cpp:379` (first current strong header, and first after each regression); `chaser_validate_batch.cpp:419` (silent batch drained) ⚠; *self*: `chaser_validate.cpp:297`, `chaser_confirm.cpp:292` | `chaser_download.cpp:133`, `chaser_validate.cpp:123`, `chaser_confirm.cpp:93` |
+| `suspend`   | `src/full_node.cpp:310` (`suspend`, with `error::suspended_channel`); `chaser_header.cpp:562` (after `do_disorganize`) ⚠ | `protocol_observer.cpp:77` (only)                                                  |
+| `resume`    | `src/full_node.cpp:301` (after `net::resume`)                                                        | `chaser_download.cpp:131`, `chaser_validate.cpp:128`, `chaser_confirm.cpp:91`                             |
+| `unfull`    | `chaser_storage.cpp:168` (reload from disk full succeeded, before `resume`)                           | `chaser_validate.cpp:101` (latched before the suspension gate)                                         |
+| `starved`   | `protocol_block_in_31800.cpp:426`                                                                    | `chaser_download.cpp:123`                                                                                 |
+| `split`     | `chaser_download.cpp:243` (via `notify_one` to the slowest channel)                                     | `protocol_block_in_31800.cpp:107`                                                                      |
+| `stall`     | `chaser_download.cpp:248`                                                                               | `protocol_block_in_31800.cpp:114`                                                                      |
+| `purge`     | `chaser_download.cpp:359`                                                                               | `protocol_block_in_31800.cpp:122`                                                                      |
 | `report`    | **external** — issued by the executor in libbitcoin-server                                           | `protocol_block_in_31800.cpp:137`                                                                      |
 
 Discrepancy notes:
 - ⚠ **`bump`**: chase.hpp says issued by 'organize'. `chaser_validate` also
   issues it when a silent-payment bank drains, because the blocks of that
-  bank may now be confirmable (`chaser_validate_batch.cpp:396-397`).
+  bank may now be confirmable (`chaser_validate_batch.cpp:418-419`).
 - ⚠ **`suspend`** is also issued by `chaser_header` after a
-  disorganization (`chaser_header.cpp:546-549`), to reset all connections.
+  disorganization (`chaser_header.cpp:558-562`), to reset all connections.
 - ⚠ **`snap`** has no live issuer anywhere in this repo. Treat as dormant.
 
 ### 2.2 Candidate chain
 
 | Event          | Issuer (file:line)                                                      | Handler (file:line)                                                                |
 | -------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `headers`      | `chaser_header.cpp:384` (every current strong organize)                 | `chaser_download.cpp:161`                                                             |
-| `download`     | `chaser_download.cpp:421` (`do_headers`), `:467` (`do_put_hashes`)         | `protocol_block_in_31800.cpp:129`                                                  |
-| `regressed`    | `chaser_header.cpp:326`                                                 | `chaser_download.cpp:147`, `chaser_validate.cpp:142`, `chaser_confirm.cpp:101`        |
-| `disorganized` | `chaser_header.cpp:546`                                                 | `chaser_download.cpp:153`, `chaser_validate.cpp:148`, `chaser_confirm.cpp:107`        |
+| `headers`      | `chaser_header.cpp:385` (every current strong organize)                 | `chaser_download.cpp:157`                                                             |
+| `download`     | `chaser_download.cpp:417` (`do_headers`), `:463` (`do_put_hashes`)         | `protocol_block_in_31800.cpp:129`                                                  |
+| `regressed`    | `chaser_header.cpp:326`                                                 | `chaser_download.cpp:143`, `chaser_validate.cpp:151`, `chaser_confirm.cpp:103`        |
+| `disorganized` | `chaser_header.cpp:559`                                                 | `chaser_download.cpp:149`, `chaser_validate.cpp:157`, `chaser_confirm.cpp:109`        |
 
 ### 2.3 Check / Identify
 
 | Event       | Issuer (file:line)                                                                  | Handler (file:line)                                                                       |
 | ----------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `checked`   | `protocol_block_in_31800.cpp:352`; `chaser_transaction.cpp:414` (compact block fill) | `chaser_download.cpp:142`, `chaser_validate.cpp:127` (also clears `window_archived_` at `:103`) |
-| `unchecked` | `protocol_block_in_31800.cpp:325`; `chaser_transaction.cpp:497` (compact block with an invalid tx) | `chaser_header.cpp:150` (gated on `database.mark_unconfirmable`)              |
-| `windowed`  | `chaser_download.cpp:407` (position reached the last requested height)                 | `chaser_validate.cpp:101` (latch) and `:132` (drain batches, called directly)              |
+| `checked`   | `protocol_block_in_31800.cpp:352`; `chaser_transaction.cpp:466` (compact block fill) | `chaser_download.cpp:138`, `chaser_validate.cpp:136` (also clears `window_archived_` at `:109`) |
+| `unchecked` | `protocol_block_in_31800.cpp:325`; `chaser_transaction.cpp:673` (compact block with an invalid tx) | `chaser_header.cpp:150` (gated on `database.mark_unconfirmable`)              |
+| `windowed`  | `chaser_download.cpp:403` (position reached the last requested height)                 | `chaser_validate.cpp:107` (latch) and `:141` (drain batches, called directly)              |
 
 ### 2.4 Accept / Connect
 
 | Event     | Issuer (file:line)                                                                              | Handler (file:line)                                                    |
 | --------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `valid`   | `chaser_validate.cpp:366` (`notify_block`; reached directly and from the batch drain's `mark_valids`) | `chaser_download.cpp:166`, `chaser_confirm.cpp:96`                  |
-| `unvalid` | `chaser_validate.cpp:358` (`notify_block`; suppressed at startup)                               | `chaser_header.cpp:159` (gated on `database.mark_unconfirmable`)       |
+| `valid`   | `chaser_validate.cpp:375` (`notify_block`; reached directly and from the batch drain's `mark_valids`) | `chaser_download.cpp:162`, `chaser_confirm.cpp:98`                  |
+| `unvalid` | `chaser_validate.cpp:367` (`notify_block`; suppressed at startup)                               | `chaser_header.cpp:159` (gated on `database.mark_unconfirmable`)       |
 
 ### 2.5 Confirm (block)
 
 | Event           | Issuer (file:line)        | Handler (file:line)                                            |
 | --------------- | ------------------------- | -------------------------------------------------------------- |
-| `confirmable`   | `chaser_confirm.cpp:362`  | None (chase.hpp agrees: "handled by none")                     |
-| `unconfirmable` | `chaser_confirm.cpp:355`  | `chaser_header.cpp:168` (gated on `database.mark_unconfirmable`) |
+| `confirmable`   | `chaser_confirm.cpp:368`  | None (chase.hpp agrees: "handled by none")                     |
+| `unconfirmable` | `chaser_confirm.cpp:361`  | `chaser_header.cpp:168` (gated on `database.mark_unconfirmable`) |
 
 ### 2.6 Confirm (chain) and Mining
 
 | Event           | Issuer (file:line)                                       | Handler (file:line)                                                                                                                                                 |
 | --------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `block`         | `chaser_confirm.cpp:445` (`announce`, only when confirmed chain is current) | `chaser_snapshot.cpp:141`, `chaser_estimate.cpp:133`, `session_outbound.cpp:73`, `protocol_block_out_106.cpp:80`, `protocol_header_out_70012.cpp:71`, `protocol_transaction_out_70013.cpp:80` ⚠ |
-| `pruned`        | `chaser_snapshot.cpp:86` (startup prune), `:192` (prune on first current block) | `chaser_estimate.cpp:124`                                                                                                                    |
-| `stale`         | `chaser_confirm.cpp:482` (stale timer expiry)            | `session_outbound.cpp:74`, `protocol_transaction_out_70013.cpp:81` ⚠                                                                                                |
-| `organized`     | `chaser_confirm.cpp:413` (`set_organized`)               | `chaser_transaction.cpp:79`, `chaser_estimate.cpp:142`                                                                                                              |
-| `reorganized`   | `chaser_confirm.cpp:380` (`set_reorganized`)             | `chaser_transaction.cpp:84`, `chaser_estimate.cpp:152`                                                                                                              |
-| `transaction`   | `chaser_transaction.cpp:230` (pooled from a reorganized block), `:329` (submitted package), `:456`, `:483` (compact fill) | `chaser_template.cpp:66`, `chaser_estimate.cpp:162`, `protocol_transaction_out_106.cpp:94` |
-| `template_`     | **none** ⚠ — chase.hpp says `template` issues; dormant   | (miners, external)                                                                                                                                                  |
+| `block`         | `chaser_confirm.cpp:462` (`announce`, only when confirmed chain is current) | `chaser_snapshot.cpp:115`, `session_outbound.cpp:73`, `protocol_block_out_106.cpp:80`, `protocol_header_out_70012.cpp:71`, `protocol_transaction_out_70013.cpp:80` ⚠ |
+| `pruned`        | `chaser_snapshot.cpp:166` (prune on first current block)  | `chaser_transaction.cpp:89`                                                                                                                                         |
+| `stale`         | `chaser_confirm.cpp:523` (stale timer expiry)            | `session_outbound.cpp:74`, `protocol_transaction_out_70013.cpp:81` ⚠                                                                                                |
+| `organized`     | `chaser_confirm.cpp:420` (`set_organized`)               | `chaser_transaction.cpp:79`, `chaser_template.cpp:76` ⚠                                                                                                             |
+| `reorganized`   | `chaser_confirm.cpp:386` (`set_reorganized`)             | `chaser_transaction.cpp:84`, `chaser_template.cpp:77` ⚠                                                                                                             |
+| `transaction`   | `chaser_transaction.cpp:241` (pooled from a reorganized block), `:378` (submitted package), `:620`, `:648` (compact fill) | `chaser_template.cpp:75`, `protocol_transaction_out_106.cpp:94` |
+| `template_`     | `chaser_template.cpp:155` (each completed template build) | (miners, external)                                                                                                                                                  |
 
 Discrepancies:
-- ⚠ **`block`**: chase.hpp lists `protocol_header/block_out/estimator`.
+- ⚠ **`block`**: chase.hpp lists `protocol_header/block_out`.
   `chaser_snapshot` (one-shot prune trigger), `session_outbound`
   (connection count) and `protocol_transaction_out_70013` (fee filter
   refresh) are also live consumers.
 - ⚠ **`stale`**: chase.hpp lists `protocol_transaction_out`;
   `session_outbound` also consumes it.
+- ⚠ **`organized`**, **`reorganized`**: chase.hpp lists `transaction`;
+  `chaser_template` also consumes both, to rebuild the template when the
+  confirmed chain changes.
 
 ### 2.7 Stop
 
 | Event  | Issuer (file:line)                                                                                                                                  | Handler                  |
 | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| `stop` | `full_node::unsubscribe_chase` via `notify_one` (`src/full_node.cpp:274`); `full_node::do_close` via `event_subscriber_.stop(...)` (`:154`)          | Every chaser & protocol  |
+| `stop` | `full_node::unsubscribe_chase` via `notify_one` (`src/full_node.cpp:279`); `full_node::do_close` via `event_subscriber_.stop(...)` (`:149`)          | Every chaser & protocol  |
 
 ---
 
@@ -228,7 +231,7 @@ flowchart LR
     SNP[chaser_snapshot]
     STG[chaser_storage]
     TPL[chaser_template]
-    EST[chaser_estimate]
+    MIN["miners (external)"]
     OBS[protocol_observer]
     SOUT[session_outbound]
     POUT_B["protocol_block_out_106"]
@@ -256,7 +259,7 @@ flowchart LR
     VAL -- "bump (silent drain)" --> CHK
     CNF -- "unconfirmable" --> HDR
     CNF -- "block" --> SNP
-    CNF -- "block, organized, reorganized" --> EST
+    CNF -- "organized, reorganized" --> TPL
     CNF -- "block, stale" --> SOUT
     CNF -- "block" --> POUT_B
     CNF -- "block" --> POUT_H
@@ -264,9 +267,9 @@ flowchart LR
     CNF -- "organized, reorganized" --> TX
     TX -- "checked, unchecked (compact fill)" --> CHK
     TX -- "transaction" --> TPL
-    TX -- "transaction" --> EST
     TX -- "transaction" --> POUT_T
-    SNP -- "pruned" --> EST
+    SNP -- "pruned" --> TX
+    TPL -- "template_" --> MIN
     STG -- "unfull" --> VAL
 
     style HDR stroke:#4f8dff,stroke-width:2px
@@ -275,8 +278,8 @@ flowchart LR
     style CHK stroke:#ff2357,stroke-width:2px
 ```
 
-`chase::confirmable` has no consumer and `chase::snap` / `chase::template_`
-have no issuer, so they are omitted.
+`chase::confirmable` has no consumer and `chase::snap` has no issuer,
+so they are omitted.
 
 ---
 
@@ -328,10 +331,10 @@ point-to-point exception used only for `split` and `stop`.
    `case chase::stop: return false;`.)
 2. *Disorganize convergence*: every `chase::regressed`/`disorganized` is
    eventually responded to by the consuming chasers' "rewind" branches
-   (`chaser_download.cpp:348-364`, `chaser_validate.cpp:170-177`,
-   `chaser_confirm.cpp:129-132`) before the next forward event is processed.
+   (`chaser_download.cpp:344-360`, `chaser_validate.cpp:179-186`,
+   `chaser_confirm.cpp:131-134`) before the next forward event is processed.
 3. *No spurious validation*: `chase::valid` is emitted only from
-   `chaser_validate::notify_block` (`chaser_validate.cpp:366`), after either
+   `chaser_validate::notify_block` (`chaser_validate.cpp:375`), after either
    full validation, bypass processing, or batch verification of the height.
 4. *Confirm uniqueness*: `chase::confirmable`, `unconfirmable`,
    `organized`, `reorganized`, `block`, `stale` all have a single issuer
@@ -343,8 +346,6 @@ point-to-point exception used only for `split` and `stop`.
 
 **Dormant events (do not model as live).**
 - `chase::snap` — handler exists, no issuer.
-- `chase::template_` — handler is "miners" (external), no issuer in this
-  repo.
 - `chase::report` — issuer is the executor (external, libbitcoin-server).
 - `chase::confirmable` — issued, no handler.
 

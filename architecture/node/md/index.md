@@ -13,8 +13,11 @@ indexes, and quiescence for snapshot, remap and shutdown) are from the
 
 Every behavioural claim is anchored with `file:line` references into the
 C++ source so it can be re-verified or re-derived if source drifts. The
-citations in this revision were verified against libbitcoin-node master at
-commit `a5173475` (2026-10-20), with `chaser_check` renamed to `chaser_download` (node branch `download`, `ea1e1264`).
+citations in documents 00, 01, 10, 11 and 12 were verified against
+libbitcoin-node master at commit `79eeac6a` (2026-11-13). The other
+documents were verified at commit `a5173475` (2026-10-20), except their
+transaction pool and template chaser references, which were verified at
+`79eeac6a`.
 
 ---
 
@@ -33,8 +36,8 @@ commit `a5173475` (2026-10-20), with `chaser_check` renamed to `chaser_download`
 | 08 | [`08-block-out-protocols`](block-out-protocols)                  | Block out at 106, 70001, 70012 and 70014; streaming send loop; `not_found` |
 | 09 | [`09-filter-out-protocol`](filter-out-protocol)                        | BIP157/158 client filters; three request types                              |
 | 10 | [`10-tx-protocols`](transaction-protocols)                                | Tx in/out ladder at 106, 60002, 70001, 70013 and 70016                      |
-| 11 | [`11-chaser-transaction`](transaction-chaser)                    | The transaction pool: package submission, compact block fill, scan starts; 9 `transactionN` fault sites |
-| 12 | [`12-periphery-chasers`](periphery-chasers)                      | `chaser_snapshot`, `chaser_storage`, `chaser_template`, `chaser_estimate`    |
+| 11 | [`11-chaser-transaction`](transaction-chaser)                    | The transaction pool: package submission and coverage, compact block fill, scan starts, templates and fee estimation; 9 `transactionN` fault sites |
+| 12 | [`12-periphery-chasers`](periphery-chasers)                      | `chaser_snapshot`, `chaser_storage`, `chaser_template`                       |
 
 ---
 
@@ -88,7 +91,7 @@ families:
 | `Confirm-*`     | 05                               | Confirmation + order-based consensus                |
 | `Session-*`, `Attach-*`, `Protocol-*`, `Observer-*`, `Performer-*`, `BlockIn-*`, `HeaderIn-*`, `HeaderOut-*`, `Compact-*`, `Anti-Echo-*`, `BlockOut-*`, `Filter-*`, `TxIn-*`, `TxOut-*` | 06–10 | Network layer |
 | `Pool-*`        | 11                               | Transaction pool                                    |
-| `Snapshot-*`, `Storage-*`, `Estimate-*`, `Periphery-*` | 12 | Periphery chasers |
+| `Snapshot-*`, `Storage-*`, `Template-*`, `Periphery-*` | 12 | Periphery chasers |
 
 ### Mermaid diagrams
 All diagrams use Mermaid (sequence, flowchart, stateDiagram-v2,
@@ -119,9 +122,10 @@ distilled-for-export view of each subsystem.
    dormant events). All are flagged in
    [`01-event-bus`](event-bus) with `⚠` and discussed in
    §2 of that doc.
-5. **Stub subsystems**: `chaser_template` is a stub. The doc describes
-   its wiring and intended design but notes clearly that current
-   behaviour is "no-op".
+5. **Pool algorithms.** Coverage, the pool projection and the fee
+   estimate search run in libbitcoin-database (`query/pool`) and
+   libbitcoin-system (`pool/algorithm`). Doc 11 describes the node's
+   calls into them and their inputs, not their implementation.
 6. **Database-side batching.** The signature and silent-payment batch
    tables, their verification kernels (CPU or GPU) and the pooled-block
    validation query live in libbitcoin-database and libbitcoin-system.
@@ -138,7 +142,6 @@ libbitcoin-node
 │   ├── full_node.cpp ........................ 00
 │   ├── configuration.cpp / settings.cpp ..... (mentioned in 00, not detailed)
 │   ├── error.cpp ............................ 00 §9
-│   ├── estimator.cpp ........................ 12 §4 (interface only)
 │   ├── rolling_bloom_filter.cpp ............. 07 §8
 │   │
 │   ├── chasers/
@@ -152,7 +155,6 @@ libbitcoin-node
 │   │   ├── chaser_confirm.cpp ............... 05
 │   │   ├── chaser_transaction.cpp ........... 11
 │   │   ├── chaser_template.cpp .............. 12 §3
-│   │   ├── chaser_estimate.cpp .............. 12 §4
 │   │   ├── chaser_snapshot.cpp .............. 12 §1
 │   │   └── chaser_storage.cpp ............... 12 §2
 │   │
@@ -201,7 +203,7 @@ libbitcoin-node
     ├── events.hpp ........................... 00 §4 (metrics enum)
     ├── error.hpp ............................ 00 §9
     ├── settings.hpp ......................... 00 §10
-    ├── estimator.hpp ........................ 12 §4
+    ├── define.hpp ........................... 11 §6.2 (estimate modes and windows)
     └── impl/sessions/session_peer.ipp ....... 06 §2
 ```
 
@@ -221,7 +223,7 @@ Files **not** detailed (treated as "use as documented"):
 2. For per-chaser docs, the relevant invariants reference specific
    `file:line`s — re-grep those when their files change.
 3. The error inventories in each chaser doc (`organizeN`,
-   `validateN`, `confirmN`, `transactionN`, `batchN`, `estimates_*`) are
+   `validateN`, `confirmN`, `transactionN`, `batchN`) are
    exhaustive at the time of writing — any new `error::<chaser>N` entry
    should add a row.
 4. The attach tree in

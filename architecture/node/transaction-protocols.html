@@ -397,7 +397,7 @@ peers by the fee filter rather than by attaching late (doc 06 §2.4).</p>
 <tbody>
 <tr>
 <td><code>src/protocols/protocol_transaction_in_106.cpp</code></td>
-<td>221</td>
+<td>223</td>
 <td>Request announced txs, submit received txs to the pool</td>
 </tr>
 <tr>
@@ -498,7 +498,7 @@ sequenceDiagram
 </div>
 <p>Source: <code>handle_receive_inventory</code> <code>:82-117</code>, <code>create_get_data</code>
 <code>:120-141</code>, <code>handle_receive_transaction</code> <code>:155-176</code>,
-<code>do_handle_submit</code> <code>:186-215</code>.</p>
+<code>do_handle_submit</code> <code>:186-217</code>.</p>
 <blockquote>
 <p><strong>Invariant (TxIn-Request-1).</strong> Only announced txs are requested and
 only requested txs are accepted; an unrequested <code>tx</code> is a protocol
@@ -507,10 +507,11 @@ violation. The backlog of outstanding requests is bounded by
 by one message).</p>
 <p><strong>Invariant (TxIn-Tolerance-1).</strong> These submit results are <em>not</em>
 misbehaviour at 106 and are ignored: <code>pooling_disabled</code>,
-<code>insufficient_fee</code>, <code>duplicate_transaction</code>, <code>double_spend</code>,
-<code>absolute_time_locked</code>, <code>relative_time_locked</code>,
-<code>missing_previous_output</code> (<code>:203-210</code>). A conflict with an unconfirmed
-tx, an orphan, a lock evaluated against the presumed next block, and a
+<code>insufficient_fee</code>, <code>duplicate_transaction</code>, <code>database::error::pool_limit</code>,
+<code>double_spend</code>, <code>absolute_time_locked</code>, <code>relative_time_locked</code>,
+<code>missing_previous_output</code> (<code>:204-212</code>). A conflict with an unconfirmed
+tx, a conflict component larger than the pool evaluates (doc 11 §3.2),
+an orphan, a lock evaluated against the presumed next block, and a
 rate the peer could not know are all legitimate from the peer's view.
 Everything else (consensus failure, faults) drops the peer.</p>
 </blockquote>
@@ -561,7 +562,7 @@ resumes the send loop (<code>:40-68</code>).</p>
 <ul>
 <li>Sends <code>feefilter{ minimum_fee_rate() }</code> at start and whenever
   <code>chase::block</code> or <code>chase::stale</code> changes the answer (<code>:42-52</code>,
-  <code>:58-69</code>, <code>:71-93</code>): the configured rate while current, <code>max_money</code>
+  <code>:58-69</code>, <code>:71-93</code>): <code>pool.minimum_fee_rate</code> while current, <code>max_money</code>
   while not (<code>protocol::minimum_fee_rate</code>, doc 06 §3). This is how
   currency is signalled to peers.</li>
 <li>Records the peer's <code>feefilter</code> on the channel (<code>set_minimum_fee</code>,
@@ -647,7 +648,7 @@ stateDiagram-v2
 <td>unrequested <code>tx</code> or <code>not_found</code></td>
 </tr>
 <tr>
-<td><code>in_106.cpp:203-214</code></td>
+<td><code>in_106.cpp:204-216</code></td>
 <td>submit code</td>
 <td>consensus failure or fault from the pool</td>
 </tr>

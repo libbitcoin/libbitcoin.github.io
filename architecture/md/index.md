@@ -54,8 +54,8 @@ flowchart LR
 Blocks are downloaded from many peers at once and validated concurrently,
 while organization and confirmation follow in order. The chasers
 communicate only through an event bus, and share state only through the
-store. Further chasers maintain the transaction pool, fee estimates, store
-snapshots and disk space.
+store. Further chasers maintain the transaction pool, with its fee estimates and
+block templates, store snapshots and disk space.
 
 Quiescing the pipeline allows store snapshot, remap and shutdown.
 

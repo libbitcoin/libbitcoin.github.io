@@ -380,7 +380,8 @@ current block restarts it.
 Consumers: `session_outbound` adjusts its connection count on both
 events, `protocol_transaction_out_70013` re-sends its fee filter (the
 maximum while stale), and the header/block out protocols and
-`chaser_snapshot` / `chaser_estimate` act on `block` (doc 01 §2.6).
+`chaser_snapshot` act on `block`, and `chaser_template` rebuilds its
+template on `organized` and `reorganized` (doc 01 §2.6).
 
 > **Invariant (Confirm-Announce-1).** `chase::block(link)` is emitted
 > only when `is_current_chain(true)`. Peers don't get announcements for
@@ -411,8 +412,7 @@ Per pop during reorg:
 > **Invariant (Confirm-Emit-1).** Reorg emits `chase::reorganized` per
 > popped link before any `chase::organized` for newly-confirmed links.
 > Order matters for subscribers that maintain auxiliary indexes
-> (`chaser_transaction` re-pools the txs of a reorganized block,
-> `chaser_estimate` pops and pushes fee rates).
+> (`chaser_transaction` re-pools the txs of a reorganized block).
 
 ---
 
@@ -461,7 +461,7 @@ flowchart LR
     CNF -- "chase::confirmable (link)" --> X0[(no consumer)]
     CNF -- "chase::unconfirmable (link)" --> HDR_in["chaser_header\n(do_disorganize)"]
     CNF -- "chase::organized / reorganized" --> TX[chaser_transaction]
-    CNF -- "chase::organized / reorganized / block" --> EST[chaser_estimate]
+    CNF -- "chase::organized / reorganized" --> TPL[chaser_template]
     CNF -- "chase::block" --> SNP[chaser_snapshot]
     CNF -- "chase::block / stale" --> SOUT[session_outbound]
     CNF -- "chase::block" --> POUT[protocol_block_out_106]
@@ -618,8 +618,9 @@ runs for this block (loop ordering at `chaser_confirm.cpp:248-286`).
   `chase::valid` consumed here)
 - [`11-chaser-transaction`](transaction-chaser) §2 (consumer of
   `organized`/`reorganized`)
-- [`12-periphery-chasers`](periphery-chasers) §1, §4
-  (`chaser_snapshot`, `chaser_estimate`, consumers of `chase::block`)
+- [`12-periphery-chasers`](periphery-chasers) §1, §3
+  (`chaser_snapshot`, consumer of `chase::block`; `chaser_template`,
+  consumer of `organized`/`reorganized`)
 - [`08-block-out-protocols`](block-out-protocols) and
   [`07-header-protocols`](header-protocols) (consumers of `chase::block`
   for peer announcements)

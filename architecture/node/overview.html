@@ -353,7 +353,7 @@ effort, which needs explicit state machines, invariants, and concurrency
 boundaries.</p>
 <p>All non-trivial claims are anchored with <code>path/to/file.ext:line</code> citations
 into the C++ so they can be re-derived if the source drifts. Citations are
-against libbitcoin-node master at <code>a5173475</code>.</p>
+against libbitcoin-node master at <code>79eeac6a</code>.</p>
 </blockquote>
 <hr />
 <h2 id="1-layer-stack">1. Layer stack<a class="anchor" href="#1-layer-stack" aria-label="Link to this section">#</a></h2>
@@ -376,7 +376,7 @@ flowchart BT
     node --&gt; server
 </div>
 <p>The node owns no executable. Embedders construct one <code>full_node</code>
-(<code>include/bitcoin/node/full_node.hpp:32</code>) against an externally-owned
+(<code>include/bitcoin/node/full_node.hpp:31</code>) against an externally-owned
 <code>query&amp;</code> (the database handle) and a <code>configuration&amp;</code>, then call
 <code>start() → run() → close()</code>.</p>
 <hr />
@@ -392,6 +392,7 @@ classDiagram
         +prioritize(hash, h)
         +get_minimum_work(h)
         +submit(txs, test, h) / submit_compact(txs, links, link, h)
+        +build_template(h) / get_template(h)
         +get_hashes / put_hashes
         +notify(ec, value) / notify_one(key, ec, value)
         +subscribe_chase / unsubscribe_chase
@@ -402,7 +403,7 @@ classDiagram
         -query_ query&amp;
         -chaser_header_, chaser_download_, chaser_validate_,
          chaser_confirm_, chaser_transaction_, chaser_template_,
-         chaser_estimate_, chaser_snapshot_, chaser_storage_
+         chaser_snapshot_, chaser_storage_
         -event_subscriber_ event_subscriber
     }
     class network_net["network::net (base)"]
@@ -410,7 +411,7 @@ classDiagram
     class session
     class protocol
     full_node --|&gt; network_net : extends
-    full_node *-- chaser : owns 9 instances
+    full_node *-- chaser : owns 8 instances
     full_node *-- "1" event_subscriber : owns
     network_net &lt;.. session : attaches (manual/inbound/outbound)
     session &lt;.. protocol : creates per-channel
@@ -420,24 +421,25 @@ classDiagram
 <p>Key facts:</p>
 <ul>
 <li><code>full_node</code> is a <code>network::net</code> subclass
-  (<code>include/bitcoin/node/full_node.hpp:32-33</code>). Networking (peer discovery,
+  (<code>include/bitcoin/node/full_node.hpp:31-32</code>). Networking (peer discovery,
   channels, message framing) is inherited unchanged from
   libbitcoin-network. The node only <em>adds</em> chasers and <em>overrides</em> session
   attachment to use node-specific sessions.</li>
-<li><code>full_node</code> owns the <strong>nine chasers as direct members</strong>
-  (<code>include/bitcoin/node/full_node.hpp:210-218</code>). They are constructed in
-  order at <code>full_node</code> construction (<code>src/full_node.cpp:44-52</code>) and live
+<li><code>full_node</code> owns the <strong>eight chasers as direct members</strong>
+  (<code>include/bitcoin/node/full_node.hpp:215-222</code>). They are constructed in
+  order at <code>full_node</code> construction (<code>src/full_node.cpp:43-50</code>) and live
   exactly as long as the node.</li>
 <li>All chasers share a single <code>event_subscriber_</code>
-  (<code>include/bitcoin/node/full_node.hpp:219</code>) — this is the central event bus.</li>
+  (<code>include/bitcoin/node/full_node.hpp:223</code>) — this is the central event bus.</li>
 <li>The store is <strong>not owned</strong> by <code>full_node</code>; only a reference to a <code>query</code> is
-  held (<code>src/full_node.cpp:43</code>). Lifetime is the embedder's responsibility.</li>
+  held (<code>src/full_node.cpp:42</code>). Lifetime is the embedder's responsibility.</li>
 <li><code>full_node</code> is a pure forwarder for the chaser entry points: organize
   variants and <code>prioritize</code>/<code>get_minimum_work</code> go to <code>chaser_header_</code>
-  (<code>src/full_node.cpp:161-188</code>), <code>submit</code>/<code>submit_compact</code> to
-  <code>chaser_transaction_</code> (<code>:190-201</code>), <code>get_hashes</code>/<code>put_hashes</code> and
-  <code>performance</code> to <code>chaser_download_</code> (<code>:203-212</code>, <code>:486-490</code>), and <code>estimate</code>
-  to <code>chaser_estimate_</code> (<code>:480-484</code>).</li>
+  (<code>src/full_node.cpp:156-183</code>), <code>submit</code>/<code>submit_compact</code>,
+  <code>build_template</code> and <code>estimate</code> to <code>chaser_transaction_</code> (<code>:185-201</code>,
+  <code>:485-489</code>), <code>get_template</code> to <code>chaser_template_</code> (<code>:203-206</code>), and
+  <code>get_hashes</code>/<code>put_hashes</code> and <code>performance</code> to <code>chaser_download_</code>
+  (<code>:208-217</code>, <code>:491-495</code>).</li>
 </ul>
 <hr />
 <h2 id="3-concurrency-model">3. Concurrency model<a class="anchor" href="#3-concurrency-model" aria-label="Link to this section">#</a></h2>
@@ -459,7 +461,7 @@ classDiagram
 <tr>
 <td>Per-chaser strand</td>
 <td>One strand per chaser, on the network pool</td>
-<td><code>src/chasers/chaser.cpp:35</code> (<code>strand_(node.service()...)</code>)</td>
+<td><code>src/chasers/chaser.cpp:36</code> (<code>strand_(node.service()...)</code>)</td>
 </tr>
 <tr>
 <td>Validation threadpool</td>
@@ -482,11 +484,11 @@ classDiagram
 <p><strong>Invariant (Concurrency-1).</strong> Every chaser method that mutates chaser state
 must be on that chaser's own strand. The base provides <code>strand()</code>,
 <code>stranded()</code>, and the <code>BIND</code>/<code>POST</code> templates to enforce this
-(<code>include/bitcoin/node/chasers/chaser.hpp:58-70</code>, <code>:110-117</code>).</p>
+(<code>include/bitcoin/node/chasers/chaser.hpp:58-70</code>, <code>:129-136</code>).</p>
 <p><strong>Invariant (Concurrency-2).</strong> All <code>event_subscriber_</code> mutation (subscribe,
 notify, notify_one, stop) happens on the <code>full_node</code> strand
-(<code>src/full_node.cpp:217-270</code>). Calls from chasers/protocols are posted into
-that strand by <code>full_node::notify</code> / <code>notify_one</code> (<code>:217-222</code>, <code>:231-237</code>).</p>
+(<code>src/full_node.cpp:222-275</code>). Calls from chasers/protocols are posted into
+that strand by <code>full_node::notify</code> / <code>notify_one</code> (<code>:222-227</code>, <code>:236-242</code>).</p>
 </blockquote>
 <h3 id="32-notification-flow">3.2 Notification flow<a class="anchor" href="#32-notification-flow" aria-label="Link to this section">#</a></h3>
 <div class="mermaid">
@@ -505,15 +507,15 @@ sequenceDiagram
 </div>
 <p>Implementation: <code>full_node::notify</code> posts to <code>strand()</code>, then
 <code>do_notify</code> calls <code>event_subscriber_.notify(...)</code>
-(<code>src/full_node.cpp:217-229</code>). Each subscriber's <code>handle_chase</code> runs on
+(<code>src/full_node.cpp:222-234</code>). Each subscriber's <code>handle_chase</code> runs on
 the node strand and immediately <code>POST</code>s the real work to its own strand,
 so chaser state is only touched stranded.</p>
 <blockquote>
 <p><strong>Invariant (Concurrency-3).</strong> A chaser subscription is created via
 <code>subscribe_chase</code> from the chaser's <code>start()</code>
-(<code>include/bitcoin/node/chasers/chaser.hpp:100-101</code>), which runs on the node
-strand (<code>src/full_node.cpp:75-95</code>). Protocols subscribe via the async
-variant (<code>include/bitcoin/node/full_node.hpp:111-113</code>) which posts to the
+(<code>include/bitcoin/node/chasers/chaser.hpp:106-107</code>), which runs on the node
+strand (<code>src/full_node.cpp:73-92</code>). Protocols subscribe via the async
+variant (<code>include/bitcoin/node/full_node.hpp:116-118</code>) which posts to the
 strand and uses a completer.</p>
 </blockquote>
 <h3 id="33-why-per-chaser-strands">3.3 Why per-chaser strands<a class="anchor" href="#33-why-per-chaser-strands" aria-label="Link to this section">#</a></h3>
@@ -767,13 +769,13 @@ handler exists in source but has no live issuer.</p>
 <td><code>block</code></td>
 <td><code>link</code></td>
 <td><code>confirm</code> (when confirmed chain current)</td>
-<td><code>snapshot</code>, <code>estimate</code>, <code>session_outbound</code>, <code>protocol_block_out_106</code>, <code>protocol_header_out_70012</code>, <code>protocol_transaction_out_70013</code> ⚠</td>
+<td><code>snapshot</code>, <code>session_outbound</code>, <code>protocol_block_out_106</code>, <code>protocol_header_out_70012</code>, <code>protocol_transaction_out_70013</code> ⚠</td>
 </tr>
 <tr>
 <td><code>pruned</code></td>
 <td><code>link</code></td>
 <td><code>snapshot</code></td>
-<td><code>estimate</code></td>
+<td><code>transaction</code></td>
 </tr>
 <tr>
 <td><code>stale</code></td>
@@ -785,13 +787,13 @@ handler exists in source but has no live issuer.</p>
 <td><code>organized</code></td>
 <td><code>link</code></td>
 <td><code>confirm</code></td>
-<td><code>transaction</code>, <code>estimate</code></td>
+<td><code>transaction</code>, <code>template</code> ⚠</td>
 </tr>
 <tr>
 <td><code>reorganized</code></td>
 <td><code>link</code></td>
 <td><code>confirm</code></td>
-<td><code>transaction</code>, <code>estimate</code></td>
+<td><code>transaction</code>, <code>template</code> ⚠</td>
 </tr>
 <tr>
 <td><strong>Mining</strong></td>
@@ -803,12 +805,12 @@ handler exists in source but has no live issuer.</p>
 <td><code>transaction</code></td>
 <td><code>link</code></td>
 <td><code>transaction</code></td>
-<td><code>template</code>, <code>estimate</code>, <code>protocol_transaction_out_106</code></td>
+<td><code>template</code>, <code>protocol_transaction_out_106</code></td>
 </tr>
 <tr>
 <td><code>template_</code></td>
 <td><code>height</code></td>
-<td><em>dormant — no live issuer</em> ⚠</td>
+<td><code>template</code> (each completed build)</td>
 <td>(miners, external)</td>
 </tr>
 <tr>
@@ -839,7 +841,7 @@ They are <strong>not</strong> part of the inter-chaser protocol; they exist only
 telemetry and should not be modelled in the spec.</p>
 <hr />
 <h2 id="5-chaser-pipeline-logical-view">5. Chaser pipeline (logical view)<a class="anchor" href="#5-chaser-pipeline-logical-view" aria-label="Link to this section">#</a></h2>
-<p>The nine chasers form a directed pipeline. The diagram below is a
+<p>The eight chasers form a directed pipeline. The diagram below is a
 <em>conceptual</em> sketch; the <strong>authoritative, source-verified</strong> issuer/handler
 graph is in <a href="event-bus.html#3-verified-issuer--handler-diagram"><code>01-event-bus §3</code></a>.</p>
 <div class="mermaid">
@@ -860,7 +862,6 @@ flowchart LR
     subgraph Pool["Transaction pool"]
         Tx[chaser_transaction]
         Tpl[chaser_template]
-        Est[chaser_estimate]
     end
 
     subgraph Store["Store maintenance"]
@@ -877,14 +878,14 @@ flowchart LR
     Val -- "valid / unvalid" --&gt; Cnf
     Cnf -- "unconfirmable" --&gt; H
     Cnf -- "organized / reorganized" --&gt; Tx
-    Cnf -- "organized / reorganized / block" --&gt; Est
+    Cnf -- "organized / reorganized" --&gt; Tpl
     T_in -- "submit" --&gt; Tx
     H_in -- "submit_compact" --&gt; Tx
     Tx -- "checked / unchecked (compact fill)" --&gt; Chk
     Tx -- "transaction" --&gt; Tpl
-    Tx -- "transaction" --&gt; Est
+    Tpl -- "build_template" --&gt; Tx
     Cnf -- "block" --&gt; Snp
-    Snp -- "pruned" --&gt; Est
+    Snp -- "pruned" --&gt; Tx
     Stg -- "unfull" --&gt; Val
 </div>
 <p>Synchronization is <strong>headers-first only</strong>. Headers are synced by the
@@ -905,11 +906,11 @@ sequenceDiagram
     actor Embedder
     participant FN as full_node
     participant Net as network::net (base)
-    participant CH as 9 chasers
+    participant CH as 8 chasers
     participant Bus as event_subscriber_
 
     Embedder-&gt;&gt;FN: full_node(query, config, log)
-    FN-&gt;&gt;CH: construct in order (header, download, validate, confirm,&lt;br/&gt;transaction, template, estimate, snapshot, storage)
+    FN-&gt;&gt;CH: construct in order (header, download, validate, confirm,&lt;br/&gt;transaction, template, snapshot, storage)
     Embedder-&gt;&gt;FN: start(handler)
     FN-&gt;&gt;Net: net::start (posts to strand)
     Net-&gt;&gt;FN: do_start [stranded]
@@ -929,47 +930,43 @@ sequenceDiagram
     FN-&gt;&gt;CH: stop()  (blocking, joins threadpools)
 </div>
 <p>Citations:
-<code>src/full_node.cpp:63-73</code> (<code>start</code>),
-<code>src/full_node.cpp:75-95</code> (<code>do_start</code>),
-<code>src/full_node.cpp:97-119</code> (<code>run</code> / <code>do_run</code>),
-<code>src/full_node.cpp:121-156</code> (<code>close</code> / <code>do_close</code>).</p>
+<code>src/full_node.cpp:61-71</code> (<code>start</code>),
+<code>src/full_node.cpp:73-92</code> (<code>do_start</code>),
+<code>src/full_node.cpp:94-116</code> (<code>run</code> / <code>do_run</code>),
+<code>src/full_node.cpp:118-151</code> (<code>close</code> / <code>do_close</code>).</p>
 <blockquote>
 <p><strong>Invariant (Lifecycle-1).</strong> The store must be initialised before <code>start</code>:
 <code>full_node::start</code> short-circuits with <code>error::store_uninitialized</code> if
-<code>query_.is_initialized()</code> is false (<code>src/full_node.cpp:65-69</code>).</p>
+<code>query_.is_initialized()</code> is false (<code>src/full_node.cpp:63-67</code>).</p>
 <p><strong>Invariant (Lifecycle-2).</strong> <code>do_close</code> initiates non-blocking
 <code>stopping(...)</code> on every chaser first, then <code>event_subscriber_.stop(...)</code>,
 then <code>net::do_close</code>; <code>close()</code> then blocks on per-chaser <code>stop()</code>, which
 joins the validation and scan threadpools. Order matters: chasers must
-observe stop before the bus is torn down (<code>src/full_node.cpp:121-156</code>).</p>
-<p><strong>Invariant (Lifecycle-3).</strong> <code>chaser_snapshot::start</code> may prune the store
-<em>before</em> the network starts, when the confirmed top is above genesis and
-the store is coalesced (<code>src/chasers/chaser_snapshot.cpp:68-92</code>). This is
-the only chaser whose <code>start()</code> performs a store write.</p>
+observe stop before the bus is torn down (<code>src/full_node.cpp:118-151</code>).</p>
 </blockquote>
 <h3 id="62-suspend--resume--fault">6.2 Suspend / resume / fault<a class="anchor" href="#62-suspend--resume--fault" aria-label="Link to this section">#</a></h3>
 <p><code>suspend(ec)</code> calls <code>net::suspend</code> and emits <code>chases::suspend</code> with
-<code>error::suspended_channel</code> (<code>src/full_node.cpp:301-306</code>). <code>resume()</code>
+<code>error::suspended_channel</code> (<code>src/full_node.cpp:306-311</code>). <code>resume()</code>
 <strong>refuses</strong> when the store is full or faulted, otherwise calls
-<code>net::resume</code> and then emits <code>chases::resume</code> (<code>:280-298</code>).</p>
+<code>net::resume</code> and then emits <code>chases::resume</code> (<code>:285-303</code>).</p>
 <p><code>fault(ec)</code> is the unified "something terminal happened" entry; it
 dispatches by store state — <code>is_full</code> → <code>chases::space</code>; <code>is_fault</code> → log
 the unrecoverable store fault; otherwise log a resumable node fault — and
-always calls <code>suspend(ec)</code> (<code>:308-330</code>).</p>
-<p><code>prune</code> / <code>snapshot</code> / <code>reload</code> (<code>:333-397</code>) share a pattern: suspend the
+always calls <code>suspend(ec)</code> (<code>:313-335</code>).</p>
+<p><code>prune</code> / <code>snapshot</code> / <code>reload</code> (<code>:338-402</code>) share a pattern: suspend the
 network, run the store operation, leave the network suspended (caller
 resumes on success). Each emits a metrics event (<code>events::prune_msecs</code>,
 <code>events::snapshot_secs</code>, <code>events::reload_msecs</code>). <code>reload</code> returns
-immediately when the store is not full (<code>:377-378</code>).</p>
+immediately when the store is not full (<code>:382-383</code>).</p>
 <blockquote>
 <p><strong>Invariant (Store-1).</strong> During a store maintenance operation, all peer
 connections are suspended; the caller is responsible for <code>resume()</code> after
 success. A <code>wait_lock</code> event during the op causes a <em>renewed</em> <code>suspend</code>
-(<code>src/full_node.cpp:343-344</code>, <code>:364-365</code>, <code>:389-390</code>) — racy connections
+(<code>src/full_node.cpp:348-349</code>, <code>:369-370</code>, <code>:394-395</code>) — racy connections
 that missed the first suspend are caught here.</p>
 </blockquote>
 <h3 id="63-currency">6.3 Currency<a class="anchor" href="#63-currency" aria-label="Link to this section">#</a></h3>
-<p>Four predicates on <code>full_node</code> gate most behaviour (<code>src/full_node.cpp:432-470</code>):</p>
+<p>Four predicates on <code>full_node</code> gate most behaviour (<code>src/full_node.cpp:437-475</code>):</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -1001,7 +998,7 @@ height can activate inbound service and block serving at that ceiling.</p>
 <hr />
 <h2 id="7-network-layer-at-a-glance">7. Network layer at a glance<a class="anchor" href="#7-network-layer-at-a-glance" aria-label="Link to this section">#</a></h2>
 <p><code>full_node</code> overrides three session-attachment hooks
-(<code>src/full_node.cpp:495-508</code>):</p>
+(<code>src/full_node.cpp:500-513</code>):</p>
 <ul>
 <li><code>attach_manual_session</code> → <code>node::session_manual</code></li>
 <li><code>attach_inbound_session</code> → <code>node::session_inbound</code></li>
@@ -1098,10 +1095,10 @@ defined in <code>include/bitcoin/node/error.hpp</code>. Categories:</p>
   <code>duplicate_header</code>, <code>unexpected_header</code></li>
 <li><strong>transaction pool</strong>: <code>pooling_disabled</code>, <code>insufficient_fee</code>,
   <code>empty_package</code>, <code>duplicate_transaction</code>, <code>excessive_backlog</code></li>
-<li><strong>fee estimation</strong>: <code>estimate_disabled</code>, <code>estimate_premature</code>, <code>estimate_false</code></li>
+<li><strong>fee estimation</strong>: <code>estimate_disabled</code>, <code>estimate_premature</code>, <code>estimate_false</code>
+  (returned by <code>chaser_transaction::estimate</code>, <a href="transaction-chaser.html#62-fee-estimation">doc 11 §6.2</a>)</li>
 <li><strong>faults (terminal)</strong>: <code>protocol1-2</code>, <code>header1</code>, <code>organize1-15</code>,
-  <code>validate1-12</code>, <code>confirm1-12</code>, <code>transaction1-9</code>, <code>estimates_initialize</code>,
-  <code>estimates_push1-2</code>, <code>estimates_pop1-2</code>, <code>estimates_pool</code>, <code>batch1-8</code></li>
+  <code>validate1-12</code>, <code>confirm1-12</code>, <code>transaction1-9</code>, <code>batch1-8</code></li>
 <li><strong>configuration</strong>: <code>silent_unwitnessed</code>, <code>silent_pruned</code>, <code>filter_pruned</code>
   (returned by <code>configuration::initialize</code>, <code>src/configuration.cpp:38-69</code>)</li>
 </ul>
@@ -1114,7 +1111,7 @@ the per-chaser docs map every one.</p>
 </blockquote>
 <hr />
 <h2 id="10-settings">10. Settings<a class="anchor" href="#10-settings" aria-label="Link to this section">#</a></h2>
-<p>The <code>[node]</code> settings (<code>include/bitcoin/node/settings.hpp:37-65</code>) that
+<p>The <code>[node]</code> settings (<code>include/bitcoin/node/settings.hpp:60-83</code>) that
 the architecture docs refer to:</p>
 <div class="scroller"><table>
 <thead>
@@ -1161,16 +1158,8 @@ the architecture docs refer to:</p>
 <td>slow-peer detection (<a href="download-chaser.html">03</a>)</td>
 </tr>
 <tr>
-<td><code>minimum_fee_rate</code>, <code>minimum_bump_rate</code></td>
-<td>pool admission and fee filter (<a href="transaction-protocols.html">10</a>, <a href="transaction-chaser.html">11</a>)</td>
-</tr>
-<tr>
 <td><code>current_connections</code></td>
 <td>outbound reduction when recent (<a href="sessions-and-protocols.html">06</a>)</td>
-</tr>
-<tr>
-<td><code>fee_estimate_horizon</code></td>
-<td>estimator (<a href="periphery-chasers.html">12</a>)</td>
 </tr>
 <tr>
 <td><code>maximum_height</code></td>
@@ -1198,6 +1187,46 @@ the architecture docs refer to:</p>
 </tr>
 </tbody>
 </table></div>
+<p>The <code>[pool]</code> settings are the member <code>pool</code> of the node settings
+(<code>settings::transaction_pool</code>, <code>include/bitcoin/node/settings.hpp:36-57</code>,
+defaults at <code>src/settings.cpp:30-37</code>). All are read by <code>chaser_transaction</code>
+(<a href="transaction-chaser.html">11</a>):</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>minimum_fee_rate</code></td>
+<td>0.000001</td>
+<td>BTC per virtual kilobyte, ceilinged to satoshis (<code>minimum_fee_rate_()</code>, <code>:40-45</code>): package rate and coverage at admission (<a href="transaction-chaser.html">11 §3</a>); fee filter sent to peers while current (<a href="transaction-protocols.html">10</a>); floor of every fee estimate (<a href="transaction-chaser.html#62-fee-estimation">11 §6.2</a>)</td>
+</tr>
+<tr>
+<td><code>maximum_outcomes</code></td>
+<td>1024</td>
+<td>most outcomes evaluated for one conflict component, in coverage, templates and projections; a larger component is <code>pool_limit</code> at admission</td>
+</tr>
+<tr>
+<td><code>bytes_per_sigop</code></td>
+<td>20</td>
+<td>virtual bytes charged per signature operation: a tx's chargeable size is the greater of its virtual size and its sigops times this</td>
+</tr>
+<tr>
+<td><code>coinbase_weight</code></td>
+<td>2000</td>
+<td>weight reserved for the coinbase in the block budget of templates, projections and coverage (<code>block_limit()</code>)</td>
+</tr>
+<tr>
+<td><code>maximum_chunk_depth</code></td>
+<td>25</td>
+<td>most levels of untaken ancestors a chunk may include when txs are taken into a template or projected block</td>
+</tr>
+</tbody>
+</table></div>
 <hr />
 <h2 id="11-subsystem-documents">11. Subsystem documents<a class="anchor" href="#11-subsystem-documents" aria-label="Link to this section">#</a></h2>
 <ul>
@@ -1211,8 +1240,8 @@ the architecture docs refer to:</p>
 <li><a href="block-out-protocols.html">08 — Block out protocols</a>: serving blocks to peers.</li>
 <li><a href="filter-out-protocol.html">09 — Filter out protocol</a>: BIP157/158 client filters.</li>
 <li><a href="transaction-protocols.html">10 — Transaction protocols</a>: transaction relay in and out.</li>
-<li><a href="transaction-chaser.html">11 — Transaction chaser</a>: the transaction pool and compact block fill.</li>
-<li><a href="periphery-chasers.html">12 — Periphery chasers</a>: snapshot, storage, template and fee estimate.</li>
+<li><a href="transaction-chaser.html">11 — Transaction chaser</a>: the transaction pool, compact block fill, templates and fee estimation.</li>
+<li><a href="periphery-chasers.html">12 — Periphery chasers</a>: snapshot, storage and template.</li>
 </ul>
 <hr />
 <h2 id="appendix-a--glossary">Appendix A — Glossary<a class="anchor" href="#appendix-a--glossary" aria-label="Link to this section">#</a></h2>

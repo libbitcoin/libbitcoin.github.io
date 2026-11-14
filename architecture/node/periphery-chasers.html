@@ -350,7 +350,7 @@
 <p>Companion to the core-pipeline chaser docs
 <a href="header-chaser.html"><code>02</code></a>–<a href="confirmation-chaser.html"><code>05</code></a> and
 <a href="transaction-chaser.html"><code>11</code></a>.</p>
-<p>The four chasers covered here are operationally peripheral to consensus.</p>
+<p>The three chasers covered here are operationally peripheral to consensus.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -363,7 +363,7 @@
 <tbody>
 <tr>
 <td><code>chaser_snapshot</code></td>
-<td>Startup prune, one-shot prune on first current block, explicit snapshot</td>
+<td>One-shot prune on first current block, explicit snapshot</td>
 <td>Live (snapshot trigger dormant)</td>
 <td>Consumes <code>block</code>, <code>snap</code>; emits <code>pruned</code></td>
 </tr>
@@ -375,18 +375,14 @@
 </tr>
 <tr>
 <td><code>chaser_template</code></td>
-<td>Mining template construction</td>
-<td>Stub</td>
-<td>Consumes <code>transaction</code></td>
-</tr>
-<tr>
-<td><code>chaser_estimate</code></td>
-<td>Fee estimation accumulator</td>
-<td>Live when <code>fee_estimate_horizon</code> is nonzero</td>
-<td>Consumes <code>pruned</code>, <code>block</code>, <code>organized</code>, <code>reorganized</code>, <code>transaction</code></td>
+<td>Holds the latest mining template, rebuilt on pool and chain change</td>
+<td>Live while the pool is open</td>
+<td>Consumes <code>transaction</code>, <code>organized</code>, <code>reorganized</code>; emits <code>template_</code></td>
 </tr>
 </tbody>
 </table></div>
+<p>Fee estimation is a <code>chaser_transaction</code> function over the pool
+projection, not a chaser of its own (§4).</p>
 </blockquote>
 <div class="scroller"><table>
 <thead>
@@ -398,7 +394,7 @@
 <tbody>
 <tr>
 <td><code>src/chasers/chaser_snapshot.cpp</code></td>
-<td>315</td>
+<td>289</td>
 </tr>
 <tr>
 <td><code>src/chasers/chaser_storage.cpp</code></td>
@@ -406,53 +402,49 @@
 </tr>
 <tr>
 <td><code>src/chasers/chaser_template.cpp</code></td>
-<td>93</td>
+<td>164</td>
 </tr>
 <tr>
-<td><code>src/chasers/chaser_estimate.cpp</code></td>
-<td>275</td>
-</tr>
-<tr>
-<td><code>include/bitcoin/node/estimator.hpp</code></td>
-<td>190</td>
+<td><code>include/bitcoin/node/chasers/chaser_template.hpp</code></td>
+<td>67</td>
 </tr>
 </tbody>
 </table></div>
-<p>All four inherit from the base <code>chaser</code>, run on their own strand on the
+<p>All three inherit from the base <code>chaser</code>, run on their own strand on the
 network pool, and subscribe to the bus in <code>start()</code>.</p>
 <hr />
 <h2 id="1-chaser_snapshot">1. <code>chaser_snapshot</code><a class="anchor" href="#1-chaser_snapshot" aria-label="Link to this section">#</a></h2>
 <h3 id="11-role">1.1 Role<a class="anchor" href="#11-role" aria-label="Link to this section">#</a></h3>
-<p>Three triggers:</p>
+<p>Two triggers:</p>
 <ul>
-<li><strong>Startup prune</strong>: in <code>start()</code>, before the network starts, when the
-  confirmed top is above genesis and the store is coalesced, prune the
-  prevout cache and emit <code>chases::pruned{ top }</code> (<code>chaser_snapshot.cpp:68-92</code>).</li>
 <li><strong>One-shot prune on announce</strong>: when the confirmed chain first
-  announces a current block (<code>chase::block</code>), prune once if coalesced;
-  latched by <code>pruned_</code> (<code>:141-148</code>, <code>:166-202</code>).</li>
+  announces a current block (<code>chase::block</code>), prune the prevout cache
+  once if the store is coalesced and emit <code>chases::pruned{ link }</code>;
+  latched by <code>pruned_</code> (<code>chaser_snapshot.cpp:115-122</code>, <code>:140-176</code>).</li>
 <li><strong>Explicit snapshot</strong>: on <code>chase::snap(height)</code>, take a full store
   snapshot. <em>No issuer of <code>chase::snap</code> exists in this repo</em> — dormant
   (doc 01 §2.1).</li>
 </ul>
+<p><code>start()</code> only subscribes to the bus (<code>:53-70</code>); it performs no store
+operation.</p>
 <h3 id="12-state">1.2 State<a class="anchor" href="#12-state" aria-label="Link to this section">#</a></h3>
-<pre><code class="language-cpp">// chaser_snapshot.hpp:43
+<pre><code class="language-cpp">// chaser_snapshot.hpp:70
 std::atomic_bool pruned_{};   // one-shot latch for prune
 </code></pre>
 <p>The periodic-snapshot thresholds (<code>snapshot_bytes/valid/confirm</code>) remain
 commented out in source and settings.</p>
 <blockquote>
 <p><strong>Invariant (Snapshot-State-1).</strong> <code>pruned_</code> is set at most once per
-process lifetime, either by the startup prune or by the first
-successful announce-time prune. After it is set, <code>chase::block</code>
-events are dropped at the handler (<code>:143-144</code>).</p>
+process lifetime, by the first successful announce-time prune. After
+it is set, <code>chase::block</code> events are dropped at the handler
+(<code>:117-118</code>).</p>
 </blockquote>
 <h3 id="13-live-event-handlers">1.3 Live event handlers<a class="anchor" href="#13-live-event-handlers" aria-label="Link to this section">#</a></h3>
-<pre><code class="language-cpp">// :141-153
+<pre><code class="language-cpp">// :75-135 handle_chase (ignored while suspended, :82-83)
 case chase::block: if (!pruned_) POST(do_prune, link);
 case chase::snap:  POST(do_snap, height);
 </code></pre>
-<h4 id="do_prunelink--166-202"><code>do_prune(link)</code> — <code>:166-202</code><a class="anchor" href="#do_prunelink--166-202" aria-label="Link to this section">#</a></h4>
+<h4 id="do_prunelink--140-176"><code>do_prune(link)</code> — <code>:140-176</code><a class="anchor" href="#do_prunelink--140-176" aria-label="Link to this section">#</a></h4>
 <p>Returns silently if already pruned, closed, or not coalesced. Calls the
 base <code>chaser::prune</code> (a wrapper around <code>full_node::prune</code>, doc 00 §6.2),
 which suspends the network, runs <code>query.prune</code>, and leaves the network
@@ -463,14 +455,14 @@ is retried on the next announce.</p>
 <blockquote>
 <p><strong>Invariant (Snapshot-Prune-1).</strong> <code>pruned_</code> is latched and
 <code>chase::pruned</code> emitted <em>before</em> <code>resume()</code>, because the resumption
-is observable (the fee estimator initializes on <code>pruned</code>, and
-organization resumes with it).</p>
+is observable (<code>chaser_transaction</code> raises its arrivals floor on
+<code>pruned</code>, doc 11 §6.4, and organization resumes with it).</p>
 <p><strong>Invariant (Snapshot-Prune-2).</strong> Prune is gated on
 <code>archive().is_coalesced()</code>. If the store isn't ready, the handler
 returns silently; the next <code>chase::block</code> re-triggers it.</p>
 </blockquote>
-<h4 id="do_snapheight--204-212"><code>do_snap(height)</code> — <code>:204-212</code><a class="anchor" href="#do_snapheight--204-212" aria-label="Link to this section">#</a></h4>
-<p>Calls <code>take_snapshot(height)</code> (<code>:229-288</code>), which calls the base
+<h4 id="do_snapheight--178-186"><code>do_snap(height)</code> — <code>:178-186</code><a class="anchor" href="#do_snapheight--178-186" aria-label="Link to this section">#</a></h4>
+<p>Calls <code>take_snapshot(height)</code> (<code>:222-262</code>), which calls the base
 <code>chaser::snapshot(handler)</code>: same suspend/resume dance as prune.
 Currently unreachable — no <code>chase::snap</code> issuer in source.</p>
 <h3 id="14-coupling">1.4 Coupling<a class="anchor" href="#14-coupling" aria-label="Link to this section">#</a></h3>
@@ -478,7 +470,7 @@ Currently unreachable — no <code>chase::snap</code> issuer in source.</p>
 flowchart LR
     CNF[chaser_confirm] -- "chase::block (link)&lt;br/&gt;only when current" --&gt; SNP[chaser_snapshot]
     DEAD[(no issuer)] -. "chase::snap (height)" .-&gt; SNP
-    SNP -- "chase::pruned (link)" --&gt; EST[chaser_estimate]
+    SNP -- "chase::pruned (link)" --&gt; TX[chaser_transaction]
     SNP -- "calls archive().prune,&lt;br/&gt;archive().snapshot,&lt;br/&gt;resume()" --&gt; NODE[full_node]
 </div>
 <hr />
@@ -543,137 +535,73 @@ flowchart LR
 </div>
 <hr />
 <h2 id="3-chaser_template">3. <code>chaser_template</code><a class="anchor" href="#3-chaser_template" aria-label="Link to this section">#</a></h2>
-<p><strong>Stub</strong> for mining-template construction (<code>chaser_template.cpp</code>).
-Subscribes to <code>chase::transaction</code> and posts an empty <code>do_transaction</code>
-(<code>:53-88</code>). The TODOs note the intended behaviour: recompute the block
-template on chain top change and on transaction graph change, and emit
-<code>chase::template_(height)</code> to wake an external miner. <code>chase::template_</code>
-has no live issuer. A spec can treat this chaser as identity until it is
-implemented.</p>
-<hr />
-<h2 id="4-chaser_estimate">4. <code>chaser_estimate</code><a class="anchor" href="#4-chaser_estimate" aria-label="Link to this section">#</a></h2>
-<h3 id="41-role">4.1 Role<a class="anchor" href="#41-role" aria-label="Link to this section">#</a></h3>
-<p>Maintains a running <strong>fee estimate</strong> over the confirmed chain and the
-pool, answering <code>full_node::estimate(target, mode)</code> (exposed to the
-server's RPC surface). Enabled when <code>node.fee_estimate_horizon</code> is
-nonzero (<code>fee_estimate_enabled()</code>); otherwise <code>estimate</code> returns
-<code>estimate_disabled</code> without subscribing (<code>chaser_estimate.cpp:45-53</code>,
-<code>:64-74</code>).</p>
-<h3 id="42-state">4.2 State<a class="anchor" href="#42-state" aria-label="Link to this section">#</a></h3>
-<pre><code class="language-cpp">// chaser_estimate.hpp:67-73
-std::atomic_bool stopping_{};      // cancels initialization
-std::atomic_bool initialized_{};   // estimator ready (thread safe)
-estimator::ptr estimator_{};       // heap allocated (large accumulator), strand-only
-bool pruned_{};                    // initialization waits for the prune
+<h3 id="31-role">3.1 Role<a class="anchor" href="#31-role" aria-label="Link to this section">#</a></h3>
+<p>Holds the latest <strong>block template</strong>: the pooled transactions of the
+next block, parents first, and the height of that block. It rebuilds the
+template whenever the pool or the confirmed chain changes, and emits
+<code>chase::template_(height)</code> after each build to wake a miner. The
+template itself is built on the <code>chaser_transaction</code> strand
+(<code>build_template</code>, doc 11 §6.1), because the pool context and the
+projection are owned there; this chaser only sequences the builds and
+holds the result.</p>
+<h3 id="32-state">3.2 State<a class="anchor" href="#32-state" aria-label="Link to this section">#</a></h3>
+<pre><code class="language-cpp">// chaser_template.hpp:57-61 (strand-protected)
+database::tx_links links_{};   // template txs, parents first
+size_t height_{};              // height of the template block
+bool building_{};              // a build is in flight on the transaction strand
+bool stale_{};                 // the pool changed during the build
 </code></pre>
-<h3 id="43-events-and-initialization">4.3 Events and initialization<a class="anchor" href="#43-events-and-initialization" aria-label="Link to this section">#</a></h3>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Event</th>
-<th>When not initialized</th>
-<th>When initialized</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>chase::pruned</code></td>
-<td><code>do_pruned</code>: set <code>pruned_</code>, try <code>do_initialize</code></td>
-<td>ignored</td>
-</tr>
-<tr>
-<td><code>chase::block</code></td>
-<td><code>do_initialize</code> (retry each current block)</td>
-<td>ignored</td>
-</tr>
-<tr>
-<td><code>chase::organized</code></td>
-<td>ignored</td>
-<td><code>do_organized</code>: push the block's fee rates (skipping backlogged heights at or under the accumulator top)</td>
-</tr>
-<tr>
-<td><code>chase::reorganized</code></td>
-<td>ignored</td>
-<td><code>do_reorganized</code>: pop the block's rates (skipping heights above the top)</td>
-</tr>
-<tr>
-<td><code>chase::transaction</code></td>
-<td>ignored</td>
-<td><code>do_transaction</code>: pool the tx's rate</td>
-</tr>
-</tbody>
-</table></div>
-<p><code>do_initialize</code> (<code>:192-214</code>) requires the prune (which rewrites the pool)
-and a chain at least <code>horizon</code> blocks long, then builds the estimator from
-the last <code>horizon</code> confirmed blocks and the pooled transactions
-(<code>estimator::initialize</code>, cancellable by <code>stopping_</code>).</p>
+<h3 id="33-events-and-builds">3.3 Events and builds<a class="anchor" href="#33-events-and-builds" aria-label="Link to this section">#</a></h3>
+<pre><code class="language-cpp">// :63-93 handle_chase (ignored while suspended, :70-71)
+case chase::transaction:
+case chase::organized:
+case chase::reorganized: POST(do_update);
+
+// :96-107 do_update
+if (building_) { stale_ = true; return; }
+build();
+
+// :119-126 build
+building_ = true; stale_ = false;
+request_template(BIND(handle_build, _1, _2, _3));   // chaser::request_template → full_node::build_template → chaser_transaction
+</code></pre>
+<p><code>handle_build</code> (<code>:129-133</code>) posts the result back to this chaser's
+strand; <code>do_build</code> (<code>:136-159</code>) clears <code>building_</code>, then:</p>
+<ul>
+<li>returns without a template when the node is closed or the result is
+  <code>service_stopped</code> or <code>pooling_disabled</code> (the pool is closed because
+  relay is disabled or the confirmed chain is not current);</li>
+<li>faults on any other error code (a store read failure);</li>
+<li>otherwise stores <code>links_</code> and <code>height_</code>, emits
+  <code>chases::template_{ height }</code>, and starts one more build if <code>stale_</code>.</li>
+</ul>
+<p><code>get_template(handler)</code> (<code>:52-58</code>, <code>full_node::get_template</code>) posts
+<code>do_get_template</code> (<code>:109-113</code>), which returns <code>success</code> with the stored
+height and links. Before the first build completes the template is
+height zero with no txs.</p>
 <blockquote>
-<p><strong>Invariant (Estimate-Init-1).</strong> The accumulator is initialized once,
-after the first prune and only when the confirmed chain reaches the
-horizon; organization events that arrive during initialization are
-reconciled by height against the accumulator top (<code>:231-233</code>,
-<code>:255-257</code>).</p>
-<p><strong>Invariant (Estimate-Consistency-1).</strong> Only txs that were pooled
-before confirmation contribute (by blocks waited from pool entry to
-confirmation); a conflict unpends the displaced txs. Push and pop are
-exact inverses on the decayed buckets, so a reorganization leaves the
-accumulator as if the popped block had never been organized.</p>
+<p><strong>Invariant (Template-Coalesce-1).</strong> At most one build is in flight.
+Events that arrive during a build set <code>stale_</code>, and the completion of
+that build starts exactly one more, so a burst of pool changes costs
+at most two builds and the last template reflects every change before
+the last build started.</p>
 </blockquote>
-<h3 id="44-the-estimator-interface-only">4.4 The estimator (interface only)<a class="anchor" href="#44-the-estimator-interface-only" aria-label="Link to this section">#</a></h3>
-<p><code>include/bitcoin/node/estimator.hpp</code> defines modes (<code>basic</code>, <code>geometric</code>,
-<code>economical</code>, <code>conservative</code>), three horizons (12, 48 and 1008 blocks),
-283 geometric fee-rate bins from 0.1 to 100,000 sat/vB with step 1.05,
-decay-weighted per-bucket confirmation counters, and pending/aged slots
-for unconfirmed pooled txs. <code>estimate(target, mode)</code> returns satoshis per
-virtual byte, or <code>estimate_failed</code> (<code>max_uint64</code>), which the chaser maps
-to <code>error::estimate_false</code>; a call before initialization returns
-<code>estimate_premature</code>. The algorithm itself is out of scope here.</p>
-<h3 id="45-error-inventory">4.5 Error inventory<a class="anchor" href="#45-error-inventory" aria-label="Link to this section">#</a></h3>
-<div class="scroller"><table>
-<thead>
-<tr>
-<th>Code</th>
-<th>Site</th>
-<th>Cause</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>estimates_initialize</code></td>
-<td><code>:206-210</code></td>
-<td><code>estimator::initialize</code> failed (estimator reset)</td>
-</tr>
-<tr>
-<td><code>estimates_push1/2</code></td>
-<td><code>:225-236</code></td>
-<td>organized block height unknown / push failed</td>
-</tr>
-<tr>
-<td><code>estimates_pop1/2</code></td>
-<td><code>:249-260</code></td>
-<td>reorganized block height unknown / pop failed</td>
-</tr>
-<tr>
-<td><code>estimates_pool</code></td>
-<td><code>:268-269</code></td>
-<td>pooling a tx's rate failed</td>
-</tr>
-<tr>
-<td><code>estimate_disabled</code>, <code>estimate_premature</code>, <code>estimate_false</code></td>
-<td><code>:67-70</code>, <code>:83-86</code>, <code>:90-91</code></td>
-<td>returned to the caller, not faults</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="46-coupling">4.6 Coupling<a class="anchor" href="#46-coupling" aria-label="Link to this section">#</a></h3>
+<h3 id="34-coupling">3.4 Coupling<a class="anchor" href="#34-coupling" aria-label="Link to this section">#</a></h3>
 <div class="mermaid">
 flowchart LR
-    SNP[chaser_snapshot] -- "chase::pruned" --&gt; EST[chaser_estimate]
-    CNF[chaser_confirm] -- "chase::block, organized, reorganized" --&gt; EST
-    TX[chaser_transaction] -- "chase::transaction" --&gt; EST
-    SRV["full_node::estimate&lt;br/&gt;(server RPC)"] -- "estimate(target, mode)" --&gt; EST
-    EST -.-&gt;|"reads: get_height, block and pool fee rates"| STORE[(query)]
+    TX[chaser_transaction] -- "chase::transaction" --&gt; TPL[chaser_template]
+    CNF[chaser_confirm] -- "chase::organized / reorganized" --&gt; TPL
+    TPL -- "request_template → build_template&lt;br/&gt;(on the transaction strand)" --&gt; TX
+    TPL -- "chase::template_ (height)" --&gt; MIN["miners (external)"]
+    SRV["full_node::get_template"] -- "get_template" --&gt; TPL
 </div>
+<hr />
+<h2 id="4-fee-estimation">4. Fee estimation<a class="anchor" href="#4-fee-estimation" aria-label="Link to this section">#</a></h2>
+<p>Fee estimation is not a chaser. <code>full_node::estimate(target, mode)</code>
+(<code>src/full_node.cpp:485-489</code>) forwards to <code>chaser_transaction::estimate</code>,
+which projects the pool into future blocks and returns the lowest fee
+rate that confirms within the target block. It is described with the
+pool in <a href="transaction-chaser.html#62-fee-estimation">doc 11 §6.2</a>.</p>
 <hr />
 <h2 id="5-summary-table-of-bus-interactions-for-the-periphery">5. Summary table of bus interactions for the periphery<a class="anchor" href="#5-summary-table-of-bus-interactions-for-the-periphery" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
@@ -697,20 +625,16 @@ flowchart LR
 </tr>
 <tr>
 <td><code>chaser_template</code></td>
-<td><code>chase::transaction</code>, <code>chase::stop</code></td>
-<td>(none; <code>template_</code> planned)</td>
-</tr>
-<tr>
-<td><code>chaser_estimate</code></td>
-<td><code>chase::pruned</code>, <code>block</code>, <code>organized</code>, <code>reorganized</code>, <code>transaction</code>, <code>stop</code></td>
-<td>(none)</td>
+<td><code>chase::transaction</code>, <code>organized</code>, <code>reorganized</code>, <code>stop</code></td>
+<td><code>chase::template_</code></td>
 </tr>
 </tbody>
 </table></div>
 <blockquote>
-<p><strong>Invariant (Periphery-Bus-1).</strong> The periphery emits exactly two
-events, both recovery/initialization signals (<code>pruned</code>, <code>unfull</code>); it
-never writes chain order and never affects validation outcomes.</p>
+<p><strong>Invariant (Periphery-Bus-1).</strong> The periphery emits exactly three
+events: two store-maintenance signals (<code>pruned</code>, <code>unfull</code>) and the
+template signal to miners (<code>template_</code>). It never writes chain order
+and never affects validation outcomes.</p>
 </blockquote>
 <hr />
 <h2 id="6-spec-view-combined">6. Spec view (combined)<a class="anchor" href="#6-spec-view-combined" aria-label="Link to this section">#</a></h2>
@@ -727,17 +651,16 @@ chaser_storage : Process
   effects: archive.reload (clears the full condition), emits unfull, resume()
 
 chaser_template : Process
-  state: ∅ (stub)
-
-chaser_estimate : Process
-  state: pruned : Bool, initialized : Bool, accumulator
-  inputs:  chase::pruned, block, organized, reorganized, transaction; estimate RPC
-  effects: none on the store
+  state: links : Seq TxLink, height : ℕ, building : Bool, stale : Bool
+  inputs:  chase::transaction, organized, reorganized — build, or mark stale while building
+           build result (height, links) from chaser_transaction
+           get_template RPC — returns (height, links)
+  effects: none on the store; emits template_(height) per completed build
 </code></pre>
 <hr />
 <h2 id="7-notes-for-the-formal-model">7. Notes for the formal model<a class="anchor" href="#7-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>These four chasers contribute little to the global proof obligation
+<li>These three chasers contribute little to the global proof obligation
   set; the one obligation that touches the pipeline is
   Storage-Unfull-1 (ordering of <code>unfull</code> before <code>resume</code>).</li>
 <li><code>chaser_snapshot</code>'s <code>pruned_</code> latch is a standard monotone Boolean;
@@ -746,9 +669,10 @@ chaser_estimate : Process
   holds" pattern; formally a liveness property "if <code>chase::space</code> is
   emitted and disk eventually has capacity, the system eventually
   resumes".</li>
-<li><code>chaser_estimate</code> is a pure function of the event stream once
-  initialized; Estimate-Consistency-1 (push/pop inverse) is the property
-  worth stating.</li>
+<li><code>chaser_template</code> is a read-only cache of a function of the pool
+  (<code>get_pool_template</code>); Template-Coalesce-1 is its only ordering
+  property. Its template is the first block of the projection that fee
+  estimation extends (doc 11 §6).</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
@@ -761,7 +685,8 @@ chaser_estimate : Process
   <code>unfull</code>)</li>
 <li><a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a> §7 (emits <code>chase::block</code>)</li>
 <li><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> (emits
-  <code>chase::transaction</code>)</li>
+  <code>chase::transaction</code>, consumes <code>chase::pruned</code>, builds templates and
+  estimates fees)</li>
 </ul>
   </article>
 

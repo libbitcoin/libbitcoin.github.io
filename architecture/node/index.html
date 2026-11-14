@@ -357,8 +357,11 @@ indexes, and quiescence for snapshot, remap and shutdown) are from the
 2021 <a href="libbitcoin-v4-node-design.pdf">design document</a> for the version 4 node.</p>
 <p>Every behavioural claim is anchored with <code>file:line</code> references into the
 C++ source so it can be re-verified or re-derived if source drifts. The
-citations in this revision were verified against libbitcoin-node master at
-commit <code>a5173475</code> (2026-10-20), with <code>chaser_check</code> renamed to <code>chaser_download</code> (node branch <code>download</code>, <code>ea1e1264</code>).</p>
+citations in documents 00, 01, 10, 11 and 12 were verified against
+libbitcoin-node master at commit <code>79eeac6a</code> (2026-11-13). The other
+documents were verified at commit <code>a5173475</code> (2026-10-20), except their
+transaction pool and template chaser references, which were verified at
+<code>79eeac6a</code>.</p>
 <hr />
 <h2 id="the-13-documents">The 13 documents<a class="anchor" href="#the-13-documents" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
@@ -428,12 +431,12 @@ commit <code>a5173475</code> (2026-10-20), with <code>chaser_check</code> rename
 <tr>
 <td>11</td>
 <td><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a></td>
-<td>The transaction pool: package submission, compact block fill, scan starts; 9 <code>transactionN</code> fault sites</td>
+<td>The transaction pool: package submission and coverage, compact block fill, scan starts, templates and fee estimation; 9 <code>transactionN</code> fault sites</td>
 </tr>
 <tr>
 <td>12</td>
 <td><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a></td>
-<td><code>chaser_snapshot</code>, <code>chaser_storage</code>, <code>chaser_template</code>, <code>chaser_estimate</code></td>
+<td><code>chaser_snapshot</code>, <code>chaser_storage</code>, <code>chaser_template</code></td>
 </tr>
 </tbody>
 </table></div>
@@ -528,7 +531,7 @@ families:</p>
 <td>Transaction pool</td>
 </tr>
 <tr>
-<td><code>Snapshot-*</code>, <code>Storage-*</code>, <code>Estimate-*</code>, <code>Periphery-*</code></td>
+<td><code>Snapshot-*</code>, <code>Storage-*</code>, <code>Template-*</code>, <code>Periphery-*</code></td>
 <td>12</td>
 <td>Periphery chasers</td>
 </tr>
@@ -560,9 +563,10 @@ distilled-for-export view of each subsystem.</p>
    dormant events). All are flagged in
    <a href="event-bus.html"><code>01-event-bus</code></a> with <code>⚠</code> and discussed in
    §2 of that doc.</li>
-<li><strong>Stub subsystems</strong>: <code>chaser_template</code> is a stub. The doc describes
-   its wiring and intended design but notes clearly that current
-   behaviour is "no-op".</li>
+<li><strong>Pool algorithms.</strong> Coverage, the pool projection and the fee
+   estimate search run in libbitcoin-database (<code>query/pool</code>) and
+   libbitcoin-system (<code>pool/algorithm</code>). Doc 11 describes the node's
+   calls into them and their inputs, not their implementation.</li>
 <li><strong>Database-side batching.</strong> The signature and silent-payment batch
    tables, their verification kernels (CPU or GPU) and the pooled-block
    validation query live in libbitcoin-database and libbitcoin-system.
@@ -576,7 +580,6 @@ distilled-for-export view of each subsystem.</p>
 │   ├── full_node.cpp ........................ 00
 │   ├── configuration.cpp / settings.cpp ..... (mentioned in 00, not detailed)
 │   ├── error.cpp ............................ 00 §9
-│   ├── estimator.cpp ........................ 12 §4 (interface only)
 │   ├── rolling_bloom_filter.cpp ............. 07 §8
 │   │
 │   ├── chasers/
@@ -590,7 +593,6 @@ distilled-for-export view of each subsystem.</p>
 │   │   ├── chaser_confirm.cpp ............... 05
 │   │   ├── chaser_transaction.cpp ........... 11
 │   │   ├── chaser_template.cpp .............. 12 §3
-│   │   ├── chaser_estimate.cpp .............. 12 §4
 │   │   ├── chaser_snapshot.cpp .............. 12 §1
 │   │   └── chaser_storage.cpp ............... 12 §2
 │   │
@@ -639,7 +641,7 @@ distilled-for-export view of each subsystem.</p>
     ├── events.hpp ........................... 00 §4 (metrics enum)
     ├── error.hpp ............................ 00 §9
     ├── settings.hpp ......................... 00 §10
-    ├── estimator.hpp ........................ 12 §4
+    ├── define.hpp ........................... 11 §6.2 (estimate modes and windows)
     └── impl/sessions/session_peer.ipp ....... 06 §2
 </code></pre>
 <p>Files <strong>not</strong> detailed (treated as "use as documented"):</p>
@@ -658,7 +660,7 @@ distilled-for-export view of each subsystem.</p>
 <li>For per-chaser docs, the relevant invariants reference specific
    <code>file:line</code>s — re-grep those when their files change.</li>
 <li>The error inventories in each chaser doc (<code>organizeN</code>,
-   <code>validateN</code>, <code>confirmN</code>, <code>transactionN</code>, <code>batchN</code>, <code>estimates_*</code>) are
+   <code>validateN</code>, <code>confirmN</code>, <code>transactionN</code>, <code>batchN</code>) are
    exhaustive at the time of writing — any new <code>error::&lt;chaser&gt;N</code> entry
    should add a row.</li>
 <li>The attach tree in

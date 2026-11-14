@@ -407,8 +407,8 @@ flowchart LR
 <p>Blocks are downloaded from many peers at once and validated concurrently,
 while organization and confirmation follow in order. The chasers
 communicate only through an event bus, and share state only through the
-store. Further chasers maintain the transaction pool, fee estimates, store
-snapshots and disk space.</p>
+store. Further chasers maintain the transaction pool, with its fee estimates and
+block templates, store snapshots and disk space.</p>
 <p>Quiescing the pipeline allows store snapshot, remap and shutdown.</p>
 <h2 id="3-store">3. Store<a class="anchor" href="#3-store" aria-label="Link to this section">#</a></h2>
 <p>The store is strictly relational, without a query engine. Every relation is

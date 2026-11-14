@@ -254,7 +254,7 @@ advertised service bits.
 
 ## 3. `node::protocol` base — sibling pattern
 
-`include/bitcoin/node/protocols/protocol.hpp:33-52`:
+`include/bitcoin/node/protocols/protocol.hpp:32-51`:
 
 `node::protocol` does **not** inherit from `network::protocol`. Instead,
 concrete protocols multiply-inherit from `network::protocol_peer` (the
@@ -266,7 +266,7 @@ wire-level base) *and* `node::protocol` (via `node::protocol_peer`,
 The base forwards the node surface to the session: organizers
 (`organize`, `organize_compact`, `prioritize`, `get_minimum_work`,
 `submit`, `submit_compact`), currency predicates, `minimum_fee_rate()`
-(the configured rate when current, `max_money` otherwise, `:74-78`),
+(`pool.minimum_fee_rate` when current, `max_money` otherwise, `:74-78`),
 `estimate`, connection and suspension passthroughs, and channel/address
 counts (`protocol.cpp:34-181`).
 

@@ -349,8 +349,9 @@
 <blockquote>
 <p>Companion to <a href="validation-chaser.html"><code>04-chaser-validate</code></a>,
 <a href="confirmation-chaser.html"><code>05-chaser-confirm</code></a>,
-<a href="header-protocols.html"><code>07-header-protocols</code></a> §4 and
-<a href="transaction-protocols.html"><code>10-tx-protocols</code></a>.</p>
+<a href="header-protocols.html"><code>07-header-protocols</code></a> §4,
+<a href="transaction-protocols.html"><code>10-tx-protocols</code></a> and
+<a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §3.</p>
 <p><code>chaser_transaction</code> owns the <strong>unconfirmed transaction pool</strong>. The
 pool is an <em>index over archived transactions</em>: a submitted transaction
 is validated, archived in the store like any other tx, and marked
@@ -359,8 +360,10 @@ mempool data structure; "pooled" is a store property, and the pool
 contents outlive the process.</p>
 <p>The chaser:</p>
 <ol>
-<li>validates and archives submitted packages (<code>submit</code>), emitting
-   <code>chase::transaction</code> per newly pooled tx;</li>
+<li>validates and archives submitted packages (<code>submit</code>), admitting a
+   package that conflicts with pooled txs only when the fee it adds to
+   the pool covers it, and emitting <code>chase::transaction</code> per newly
+   pooled tx;</li>
 <li>fills identified compact blocks from the pool (<code>submit_compact</code>),
    validating and archiving the unpooled txs in block order,
    associating the block, and emitting <code>chase::checked</code> — the second
@@ -368,7 +371,10 @@ contents outlive the process.</p>
 <li>re-pools the unpooled txs of a reorganized block;</li>
 <li>maintains the pool context on every organized block, closes the
    pool when the chain is not current, and maps <strong>silent-payment scan
-   starts</strong> on a dedicated single thread.</li>
+   starts</strong> on a dedicated single thread;</li>
+<li>projects the pool into future blocks, answering block template
+   builds for <code>chaser_template</code> (<code>build_template</code>) and fee estimates
+   (<code>estimate</code>) from that projection.</li>
 </ol>
 </blockquote>
 <div class="scroller"><table>
@@ -382,37 +388,42 @@ contents outlive the process.</p>
 <tbody>
 <tr>
 <td><code>include/bitcoin/node/chasers/chaser_transaction.hpp</code></td>
-<td>108</td>
+<td>131</td>
 <td>Declaration</td>
 </tr>
 <tr>
 <td><code>src/chasers/chaser_transaction.cpp</code></td>
-<td>602</td>
+<td>872</td>
 <td>Implementation</td>
 </tr>
 </tbody>
 </table></div>
 <hr />
 <h2 id="1-state">1. State<a class="anchor" href="#1-state" aria-label="Link to this section">#</a></h2>
-<pre><code class="language-cpp">// chaser_transaction.hpp:95-102
+<pre><code class="language-cpp">// chaser_transaction.hpp:114-125
 network::threadpool scan_threadpool_;   // one thread, node.thread_priority
 stopper stopping_{};                    // cancels a running scan map
 
 // strand-protected
 system::chain::context pool_{};         // context of the next block (where a pooled tx would confirm)
+query::pool_projection projection_{};   // the pool taken into successive blocks by chunk rate (§6)
+query::pool_arrivals arrivals_{};       // rate and size pooled at each recent height (§6.2)
+size_t floor_{};                        // lowest height from which arrivals are whole (§6.4)
 bool pooling_{};                        // pool open (relay enabled and confirmed chain current)
 bool scanning_{};                       // a scan-start map is running
+bool projected_{};                      // projection_ reflects the current pool (§6.3)
+bool arrived_{};                        // arrivals_ reflects the current pool (§6.3)
 </code></pre>
 <blockquote>
 <p><strong>Invariant (Pool-Context-1).</strong> <code>pool_</code> is the chain context of the
 block <em>after</em> the confirmed top (<code>chain_state{ *state, settings }.context()</code>,
-<code>:134</code>), recomputed on every <code>organized</code> and <code>reorganized</code> event. Every
-pool admission and every fee-rate decision is made against that
-context.</p>
+<code>:141</code>), recomputed on every <code>organized</code> and <code>reorganized</code> event. Every
+pool admission, fee-rate decision, template and estimate is made
+against that context.</p>
 </blockquote>
 <hr />
 <h2 id="2-bus-integration">2. Bus integration<a class="anchor" href="#2-bus-integration" aria-label="Link to this section">#</a></h2>
-<p>Inputs (<code>:72-100</code>):</p>
+<p>Inputs (<code>:72-105</code>):</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -428,6 +439,10 @@ context.</p>
 <tr>
 <td><code>chase::reorganized</code></td>
 <td><code>do_reorganized(link)</code>: <code>do_bump</code>, then pool the unpooled txs of the block</td>
+</tr>
+<tr>
+<td><code>chase::pruned</code></td>
+<td><code>do_pruned(link)</code>: raise the arrivals floor above the pruned block (§6.4)</td>
 </tr>
 <tr>
 <td><code>chase::stop</code></td>
@@ -448,40 +463,47 @@ context.</p>
 <tbody>
 <tr>
 <td><code>chase::transaction</code></td>
-<td><code>:230</code>, <code>:329</code>, <code>:456</code>, <code>:483</code></td>
+<td><code>:241</code>, <code>:378</code>, <code>:620</code>, <code>:648</code></td>
 <td>a tx was pooled (reorganized block, package, compact fill)</td>
 </tr>
 <tr>
 <td><code>chase::checked</code></td>
-<td><code>:414</code></td>
+<td><code>:466</code></td>
 <td>a compact block was filled and associated</td>
 </tr>
 <tr>
 <td><code>chase::unchecked</code></td>
-<td><code>:497</code></td>
+<td><code>:673</code></td>
 <td>an identified compact block contained an invalid tx</td>
 </tr>
 </tbody>
 </table></div>
-<p>Reporting: <code>events::tx_archived</code> with the tx fee rate (<code>:328</code>, <code>:482</code>),
-<code>events::block_archived</code> (<code>:415</code>), <code>events::block_unconfirmable</code> (<code>:498</code>).</p>
+<p>Reporting: <code>events::tx_archived</code> with the tx fee rate (<code>:377</code>, <code>:647</code>),
+<code>events::block_archived</code> (<code>:467</code>), <code>events::block_unconfirmable</code> (<code>:674</code>).</p>
+<p>Calls in: <code>submit</code>, <code>submit_compact</code>, <code>build_template</code> and <code>estimate</code>
+(<code>:267-301</code>) are posted to the chaser strand from <code>full_node</code>
+(<code>src/full_node.cpp:185-201</code>, <code>:485-489</code>).</p>
 <h3 id="21-the-pool-latch">2.1 The pool latch<a class="anchor" href="#21-the-pool-latch" aria-label="Link to this section">#</a></h3>
-<pre><code class="language-cpp">// :105-153 do_bump
-pooling_ = false;
+<pre><code class="language-cpp">// :110-164 do_bump
+pooling_ = false; projected_ = false;
 if (closed() || !is_current_chain(true)) return;
 if (network_settings().enable_relay) {
     pool_ = next-block context of the confirmed top;
     query.set_pooling();          // permanent store property
     pooling_ = true;
+    if (pool was closed) floor_ = max(floor_, pool_.height);   // §6.4
 }
 map scan starts (§5)
 </code></pre>
 <blockquote>
-<p><strong>Invariant (Pool-Open-1).</strong> The pool accepts submissions only while
-relay is enabled and the confirmed chain is current (<code>pooling_</code>,
-checked in <code>do_submit</code>, <code>:268-272</code> → <code>error::pooling_disabled</code>). The
-store latch <code>set_pooling</code> is one-way: txs archived while the pool was
-open outlive a later loss of currency.</p>
+<p><strong>Invariant (Pool-Open-1).</strong> The pool accepts submissions, builds
+templates and answers estimates only while relay is enabled and the
+confirmed chain is current (<code>pooling_</code>, checked in <code>do_submit</code>
+<code>:315-319</code> and <code>do_build_template</code> <code>:483-487</code> →
+<code>error::pooling_disabled</code>; in <code>do_estimate</code> <code>:519-523</code> →
+<code>error::estimate_premature</code>). The store latch <code>set_pooling</code> is
+one-way: txs archived while the pool was open outlive a later loss of
+currency.</p>
 </blockquote>
 <hr />
 <h2 id="3-submission">3. Submission<a class="anchor" href="#3-submission" aria-label="Link to this section">#</a></h2>
@@ -511,47 +533,94 @@ flowchart TD
     N --&gt; L
     L -- done --&gt; R4[handler success]
 </div>
-<p>Source: <code>do_submit</code> <code>:257-333</code>. Parents precede children in a package,
-so a parent is archived before its child is resolved.</p>
-<p>Package validation (<code>validate(index, txs, stored)</code>, <code>:518-557</code>):</p>
+<p>Source: <code>do_submit</code> <code>:304-383</code>. Parents precede children in a package,
+so a parent is archived before its child is resolved. A package that is
+archived (not <code>test</code>) clears <code>projected_</code> (<code>:342</code>).</p>
+<p>Package validation (<code>validate(index, txs, stored)</code>, <code>:758-827</code>) runs
+the cheapest checks first and script validation last:</p>
 <ol>
 <li>empty package → <code>empty_package</code>; all already stored →
-   <code>duplicate_transaction</code>;</li>
+   <code>duplicate_transaction</code> (<code>:761-765</code>);</li>
 <li><code>block::is_forward_reference</code> → <code>forward_reference</code>;
-   <code>block::is_internal_double_spend</code> → <code>block_internal_double_spend</code>;</li>
-<li><code>block::populate(txs, pool_)</code> fills intra-package prevouts;</li>
-<li>each unstored tx is validated (below), accumulating fee and virtual
-   size; <code>index</code> reports the failing tx;</li>
+   <code>block::is_internal_double_spend</code> → <code>block_internal_double_spend</code>
+   (<code>:767-771</code>);</li>
+<li><code>block::populate(txs, pool_)</code> fills intra-package prevouts
+   (<code>:773-774</code>);</li>
+<li>each unstored tx is checked and accepted (<code>accept</code>, below),
+   accumulating its fee and its chargeable size, the greater of its
+   virtual size and its signature operations times
+   <code>pool.bytes_per_sigop</code>; <code>index</code> reports the failing tx (<code>:782-795</code>);</li>
 <li>the package rate (satoshis per virtual kilobyte) must reach
-   <code>node.minimum_fee_rate</code> → <code>insufficient_fee</code>.</li>
+   <code>pool.minimum_fee_rate</code> → <code>insufficient_fee</code> (<code>:797-803</code>);</li>
+<li><strong>coverage</strong>: <code>query.get_pool_coverage</code> must find that the package
+   pays for itself against the txs it conflicts with (§3.2) →
+   <code>insufficient_fee</code> if not covered, <code>database::error::pool_limit</code>
+   returned to the submitter if the conflict exceeds the search bounds,
+   any other code faulted (<code>:805-818</code>);</li>
+<li><code>connect(pool_)</code> runs the scripts of each unstored tx (<code>:820-824</code>).</li>
 </ol>
-<p>Per-tx validation (<code>validate(tx)</code>, <code>:559-579</code>):</p>
+<p>Per-tx check and accept (<code>accept(tx)</code>, <code>:829-849</code>):</p>
 <pre><code>tx.check(); tx.check(pool_)                        // tx consensus
+tx.check_guard(); tx.check_guard(pool_)            // presumed block rules (DoS guard), before any store read
 archive().populate_with_metadata(tx, true, true)   // external prevouts from confirmed and pooled
-tx.accept(pool_)
-tx.check_guard(); tx.check_guard(pool_); tx.accept_guard(pool_); tx.confirm_guard(pool_)   // presumed block rules (DoS guard)
-tx.connect(pool_)                                  // scripts last, most costly
+tx.accept(pool_); tx.accept_guard(pool_); tx.confirm_guard(pool_)
+double_spend → success                             // a conflict with a pooled tx is decided by coverage
 </code></pre>
 <blockquote>
 <p><strong>Invariant (Pool-Validate-1).</strong> A pooled tx has passed tx consensus,
 the block-level rules it would be subject to in the next block (the
-guards), and script validation, all under the pool context. The
-pooled block path of <code>chaser_validate</code> relies on this to skip per-tx
-validation (doc 04 §4.2).</p>
+guards), the package fee rate, coverage, and script validation, all
+under the pool context. The pooled block path of <code>chaser_validate</code>
+relies on this to skip per-tx validation (doc 04 §4.2).</p>
 <p><strong>Invariant (Pool-Package-1).</strong> A package is accepted or rejected as a
 whole, by validation; archival is per tx in order, so a disk-full
 decline can leave a package partly archived, which a resubmit
-resolves (<code>:306-310</code>).</p>
+resolves (<code>:355-360</code>).</p>
 </blockquote>
-<h3 id="32-compact-blocks-submit_compact">3.2 Compact blocks (<code>submit_compact</code>)<a class="anchor" href="#32-compact-blocks-submit_compact" aria-label="Link to this section">#</a></h3>
-<p><code>do_submit_compact(txs, links, link)</code> (<code>:336-417</code>) receives the unpooled
+<h3 id="32-coverage">3.2 Coverage<a class="anchor" href="#32-coverage" aria-label="Link to this section">#</a></h3>
+<p>A package may spend an output that a pooled tx already spends.
+Conflicting txs coexist in the pool, and a block can confirm only one
+spender of each output, so each set of txs
+linked by conflicts and by parent/child edges is a <strong>conflict
+component</strong> whose confirmable subsets are its <em>outcomes</em>.
+<code>get_pool_coverage(covered, txs, stored, context(pool_), rate,
+pool.bytes_per_sigop, block_limit(), pool.maximum_outcomes)</code> decides
+whether the package pays for its place in the pool (libbitcoin-database
+<code>query/pool/pool_coverage.ipp</code>, algorithm in libbitcoin-system
+<code>pool/algorithm</code>):</p>
+<ul>
+<li>a package spending an output already spent by a confirmed tx is not
+  covered, and neither is one with a pooled parent that no outcome can
+  confirm;</li>
+<li>for each component that contains an unstored package tx, every
+  outcome is enumerated and the best total fee is found with the package
+  and without it; a component with more members than the outcome mask
+  holds, with more than <code>pool.maximum_outcomes</code> outcomes, or whose
+  ancestry exceeds the block limit is <code>pool_limit</code>;</li>
+<li>the package is covered when the fee it adds (the sum over its
+  components of best-with less best-without) pays for the package's
+  chargeable size at <code>pool.minimum_fee_rate</code>.</li>
+</ul>
+<p>A package with no conflict adds its whole fee, so coverage reduces to
+the package rate check of step 5.</p>
+<blockquote>
+<p><strong>Invariant (Pool-Coverage-1).</strong> A package enters the pool only if
+the best confirmable fee of the pool rises by at least
+<code>pool.minimum_fee_rate</code> times the chargeable size the package adds. A
+conflicting package that would lower the pool's best outcome, or raise
+it by less than its own minimum fee, is rejected, so a peer cannot
+grow the pool with conflicts that pay nothing.</p>
+</blockquote>
+<h3 id="33-compact-blocks-submit_compact">3.3 Compact blocks (<code>submit_compact</code>)<a class="anchor" href="#33-compact-blocks-submit_compact" aria-label="Link to this section">#</a></h3>
+<p><code>do_submit_compact(txs, links, link)</code> (<code>:386-469</code>) receives the unpooled
 txs of an identified compact block and the full link vector with
 terminal entries at their positions:</p>
 <ol>
 <li><code>duplicate_block</code> if the block is already associated (another channel
    filled it); <code>transaction3</code> fault if the context is missing;
-   <code>transaction5</code> if the terminal count does not match the tx count.</li>
-<li>Each terminal position is filled in block order by <code>fill</code> (<code>:435-487</code>):
+   <code>transaction5</code> if the terminal count does not match the tx count
+   (<code>:399-418</code>).</li>
+<li>Each terminal position is filled in block order by <code>fill</code> (<code>:599-653</code>):
    an already stored tx (matched by witness, <code>to_stored</code>) is reused and,
    if pooling and not yet pooled or confirmed, validated under the block
    context and pooled; an unstored tx is validated under the block
@@ -559,18 +628,19 @@ terminal entries at their positions:</p>
    indexed when at or above <code>silent_start_height</code> under taproot. Each
    newly pooled tx emits <code>chase::transaction</code>.</li>
 <li>The coinbase, when missing, is filled last (validation indexes only
-   txs linked above it).</li>
+   txs linked above it, <code>:456-457</code>).</li>
 <li><code>query.set_code(link, filled, strong)</code> associates the block with
-   <code>strong = is_under_checkpoint(height)</code>; then <code>chase::checked</code>.</li>
+   <code>strong = is_under_checkpoint(height)</code>; then <code>chase::checked</code>
+   (<code>:459-466</code>).</li>
 </ol>
 <p>A tx that fails validation makes the identified block unconfirmable:
-<code>unconfirmable</code> (<code>:490-500</code>) sets the block unconfirmable (<code>transaction4</code>
+<code>unconfirmable</code> (<code>:666-676</code>) sets the block unconfirmable (<code>transaction4</code>
 on failure), emits <code>chase::unchecked</code> and returns the consensus code to
 the protocol, which drops the peer.</p>
-<p>Block-context tx validation (<code>validate(tx, ctx)</code>, <code>:583-596</code>) applies
+<p>Block-context tx validation (<code>validate(tx, ctx)</code>, <code>:853-866</code>) applies
 <code>check</code>, <code>check(ctx)</code>, <code>populate_with_metadata</code>, <code>accept(ctx)</code>,
-<code>connect(ctx)</code> — no policy (fee rate, guards), because a block tx is
-under proof of work and may conflict with unconfirmed txs.</p>
+<code>connect(ctx)</code> — no policy (fee rate, guards, coverage), because a block
+tx is under proof of work and may conflict with unconfirmed txs.</p>
 <blockquote>
 <p><strong>Invariant (Pool-Compact-1).</strong> A compact-filled block is associated
 only after every one of its txs is archived and (for unpooled ones)
@@ -584,7 +654,7 @@ txs are sufficiently pooled, else full validation).</p>
 </blockquote>
 <hr />
 <h2 id="4-reorganization">4. Reorganization<a class="anchor" href="#4-reorganization" aria-label="Link to this section">#</a></h2>
-<p><code>do_reorganized(link)</code> (<code>:193-232</code>) recomputes the pool context, then
+<p><code>do_reorganized(link)</code> (<code>:204-244</code>) recomputes the pool context, then
 for every non-coinbase tx of the popped block that is neither pooled nor
 confirmed by another block, populates it with metadata and pools it
 under the block's context with the block's timestamp as arrival time,
@@ -599,7 +669,8 @@ this handler.</p>
 <p>When the store's silent index is enabled, the chaser builds and
 maintains the <strong>scan start map</strong> — the per-block entry points that the
 server's silent-payment scans use — on the single-thread
-<code>scan_threadpool_</code> (<code>start_scan</code>/<code>do_scan</code>/<code>do_scanned</code>, <code>:155-189</code>):</p>
+<code>scan_threadpool_</code> (<code>start_scan</code>/<code>do_scan</code>/<code>do_scanned</code>, <code>:166-200</code>;
+the choice in <code>do_bump</code>, <code>:150-163</code>):</p>
 <ul>
 <li>a full map (<code>remap = true</code>) when genesis has no scan start;</li>
 <li>an extension when the top has none and the pool is not yet latched;</li>
@@ -615,7 +686,156 @@ pool latch, since pooled rows are unordered; at most one map runs at a
 time (<code>scanning_</code>), and a failed map is a <code>transaction8</code> fault.</p>
 </blockquote>
 <hr />
-<h2 id="6-error-inventory">6. Error inventory<a class="anchor" href="#6-error-inventory" aria-label="Link to this section">#</a></h2>
+<h2 id="6-projection-templates-and-fee-estimates">6. Projection: templates and fee estimates<a class="anchor" href="#6-projection-templates-and-fee-estimates" aria-label="Link to this section">#</a></h2>
+<p>The pool is <strong>projected</strong> into successive blocks: pooled txs are taken
+by chunk rate (a tx with its untaken ancestors, at their combined rate),
+best first, into blocks of <code>block_limit()</code>, until the requested number
+of blocks is filled or the pool is exhausted. Conflict components are
+first resolved to their best outcome, and the txs outside it are
+excluded from the projection. Projection runs in the store
+(<code>get_pool_template</code>, <code>get_pool_projection</code>) on the chaser strand.</p>
+<p><code>block_limit()</code> (<code>:737-753</code>) is the block budget of a projected block:
+the maximum block weight less the header, the largest possible tx count
+prefix and <code>pool.coinbase_weight</code>, as virtual size, with the sigop limit
+of the pool context (the bip141 limit once segwit is active). A chunk
+deeper than <code>pool.maximum_chunk_depth</code> levels of untaken ancestors is
+not taken.</p>
+<h3 id="61-template-build">6.1 Template build<a class="anchor" href="#61-template-build" aria-label="Link to this section">#</a></h3>
+<p><code>build_template(handler)</code> (<code>:286-292</code>) posts <code>do_build_template</code>
+(<code>:472-499</code>), which returns <code>service_stopped</code> when closed and
+<code>pooling_disabled</code> while the pool is closed; otherwise it calls
+<code>get_pool_template</code> and returns the txs of the <strong>first projected
+block</strong>, parents first, with <code>pool_.height</code> (the height the block would
+have). The one-block projection is kept as <code>projection_</code> (<code>projected_</code>
+set when the build succeeds) and <code>arrived_</code> is cleared, so the next
+estimate extends this projection and reads fresh arrivals. The caller is
+<code>chaser_template</code> (doc 12 §3), through <code>chaser::request_template</code> and
+<code>full_node::build_template</code>.</p>
+<h3 id="62-fee-estimation">6.2 Fee estimation<a class="anchor" href="#62-fee-estimation" aria-label="Link to this section">#</a></h3>
+<p><code>estimate(target, mode, handler)</code> (<code>:294-301</code>) posts <code>do_estimate</code>
+(<code>:502-581</code>). The result is the lowest fee rate, in satoshis per virtual
+kilobyte, at which a tx submitted now is projected to confirm within
+<code>target + 1</code> blocks:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Rule</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>closed</td>
+<td><code>service_stopped</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>network.enable_relay</code> false</td>
+<td><code>estimate_disabled</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>pool closed (<code>!pooling_</code>, the confirmed chain is not current)</td>
+<td><code>estimate_premature</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>mode</code> is <code>unknown</code>, or <code>target ≥ maximum_estimate_horizon</code> (1008)</td>
+<td><code>estimate_false</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>extend <code>projection_</code> to <code>target + 1</code> blocks (<code>get_pool_projection</code>, <code>:541-548</code>)</td>
+<td>store code faulted</td>
+</tr>
+<tr>
+<td>6</td>
+<td>read arrivals unless <code>basic</code> or already read (<code>get_pool_arrivals</code>, <code>:552-564</code>)</td>
+<td>store code faulted</td>
+</tr>
+<tr>
+<td>7</td>
+<td>binary search for the lowest rate that <code>target + 1</code> blocks take (<code>pool::algorithm::estimate</code>, <code>:571-573</code>)</td>
+<td><code>estimate_false</code> if no rate is taken</td>
+</tr>
+<tr>
+<td>8</td>
+<td>otherwise</td>
+<td><code>success</code>, the rate raised to at least <code>pool.minimum_fee_rate</code> (<code>:580</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>A rate is <em>taken</em> within the count of blocks when, block by block, the
+chargeable size already pooled at or above the rate plus the size
+carried from the blocks before it fits in the block: a block that left
+pooled txs behind is full at its projected size, and the blocks beyond
+the projected pool have the whole block budget. The size projected to
+arrive in each block at or above the rate is added to the carry, by
+<code>mode</code> (<code>arriving</code>, <code>:679-721</code>; modes and windows in
+<code>include/bitcoin/node/define.hpp:37-57</code>):</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Arrivals per block</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>basic</code></td>
+<td>none: the pool as it is</td>
+</tr>
+<tr>
+<td><code>geometric</code></td>
+<td>every recent height weighted by recency, each half the weight of the one above it</td>
+</tr>
+<tr>
+<td><code>economical</code></td>
+<td>the mean over the most recent <code>economical_estimate_window</code> (12) heights</td>
+</tr>
+<tr>
+<td><code>conservative</code></td>
+<td>the peak over up to <code>conservative_estimate_window</code> (144) heights</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>arrivals_</code> holds, for each of up to 144 heights below <code>pool_.height</code>
+and at or above <code>floor_</code>, the rate and chargeable size of each pooled
+row whose context is that height (<code>get_pool_arrivals</code>, most recent
+first). The forwarding chain is <code>protocol::estimate</code> →
+<code>session::estimate</code> → <code>full_node::estimate</code> → <code>chaser_transaction</code>.</p>
+<h3 id="63-projection-cache">6.3 Projection cache<a class="anchor" href="#63-projection-cache" aria-label="Link to this section">#</a></h3>
+<p><code>projection_</code> and <code>arrivals_</code> persist across calls on the strand.
+<code>projected_</code> is cleared whenever the pool can have changed: every
+<code>do_bump</code> (each <code>organized</code> and <code>reorganized</code> event, <code>:115</code>), each
+archived package (<code>:342</code>), each compact fill (<code>:420</code>) and each
+<code>pruned</code> event (<code>:260</code>). An estimate that finds <code>projected_</code> clear
+discards the projection and the arrivals and recomputes both
+(<code>:531-535</code>); otherwise it extends the cached projection only by the
+blocks it lacks (the store continues a projection from its marks).</p>
+<h3 id="64-the-arrivals-floor">6.4 The arrivals floor<a class="anchor" href="#64-the-arrivals-floor" aria-label="Link to this section">#</a></h3>
+<p>Arrivals are whole only for heights at which the pool held every row
+that arrived. <code>floor_</code> is the lowest such height:</p>
+<ul>
+<li>when the pool opens (from closed), <code>floor_</code> rises to <code>pool_.height</code>,
+  because rows that arrived while the pool was closed are not in it
+  (<code>:145-147</code>);</li>
+<li>on <code>chase::pruned(link)</code>, <code>do_pruned</code> (<code>:247-262</code>) raises <code>floor_</code>
+  above the pruned block, because the prune does not retain the rows
+  confirmed by that block.</li>
+</ul>
+<p>The arrival window is <code>min(pool_.height − floor_, 144)</code> heights
+(<code>:554-555</code>).</p>
+<blockquote>
+<p><strong>Invariant (Pool-Estimate-1).</strong> An estimate is a pure function of
+the pool rows, the pool context, <code>floor_</code>, the target and the mode.
+The cache only shortens the computation: a cleared <code>projected_</code> forces
+both the projection and the arrivals to be read again from the store.</p>
+</blockquote>
+<hr />
+<h2 id="7-error-inventory">7. Error inventory<a class="anchor" href="#7-error-inventory" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -627,100 +847,118 @@ time (<code>scanning_</code>), and a failed map is a <code>transaction8</code> f
 <tbody>
 <tr>
 <td><code>transaction1</code></td>
-<td><code>:127-131</code></td>
+<td><code>:134-138</code></td>
 <td>confirmed chain state of the top not obtainable</td>
 </tr>
 <tr>
 <td><code>transaction2</code></td>
-<td><code>:224-228</code>, <code>:315-318</code>, <code>:449-450</code>, <code>:472-473</code></td>
+<td><code>:235-239</code>, <code>:364-367</code>, <code>:613-614</code>, <code>:637-638</code></td>
 <td><code>set_pooled</code> failed</td>
 </tr>
 <tr>
 <td><code>transaction3</code></td>
-<td><code>:356-360</code></td>
+<td><code>:405-410</code></td>
 <td><code>get_context</code> of the compact block's link failed</td>
 </tr>
 <tr>
 <td><code>transaction4</code></td>
-<td><code>:493-494</code></td>
+<td><code>:669-670</code></td>
 <td><code>set_block_unconfirmable</code> of an invalid compact block failed</td>
 </tr>
 <tr>
 <td><code>transaction5</code></td>
-<td><code>:362-368</code></td>
+<td><code>:412-418</code></td>
 <td>compact fill: terminal count ≠ tx count (protocol-side error, not a fault)</td>
 </tr>
 <tr>
 <td><code>transaction6</code></td>
-<td><code>:321-324</code>, <code>:452-454</code>, <code>:475-477</code></td>
+<td><code>:370-374</code>, <code>:616-618</code>, <code>:640-642</code></td>
 <td><code>set_silent</code> failed</td>
 </tr>
 <tr>
 <td><code>transaction7</code></td>
-<td><code>:203-207</code>, <code>:217-221</code></td>
+<td><code>:214-218</code>, <code>:228-232</code></td>
 <td>reorganized block txs or context not readable</td>
 </tr>
 <tr>
 <td><code>transaction8</code></td>
-<td><code>:182-186</code></td>
+<td><code>:193-197</code></td>
 <td>scan start map failed</td>
 </tr>
 <tr>
 <td><code>transaction9</code></td>
-<td><code>:118-122</code></td>
-<td>height of the confirmed top not obtainable</td>
+<td><code>:125-129</code>, <code>:254-258</code></td>
+<td>height of the confirmed top, or of the pruned block, not obtainable</td>
 </tr>
 <tr>
-<td><code>pooling_disabled</code>, <code>insufficient_fee</code>, <code>empty_package</code>, <code>duplicate_transaction</code></td>
-<td><code>:268-272</code>, <code>:518-557</code></td>
+<td><code>pooling_disabled</code>, <code>insufficient_fee</code>, <code>empty_package</code>, <code>duplicate_transaction</code>, <code>database::error::pool_limit</code></td>
+<td><code>:315-319</code>, <code>:758-827</code></td>
 <td>package rejections returned to the submitter</td>
+</tr>
+<tr>
+<td><code>estimate_disabled</code>, <code>estimate_premature</code>, <code>estimate_false</code></td>
+<td><code>:513-529</code>, <code>:574-578</code></td>
+<td>estimate results returned to the caller, not faults</td>
 </tr>
 </tbody>
 </table></div>
 <p>All <code>transactionN</code> except <code>transaction5</code> are faults; store write codes
-from <code>set_code</code> are faulted and returned (<code>:307-310</code>, <code>:466-467</code>).</p>
+from <code>set_code</code> are faulted and returned (<code>:356-360</code>, <code>:459-464</code>,
+<code>:631-632</code>), as are store codes from coverage other than <code>pool_limit</code>
+(<code>:811</code>) and from the estimate's projection and arrivals reads
+(<code>:545-547</code>, <code>:558-560</code>). A template store code is returned to
+<code>chaser_template</code>, which faults it (doc 12 §3.3).</p>
 <hr />
-<h2 id="7-coupling-diagram">7. Coupling diagram<a class="anchor" href="#7-coupling-diagram" aria-label="Link to this section">#</a></h2>
+<h2 id="8-coupling-diagram">8. Coupling diagram<a class="anchor" href="#8-coupling-diagram" aria-label="Link to this section">#</a></h2>
 <div class="mermaid">
 flowchart LR
     TIN["protocol_transaction_in_*"] -- "submit(txs)" --&gt; TX[chaser_transaction]
     HIN["protocol_header_in_70014"] -- "submit_compact(txs, links, link)" --&gt; TX
     CNF[chaser_confirm] -- "chase::organized / reorganized" --&gt; TX
+    SNP[chaser_snapshot] -- "chase::pruned (link)" --&gt; TX
+    TPL[chaser_template] -- "build_template" --&gt; TX
+    EST["full_node::estimate&lt;br/&gt;(server RPC)"] -- "estimate(target, mode)" --&gt; TX
 
     TX -- "chase::transaction (link)" --&gt; TOUT["protocol_transaction_out_*"]
-    TX -- "chase::transaction (link)" --&gt; TPL[chaser_template]
-    TX -- "chase::transaction (link)" --&gt; EST[chaser_estimate]
+    TX -- "chase::transaction (link)" --&gt; TPL
     TX -- "chase::checked (h)" --&gt; CHK[chaser_download]
     TX -- "chase::checked (h)" --&gt; VAL[chaser_validate]
     TX -- "chase::unchecked (link)" --&gt; HDR[chaser_header]
 
-    TX -.-&gt;|"reads: is_tx, to_duplicates, is_witness_match, is_pooled,&lt;br/&gt;is_confirmed_tx, get_transaction, get_context, to_transactions,&lt;br/&gt;populate_with_metadata, get_scan_start, get_latch_tx"| STORE[(query)]
+    TX -.-&gt;|"reads: is_tx, to_duplicates, is_witness_match, is_pooled,&lt;br/&gt;is_confirmed_tx, get_transaction, get_context, to_transactions,&lt;br/&gt;populate_with_metadata, get_scan_start, get_latch_tx,&lt;br/&gt;get_pool_coverage, get_pool_template, get_pool_projection, get_pool_arrivals"| STORE[(query)]
     TX -.-&gt;|"writes: set_code (tx, block), set_pooled, set_silent,&lt;br/&gt;set_pooling, set_scan_starts, set_block_unconfirmable"| STORE
 </div>
 <hr />
-<h2 id="8-spec-view">8. Spec view<a class="anchor" href="#8-spec-view" aria-label="Link to this section">#</a></h2>
+<h2 id="9-spec-view">9. Spec view<a class="anchor" href="#9-spec-view" aria-label="Link to this section">#</a></h2>
 <pre><code>chaser_transaction : Process
-  state: pool_ctx : Context, pooling ∈ 𝔹, scanning ∈ 𝔹
-  inputs:  chase::{organized, reorganized, stop}
-           submit(txs, test), submit_compact(txs, links, link) RPCs
-  outputs: chase::{transaction, checked, unchecked}; handler codes
+  state: pool_ctx : Context, pooling ∈ 𝔹, scanning ∈ 𝔹,
+         floor ∈ ℕ, projection (cache), arrivals (cache), projected ∈ 𝔹, arrived ∈ 𝔹
+  inputs:  chase::{organized, reorganized, pruned, stop}
+           submit(txs, test), submit_compact(txs, links, link),
+           build_template(), estimate(target, mode) RPCs
+  outputs: chase::{transaction, checked, unchecked}; handler codes, templates, rates
   effects: tx archival, pooled/silent rows, block association, scan starts
 </code></pre>
 <p>Safety: Pool-Validate-1 (every pooled tx is valid under the next-block
-context); Pool-Compact-1 (association after archival, in order);
-Pool-Reorg-1. Liveness: pooling resumes on the first organized block
-after the chain becomes current; scan maps complete or fault.</p>
+context); Pool-Coverage-1 (a conflict enters only by raising the pool's
+best fee); Pool-Compact-1 (association after archival, in order);
+Pool-Reorg-1; Pool-Estimate-1. Liveness: pooling resumes on the first
+organized block after the chain becomes current; scan maps complete or
+fault.</p>
 <hr />
-<h2 id="9-notes-for-the-formal-model">9. Notes for the formal model<a class="anchor" href="#9-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
+<h2 id="10-notes-for-the-formal-model">10. Notes for the formal model<a class="anchor" href="#10-notes-for-the-formal-model" aria-label="Link to this section">#</a></h2>
 <ul>
 <li>Strand-confined except for the scan map, which only writes scan
   starts and reports back by post.</li>
 <li>The pool is a store projection ("pooled under context C"); model it
   as a set of (tx, context, arrival) rows with the latch as a one-way
-  flag.</li>
+  flag. Conflicting rows coexist; the projection and coverage choose
+  among their outcomes.</li>
 <li>The compact fill is the only place where a block is archived by a
   path other than the download protocol; its <code>checked</code> obligation is the
   same as doc 06 §8.3-1.</li>
+<li>Templates and estimates read the pool and write nothing; the
+  projection cache can be modelled away (Pool-Estimate-1).</li>
 </ul>
 <hr />
 <h2 id="cross-references">Cross-references<a class="anchor" href="#cross-references" aria-label="Link to this section">#</a></h2>
@@ -731,8 +969,9 @@ after the chain becomes current; scan maps complete or fault.</p>
   ordering)</li>
 <li><a href="header-protocols.html"><code>07-header-protocols</code></a> §4 (compact fill)</li>
 <li><a href="transaction-protocols.html"><code>10-tx-protocols</code></a> (submitters and announcers)</li>
-<li><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §3, §4 (<code>chaser_template</code>,
-  <code>chaser_estimate</code> consume <code>transaction</code>)</li>
+<li><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §1 (<code>chaser_snapshot</code>
+  emits <code>pruned</code>), §3 (<code>chaser_template</code> consumes <code>transaction</code> and
+  requests templates)</li>
 </ul>
   </article>
 

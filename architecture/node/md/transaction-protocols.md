@@ -18,7 +18,7 @@
 
 | File                                                    | Lines | Role                                                              |
 | ------------------------------------------------------- | ----- | ----------------------------------------------------------------- |
-| `src/protocols/protocol_transaction_in_106.cpp`         | 221   | Request announced txs, submit received txs to the pool             |
+| `src/protocols/protocol_transaction_in_106.cpp`         | 223   | Request announced txs, submit received txs to the pool             |
 | `src/protocols/protocol_transaction_in_70001.cpp`       |  84   | Accept `not_found` for requested txs                               |
 | `src/protocols/protocol_transaction_in_70013.cpp`       |  61   | Drop peers that send against our fee filter or suspension          |
 | `src/protocols/protocol_transaction_in_70016.cpp`       |  63   | Identify by wtxid                                                  |
@@ -94,7 +94,7 @@ sequenceDiagram
 
 Source: `handle_receive_inventory` `:82-117`, `create_get_data`
 `:120-141`, `handle_receive_transaction` `:155-176`,
-`do_handle_submit` `:186-215`.
+`do_handle_submit` `:186-217`.
 
 > **Invariant (TxIn-Request-1).** Only announced txs are requested and
 > only requested txs are accepted; an unrequested `tx` is a protocol
@@ -104,10 +104,11 @@ Source: `handle_receive_inventory` `:82-117`, `create_get_data`
 
 > **Invariant (TxIn-Tolerance-1).** These submit results are *not*
 > misbehaviour at 106 and are ignored: `pooling_disabled`,
-> `insufficient_fee`, `duplicate_transaction`, `double_spend`,
-> `absolute_time_locked`, `relative_time_locked`,
-> `missing_previous_output` (`:203-210`). A conflict with an unconfirmed
-> tx, an orphan, a lock evaluated against the presumed next block, and a
+> `insufficient_fee`, `duplicate_transaction`, `database::error::pool_limit`,
+> `double_spend`, `absolute_time_locked`, `relative_time_locked`,
+> `missing_previous_output` (`:204-212`). A conflict with an unconfirmed
+> tx, a conflict component larger than the pool evaluates (doc 11 §3.2),
+> an orphan, a lock evaluated against the presumed next block, and a
 > rate the peer could not know are all legitimate from the peer's view.
 > Everything else (consensus failure, faults) drops the peer.
 
@@ -174,7 +175,7 @@ resumes the send loop (`:40-68`).
 
 - Sends `feefilter{ minimum_fee_rate() }` at start and whenever
   `chase::block` or `chase::stale` changes the answer (`:42-52`,
-  `:58-69`, `:71-93`): the configured rate while current, `max_money`
+  `:58-69`, `:71-93`): `pool.minimum_fee_rate` while current, `max_money`
   while not (`protocol::minimum_fee_rate`, doc 06 §3). This is how
   currency is signalled to peers.
 - Records the peer's `feefilter` on the channel (`set_minimum_fee`,
@@ -233,7 +234,7 @@ stateDiagram-v2
 | ------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------- |
 | `in_106.cpp:100-106`                              | `error::excessive_backlog`            | more than `max_inventory` requested txs outstanding         |
 | `in_106.cpp:164-170`, `in_70001.cpp:68-74`        | `protocol_violation`                  | unrequested `tx` or `not_found`                             |
-| `in_106.cpp:203-214`                              | submit code                           | consensus failure or fault from the pool                    |
+| `in_106.cpp:204-216`                              | submit code                           | consensus failure or fault from the pool                    |
 | `in_70013.cpp:47-52`                              | `insufficient_fee`, `pooling_disabled`| tx sent against the advertised fee filter / suspension      |
 | `out_106.cpp:180-187`                             | `protocol_violation`                  | witness requested but `provide_witness` false               |
 | `out_106.cpp:215-225`                             | `system::error::not_found`            | tx requested but missing from store (106 only)              |

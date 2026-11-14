@@ -787,7 +787,8 @@ current block restarts it.</p>
 <p>Consumers: <code>session_outbound</code> adjusts its connection count on both
 events, <code>protocol_transaction_out_70013</code> re-sends its fee filter (the
 maximum while stale), and the header/block out protocols and
-<code>chaser_snapshot</code> / <code>chaser_estimate</code> act on <code>block</code> (doc 01 §2.6).</p>
+<code>chaser_snapshot</code> act on <code>block</code>, and <code>chaser_template</code> rebuilds its
+template on <code>organized</code> and <code>reorganized</code> (doc 01 §2.6).</p>
 <blockquote>
 <p><strong>Invariant (Confirm-Announce-1).</strong> <code>chase::block(link)</code> is emitted
 only when <code>is_current_chain(true)</code>. Peers don't get announcements for
@@ -840,8 +841,7 @@ the timer (<code>:457-458</code>).</p>
 <p><strong>Invariant (Confirm-Emit-1).</strong> Reorg emits <code>chase::reorganized</code> per
 popped link before any <code>chase::organized</code> for newly-confirmed links.
 Order matters for subscribers that maintain auxiliary indexes
-(<code>chaser_transaction</code> re-pools the txs of a reorganized block,
-<code>chaser_estimate</code> pops and pushes fee rates).</p>
+(<code>chaser_transaction</code> re-pools the txs of a reorganized block).</p>
 </blockquote>
 <hr />
 <h2 id="9-error-inventory">9. Error inventory<a class="anchor" href="#9-error-inventory" aria-label="Link to this section">#</a></h2>
@@ -954,7 +954,7 @@ flowchart LR
     CNF -- "chase::confirmable (link)" --&gt; X0[(no consumer)]
     CNF -- "chase::unconfirmable (link)" --&gt; HDR_in["chaser_header&lt;br/&gt;(do_disorganize)"]
     CNF -- "chase::organized / reorganized" --&gt; TX[chaser_transaction]
-    CNF -- "chase::organized / reorganized / block" --&gt; EST[chaser_estimate]
+    CNF -- "chase::organized / reorganized" --&gt; TPL[chaser_template]
     CNF -- "chase::block" --&gt; SNP[chaser_snapshot]
     CNF -- "chase::block / stale" --&gt; SOUT[session_outbound]
     CNF -- "chase::block" --&gt; POUT[protocol_block_out_106]
@@ -1105,8 +1105,9 @@ runs for this block (loop ordering at <code>chaser_confirm.cpp:248-286</code>).<
   <code>chase::valid</code> consumed here)</li>
 <li><a href="transaction-chaser.html"><code>11-chaser-transaction</code></a> §2 (consumer of
   <code>organized</code>/<code>reorganized</code>)</li>
-<li><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §1, §4
-  (<code>chaser_snapshot</code>, <code>chaser_estimate</code>, consumers of <code>chase::block</code>)</li>
+<li><a href="periphery-chasers.html"><code>12-periphery-chasers</code></a> §1, §3
+  (<code>chaser_snapshot</code>, consumer of <code>chase::block</code>; <code>chaser_template</code>,
+  consumer of <code>organized</code>/<code>reorganized</code>)</li>
 <li><a href="block-out-protocols.html"><code>08-block-out-protocols</code></a> and
   <a href="header-protocols.html"><code>07-header-protocols</code></a> (consumers of <code>chase::block</code>
   for peer announcements)</li>
