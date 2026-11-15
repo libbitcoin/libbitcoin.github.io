@@ -8,7 +8,7 @@ no installer and there are no dependencies, just a single executable file.
 
 ```
 $ chmod +x selector-linux-x64
-$ ./selector-linux-x64 bs
+$ ./selector-linux-x64
 bs-linux-x64-avx2-shani
 ```
 
@@ -62,15 +62,25 @@ The `selector`, published beside the builds as
 the CPU it runs on:
 
 ```
-$ selector-linux-x64 bs
+$ selector-linux-x64
 bs-linux-x64-avx2-shani
 ```
 
 Given a release tag, it prints the download address of that build:
 
 ```
-$ selector-linux-x64 bs <release>
+$ selector-linux-x64 <release>
 https://github.com/libbitcoin/libbitcoin-server/releases/download/<release>/bs-linux-x64-avx2-shani
+```
+
+With `--tags`, it prints the tags of the extensions the CPU has, one per
+line:
+
+```
+$ selector-linux-x64 --tags
+sse41
+avx2
+shani
 ```
 
 Any build also prints the name with `--hardware`, after the extensions of

@@ -356,7 +356,7 @@
 one for each platform and hardware level, each with a signature. There is
 no installer and there are no dependencies, just a single executable file.</p>
 <pre class="console"><code>$ chmod +x selector-linux-x64
-$ ./selector-linux-x64 bs
+$ ./selector-linux-x64
 bs-linux-x64-avx2-shani
 </code></pre>
 <h2 id="1-a-release">1. A release<a class="anchor" href="#1-a-release" aria-label="Link to this section">#</a></h2>
@@ -462,12 +462,19 @@ every extension it uses, and is faster for using them. The <code>x64</code> and
 <p>The <code>selector</code>, published beside the builds as
 <code>selector-&lt;platform&gt;-&lt;architecture&gt;</code>, prints the name of the build for
 the CPU it runs on:</p>
-<pre class="console"><code>$ selector-linux-x64 bs
+<pre class="console"><code>$ selector-linux-x64
 bs-linux-x64-avx2-shani
 </code></pre>
 <p>Given a release tag, it prints the download address of that build:</p>
-<pre class="console"><code>$ selector-linux-x64 bs &lt;release&gt;
+<pre class="console"><code>$ selector-linux-x64 &lt;release&gt;
 https://github.com/libbitcoin/libbitcoin-server/releases/download/&lt;release&gt;/bs-linux-x64-avx2-shani
+</code></pre>
+<p>With <code>--tags</code>, it prints the tags of the extensions the CPU has, one per
+line:</p>
+<pre class="console"><code>$ selector-linux-x64 --tags
+sse41
+avx2
+shani
 </code></pre>
 <p>Any build also prints the name with <code>--hardware</code>, after the extensions of
 the CPU (<code>platform</code>) and those of the build (<code>compiled</code>):</p>
