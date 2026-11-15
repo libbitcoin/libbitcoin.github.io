@@ -89,6 +89,35 @@ SITE_MENU = [
     ("about.html", "About"),
 ]
 
+RELEASE = "v4.0.3627-preview"
+SELECTORS = {
+    "selector-linux-x64": "c72aeef673d25599372fd9dae85891d471b30ae1522ead125253cb3e5328f30f",
+    "selector-linux-arm64": "446175711c94d0528fa0433d5c3a1c8a0fb5b329222190901ffc2cad8c8c4d8a",
+    "selector-macos-x64": "29dff6cc876b2849241431f8bd575441a6607b8c5bf42d43ed53cb96e11751cf",
+    "selector-macos-arm64": "20871a1e297770e0803c4e547937879a05116ab8dfcf18e4887739ad5919055f",
+    "selector-windows-x64.exe": "5464d4d5a0f446079721eda1eeaaf98631740e82af9c4bfbdb2e5d5eaaba6d0c",
+    "selector-windows-arm64.exe": "d82c0da5a3065e415fcd9f0b18c30fa79bb62167d1a652ea36e5b2541e4a56d8",
+}
+HASH_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 2 4.5 14M11.5 2 10 14M2.5 5.5h12M1.5 10.5h12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
+SIGNATURE_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="5" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 8h7M12.5 8v3M15 8v2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
+
+
+def platforms():
+    base = "https://github.com/libbitcoin/libbitcoin-server/releases"
+    rows = []
+    for icon, name, ext in (("linux", "Linux", ""), ("macos", "macOS", ""), ("windows", "Windows", ".exe")):
+        cells = ['<td><img src="images/%s.png" width="36" height="36" alt="%s"></td><td>%s</td>' % (icon, name, name)]
+        for arch in ("x64", "arm64"):
+            file = "selector-%s-%s%s" % (icon, arch, ext)
+            cells.append(
+                '<td><a href="%(base)s/download/%(tag)s/%(file)s"><code>%(file)s</code></a></td>'
+                '<td class="verify"><a href="%(base)s/tag/%(tag)s" title="SHA-256 %(hash)s" aria-label="SHA-256 of %(file)s">%(hash_icon)s</a>'
+                '<a href="%(base)s/download/%(tag)s/%(file)s.asc" title="Signature" aria-label="Signature of %(file)s">%(sig_icon)s</a></td>'
+                % dict(base=base, tag=RELEASE, file=file, hash=SELECTORS[file], hash_icon=HASH_ICON, sig_icon=SIGNATURE_ICON))
+        rows.append("<tr>%s</tr>" % "".join(cells))
+    return '<table class="platforms">\n%s\n</table>' % "\n".join(rows)
+
+
 SECTIONS = {
     "architecture": {
         "title": "Architecture Overview",
@@ -260,6 +289,7 @@ SECTIONS = {
         "h1": "Download BS",
         "description": "Download Bitcoin Server (bs): selecting a build for your hardware and verifying its signature.",
         "lede": "Download <strong>Bitcoin Server</strong> (bs): selecting a build\n      for your hardware and verifying its signature.",
+        "top": platforms(),
         "foot": "",
         "pages": [
             ("index", "Download BS"),
@@ -463,6 +493,13 @@ STYLE = """
   .mermaid svg { max-width: 100%; height: auto; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
   .doc a.figure { cursor: zoom-in; }
+  .doc table.platforms { width: auto; margin: 0; }
+  .doc table.platforms td { vertical-align: middle; }
+  .doc table.platforms img { width: 36px; height: 36px; margin: 0; border: 0; cursor: auto; }
+  .doc table.platforms td.verify { padding-left: 0; white-space: nowrap; }
+  .doc table.platforms td.verify a { display: inline-block; margin-right: 8px; color: var(--ink-3); vertical-align: middle; }
+  .doc table.platforms td.verify a:hover, .doc table.platforms td.verify a:focus { color: var(--accent); }
+  .doc table.platforms td.verify svg { display: block; }
   .doc a:not(.figure) img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .mermaid:not([data-processed]) { font-family: var(--mono); font-size: 12px; text-align: left; white-space: pre; color: var(--ink-3); }
   .mermaid p, .mermaid span, .mermaid div { margin: 0; max-width: none; }
@@ -729,7 +766,7 @@ def render(key, name, md, guard, logo, mermaid_src):
     </nav>
     <p class="lede">
       %(lede)s
-    </p>
+    </p>%(top)s
   </header>
 
   <nav class="menu">
@@ -871,7 +908,7 @@ document.querySelectorAll('.doc pre > code').forEach(function (code) {
 </html>
 """ % dict(page_title=page_title, description=description, name=name, guard=guard, logo=logo,
            style=STYLE, h1=h1, menu=menu(pages, name) if len(pages) > 1 else section_menu(body), body=body, pager=pager(pages, name),
-           mermaid=mermaid_src, mermaid_sri=' integrity="%s" crossorigin="anonymous"' % MERMAID_SRI if mermaid_src == MERMAID else "", key=key, root=root(key), site=site_menu(key, name), lede=section["lede"], foot=foot)
+           mermaid=mermaid_src, mermaid_sri=' integrity="%s" crossorigin="anonymous"' % MERMAID_SRI if mermaid_src == MERMAID else "", key=key, root=root(key), site=site_menu(key, name), lede=section["lede"], top='\n    <div class="doc top">\n%s\n    </div>' % section["top"] if "top" in section else "", foot=foot)
 
 
 def check_links(key, pages):

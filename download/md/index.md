@@ -1,10 +1,7 @@
 # Download BS
 
-<div class="banner"><strong>Version 4 release preview builds are planned for early November 2026.</strong> Until then, build <code>bs</code> from source (see <a href="../start/index.html">Quick Start</a>).</div>
-
-<p class="download"><a href="https://github.com/libbitcoin/libbitcoin-server/releases">Download Bitcoin Server</a></p>
-
-Builds of `bs` are published on the libbitcoin-server
+Each `selector` names the build for its CPU (see
+[Selecting a build](#2-selecting-a-build)). Builds of `bs` are published on the libbitcoin-server
 [releases page](https://github.com/libbitcoin/libbitcoin-server/releases),
 one for each platform and hardware level, each with a signature. There is
 no installer and there are no dependencies, just a single executable file.
