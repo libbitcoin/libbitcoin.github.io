@@ -34,7 +34,7 @@
 ### 1.1 Configuration (immutable, set at construction)
 
 ```cpp
-// chaser_download.hpp:96-102  / chaser_download.cpp:61-71
+// chaser_download.hpp:97-102  / chaser_download.cpp:61-71
 const float  allowed_deviation_;       // σ multiplier for "slow" cutoff
 const size_t maximum_concurrency_;     // download window size cap
 const size_t maximum_height_;          // hard ceiling (0 → no cap)
@@ -51,7 +51,7 @@ the inventory (`:54-59`).
 ### 1.2 Strand-protected runtime state
 
 ```cpp
-// chaser_download.hpp:104-115
+// chaser_download.hpp:105-115
 size_t   inventory_{};   // per-channel inventory size — latched after first nonzero
 size_t   requested_{};   // height of last request issued
 size_t   advanced_{};    // count of chase::valid events received (NOT a height)
@@ -68,7 +68,7 @@ below are associated (downloaded) on the candidate chain.
 
 ### 1.3 Why `advanced_` is a counter, not a height
 
-`do_advanced` (`chaser_download.cpp:369-379`) increments `advanced_` on every
+`do_advanced` (`chaser_download.cpp:365-375`) increments `advanced_` on every
 `chase::valid` event, regardless of which height was validated. The
 *round* is complete when `advanced_ == requested_`. This is correct
 because:
@@ -83,7 +83,7 @@ permitted as long as the count balances.
 
 > **Invariant (Download-State-1).** `position() ≤ requested_` and
 > `advanced_ ≤ requested_` always hold on the strand. `set_unassociated`
-> short-circuits if either falls behind (`chaser_download.cpp:503-509`).
+> short-circuits if either falls behind (`chaser_download.cpp:499-505`).
 
 ### 1.4 The `job_` token (purge semaphore)
 
@@ -93,9 +93,9 @@ permitted as long as the count balances.
 - A `race_all` invokes its completer **once all copies are dropped**.
 - `chaser_download` holds one copy in `job_`. Every peer protocol that
   calls `get_hashes` receives a copy via the `map_handler`
-  (`chaser_download.cpp:455`: `handler(success, get_map(), job_)`).
+  (`chaser_download.cpp:451`: `handler(success, get_map(), job_)`).
 - When `chaser_download` drops its copy via `stop_tracking()`
-  (`:193-201`), the completer fires only after every peer has also
+  (`:189-197`), the completer fires only after every peer has also
   dropped its copy — i.e., released its current download work.
 
 So `job_` is effectively a *purge barrier*: "wait until every
@@ -104,8 +104,8 @@ in-flight download has either completed or surrendered, then resume".
 > **Invariant (Download-Job-1).** `job_ == nullptr` ⇒ chaser is *purging*
 > (currently waiting for the barrier). While purging, all of `do_bump`,
 > `do_get_hashes`, `do_put_hashes`, and `set_unassociated` are no-ops
-> (`:393-394`, `:452-453`, `:463-464`, `:500-501`). The transition out of
-> purging is exactly the `do_handle_purged` callback (`:213-219`) which
+> (`:389-390`, `:448-449`, `:459-460`, `:496-497`). The transition out of
+> purging is exactly the `do_handle_purged` callback (`:209-215`) which
 > calls `start_tracking()` followed by `do_bump`.
 
 ---
@@ -186,11 +186,11 @@ Outputs:
 
 | Event              | When                                                                | Payload                     |
 | ------------------ | ------------------------------------------------------------------- | --------------------------- |
-| `chase::download`  | After `set_unassociated` adds new work (`:420-421`), or `do_put_hashes` re-queues (`:466-467`) | `count` added |
-| `chase::windowed`  | `do_bump` advanced the position to `requested_` (`:406-407`)        | `height`                    |
-| `chase::purge`     | After `do_regressed` purges all outstanding work (`:363`)           | `branch_point`              |
-| `chase::split`     | (`notify_one`) On starvation, target the slowest tracked channel (`:247`) | `channel` (= starved channel) |
-| `chase::stall`     | On starvation when **no speeds** are tracked (`:252`)               | `channel` (= starved channel) |
+| `chase::download`  | After `set_unassociated` adds new work (`:416-417`), or `do_put_hashes` re-queues (`:462-463`) | `count` added |
+| `chase::windowed`  | `do_bump` advanced the position to `requested_` (`:402-403`)        | `height`                    |
+| `chase::purge`     | After `do_regressed` purges all outstanding work (`:359`)           | `branch_point`              |
+| `chase::split`     | (`notify_one`) On starvation, target the slowest tracked channel (`:243`) | `channel` (= starved channel) |
+| `chase::stall`     | On starvation when **no speeds** are tracked (`:248`)               | `channel` (= starved channel) |
 
 ---
 
@@ -237,11 +237,11 @@ stateDiagram-v2
 > followed (eventually, after barrier completion) by an idempotent return
 > to the ACTIVE state with `position_` rewound to
 > `min(branch_point, position)`, `requested_ = advanced_ = position`, and
-> `maps_` empty (`:348-364`). While in PURGING, no work is handed out and
+> `maps_` empty (`:344-360`). While in PURGING, no work is handed out and
 > no new work is computed.
 
 > **Invariant (Download-Purge-2).** `do_regressed` ignores regressions at or
-> above `max(position, requested_)` (`:353-354`). These are
+> above `max(position, requested_)` (`:349-350`). These are
 > "inconsequential": neither the position nor the window has reached that
 > height, so there is no work to purge. A regression *inside* the window
 > but above the position still purges, because the window must follow the
@@ -249,7 +249,7 @@ stateDiagram-v2
 
 > **Invariant (Download-Window-1).** `chase::windowed(height)` is emitted
 > exactly when the contiguous associated position reaches the last
-> requested height (`:401-408`). `chaser_validate` uses it to know that no
+> requested height (`:397-404`). `chaser_validate` uses it to know that no
 > more blocks are coming for the window and drain its batches (doc 04 §5).
 
 ---
@@ -275,7 +275,7 @@ otherwise:              record speed = double(speed)
                         else:                          return success
 ```
 
-(`chaser_download.cpp:278-343`; `minimum_for_standard_deviation = 4`,
+(`chaser_download.cpp:274-339`; `minimum_for_standard_deviation = 4`,
 `chaser_download.hpp:83`)
 
 - `exhausted_channel`: peer announces "I have nothing else useful for
@@ -287,7 +287,7 @@ otherwise:              record speed = double(speed)
 ### 6.2 `do_starved` (when a peer has no work)
 
 `protocol_block_in_31800` emits `chase::starved(self)` when it receives an
-empty map. `do_starved` (`:224-253`):
+empty map. `do_starved` (`:220-249`):
 
 1. Removes `self` from `speeds_` (so it can't be picked as its own
    victim).
@@ -305,32 +305,32 @@ The receiver of `split`/`stall` is `protocol_block_in_31800`; see
 
 ## 7. `set_unassociated` — the work generator
 
-`set_unassociated` (`chaser_download.cpp:496-571`) is the heart of work
+`set_unassociated` (`chaser_download.cpp:492-567`) is the heart of work
 generation. It:
 
 1. Early-exits if purging, if not all previously-requested work has cleared
    (`position < requested`), or if validation has not caught up
-   (`advanced < requested`) (`:500-509`).
-2. Latches `inventory_` on first nonzero (`:512-514` →
+   (`advanced < requested`) (`:496-505`).
+2. Latches `inventory_` on first nonzero (`:508-510` →
    `get_inventory_size`).
 3. Computes a `stop` height: `min(position + maximum_concurrency,
    maximum_height)`, **clamped to the bypass height** while the position
-   is under it (`:524-527`). Bypassed blocks may archive unprobed, so the
+   is under it (`:520-523`). Bypassed blocks may archive unprobed, so the
    window must not extend above the bypass height until all blocks at or
    below it are associated.
 4. When current and `compact_timeout` is nonzero, if the top candidate is
    a compact-announced header that is not yet associated, clamps `stop`
    to one below it and starts the compact timer (once per link)
-   (`:530-547`). This gives the compact fill a chance before the block is
+   (`:526-543`). This gives the compact fill a chance before the block is
    downloaded in full; when the timer fires, `expired_` records the link
-   and `do_headers` re-runs the generator without the clamp (`:573-582`).
+   and `do_headers` re-runs the generator without the clamp (`:569-578`).
 5. Loops `query.get_unassociated_above(requested_, inventory_, stop)`,
    chunking each result into a `map_ptr` and pushing onto `maps_`, until
    `set_map` returns false (empty map, end of unassociated headers
-   below `stop`) (`:549-560`).
+   below `stop`) (`:545-556`).
 6. Returns total count added.
 
-`get_inventory_size` (`:584-593`):
+`get_inventory_size` (`:580-589`):
 
 - Returns 0 if no connections OR if `is_current_chain(false)` is false —
   i.e. the **candidate** (header) chain isn't current.
@@ -345,12 +345,12 @@ until header sync has produced a current (and therefore presumed
 near-canonical) candidate.
 
 > **Invariant (Download-Inventory-1).** `inventory_` is computed at most
-> once (latch on first nonzero result, `:512-514`). Peer inventory size is
+> once (latch on first nonzero result, `:508-510`). Peer inventory size is
 > fixed for the run, after the first "currentness" of the chain.
 
 > **Invariant (Download-Bypass-1).** No download window spans the bypass
 > height: while `position < bypass_height`, `stop ≤ bypass_height`
-> (`:526-527`). Validation of bypassed blocks therefore never races
+> (`:522-523`). Validation of bypassed blocks therefore never races
 > ahead of their association.
 
 ---
@@ -436,7 +436,7 @@ A formal model can represent `chaser_download` as a process with:
    contracts, the position increases monotonically when not purging.
    *Liveness*; requires fairness on peer scheduling.
 5. **Split correctness**: `chase::split(self)` is sent only to
-   `notify_one(slow)` where `slow ≠ self` (`:228-247`).
+   `notify_one(slow)` where `slow ≠ self` (`:224-243`).
 6. **Purge barrier completeness**: every `chase::purge` is eventually
    followed by a `chase::download` (or by `stop`). This depends on the
    `race_all` semantics and peer compliance.

@@ -44,9 +44,11 @@
 
 ## 1. Operating modes
 
-There is no longer a defer-confirmation setting: the chaser always
-subscribes (`chaser_confirm.cpp:43-58`). Its only configuration input is
-the currency window used by the stale timer (§7).
+The chaser always
+subscribes (`chaser_confirm.cpp:45-60`). Its configuration inputs are
+the currency window used by the stale timer (§7) and `maximum_height`,
+which only logs the elapsed time when that height is organized
+(`:425-432`).
 
 ### 1.1 No parallel pool (unlike validate)
 
@@ -57,15 +59,16 @@ sequential.
 
 > **Invariant (Confirm-Conc-1).** All confirm operations run on the
 > chaser's own strand. Every `do_*` and helper has
-> `BC_ASSERT(stranded())` at entry. No off-strand work.
+> `BC_ASSERT(stranded())` at entry. The only off-strand work is the
+> wire-block broadcast, run on `broadcast_strand_` (`:467-489`).
 
 ---
 
 ## 2. State
 
 The chaser holds *no in-memory state machine state* beyond the base
-class's `position_` (set in `start`, otherwise unused) and the stale
-timer (`chaser_confirm.hpp:78`).
+class's `position_` (set in `start`, otherwise unused), the stale
+timer and `maximum_height_` (`chaser_confirm.hpp:84-85`).
 
 All durable state lives in the database, specifically:
 
@@ -99,8 +102,8 @@ Inputs:
 | `chase::stop`             | service                      | unsubscribe                                                           |
 
 Suspension: `handle_chase` short-circuits with `return true` if
-`suspended()` (`chaser_confirm.cpp:84-85`). `do_bumped` also has an
-explicit early exit on `suspended()` (`:158-159`).
+`suspended()` (`chaser_confirm.cpp:86-87`). `do_bumped` also has an
+explicit early exit on `suspended()` (`:160-161`).
 
 > **Invariant (Confirm-Regress-1).** Regression events are *not acted
 > upon*. The next bump-driven call to `do_bumped` will use
@@ -112,12 +115,16 @@ Outputs (all from `chaser_confirm.cpp`, all stranded):
 
 | Event              | Site                            | Payload      | Trigger                                                                 |
 | ------------------ | ------------------------------- | ------------ | ----------------------------------------------------------------------- |
-| `chase::reorganized` | `:380` (in `set_reorganized`) | `link`       | Each `pop_confirmed` during a reorg or rollback                         |
-| `chase::organized` | `:413` (in `set_organized`)     | `link`       | Each `push_confirmed` during a reorg or rollback                        |
-| `chase::block`     | `:445` (in `announce`)          | `link`       | Each `set_organized` *if the confirmed chain is current*                |
-| `chase::stale`     | `:482` (in `handle_stale_timer`)| —            | The confirmed top aged past the currency window without a new block     |
-| `chase::unconfirmable` | `:355` (in `notify_block`)  | `link`       | Block failed `block_confirmable` check                                  |
-| `chase::confirmable` | `:362` (in `notify_block`)    | `link`       | Block passed, or was bypassed / previously confirmable                  |
+| `chase::reorganized` | `:386` (in `set_reorganized`) | `link`       | Each `pop_confirmed` during a reorg or rollback                         |
+| `chase::organized` | `:420` (in `set_organized`)     | `link`       | Each `push_confirmed` during a reorg or rollback                        |
+| `chase::block`     | `:462` (in `announce`)          | `link`       | Each `set_organized` *if the confirmed chain is current*                |
+| `chase::stale`     | `:523` (in `handle_stale_timer`)| —            | The confirmed top aged past the currency window without a new block     |
+| `chase::unconfirmable` | `:361` (in `notify_block`)  | `link`       | Block failed `block_confirmable` check                                  |
+| `chase::confirmable` | `:368` (in `notify_block`)    | `link`       | Block passed, or was bypassed / previously confirmable                  |
+
+`set_reorganized` and `set_organized` also post the block to peers as a
+`wire_block` (organized `false`/`true`) on `broadcast_strand_` when
+`wire_block_demanded()` and the confirmed chain is current (`:467-489`).
 
 ---
 
@@ -287,14 +294,14 @@ stateDiagram-v2
 
 ## 6. The three confirmation paths
 
-`organize` (`chaser_confirm.cpp:240-291`) is a switch on the
+`organize` (`chaser_confirm.cpp:242-293`) is a switch on the
 *candidate-side state flags* of each block in the fork, read with the
 database's `is_bypass`, `is_confirmable`, `is_validated` predicates:
 
 ### 6.1 Bypassed
 
 ```cpp
-// chaser_confirm.cpp:253-262
+// chaser_confirm.cpp:255-264
 if (!query.set_filter_head(item.link)) { fault(confirm6); return; }
 complete_block(error::success, item.link, height, true);    // bypass=true
 ```
@@ -306,7 +313,7 @@ validate). Skip confirmation work, just persist filter head, mark
 ### 6.2 Previously confirmable
 
 ```cpp
-// chaser_confirm.cpp:263-267
+// chaser_confirm.cpp:265-269
 // Previously confirmable is not considered bypass.
 complete_block(error::success, item.link, height, false);
 ```
@@ -321,8 +328,10 @@ The normal path — block was validated, must now be confirmed against the
 *current* confirmed chain.
 
 ```cpp
-// chaser_confirm.cpp:293-330 (confirm_block)
+// chaser_confirm.cpp:295-336 (confirm_block)
 if (const auto ec = query.block_confirmable(link)) {
+    if (database::error::error_category::contains(ec))
+        return complete_block(ec, link, height, false);      // faults
     if (!query.set_block_unconfirmable(link)) { fault(confirm9); return false; }
     if (!roll_back(popped, fork_point, height-1)) { fault(confirm10); return false; }
     return complete_block(ec, link, height, false);          // emits chase::unconfirmable
@@ -336,21 +345,22 @@ return complete_block(error::success, link, height, false);  // emits chase::con
 > `set_block_confirmable`. Symmetric with validate's ordering: state
 > bit is the last write so it never advances over an incomplete record.
 
-> **Invariant (Confirm-Rollback-1).** A `block_confirmable` failure
+> **Invariant (Confirm-Rollback-1).** A non-database `block_confirmable`
+> failure
 > triggers `roll_back(popped, fork_point, height-1)` which:
 > 1. Pops the confirmed top back to `fork_point` (reversing
 >    confirmations completed for this fork before the failing block).
 > 2. Re-pushes the originally-popped blocks (restoring the previous
 >    confirmed chain).
 >
-> Implementation: `chaser_confirm.cpp:422-436`. Post-condition: confirmed
+> Implementation: `chaser_confirm.cpp:439-453`. Post-condition: confirmed
 > chain == its state before this `do_bumped` call.
 
 ### 6.4 All other states → fault
 
 ```cpp
-// chaser_confirm.cpp:274-278
-default: fault(error::confirm7);
+// chaser_confirm.cpp:276-280
+else { fault(error::confirm7); return; }
 ```
 
 > **Invariant (Confirm-State-1).** `get_validated_fork` should not
@@ -360,21 +370,23 @@ default: fault(error::confirm7);
 
 ### 6.5 Error routing in `complete_block`
 
-`complete_block` (`:333-347`) treats any **database-category** error from
-`block_confirmable` as a fault (`:339-344`) — disk full is the recoverable
-case — and otherwise hands the code to `notify_block`, which emits
-`unconfirmable` for a consensus failure or `confirmable` for success
-(`:349-366`).
+`complete_block` (`:339-353`) treats any **database-category** error as a
+fault (`:345-350`) — disk full is the recoverable case — and otherwise
+hands the code to `notify_block`, which emits `unconfirmable` for a
+consensus failure or `confirmable` for success (`:355-372`).
+`confirm_block` passes a database-category error from
+`block_confirmable` straight to `complete_block` (`:304-305`), without
+marking the block unconfirmable or rolling back.
 
 ---
 
 ## 7. Announcement and the stale timer
 
-`set_organized` calls `announce` (`:417`), which emits `chase::block` and
+`set_organized` calls `announce` (`:434`), which emits `chase::block` and
 (re)starts the stale timer **only when the confirmed chain is current**
-(`:438-448`). The timer expires at the top block's timestamp plus the
+(`:455-465`). The timer expires at the top block's timestamp plus the
 currency window, which may be sooner than a full window from now
-(`:452-466`); on expiry it emits `chase::stale` (`:469-483`). Each new
+(`:493-507`); on expiry it emits `chase::stale` (`:510-524`). Each new
 current block restarts it.
 
 Consumers: `session_outbound` adjusts its connection count on both
@@ -390,7 +402,7 @@ template on `organized` and `reorganized` (doc 01 §2.6).
 > **Invariant (Confirm-Stale-1).** Between a `chase::block` and the next
 > one, at most one `chase::stale` is emitted, and only after the top's
 > timestamp plus the currency window has passed. A zero window disables
-> the timer (`:457-458`).
+> the timer (`:498-499`).
 
 ---
 
@@ -422,21 +434,21 @@ All terminal (call `fault`, suspend network).
 
 | Code                  | Site                                  | Cause                                                                                                            |
 | --------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `confirm1`            | `chaser_confirm.cpp:174`              | `fork_point > top` — fork above confirmed top (inconsistent store)                                              |
-| `confirm2`            | `chaser_confirm.cpp:185`              | `get_work(fork)` failed                                                                                          |
-| `confirm3`            | `chaser_confirm.cpp:194`              | `get_strong_fork(strong, work, fork_point, true)` failed                                                        |
-| `confirm4`            | `chaser_confirm.cpp:220`              | `to_confirmed(top)` returned terminal during pop                                                                |
-| `confirm5`            | `chaser_confirm.cpp:227`              | `pop_confirmed()` failed in `set_reorganized`                                                                   |
-| `confirm6`            | `chaser_confirm.cpp:257`              | `set_filter_head` failed in bypass path                                                                         |
-| `confirm7`            | `chaser_confirm.cpp:276`              | Unexpected block state in fork                                                                                  |
-| `confirm8`            | `chaser_confirm.cpp:283`              | `set_organized` (push_confirmed) failed                                                                          |
-| `confirm9`            | `chaser_confirm.cpp:303`              | `set_block_unconfirmable` failed after `block_confirmable` returned error                                       |
-| `confirm10`           | `chaser_confirm.cpp:309`              | `roll_back` failed                                                                                              |
-| `confirm11`           | `chaser_confirm.cpp:319`              | `set_filter_head` failed before `set_block_confirmable`                                                         |
-| `confirm12`           | `chaser_confirm.cpp:325`              | `set_block_confirmable` failed                                                                                  |
-| (database code)       | `chaser_confirm.cpp:339-344`          | `block_confirmable` returned a database-category error (store fault or disk full)                               |
-| `suspended_channel`   | `chaser_confirm.cpp:392-398` (`!NDEBUG`) | `confirmed_height != top+1` in `set_organized` — sequencing bug. Debug-only.                                 |
-| `suspended_service`   | `chaser_confirm.cpp:400-406` (`!NDEBUG`) | `to_parent(link) != to_confirmed(previous_height)` — parent mismatch. Debug-only.                            |
+| `confirm1`            | `chaser_confirm.cpp:176`              | `fork_point > top` — fork above confirmed top (inconsistent store)                                              |
+| `confirm2`            | `chaser_confirm.cpp:187`              | `get_work(fork)` failed                                                                                          |
+| `confirm3`            | `chaser_confirm.cpp:196`              | `get_strong_fork(strong, work, fork_point, true)` failed                                                        |
+| `confirm4`            | `chaser_confirm.cpp:222`              | `to_confirmed(top)` returned terminal during pop                                                                |
+| `confirm5`            | `chaser_confirm.cpp:229`              | `pop_confirmed()` failed in `set_reorganized`                                                                   |
+| `confirm6`            | `chaser_confirm.cpp:259`              | `set_filter_head` failed in bypass path                                                                         |
+| `confirm7`            | `chaser_confirm.cpp:278`              | Unexpected block state in fork                                                                                  |
+| `confirm8`            | `chaser_confirm.cpp:285`              | `set_organized` (push_confirmed) failed                                                                          |
+| `confirm9`            | `chaser_confirm.cpp:309`              | `set_block_unconfirmable` failed after `block_confirmable` returned error                                       |
+| `confirm10`           | `chaser_confirm.cpp:315`              | `roll_back` failed                                                                                              |
+| `confirm11`           | `chaser_confirm.cpp:325`              | `set_filter_head` failed before `set_block_confirmable`                                                         |
+| `confirm12`           | `chaser_confirm.cpp:331`              | `set_block_confirmable` failed                                                                                  |
+| (database code)       | `chaser_confirm.cpp:304-305, 345-350` | `block_confirmable` returned a database-category error (store fault or disk full)                               |
+| `suspended_channel`   | `chaser_confirm.cpp:400-405` (`!NDEBUG`) | `confirmed_height != top+1` in `set_organized` — sequencing bug. Debug-only.                                 |
+| `suspended_service`   | `chaser_confirm.cpp:407-413` (`!NDEBUG`) | `to_parent(link) != to_confirmed(previous_height)` — parent mismatch. Debug-only.                            |
 
 > **Spec obligation list.** As with header/validate, every `confirmN`
 > is unreachable under store-consistency invariants plus the strand
@@ -496,7 +508,7 @@ chaser_confirm : Process
    each successful `set_reorganized`, it decreases by exactly one.
 
 2. **Reorg atomicity** (Confirm-Rollback-1): if `confirm_block` fails
-   mid-fork, the post-rollback state equals the pre-`do_bumped` state.
+   mid-fork on a consensus error, the post-rollback state equals the pre-`do_bumped` state.
    Either the whole fork commits or no part of it does.
 
 3. **State-bit ordering** (Confirm-Order-1): `set_block_confirmable` is
@@ -519,7 +531,7 @@ chaser_confirm : Process
 - Provided validate keeps emitting `chase::valid`, every block on the
   candidate chain with a validated state eventually receives a
   `do_bumped` call that includes it in the fork.
-- The self-bump after fork drain (`chaser_confirm.cpp:288-290`) ensures
+- The self-bump after fork drain (`chaser_confirm.cpp:290-292`) ensures
   no stall when `chase::valid` arrived during the in-progress
   iteration.
 
@@ -573,7 +585,7 @@ block_confirmable(link, fork, store_state) →
 
 The chaser sequences calls so that prior fork blocks have already had
 `set_block_confirmable` written by the time `block_confirmable(link)`
-runs for this block (loop ordering at `chaser_confirm.cpp:248-286`).
+runs for this block (loop ordering at `chaser_confirm.cpp:250-288`).
 
 ---
 

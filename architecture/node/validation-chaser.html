@@ -426,9 +426,10 @@ chaser however — it is split across several stages:</p>
 </table></div>
 <hr />
 <h2 id="1-configuration">1. Configuration<a class="anchor" href="#1-configuration" aria-label="Link to this section">#</a></h2>
-<pre><code class="language-cpp">// chaser_validate.hpp:181-192, chaser_validate.cpp:37-54
+<pre><code class="language-cpp">// chaser_validate.hpp:185-196, chaser_validate.cpp:37-55
 const uint32_t subsidy_interval_;        // bitcoin: 210000 (halving interval)
 const uint64_t initial_subsidy_;         // bitcoin: 50 * 10^8 sat
+const chain::script signet_challenge_;   // system.signet_challenge (block.check(ctx, …))
 const size_t   maximum_backlog_;         // = node.maximum_concurrency (in-flight cap)
 const size_t   maximum_height_;          // stop height (0 → none)
 const uint64_t verify_target_;           // node.batch_verify: signatures per bank before drain
@@ -439,14 +440,14 @@ const bool     silent_enabled_;          // batch_silent &gt; 0 and (gpu or cpu_
 const bool     node_witness_;            // node.require_witness: fetch witness data
 const bool     filter_;                  // archive.filter_enabled(): produce BIP158 bodies
 </code></pre>
-<p><code>start()</code> logs why batching is disabled or on the CPU (<code>chaser_validate.cpp:56-72</code>),
+<p><code>start()</code> logs why batching is disabled or on the CPU (<code>chaser_validate.cpp:59-80</code>),
 sets the position to the fork point, <strong>drains any banks left from a
-previous run</strong> (<code>start_batch</code>, <code>start_silent_batch</code>, <code>:73-78</code>) and
-subscribes. There is no longer a defer-validation setting and the chaser
+previous run</strong> (<code>start_batch</code>, <code>start_silent_batch</code>, <code>:82-87</code>) and
+subscribes. There is no defer-validation setting and the chaser
 is always active.</p>
 <h3 id="11-bypass-conditions-per-block">1.1 Bypass conditions per block<a class="anchor" href="#11-bypass-conditions-per-block" aria-label="Link to this section">#</a></h3>
 <p>Bypass is a stored header property, read as <code>database::is_bypass(state)</code>
-(<code>:230</code>): the block is under the top checkpoint or was archived under the
+(<code>:239</code>): the block is under the top checkpoint or was archived under the
 active milestone (doc 07 §2.3).</p>
 <blockquote>
 <p><strong>Invariant (Validate-Bypass-1).</strong> Under bypass:
@@ -455,18 +456,18 @@ active milestone (doc 07 §2.3).</p>
 - the block is read as a <code>chain::view::block</code> and only its optional
   indexes are produced (<code>validate_view</code>, §4.2).</p>
 <p><code>set_block_valid</code> <strong>is</strong> written on the bypass path (<code>complete_view</code>,
-<code>chaser_validate_parallel.cpp:197-210</code>), after <code>set_filter_body</code>. This
+<code>chaser_validate_parallel.cpp:204-217</code>), after <code>set_filter_body</code>. This
 is the only place where consensus checks can be elided; it is gated on
 checkpoint/milestone — the rest of the system must trust that these
 gates are sound.</p>
 </blockquote>
 <p>A bypassed block that needs <strong>no</strong> index at all (no filters and not
 silent-eligible) is completed on the strand without posting
-(<code>chaser_validate.cpp:250-253</code>).</p>
+(<code>chaser_validate.cpp:259-262</code>).</p>
 <hr />
 <h2 id="2-concurrency-model--unique-among-the-chasers">2. Concurrency model — unique among the chasers<a class="anchor" href="#2-concurrency-model--unique-among-the-chasers" aria-label="Link to this section">#</a></h2>
 <p><code>chaser_validate</code> is the only chaser with its <strong>own thread pool</strong>.</p>
-<pre><code class="language-cpp">// chaser_validate.hpp:163-166, chaser_validate.cpp:39-41, :393-401
+<pre><code class="language-cpp">// chaser_validate.hpp:166-169, chaser_validate.cpp:39-41, :402-410
 network::threadpool        validation_threadpool_;   // node.threads, node.thread_priority
 network::io::strand        validation_strand_;       // on validation_threadpool_
 strand()    → validation_strand_     // overrides base
@@ -506,12 +507,13 @@ stranded()  → validation_strand_.running_in_this_thread()
 batch drains are <em>self-serviced</em> by whichever thread completes the work
 that matured the bank. <code>maximum_backlog_</code> caps in-flight parallelism.</p>
 <h3 id="21-lifecycle-override">2.1 Lifecycle override<a class="anchor" href="#21-lifecycle-override" aria-label="Link to this section">#</a></h3>
-<pre><code class="language-cpp">// chaser_validate.cpp:374-391
+<pre><code class="language-cpp">// chaser_validate.cpp:383-400
 void stopping(const code&amp; ec) { stopping_.store(true); validation_threadpool_.stop(); chaser::stopping(ec); }
 void stop()                   { if (!validation_threadpool_.join()) std::abort(); }
 </code></pre>
 <p><code>stopping_</code> is a <code>stopper</code> observed by the batch kernels so long-running
-GPU/CPU verification cancels (<code>do_process_batch</code>, <code>:103</code>, <code>:111</code>).</p>
+GPU/CPU verification cancels (<code>do_process_batch</code>, <code>chaser_validate_batch.cpp:130</code>, <code>:155</code>;
+<code>do_process_silent_batch</code>, <code>:395</code>).</p>
 <blockquote>
 <p><strong>Invariant (Validate-Lifecycle-1).</strong> All posted <code>validate_block</code> jobs
 and any running batch drain must complete or cancel before <code>stop()</code>
@@ -519,17 +521,17 @@ returns. The threadpool's <code>join</code> enforces the former; the <code>stopp
 cancel token and the <code>closed()</code> checks in the drain loops the latter.</p>
 </blockquote>
 <h3 id="22-backlog-control">2.2 Backlog control<a class="anchor" href="#22-backlog-control" aria-label="Link to this section">#</a></h3>
-<pre><code class="language-cpp">// chaser_validate.cpp:206-264 (do_bumped, on strand)
+<pre><code class="language-cpp">// chaser_validate.cpp:215-273 (do_bumped, on strand)
 while ((validate_backlog_ &lt; maximum_backlog_) &amp;&amp; !closed() &amp;&amp; !suspended()) {
     ... pick next height, decide path, post_block/post_scan or complete inline ...
     set_position(height++);
 }
 
-// chaser_validate_parallel.cpp:127-128 (validate_block, off-strand, at the END)
+// chaser_validate_parallel.cpp:135-136 (validate_block, off-strand, at the END)
 --validate_backlog_;
 complete_block(ec, link, ctx.height, bypass, batched, capturing);
 
-// chaser_validate.cpp:284-289 (complete_block)
+// chaser_validate.cpp:294-298 (complete_block)
 if (is_zero(validate_backlog_.load()) &amp;&amp; !stranded())
     handle_chase({}, chases::bump{});      // self-bump, not through the bus
 </code></pre>
@@ -546,15 +548,15 @@ if (is_zero(validate_backlog_.load()) &amp;&amp; !stranded())
 <blockquote>
 <p><strong>Invariant (Validate-Backlog-1).</strong> The number of concurrently running
 <code>validate_block</code>/<code>scan_block</code> tasks is always ≤ <code>maximum_backlog_</code>.
-Enforced by the loop guard at <code>chaser_validate.cpp:213</code>.</p>
+Enforced by the loop guard at <code>chaser_validate.cpp:222</code>.</p>
 <p><strong>Invariant (Validate-Backlog-2).</strong> Self-bump on backlog drain
-(<code>chaser_validate.cpp:284-289</code>) prevents validation from stalling when
+(<code>chaser_validate.cpp:294-298</code>) prevents validation from stalling when
 the loop guard would otherwise sit idle. From a spec standpoint it is
 equivalent to a bus-mediated <code>chase::bump</code>; treat it as such.</p>
 </blockquote>
 <hr />
 <h2 id="3-bus-integration-verified">3. Bus integration (verified)<a class="anchor" href="#3-bus-integration-verified" aria-label="Link to this section">#</a></h2>
-<p>Inputs (<code>chaser_validate.cpp:84-165</code>):</p>
+<p>Inputs (<code>chaser_validate.cpp:93-174</code>):</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -602,13 +604,13 @@ equivalent to a bus-mediated <code>chase::bump</code>; treat it as such.</p>
 </tbody>
 </table></div>
 <p>Suspension gate: <code>handle_chase</code> short-circuits with <code>return true</code>
-(remain subscribed) if <code>suspended()</code> (<code>:108-109</code>), after the three
-latches above. Already-posted validations keep running (<code>:260-262</code>).</p>
+(remain subscribed) if <code>suspended()</code> (<code>:117-118</code>), after the three
+latches above. Already-posted validations keep running (<code>:269-270</code>).</p>
 <blockquote>
 <p><strong>Invariant (Validate-Drain-1).</strong> The <code>windowed</code> drain is called
 directly, never posted: saturated validations can exhaust the strand for
 an entire window, so release-side control must not depend on scheduling
-(<code>:132-141</code>).</p>
+(<code>:141-150</code>).</p>
 </blockquote>
 <p>Outputs:</p>
 <div class="scroller"><table>
@@ -623,19 +625,19 @@ an entire window, so release-side control must not depend on scheduling
 <tbody>
 <tr>
 <td><code>chase::valid</code></td>
-<td><code>notify_block</code> <code>:366</code></td>
+<td><code>notify_block</code> <code>:375</code></td>
 <td><code>height</code></td>
 <td>block valid (any path), or batch drain marked it valid</td>
 </tr>
 <tr>
 <td><code>chase::unvalid</code></td>
-<td><code>notify_block</code> <code>:358</code></td>
+<td><code>notify_block</code> <code>:367</code></td>
 <td><code>link</code></td>
 <td>validation produced a consensus error, or batch verification failed</td>
 </tr>
 <tr>
 <td><code>chase::bump</code></td>
-<td><code>do_process_silent_batch</code> (<code>chaser_validate_batch.cpp:416</code>)</td>
+<td><code>do_process_silent_batch</code> (<code>chaser_validate_batch.cpp:419</code>)</td>
 <td>—</td>
 <td>a silent bank drained; its blocks may now be confirmable</td>
 </tr>
@@ -645,8 +647,8 @@ an entire window, so release-side control must not depend on scheduling
 bank left over from a previous run is drained in <code>start()</code>; the next
 <code>chase::start</code> iteration will find the stored states.</p>
 <p>Reporting: <code>events::block_validated</code> / <code>block_unconfirmable</code>
-(<code>:359</code>, <code>:367</code>), <code>validate_usecs</code> for current blocks
-(<code>chaser_validate_parallel.cpp:107-125</code>), <code>ecdsa_secs</code>, <code>schnorr_secs</code>,
+(<code>:376</code>, <code>:368</code>), <code>validate_usecs</code> for current blocks
+(<code>chaser_validate_parallel.cpp:114-133</code>), <code>ecdsa_secs</code>, <code>schnorr_secs</code>,
 <code>silent_secs</code> per drain.</p>
 <hr />
 <h2 id="4-the-validation-pipeline-per-block">4. The validation pipeline (per block)<a class="anchor" href="#4-the-validation-pipeline-per-block" aria-label="Link to this section">#</a></h2>
@@ -667,13 +669,13 @@ flowchart TD
     VP -- not pooled --&gt; FULL
     P -- no --&gt; B{bypass?}
     B -- yes --&gt; VV[complete_view link, filter, silent, bank]
-    B -- no --&gt; FULL[query.get_block link, witness]
-    FULL -- null --&gt; E2[ec = validate2]
-    FULL -- ok --&gt; D[populate block, ctx]
+    B -- no --&gt; FULL[view::block query.get_wire_block link, witness]
+    FULL -- invalid --&gt; E2[ec = validate2]
+    FULL -- ok --&gt; D[populate block, spends, conflicts, link, ctx]
     D -- error --&gt; D1[query.set_block_unconfirmable]
     D1 -- fail --&gt; E4[ec = validate4]
     D1 -- ok --&gt; CP
-    D -- success --&gt; V[validate batched, capturing, block, link, ctx]
+    D -- success --&gt; V[validate batched, capturing, block, spends, conflicts, link, ctx]
     V -- error --&gt; V1[query.set_block_unconfirmable]
     V1 -- fail --&gt; E5[ec = validate5]
     V1 -- ok --&gt; CP
@@ -689,9 +691,9 @@ flowchart TD
     CP --&gt; DEC[backlog-- then self-bump if zero]
     DEC --&gt; Z
 </div>
-<p>Source: <code>chaser_validate_parallel.cpp:54-129</code>.</p>
+<p>Source: <code>chaser_validate_parallel.cpp:53-137</code>.</p>
 <h3 id="42-the-three-paths">4.2 The three paths<a class="anchor" href="#42-the-three-paths" aria-label="Link to this section">#</a></h3>
-<p><strong>Pooled</strong> (<code>validate_pooled</code> / <code>complete_pooled</code>, <code>:212-248</code>). Only for
+<p><strong>Pooled</strong> (<code>validate_pooled</code> / <code>complete_pooled</code>, <code>:219-255</code>). Only for
 <em>current</em> non-bypass blocks. <code>query.validate_pooled(link, ctx, subsidy…)</code>
 runs the block-level checks in the store over txs that are all already
 pooled under a sufficient context (doc 11 §4). <code>database::error::unvalidated</code>
@@ -699,44 +701,46 @@ means "not all pooled, fall through to full"; other store codes are
 <code>validate11</code> faults; consensus codes mark the block unconfirmable. On
 success the block is marked scanned (pooled txs were silent-indexed on
 entry) and valid, producing a filter body first if filters are enabled.</p>
-<p><strong>Bypass</strong> (<code>validate_view</code> / <code>complete_view</code>, <code>:164-210</code>). The block is
+<p><strong>Bypass</strong> (<code>validate_view</code> / <code>complete_view</code>, <code>:171-217</code>). The block is
 read as a <code>chain::view::block</code> over the wire bytes, with witness only
 when the node requires witness and the block is silent-eligible. Prevouts
 are populated for all inputs when a filter is produced, otherwise only
 for silent-payment eligible txs. <code>set_filter_body</code> (when enabled) and the
 silent index (direct, or banked) are written, then <code>set_block_valid</code>.
 <code>missing_previous_output</code> marks the block unconfirmable.</p>
-<p><strong>Full</strong> (<code>populate</code> + <code>validate</code>, <code>:134-147</code>, <code>:250-304</code>):</p>
+<p><strong>Full</strong> (<code>populate</code> + <code>validate</code>, <code>:142-154</code>, <code>:257-312</code>). The block is
+read as a <code>chain::view::block</code> over the wire bytes, with witness when the
+node requires witness.</p>
 <pre><code class="language-cpp">// populate
-block.populate(ctx)                       // internal prevouts, maturity and time locks
-query.populate_with_metadata(block)       // external prevouts + spent-coin metadata, else missing_previous_output
+query.get_block_prevouts(prevouts, spends, conflicts, link)  // all prevouts + spends/conflicts, else missing_previous_output
+block.populate(ctx, prevouts)                                // populate; internal maturity and time locks
 
 // validate
-block.check(false); block.check(ctx, false)                    // (a) block checks (deferred from download)
+block.check(); block.check(ctx, signet_challenge_)             // (a) block checks (deferred from download)
 block.accept(ctx, subsidy_interval_, initial_subsidy_)         // (b) block-wide consensus
 capture = get_capture(link); capturing = capture.enabled       // signature capture when batching and not current
 ec = block.connect(ctx, capture)                               // (c) script execution; batched = capture.batched
 if capturing: batched ? commit_capture(batched, link) : clear_capture()
-query.set_prevouts(link, block)        → validate7              // (d) persist prevout metadata for confirmation
+query.set_prevouts(link, spends, conflicts) → validate7              // (d) persist prevout metadata for confirmation
 query.set_filter_body(link, block)     → validate8              // (e) BIP158 body
 if silent-eligible: commit_silent_batch or set_silent → validate9
 if !batched: query.set_block_valid(link) → validate10           // (f) deferred when batched
 </code></pre>
 <blockquote>
-<p><strong>Invariant (Validate-Populate-1).</strong> Every input not satisfied by
-internal-block prevouts must be satisfied by the store, otherwise
+<p><strong>Invariant (Validate-Populate-1).</strong> Every input's prevout must be
+found by the store, in the block or in a stored transaction, otherwise
 <code>populate</code> returns <code>missing_previous_output</code>. This is the <em>UTXO
 availability</em> check.</p>
 <p><strong>Invariant (Validate-Ordering-1).</strong> <code>set_prevouts</code> precedes
 <code>set_filter_body</code>, and <code>set_block_valid</code> follows both
-(<code>chaser_validate_parallel.cpp:286-302</code>). The store represents block
+(<code>chaser_validate_parallel.cpp:295-309</code>). The store represents block
 state as monotone flags; setting valid before metadata is complete would
 expose confirmation to an incomplete record. Under batching, the valid
 flag is written by the drain (<code>mark_valids</code>), after the signatures
 verified.</p>
 </blockquote>
 <h3 id="43-complete_block-any-thread">4.3 <code>complete_block</code> (any thread)<a class="anchor" href="#43-complete_block-any-thread" aria-label="Link to this section">#</a></h3>
-<p>Three terminal cases plus the batch hooks (<code>chaser_validate.cpp:281-348</code>):</p>
+<p>Three terminal cases plus the batch hooks (<code>chaser_validate.cpp:290-357</code>):</p>
 <pre><code>if backlog == 0 and not stranded: self-bump
 node-category error                → fault(ec)                         // validate1..12, batch*
 other error                        → notify_block(ec) → chase::unvalid
@@ -772,7 +776,7 @@ by the direct path.</p>
 count themselves in <code>writers_[bank]</code>; a drain flips <code>bank_</code> so new commits
 go to the other bank, then spins until <code>writers_[old]</code> is zero before
 reading it (<code>enter_capture</code>/<code>exit_capture</code>, <code>process_batch</code>,
-<code>chaser_validate_batch.cpp:58-115</code>, <code>:459-494</code>).</p>
+<code>chaser_validate_batch.cpp:58-115</code>, <code>:481-497</code>).</p>
 <div class="mermaid">
 stateDiagram-v2
     [*] --&gt; FILLING_A: start (bank_ = A)
@@ -798,29 +802,29 @@ the claim are drained too.</p>
 <h3 id="53-maturity-and-residuals">5.3 Maturity and residuals<a class="anchor" href="#53-maturity-and-residuals" aria-label="Link to this section">#</a></h3>
 <p>A bank drains when <strong>mature</strong> — its row count reached <code>batch_verify</code> /
 <code>batch_silent</code> — or when a <strong>residual</strong> drain is forced
-(<code>is_mature</code>, <code>is_silent_mature</code>, <code>chaser_validate_batch.cpp:238-273</code>,
-<code>:281-293</code>). A residual drain is allowed whenever the backlog is empty
+(<code>is_mature</code>, <code>is_silent_mature</code>, <code>chaser_validate_batch.cpp:259-275</code>,
+<code>:283-295</code>). A residual drain is allowed whenever the backlog is empty
 and either the download window is fully archived (<code>window_archived_</code>,
 set by <code>chase::windowed</code>) or the maximum height has been posted
-(<code>is_residual</code>, <code>:250-255</code>); <code>complete_block</code> also forces one for the
+(<code>is_residual</code>, <code>:252-257</code>); <code>complete_block</code> also forces one for the
 first current block so that nothing is left banked when the chain
 becomes current.</p>
 <h3 id="54-draining-a-signature-bank">5.4 Draining a signature bank<a class="anchor" href="#54-draining-a-signature-bank" aria-label="Link to this section">#</a></h3>
-<p><code>do_process_batch(bank, startup)</code> (<code>:118-176</code>):</p>
+<p><code>do_process_batch(bank, startup)</code> (<code>:118-178</code>):</p>
 <ol>
 <li><code>query.verify_ecdsa_signatures(cancel, use_gpu, fails, bank)</code> and
    <code>query.verify_schnorr_signatures(...)</code>; each returns the links of
    blocks with a failed signature; cancellation returns
    <code>operation_canceled</code>.</li>
 <li><code>mark_invalids</code>: each failed block is set unconfirmable and reported
-   with <code>chase::unvalid(invalid_signature)</code> (<code>:189-214</code>).</li>
+   with <code>chase::unvalid(invalid_signature)</code> (<code>:191-216</code>).</li>
 <li><code>mark_valids</code>: every remaining prevalid block is set valid in
-   parallel (<code>poolstl par</code>) and reported with <code>chase::valid</code> (<code>:218-244</code>).</li>
-<li><code>purge_batch</code>: prevalids before signatures (<code>:178-187</code>).</li>
+   parallel (<code>poolstl par</code>) and reported with <code>chase::valid</code> (<code>:220-246</code>).</li>
+<li><code>purge_batch</code>: prevalids before signatures (<code>:180-189</code>).</li>
 </ol>
 <p>A silent bank drains with <code>query.compute_silents(cancel, use_gpu, bank)</code>,
 purges presilents then silents, and emits <code>chase::bump</code> because the
-bank's blocks may now be confirmable (<code>:386-418</code>). Confirmation gates on
+bank's blocks may now be confirmable (<code>:389-421</code>). Confirmation gates on
 the scanned flag, so a block whose silent rows are still banked is not
 yet in the validated fork (doc 05 §4).</p>
 <blockquote>
@@ -839,9 +843,9 @@ completes by the non-batched path; the decline is faulted as <code>batch5</code>
 <h3 id="55-restart-durability">5.5 Restart durability<a class="anchor" href="#55-restart-durability" aria-label="Link to this section">#</a></h3>
 <p>Batch state is the store, so a crash or shutdown mid-bank loses nothing:
 <code>start_batch</code> / <code>start_silent_batch</code> drain any non-empty bank before the
-chaser subscribes (<code>chaser_validate_batch.cpp:41-56</code>, <code>:315-329</code>). A
+chaser subscribes (<code>chaser_validate_batch.cpp:41-56</code>, <code>:317-331</code>). A
 validated block whose silent bank was dropped by a store restore is
-re-scanned by <code>post_scan</code> (<code>chaser_validate.cpp:231-248</code>).</p>
+re-scanned by <code>post_scan</code> (<code>chaser_validate.cpp:240-258</code>).</p>
 <hr />
 <h2 id="6-the-strand-level-state-machine-do_-methods">6. The strand-level state machine (<code>do_*</code> methods)<a class="anchor" href="#6-the-strand-level-state-machine-do_-methods" aria-label="Link to this section">#</a></h2>
 <div class="mermaid">
@@ -861,7 +865,7 @@ stateDiagram-v2
     STOPPED --&gt; [*]
 </div>
 <h3 id="61-do_bumped-height-iteration">6.1 <code>do_bumped</code> height iteration<a class="anchor" href="#61-do_bumped-height-iteration" aria-label="Link to this section">#</a></h3>
-<p><code>do_bumped</code> (<code>chaser_validate.cpp:206-264</code>) is the inner work-finder.
+<p><code>do_bumped</code> (<code>chaser_validate.cpp:215-273</code>) is the inner work-finder.
 For each iteration:</p>
 <ol>
 <li>Compute <code>link = to_candidate(height)</code>; fetch <code>get_block_state(link)</code>.</li>
@@ -884,18 +888,18 @@ For each iteration:</p>
 in <code>do_bumped</code>, regardless of path. Each iteration that doesn't
 early-exit advances by one.</p>
 <p><strong>Invariant (Validate-Iter-2).</strong> Encountering an unassociated state
-aborts the loop (<code>:220-221</code>). This guarantees that <strong>no block is
+aborts the loop (<code>:229-230</code>). This guarantees that <strong>no block is
 bypassed-as-valid without being downloaded first</strong> — there's no path
 through the loop that writes a valid flag on an unassociated link.</p>
 </blockquote>
 <h3 id="62-do_checked-do_bump-and-do_regressed">6.2 <code>do_checked</code>, <code>do_bump</code> and <code>do_regressed</code><a class="anchor" href="#62-do_checked-do_bump-and-do_regressed" aria-label="Link to this section">#</a></h3>
-<p><code>do_checked(h)</code> (<code>:179-186</code>): if <code>h == position+1</code>, call <code>do_bumped(h)</code>.
+<p><code>do_checked(h)</code> (<code>:188-195</code>): if <code>h == position+1</code>, call <code>do_bumped(h)</code>.
 This is the <em>fast path</em> for when a block arrives right at the head —
 skip waiting for the next <code>chase::bump</code>.</p>
-<p><code>do_bump</code> (<code>:188-201</code>): if recovering from disk full and the backlog is
+<p><code>do_bump</code> (<code>:197-210</code>): if recovering from disk full and the backlog is
 empty, reset the position to the fork point (in-flight blocks were lost
 to the full disk); then <code>do_bumped</code> if the next height is validateable.</p>
-<p><code>do_regressed(bp)</code> (<code>:170-177</code>): if <code>bp &lt; position</code>, set position to
+<p><code>do_regressed(bp)</code> (<code>:179-186</code>): if <code>bp &lt; position</code>, set position to
 <code>bp</code>. The next bump re-walks from there. Crucially, <strong>there is no purge</strong>
 like in <code>chaser_download</code>: in-flight validations on heights above <code>bp</code> keep
 running. Their results either find the block still on the candidate
@@ -925,22 +929,22 @@ reconciles correctness via the link/state map.</p>
 </tr>
 <tr>
 <td><code>validate2</code></td>
-<td><code>chaser_validate_parallel.cpp:93</code>, <code>:176</code></td>
-<td><code>get_block</code> returned null, or the wire view is invalid</td>
+<td><code>chaser_validate_parallel.cpp:98</code>, <code>:183</code></td>
+<td>the wire view is invalid</td>
 </tr>
 <tr>
 <td><code>validate3</code></td>
-<td><code>chaser_validate_parallel.cpp:70</code>, <code>:158</code></td>
+<td><code>chaser_validate_parallel.cpp:68</code>, <code>:165</code></td>
 <td><code>get_context</code> / <code>get_height</code> failed</td>
 </tr>
 <tr>
 <td><code>validate4</code></td>
-<td><code>chaser_validate_parallel.cpp:98</code>, <code>:203</code></td>
+<td><code>chaser_validate_parallel.cpp:103</code>, <code>:210</code></td>
 <td><code>set_block_unconfirmable</code> failed after a populate failure</td>
 </tr>
 <tr>
 <td><code>validate5</code></td>
-<td><code>chaser_validate_parallel.cpp:103</code></td>
+<td><code>chaser_validate_parallel.cpp:110</code></td>
 <td><code>set_block_unconfirmable</code> failed after a validate failure</td>
 </tr>
 <tr>
@@ -950,52 +954,52 @@ reconciles correctness via the link/state map.</p>
 </tr>
 <tr>
 <td><code>validate7</code></td>
-<td><code>chaser_validate_parallel.cpp:288</code></td>
+<td><code>chaser_validate_parallel.cpp:296</code></td>
 <td><code>set_prevouts</code> failed</td>
 </tr>
 <tr>
 <td><code>validate8</code></td>
-<td><code>chaser_validate_parallel.cpp:187</code>, <code>:291</code></td>
+<td><code>chaser_validate_parallel.cpp:194</code>, <code>:299</code></td>
 <td><code>set_filter_body</code> failed</td>
 </tr>
 <tr>
 <td><code>validate9</code></td>
-<td><code>chaser_validate_parallel.cpp:192</code>, <code>:245</code>, <code>:296</code></td>
+<td><code>chaser_validate_parallel.cpp:199</code>, <code>:252</code>, <code>:304</code></td>
 <td>silent index write (<code>set_silent</code>, bank commit, <code>set_block_scanned</code>) failed</td>
 </tr>
 <tr>
 <td><code>validate10</code></td>
-<td><code>chaser_validate_parallel.cpp:209</code>, <code>:247</code>, <code>:301</code></td>
+<td><code>chaser_validate_parallel.cpp:216</code>, <code>:254</code>, <code>:309</code></td>
 <td><code>set_block_valid</code> failed</td>
 </tr>
 <tr>
 <td><code>validate11</code></td>
-<td><code>chaser_validate_parallel.cpp:226</code>, <code>:237</code></td>
+<td><code>chaser_validate_parallel.cpp:233</code>, <code>:244</code></td>
 <td>store error from <code>validate_pooled</code>, or filter body of a pooled block missing a prevout</td>
 </tr>
 <tr>
 <td><code>validate12</code></td>
-<td><code>chaser_validate_parallel.cpp:75</code></td>
+<td><code>chaser_validate_parallel.cpp:74</code></td>
 <td><code>set_block_unconfirmable</code> failed after a pooled consensus failure</td>
 </tr>
 <tr>
 <td><code>batch1</code></td>
-<td><code>chaser_validate_batch.cpp:126</code></td>
+<td><code>chaser_validate_batch.cpp:146</code></td>
 <td><code>mark_invalids</code> failed after ecdsa verification</td>
 </tr>
 <tr>
 <td><code>batch2</code></td>
-<td><code>chaser_validate_batch.cpp:150</code></td>
+<td><code>chaser_validate_batch.cpp:171</code></td>
 <td><code>mark_invalids</code> failed after schnorr verification</td>
 </tr>
 <tr>
 <td><code>batch3</code></td>
-<td><code>chaser_validate_batch.cpp:154</code></td>
+<td><code>chaser_validate_batch.cpp:175</code></td>
 <td><code>mark_valids</code> failed</td>
 </tr>
 <tr>
 <td><code>batch4</code></td>
-<td><code>chaser_validate_batch.cpp:167</code></td>
+<td><code>chaser_validate_batch.cpp:188</code></td>
 <td>purge of a signature bank failed</td>
 </tr>
 <tr>
@@ -1005,17 +1009,17 @@ reconciles correctness via the link/state map.</p>
 </tr>
 <tr>
 <td><code>batch6</code></td>
-<td><code>chaser_validate_batch.cpp:433</code></td>
+<td><code>chaser_validate_batch.cpp:436</code></td>
 <td>silent commit declined (recoverable; rows written directly)</td>
 </tr>
 <tr>
 <td><code>batch7</code></td>
-<td><code>chaser_validate_batch.cpp:402</code></td>
+<td><code>chaser_validate_batch.cpp:403</code></td>
 <td><code>compute_silents</code> failed</td>
 </tr>
 <tr>
 <td><code>batch8</code></td>
-<td><code>chaser_validate_batch.cpp:413</code></td>
+<td><code>chaser_validate_batch.cpp:416</code></td>
 <td>purge of a silent bank failed</td>
 </tr>
 </tbody>
@@ -1060,7 +1064,7 @@ flowchart LR
     VAL -- "chase::bump (silent drain)" --&gt; CNF
     VAL -- "chase::unvalid (link)" --&gt; HDR_in["chaser_header&lt;br/&gt;(do_disorganize)"]
 
-    VAL -.-&gt;|"reads: get_block, get_wire_block, get_context, get_block_state,&lt;br/&gt;is_validateable, is_silent, populate_with_metadata, get_*_prevouts,&lt;br/&gt;validate_pooled, *_records"| STORE[(libbitcoin-database query)]
+    VAL -.-&gt;|"reads: get_wire_block, get_context, get_block_state,&lt;br/&gt;is_validateable, is_silent, get_*_prevouts,&lt;br/&gt;validate_pooled, *_records"| STORE[(libbitcoin-database query)]
     VAL -.-&gt;|"writes: set_prevouts, set_filter_body, set_silent, set_silents,&lt;br/&gt;set_signatures, set_prevalid, set_block_scanned, set_block_valid,&lt;br/&gt;set_block_unconfirmable, verify_*_signatures, compute_silents, purge_*"| STORE
 </div>
 <hr />
@@ -1111,9 +1115,9 @@ elif bypass:
     view.populate(selected prevouts) &gt; ok
     [filter body]; [silent index]; set valid; succeed
 else:
-    block.populate(ctx) &gt; ok
-    query.populate_with_metadata(block) &gt; ok
-    block.check; block.check(ctx) &gt; ok
+    query.get_block_prevouts(link) &gt; ok
+    block.populate(ctx, prevouts) &gt; ok
+    block.check; block.check(ctx, signet_challenge) &gt; ok
     block.accept(ctx, subsidy_interval, initial_subsidy) &gt; ok
     block.connect(ctx, capture) &gt; ok                -- signatures captured when batching
     set_prevouts; set_filter_body; [silent index]

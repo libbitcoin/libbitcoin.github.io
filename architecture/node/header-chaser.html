@@ -357,10 +357,7 @@
 <p>Companion to <a href="overview.html"><code>00-overview</code></a> and
 <a href="event-bus.html"><code>01-event-bus</code></a>.</p>
 <p><code>chaser_header</code> is the state machine that attaches headers to the
-<strong>candidate chain</strong>. It is the only organizer: blocks-first
-synchronization and the templated <code>chaser_organize&lt;Block&gt;</code> it shared
-with the header chaser were removed in September 2026, and the
-organizer was folded into this class.</p>
+<strong>candidate chain</strong>. It is the only organizer.</p>
 <p>Headers reach it in three forms: <strong>proven</strong> headers from the header
 protocols (already validated and proven to a checkpoint or to a current
 top at minimum work, doc 07 §2), <strong>unproven</strong> headers announced by
@@ -381,7 +378,7 @@ as a manual tie break.</p>
 </tr>
 <tr>
 <td><code>src/chasers/chaser_header.cpp</code></td>
-<td>Implementation (925 lines)</td>
+<td>Implementation (952 lines)</td>
 </tr>
 </tbody>
 </table></div>
@@ -414,18 +411,23 @@ chain projections exposed by <code>database::query</code>:</p>
 <td><code>set_code(out link, header, ctx, work, milestone, compact)</code>, <code>set_block_unconfirmable(link)</code></td>
 <td><code>to_header(hash)</code>, <code>to_parent(link)</code>, <code>is_unconfirmable(link)</code>, <code>get_header(link)</code>, <code>get_height(link)</code>, <code>get_branch(out states, hash)</code>, <code>get_work(out, states)</code>, <code>get_strong_branch(out, work, branch_point, prioritized)</code></td>
 </tr>
+<tr>
+<td>Activations</td>
+<td><code>clear_activation(flags)</code>, <code>set_activation(flags, link)</code></td>
+<td>—</td>
+</tr>
 </tbody>
 </table></div>
 <blockquote>
 <p><strong>Invariant (Organize-Store-1).</strong> Every store mutation in organize is
 performed on the chaser's own strand (<code>src/chasers/chaser_header.cpp:195</code>,
-<code>:439</code> — both <code>do_organize</code> and <code>do_disorganize</code> open with
+<code>:446</code> — both <code>do_organize</code> and <code>do_disorganize</code> open with
 <code>BC_ASSERT(stranded())</code>). Concurrent writes from other chasers do not
 occur in this class's scope; coordination across chasers happens via
 the event bus.</p>
 </blockquote>
 <h3 id="12-in-memory-this-chaser-only">1.2 In-memory (this chaser only)<a class="anchor" href="#12-in-memory-this-chaser-only" aria-label="Link to this section">#</a></h3>
-<pre><code class="language-cpp">// chaser_header.hpp:138-149
+<pre><code class="language-cpp">// chaser_header.hpp:144-154
 const system::settings&amp; settings_;               // immutable
 const system::chain::checkpoints&amp; checkpoints_;  // immutable
 
@@ -441,10 +443,10 @@ header_tree tree_{};                // strand-only; unordered_map&lt;hash_cref, 
 <li><strong><code>state_</code></strong> — current top of the <em>candidate</em> chain, cached as a
   <code>chain_state</code> (height, hash, flags, cumulative work). Initialised in
   <code>start()</code> (<code>:76-78</code>); updated at the end of every successful strong
-  organize (<code>:389</code>); rewound by <code>do_disorganize</code> (<code>:542-543</code>).</li>
+  organize (<code>:396</code>); rewound by <code>do_disorganize</code> (<code>:541-556</code>).</li>
 <li><strong><code>tree_</code></strong> — a memory-resident map of <em>weak-branch</em> headers (headers
   whose branch does not beat the current candidate). Populated by
-  <code>cache()</code> (<code>:659-666</code>); drained by <code>push_header(key)</code> (<code>:647-657</code>);
+  <code>cache()</code> (<code>:672-679</code>); drained by <code>push_header(key)</code> (<code>:659-670</code>);
   pruned by work window and by checkpoint (§6).</li>
 <li><strong><code>bumped_</code></strong> — latches <code>true</code> after validation has been kicked via
   <code>chase::bump</code> for the first current strong header; reset to <code>false</code> on
@@ -606,18 +608,19 @@ stateDiagram-v2
     PUSH_TREE_BRANCH --&gt; F_PUSH_KEY: code ≠ success
     PUSH_TREE_BRANCH --&gt; PUSH_TOP_NEW
 
-    PUSH_TOP_NEW: cpp 353-358 push_header(header, ctx, work, milestone, compact)
+    PUSH_TOP_NEW: cpp 353-359 push_header(header, ctx, work, milestone, compact)
     PUSH_TOP_NEW --&gt; F_PUSH_NEW: code ≠ success
     PUSH_TOP_NEW --&gt; CHECK_CURRENT
 
-    CHECK_CURRENT: cpp 365 is_current_time(header.timestamp())
+    CHECK_CURRENT: cpp 366 is_current_time(header.timestamp())
     CHECK_CURRENT --&gt; UPDATE_STATE: not current (skip bump and headers)
     CHECK_CURRENT --&gt; EMIT_BUMP_AND_HEADERS: current
 
-    EMIT_BUMP_AND_HEADERS: cpp 366-385 if !bumped_ → notify(chase∷bump, bp+1), bumped_ = true, then notify(chase∷headers, bp)
+    EMIT_BUMP_AND_HEADERS: cpp 367-386 if !bumped_ → notify(chase∷bump, bp+1), bumped_ = true, then notify(chase∷headers, bp)
     EMIT_BUMP_AND_HEADERS --&gt; UPDATE_STATE
 
-    UPDATE_STATE: cpp 388-395 state_ = state, update_checkpoint(height), prune_tree(height), shrink_tree(current), handler(success, height)
+    UPDATE_STATE: cpp 388-402 set_activations(*parent, *state, link), state_ = state, update_checkpoint(height), prune_tree(height), shrink_tree(current), handler(success, height)
+    UPDATE_STATE --&gt; F_organize16: set_activations failed
     UPDATE_STATE --&gt; [*]
 
     RETURN_STOPPED --&gt; [*]: handler(service_stopped)
@@ -636,6 +639,7 @@ stateDiagram-v2
     F_organize6 --&gt; [*]: F → fault(organize6)
     F_PUSH_KEY --&gt; [*]: F → fault(ec) (organize14, organize15 or a store code)
     F_PUSH_NEW --&gt; [*]: F → fault(ec) (organize14 or a store code)
+    F_organize16 --&gt; [*]: F → fault(organize16)
 </div>
 <h3 id="31-logical-phases-for-the-spec">3.1 Logical phases (for the spec)<a class="anchor" href="#31-logical-phases-for-the-spec" aria-label="Link to this section">#</a></h3>
 <pre><code>PHASE                                LINES                 OBSERVABLE EFFECTS
@@ -645,9 +649,9 @@ B. State roll-forward                cpp 244-259           none (in-memory)
 C. Consensus validate (unproven)     cpp 262-269           none (read-only validate)
 D. Branch-work accounting            cpp 274-290           none
 E. Weak-branch test                  cpp 293-299           may write to tree_
-F. Reorganize candidate chain        cpp 305-358           DB writes; emit regressed
-G. Currency check &amp; emit             cpp 365-385           emit bump (once per regression) + headers
-H. State commit &amp; tree maintenance   cpp 388-395           in-memory state_, tree pruning; handler
+F. Reorganize candidate chain        cpp 305-359           DB writes; emit regressed
+G. Currency check &amp; emit             cpp 366-386           emit bump (once per regression) + headers
+H. State commit &amp; tree maintenance   cpp 388-402           activation writes, in-memory state_, tree pruning; handler
 </code></pre>
 <p>Every header that reaches phase E is <strong>storable</strong>: proven headers were
 validated by the protocol, unproven ones in phase C. Only strength
@@ -692,22 +696,22 @@ decides between archival (F) and caching (E).</p>
 <blockquote>
 <p><strong>Invariant (Organize-Emit-1).</strong> <code>chase::bump</code> is emitted once per
 "currentness epoch": once for the first current strong header, and once
-more after every regression (latched by <code>bumped_</code>, <code>:324-328</code>, <code>:366-380</code>).
+more after every regression (latched by <code>bumped_</code>, <code>:324-328</code>, <code>:367-381</code>).
 The payload is <code>branch_point + 1</code>, the first height that may need
 validation.</p>
 <p><strong>Invariant (Organize-Emit-2).</strong> <code>chase::headers</code> is emitted on <strong>every</strong>
 successful strong organize whose header is current, not only on regress
-(<code>:382-384</code>). Non-current organizes are silent so block download does not
+(<code>:383-385</code>). Non-current organizes are silent so block download does not
 start until headers are current.</p>
 </blockquote>
 <hr />
 <h2 id="4-checkpoint-gate-and-milestone">4. Checkpoint gate and milestone<a class="anchor" href="#4-checkpoint-gate-and-milestone" aria-label="Link to this section">#</a></h2>
 <p>A <em>checkpoint</em> is a configured <code>(hash, height)</code> pair that fixes the
-chain. <code>update_checkpoint(top)</code> (<code>:697-718</code>) tracks the highest checkpoint
+chain. <code>update_checkpoint(top)</code> (<code>:711-731</code>) tracks the highest checkpoint
 reached by the candidate top (<code>active_checkpoint_</code>) and the next one
 above it; when a new checkpoint is reached, tree headers at or under it
-are purged (<code>prune_tree()</code>, <code>:796-810</code>).</p>
-<p><code>is_under_active_checkpoint(previous)</code> (<code>:671-695</code>) refuses any header
+are purged (<code>prune_tree()</code>, <code>:810-823</code>).</p>
+<p><code>is_under_active_checkpoint(previous)</code> (<code>:684-708</code>) refuses any header
 whose parent is stored <em>below</em> the active checkpoint — a fork under a
 reached checkpoint is a <code>checkpoint_conflict</code> before any state is
 computed. Extending the top, extending a tree header, and orphans are
@@ -715,7 +719,7 @@ excluded from the test.</p>
 <blockquote>
 <p><strong>Invariant (Organize-Checkpoint-1).</strong> Once the candidate reaches
 checkpoint <code>C</code>, no header forking below <code>C</code> is organized or cached. The
-<code>set_reorganized</code> assertion <code>!is_under_checkpoint(height)</code> (<code>:588</code>)
+<code>set_reorganized</code> assertion <code>!is_under_checkpoint(height)</code> (<code>:602</code>)
 follows: pops never descend under the top checkpoint.</p>
 </blockquote>
 <p>A <em>milestone</em> is a configured <code>(hash, height)</code> pair that does <strong>not</strong> fix
@@ -723,7 +727,7 @@ the chain. It permits bypass of validation for blocks at or under it,
 <em>if</em> the milestone is on the archived branch. The milestone flag is
 decided by the header protocol while collecting a proven branch
 (<code>milestone = height &lt;= milestone_</code>, doc 07 §2.3) and stored with the
-header by <code>set_code</code> (<code>:755-756</code>). This chaser does not track milestones
+header by <code>set_code</code> (<code>:650</code>). This chaser does not track milestones
 itself.</p>
 <hr />
 <h2 id="5-do_disorganize-the-rollback-state-machine">5. <code>do_disorganize</code>: the rollback state machine<a class="anchor" href="#5-do_disorganize-the-rollback-state-machine" aria-label="Link to this section">#</a></h2>
@@ -733,48 +737,49 @@ itself.</p>
 <div class="mermaid">
 stateDiagram-v2
     [*] --&gt; STRAND_GUARD: do_disorganize(link)
-    STRAND_GUARD: cpp 439 BC_ASSERT(stranded())
+    STRAND_GUARD: cpp 446 BC_ASSERT(stranded())
     STRAND_GUARD --&gt; CHECK_CLOSED
-    CHECK_CLOSED: cpp 442-443
+    CHECK_CLOSED: cpp 449-450
     CHECK_CLOSED --&gt; RETURN: closed()
     CHECK_CLOSED --&gt; ALREADY_REORG: open
 
-    ALREADY_REORG: cpp 446-447 !is_candidate_header(link) (may have been undone)
+    ALREADY_REORG: cpp 453-454 !is_candidate_header(link) (may have been undone)
     ALREADY_REORG --&gt; RETURN: yes (silent return)
     ALREADY_REORG --&gt; GET_FORK: no
 
-    GET_FORK: cpp 453-454 get_candidate_fork(out fork_point)
+    GET_FORK: cpp 460-461 get_candidate_fork(out fork_point)
     GET_FORK --&gt; PART_AT_LINK
-    PART_AT_LINK: cpp 457-459 part(candidates, invalids, link)
+    PART_AT_LINK: cpp 464-466 part(candidates, invalids, link)
     PART_AT_LINK --&gt; RETURN: !part (degenerate)
     PART_AT_LINK --&gt; GET_FORK_STATE: ok
 
-    GET_FORK_STATE: cpp 464-469 get_candidate_chain_state(fork_point)
+    GET_FORK_STATE: cpp 471-476 get_candidate_chain_state(fork_point)
     GET_FORK_STATE --&gt; F_organize7: null
     GET_FORK_STATE --&gt; REBUILD_TREE: ok
 
-    REBUILD_TREE: cpp 471-482 for each candidate below link → state = chain_state(state, header), cache(header, state)
+    REBUILD_TREE: cpp 478-489 for each candidate below link → state = chain_state(state, header), cache(header, state)
     REBUILD_TREE --&gt; F_organize8: get_header failed
     REBUILD_TREE --&gt; POP_INVALIDS
 
-    POP_INVALIDS: cpp 487-500 for each invalid (top→link) → set_block_unconfirmable, set_reorganized(invalid)
+    POP_INVALIDS: cpp 494-507 for each invalid (top→link) → set_block_unconfirmable, set_reorganized(invalid)
     POP_INVALIDS --&gt; F_organize9: set_block_unconfirmable failed
     POP_INVALIDS --&gt; F_organize10: set_reorganized failed
     POP_INVALIDS --&gt; POP_WEAK
 
-    POP_WEAK: cpp 505-512 for each candidate below link (rev) → set_reorganized(candidate)
+    POP_WEAK: cpp 512-519 for each candidate below link (rev) → set_reorganized(candidate)
     POP_WEAK --&gt; F_organize11: set_reorganized failed
     POP_WEAK --&gt; PUSH_CONFIRMED
 
-    PUSH_CONFIRMED: cpp 518-528 for each in get_confirmed_fork(fork) → set_organized(confirmed, ++fork_point)
+    PUSH_CONFIRMED: cpp 525-535 for each in get_confirmed_fork(fork) → set_organized(confirmed, ++fork_point)
     PUSH_CONFIRMED --&gt; F_organize12: set_organized failed
     PUSH_CONFIRMED --&gt; REFRESH_STATE
 
-    REFRESH_STATE: cpp 534-539 get_candidate_chain_state(fork_point)
+    REFRESH_STATE: cpp 541-546 get_candidate_chain_state(fork_point)
     REFRESH_STATE --&gt; F_organize13: null
     REFRESH_STATE --&gt; EMIT_DISORG
 
-    EMIT_DISORG: cpp 542-549 state_ = state, notify(chase∷disorganized, fork_point), notify(chase∷suspend)
+    EMIT_DISORG: cpp 549-562 set_activations(*state_, *state, to_candidate(fork_point)), state_ = state, notify(chase∷disorganized, fork_point), notify(chase∷suspend)
+    EMIT_DISORG --&gt; F_organize17: set_activations failed
     EMIT_DISORG --&gt; [*]
 
     F_organize7 --&gt; [*]
@@ -784,6 +789,7 @@ stateDiagram-v2
     F_organize11 --&gt; [*]
     F_organize12 --&gt; [*]
     F_organize13 --&gt; [*]
+    F_organize17 --&gt; [*]
     RETURN --&gt; [*]
 </div>
 <h3 id="51-what-disorganize-accomplishes">5.1 What disorganize accomplishes<a class="anchor" href="#51-what-disorganize-accomplishes" aria-label="Link to this section">#</a></h3>
@@ -791,15 +797,16 @@ stateDiagram-v2
 <ol>
 <li><strong><code>set_block_unconfirmable</code></strong> has been called for the offending link
    and every candidate above it. The store now permanently marks
-   these headers as bad (<code>:489</code>).</li>
+   these headers as bad (<code>:496</code>).</li>
 <li>The <strong>candidate chain top equals the previous confirmed chain top</strong>:
    every candidate above the fork point has been popped
-   (<code>:487-512</code>); every confirmed block above the fork point has been
-   re-pushed as candidate (<code>:518-528</code>).</li>
+   (<code>:494-519</code>); every confirmed block above the fork point has been
+   re-pushed as candidate (<code>:525-535</code>).</li>
 <li>The valid portion of the candidate branch (below the bad link) has
    been re-cached into <code>tree_</code> so that subsequent organize calls can
-   re-promote it (<code>:471-482</code>).</li>
-<li><code>state_</code> is reset to the new (lower) candidate top (<code>:542-543</code>).</li>
+   re-promote it (<code>:478-489</code>).</li>
+<li><code>state_</code> is reset to the new (lower) candidate top and fork
+   activations are updated to it (<code>:541-556</code>).</li>
 <li><strong><code>chase::disorganized</code></strong> is published with payload = new fork point;
    downstream chasers (<code>download</code>, <code>validate</code>, <code>confirm</code>) rewind themselves
    to this height.</li>
@@ -810,17 +817,17 @@ stateDiagram-v2
 <p><strong>Invariant (Organize-Disorg-1).</strong> After <code>chase::disorganized</code> is
 emitted, the candidate top equals the confirmed top (modulo races; the
 confirmed interlock guarantees the snapshot used to compute the fork
-point is consistent, <code>:452</code>, <code>:520</code>). This is the strongest correctness
+point is consistent, <code>:459</code>, <code>:527</code>). This is the strongest correctness
 obligation in the organize machine.</p>
 <p><strong>Invariant (Organize-Disorg-2).</strong> <code>chase::suspend</code> follows
-<code>chase::disorganized</code> <em>unconditionally</em> on success (<code>:546-549</code>).
+<code>chase::disorganized</code> <em>unconditionally</em> on success (<code>:558-562</code>).
 The two emissions are not reordered. A specification can treat them as
 a single atomic publish.</p>
 </blockquote>
 <h3 id="52-re-entrancy">5.2 Re-entrancy<a class="anchor" href="#52-re-entrancy" aria-label="Link to this section">#</a></h3>
 <p>Disorganize can be triggered while another disorganize is still in
 flight (a second <code>chase::unvalid</code> arrives). The <code>is_candidate_header</code>
-short-circuit at <code>:446-447</code> handles this gracefully: the second call
+short-circuit at <code>:453-454</code> handles this gracefully: the second call
 silently returns because the offending link is no longer on the
 candidate chain. There is no explicit lock.</p>
 <blockquote>
@@ -836,14 +843,14 @@ strong enough to archive. Two arrival paths:</p>
 <ol>
 <li><strong>Weak branch</strong> (<code>:293-299</code>) — branch work doesn't beat the current
    candidate top (or ties it without prioritization).</li>
-<li><strong>Disorganize</strong> (<code>:471-482</code>) — the valid portion of a rolled-back
+<li><strong>Disorganize</strong> (<code>:478-489</code>) — the valid portion of a rolled-back
    branch is re-cached with its chain state.</li>
 </ol>
 <p>Exit paths:</p>
 <ul>
-<li><strong><code>push_header(key)</code></strong> (<code>:647-657</code>) — extracts from <code>tree_</code>, archives,
+<li><strong><code>push_header(key)</code></strong> (<code>:659-670</code>) — extracts from <code>tree_</code>, archives,
   pushes to candidate.</li>
-<li><strong><code>do_prioritize</code></strong> (<code>:400-427</code>) — extracts a cached branch top for
+<li><strong><code>do_prioritize</code></strong> (<code>:407-434</code>) — extracts a cached branch top for
   re-evaluation as prioritized.</li>
 <li><strong>Pruning</strong> (below).</li>
 </ul>
@@ -859,26 +866,26 @@ strong enough to archive. Two arrival paths:</p>
 </thead>
 <tbody>
 <tr>
-<td><code>prune_tree(threshold)</code> <code>:735-780</code></td>
-<td>once per window of candidate progress (<code>prune_tree(top)</code>, <code>:783-794</code>)</td>
+<td><code>prune_tree(threshold)</code> <code>:748-793</code></td>
+<td>once per window of candidate progress (<code>prune_tree(top)</code>, <code>:796-807</code>)</td>
 <td>erase every tree branch whose top has cumulative work under the window threshold, descending while each parent has no other child</td>
 </tr>
 <tr>
-<td><code>prune_tree()</code> <code>:797-810</code></td>
+<td><code>prune_tree()</code> <code>:810-823</code></td>
 <td>a new checkpoint reached (<code>update_checkpoint</code>)</td>
 <td>erase every tree header at or under the active checkpoint</td>
 </tr>
 <tr>
-<td><code>shrink_tree(current)</code> <code>:723-732</code></td>
+<td><code>shrink_tree(current)</code> <code>:736-745</code></td>
 <td>first current organize (one-shot, <code>shrunk_</code>)</td>
 <td>rehash the map to release bucket capacity used during catch-up</td>
 </tr>
 </tbody>
 </table></div>
 <p>The <em>window</em> is <code>currency_window_minutes × 60 / block_spacing_seconds</code>
-blocks (<code>get_window</code>, <code>:816-821</code>), and the work threshold is the
+blocks (<code>get_window</code>, <code>:829-834</code>), and the work threshold is the
 candidate top's cumulative work less one window of its proof
-(<code>get_window_work</code>, <code>:824-831</code>). A zero currency window disables the
+(<code>get_window_work</code>, <code>:837-844</code>). A zero currency window disables the
 work prune.</p>
 <blockquote>
 <p><strong>Invariant (Organize-Tree-1).</strong> A tree branch survives a window prune
@@ -886,17 +893,17 @@ only if its top's cumulative work is at least the candidate top's work
 less one window of proof. A peer cannot hold memory with a dead branch
 for longer than one window of candidate progress.</p>
 <p><strong>Invariant (Organize-Tree-2).</strong> Every tree header carries its chain
-state (<code>cache</code> sets it, <code>:659-666</code>), so <code>get_chain_state</code> can extend a
-tree branch without touching the store (<code>:833-850</code>).</p>
+state (<code>cache</code> sets it, <code>:672-679</code>), so <code>get_chain_state</code> can extend a
+tree branch without touching the store (<code>:846-863</code>).</p>
 </blockquote>
 <h3 id="63-minimum-work-get_minimum_work">6.3 Minimum work (<code>get_minimum_work</code>)<a class="anchor" href="#63-minimum-work-get_minimum_work" aria-label="Link to this section">#</a></h3>
-<p><code>do_get_minimum_work</code> (<code>:430-435</code>) answers the header protocols with
+<p><code>do_get_minimum_work</code> (<code>:437-442</code>) answers the header protocols with
 <code>max(settings.minimum_work, get_window_work())</code>: a proven branch must
 reach at least the candidate top's work less one window, so a peer
 cannot make the node archive a branch that is far behind.</p>
 <h3 id="64-prioritization-do_prioritize">6.4 Prioritization (<code>do_prioritize</code>)<a class="anchor" href="#64-prioritization-do_prioritize" aria-label="Link to this section">#</a></h3>
 <p>A manual tie break between equal-work branches, bitcoind's
-<code>preciousblock</code> analogue (<code>:398-427</code>). The hash must be the top of a
+<code>preciousblock</code> analogue (<code>:405-434</code>). The hash must be the top of a
 cached branch; it is extracted and reorganized with <code>prioritized = true</code>,
 which <code>get_strong_branch</code> treats as "at least equal work". The preference
 is not retained: the reorganized branch then wins ties.</p>
@@ -947,66 +954,76 @@ store-corruption error). For a formal model, each is a proof obligation:
 </tr>
 <tr>
 <td><code>organize7</code></td>
-<td><code>cpp:464-468</code></td>
+<td><code>cpp:472-476</code></td>
 <td>disorganize: <code>get_candidate_chain_state(fork_point)</code> returned null</td>
 </tr>
 <tr>
 <td><code>organize8</code></td>
-<td><code>cpp:473-477</code></td>
+<td><code>cpp:481-485</code></td>
 <td>disorganize: <code>get_header(candidate)</code> returned null</td>
 </tr>
 <tr>
 <td><code>organize9</code></td>
-<td><code>cpp:489-493</code></td>
+<td><code>cpp:496-500</code></td>
 <td>disorganize: <code>set_block_unconfirmable(invalid)</code> failed</td>
 </tr>
 <tr>
 <td><code>organize10</code></td>
-<td><code>cpp:495-499</code></td>
+<td><code>cpp:502-506</code></td>
 <td>disorganize: <code>set_reorganized(invalid)</code> failed</td>
 </tr>
 <tr>
 <td><code>organize11</code></td>
-<td><code>cpp:507-511</code></td>
+<td><code>cpp:514-518</code></td>
 <td>disorganize: <code>set_reorganized(candidate)</code> failed (pop weak)</td>
 </tr>
 <tr>
 <td><code>organize12</code></td>
-<td><code>cpp:523-527</code></td>
+<td><code>cpp:530-534</code></td>
 <td>disorganize: <code>set_organized(confirmed, ...)</code> failed (push confirmed back as candidate)</td>
 </tr>
 <tr>
 <td><code>organize13</code></td>
-<td><code>cpp:534-538</code></td>
+<td><code>cpp:542-546</code></td>
 <td>disorganize: <code>get_candidate_chain_state(fork_point)</code> after rebuild returned null</td>
 </tr>
 <tr>
 <td><code>organize14</code></td>
-<td><code>cpp:762</code> (in <code>push_header</code>)</td>
+<td><code>cpp:656</code> (in <code>push_header</code>)</td>
 <td><code>set_organized</code> failed after a successful <code>set_code</code> (archived but not pushed to candidate)</td>
 </tr>
 <tr>
 <td><code>organize15</code></td>
-<td><code>cpp:649-651</code> (in <code>push_header(key)</code>)</td>
+<td><code>cpp:661-663</code> (in <code>push_header(key)</code>)</td>
 <td>Tree extract returned no handle (item missing when expected)</td>
 </tr>
 <tr>
+<td><code>organize16</code></td>
+<td><code>cpp:390-394</code></td>
+<td><code>set_activations(*parent, *state, link)</code> failed after organize</td>
+</tr>
+<tr>
+<td><code>organize17</code></td>
+<td><code>cpp:550-554</code></td>
+<td>disorganize: <code>set_activations(*state_, *state, ...)</code> failed after rebuild</td>
+</tr>
+<tr>
 <td><code>stalled_channel</code></td>
-<td><code>cpp:604-610</code> (<code>set_organized</code>, <code>!NDEBUG</code> only)</td>
+<td><code>cpp:618-623</code> (<code>set_organized</code>, <code>!NDEBUG</code> only)</td>
 <td>Candidate height isn't <code>top+1</code> (broken sequencing). Debug-only safety check.</td>
 </tr>
 <tr>
 <td><code>suspended_channel</code></td>
-<td><code>cpp:612-618</code> (<code>set_organized</code>, <code>!NDEBUG</code> only)</td>
+<td><code>cpp:625-631</code> (<code>set_organized</code>, <code>!NDEBUG</code> only)</td>
 <td>Parent of new candidate isn't current top (broken sequencing). Debug-only safety check.</td>
 </tr>
 </tbody>
 </table></div>
-<p><code>header1</code> is no longer issued by this chaser (milestone initialization
-moved to the header protocols); it remains in <code>error.hpp</code>.</p>
+<p><code>header1</code> is defined in <code>error.hpp</code> but not issued by this chaser;
+milestone initialization is in the header protocols.</p>
 <blockquote>
 <p><strong>Spec obligation list.</strong> A formal model should be able to discharge
-<code>organize2</code> through <code>organize15</code> as unreachable, given:
+<code>organize2</code> through <code>organize17</code> as unreachable, given:
 - Store consistency invariants supplied by libbitcoin-database.
 - The strand invariant (Organize-Iface-1) excluding concurrent writes.
 - <code>tree_</code> invariant (every key has a value with state).</p>
@@ -1017,13 +1034,13 @@ moved to the header protocols); it remains in <code>error.hpp</code>.</p>
 <p>(For book-keeping; cross-reference with
 <a href="event-bus.html#2-verified-event-reference"><code>01-event-bus §2</code></a>.)</p>
 <ul>
-<li><code>chase::bump</code> "issued by 'organize'": this chaser (<code>:378</code>) plus
+<li><code>chase::bump</code> "issued by 'organize'": this chaser (<code>:379</code>) plus
   <code>chaser_validate</code> on silent drain.</li>
-<li><code>chase::headers</code> "issued by 'header'". ✓ (<code>:384</code>).</li>
+<li><code>chase::headers</code> "issued by 'header'". ✓ (<code>:385</code>).</li>
 <li><code>chase::regressed</code> / <code>disorganized</code> "issued by 'organize'". ✓
-  (<code>:326</code>, <code>:546</code>).</li>
+  (<code>:326</code>, <code>:559</code>).</li>
 <li><code>chase::suspend</code> "issued by 'full_node'": incomplete, this chaser
-  <em>also</em> emits it after a disorganize (<code>:549</code>).</li>
+  <em>also</em> emits it after a disorganize (<code>:562</code>).</li>
 <li><code>chase::unchecked</code> / <code>unvalid</code> / <code>unconfirmable</code> "handled by
   'organize'": ✓, with the <code>mark_unconfirmable</code> gate.</li>
 </ul>
@@ -1045,7 +1062,7 @@ moved to the header protocols); it remains in <code>error.hpp</code>.</p>
 </li>
 <li>
 <p><code>get_branch_work</code> walks <code>tree_</code> by parent-hash chain into the store
-  (<code>:854-890</code>) — straightforward recursion that also yields the ordered
+  (<code>:867-903</code>) — straightforward recursion that also yields the ordered
   branch for the reorg.</p>
 </li>
 </ul>
