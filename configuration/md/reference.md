@@ -788,6 +788,8 @@ bind = 127.0.0.1
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
+# Compress response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '10'.
@@ -838,6 +840,8 @@ allow_opaque_origin = false
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
+# Compress response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
@@ -890,6 +894,8 @@ allow_opaque_origin = false
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
+# Compress response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
@@ -972,6 +978,8 @@ allow_opaque_origin = false
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
+# Compress response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
@@ -1024,6 +1032,8 @@ banner_message =
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
+# Compress http response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
@@ -1092,6 +1102,8 @@ banner_message =
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
+# Compress http response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
@@ -1160,6 +1172,8 @@ allow_opaque_origin = false
 cert_auth =
 # The path to the server certificate file (.PEM), defaults to empty.
 cert_path =
+# Compress response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.

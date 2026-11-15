@@ -570,6 +570,10 @@ services, and also have:</p>
 <td><code>allow_opaque_origin</code></td>
 <td>Allow requests with an opaque origin (<a href="https://www.rfc-editor.org/rfc/rfc6454.txt">RFC 6454 §7.3</a>), such as from a page opened as a local file.</td>
 </tr>
+<tr>
+<td><code>compression</code></td>
+<td>Compress response bodies as accepted by the request's <code>Accept-Encoding</code> (<a href="https://www.rfc-editor.org/rfc/rfc9110.txt">RFC 9110 §12.5.3</a>), as gzip or deflate, preferring gzip when the quality values tie. Defaults to <code>true</code>. A request with no <code>Accept-Encoding</code>, or with <code>identity</code>, gets an uncoded body. Only successful responses built in memory are coded (JSON, text, binary and streamed data, and JSON-RPC results), never errors, files, <code>HEAD</code> responses or websocket frames. <code>[electrum]</code> and <code>[sparrow]</code> also have this setting, for their HTTP responses.</td>
+</tr>
 </tbody>
 </table></div>
 <h2 id="5-limits">5. Limits<a class="anchor" href="#5-limits" aria-label="Link to this section">#</a></h2>

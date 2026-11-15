@@ -175,6 +175,7 @@ services, and also have:
 | `host` | Allowed `Host` header values ([RFC 9110 §7.2](https://www.rfc-editor.org/rfc/rfc9110.txt)). Multiple allowed. With an `origin` list, a request whose `Origin` is the same as its `Host` is admitted only if that `Host` is listed here. |
 | `origin` | An origin allowed to make cross-origin requests ([RFC 6454](https://www.rfc-editor.org/rfc/rfc6454.txt)), as a host and port without a scheme, matched against the request's `Origin` header. Multiple allowed. When any are set, the service's own pages are admitted only if the request's `Host` is in `host`. |
 | `allow_opaque_origin` | Allow requests with an opaque origin ([RFC 6454 §7.3](https://www.rfc-editor.org/rfc/rfc6454.txt)), such as from a page opened as a local file. |
+| `compression` | Compress response bodies as accepted by the request's `Accept-Encoding` ([RFC 9110 §12.5.3](https://www.rfc-editor.org/rfc/rfc9110.txt)), as gzip or deflate, preferring gzip when the quality values tie. Defaults to `true`. A request with no `Accept-Encoding`, or with `identity`, gets an uncoded body. Only successful responses built in memory are coded (JSON, text, binary and streamed data, and JSON-RPC results), never errors, files, `HEAD` responses or websocket frames. `[electrum]` and `[sparrow]` also have this setting, for their HTTP responses. |
 
 ## 5. Limits
 
