@@ -6,6 +6,12 @@ Each `selector` names the build for its CPU (see
 one for each platform and hardware level, each with a signature. There is
 no installer and there are no dependencies, just a single executable file.
 
+```
+$ chmod +x selector-linux-x64
+$ ./selector-linux-x64 bs
+bs-linux-x64-avx2-shani
+```
+
 ## 1. A release
 
 Each release lists the version of each library it was built from, and the
