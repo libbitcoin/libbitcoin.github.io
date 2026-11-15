@@ -525,8 +525,9 @@ one with an unknown parameter name with <code>invalid_parameter</code>, and one 
 a missing or extra parameter with <code>misc_error</code>, and the connection is
 kept. A message that cannot be read is answered with -32700 (parse error),
 or -32600 (invalid request) when it is not a valid request, and the
-connection is closed. bitcoind accepts some types that <code>bs</code> does not, such
-as a boolean for <code>getrawtransaction</code> verbosity or a quoted amount.</p>
+connection is closed. An amount is a number or a string containing a
+number, such as <code>"0.1"</code> or <code>"1e-8"</code>, and one that is negative or not exact
+to 8 decimal places is answered with <code>type_error</code>.</p>
 <h3 id="23-credentials">2.3 Credentials<a class="anchor" href="#23-credentials" aria-label="Link to this section">#</a></h3>
 <pre><code class="language-ini"><span class="section">[bitcoind]</span>
 bind = 127.0.0.1
@@ -689,7 +690,8 @@ after the first request. The version lasts as long as the connection.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Verbosity is a number. Values below 0 are read as 0, and above 3 as 3.
+<p>Verbosity is a number, or a boolean read as 0 (<code>false</code>) or 1 (<code>true</code>),
+and may be named <code>verbose</code>. Values below 0 are read as 0, and above 3 as 3.
 The <code>coinbase_tx</code> field is not included. A block that is not confirmed has
 <code>confirmations</code> of -1.</p>
 <h3 id="getblockheader">getblockheader<a class="anchor" href="#getblockheader" aria-label="Link to this section">#</a></h3>
@@ -928,25 +930,24 @@ Transactions that are rejected are skipped.</p>
 </tr>
 </tbody>
 </table></div>
-<p>No transaction index setting is required. Verbosity is a number, not a
-boolean.</p>
+<p>No transaction index setting is required. Verbosity is a number, or a
+boolean read as 0 (<code>false</code>) or 1 (<code>true</code>), and may be named <code>verbose</code>.</p>
 <h3 id="sendrawtransaction">sendrawtransaction<a class="anchor" href="#sendrawtransaction" aria-label="Link to this section">#</a></h3>
 <p>Submits a transaction to the memory pool. <strong>Parameters:</strong> <code>hexstring</code>,
-<code>maxfeerate</code>, <code>maxburnamount</code> (both ignored). <strong>Result:</strong> the
+<code>maxfeerate</code>, <code>maxburnamount</code> (amounts, both ignored). <strong>Result:</strong> the
 transaction hash. The pool accepts transactions only when the node is
 current.</p>
 <h3 id="testmempoolaccept">testmempoolaccept<a class="anchor" href="#testmempoolaccept" aria-label="Link to this section">#</a></h3>
 <p>Tests whether transactions would be accepted to the memory pool.
-<strong>Parameters:</strong> <code>rawtxs</code>, <code>maxfeerate</code> (ignored). <strong>Result:</strong> for each,
+<strong>Parameters:</strong> <code>rawtxs</code>, <code>maxfeerate</code> (an amount, ignored). <strong>Result:</strong> for each,
 <code>{"txid", "wtxid", "allowed", "reject-reason"}</code>. The transactions are
 tested as one package.</p>
 <h3 id="submitpackage">submitpackage<a class="anchor" href="#submitpackage" aria-label="Link to this section">#</a></h3>
 <p>Submits a package of up to 25 transactions to the memory pool.
-<strong>Parameters:</strong> <code>package</code>, <code>maxfeerate</code>, <code>maxburnamount</code> (both ignored).</p>
+<strong>Parameters:</strong> <code>package</code>, <code>maxfeerate</code>, <code>maxburnamount</code> (amounts, both ignored).</p>
 <h3 id="createrawtransaction">createrawtransaction<a class="anchor" href="#createrawtransaction" aria-label="Link to this section">#</a></h3>
 <p>Creates an unsigned transaction. <strong>Parameters:</strong> <code>inputs</code>, <code>outputs</code>,
-<code>locktime</code> (0), <code>replaceable</code> (<code>true</code>), <code>version</code> (2). Amounts are
-numbers, not strings.</p>
+<code>locktime</code> (0), <code>replaceable</code> (<code>true</code>), <code>version</code> (2).</p>
 <h3 id="decoderawtransaction">decoderawtransaction<a class="anchor" href="#decoderawtransaction" aria-label="Link to this section">#</a></h3>
 <p>Decodes a transaction. <strong>Parameters:</strong> <code>hexstring</code>, <code>iswitness</code>.
 <strong>Result:</strong> the transaction, including its <code>hex</code>.</p>

@@ -647,13 +647,16 @@ Notifications are sent for confirmed blocks only, except
 <p>Sets the addresses and outputs whose transactions
 <code>filteredblockconnected</code> and <code>rescanblocks</code> report. <strong>Parameters:</strong>
 <code>reload</code>, <code>addresses</code>, <code>outpoints</code>, where each outpoint is
-<code>{"hash", "index"}</code>. With <code>reload</code>, the filter is replaced; otherwise it
+<code>{"hash", "index"}</code>. A null list is read as empty, as in each method
+below. With <code>reload</code>, the filter is replaced; otherwise it
 is added to. Only blocks confirmed later match. Outputs do not require
 the address index.</p>
 <h3 id="rescanblocks">rescanblocks<a class="anchor" href="#rescanblocks" aria-label="Link to this section">#</a></h3>
 <p>The transactions matching <code>loadtxfilter</code> in blocks. <strong>Parameters:</strong>
 <code>blockhashes</code>. <strong>Result:</strong> <code>[{"hash", "transactions"}]</code>, for each block
-with a match, as hex. Requires the address index.</p>
+with a match, as hex. Requires the address index. A block that is not
+confirmed returns -5, and one that is not the child of the block before
+it in the list returns -8.</p>
 <h3 id="notifyreceived">notifyreceived<a class="anchor" href="#notifyreceived" aria-label="Link to this section">#</a></h3>
 <p>Notifies each confirmed transaction that pays an address, and then the
 spending of that payment. <strong>Parameters:</strong> <code>addresses</code>.</p>

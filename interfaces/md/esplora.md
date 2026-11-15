@@ -75,9 +75,13 @@ a prefix, such as `/api`, needs that prefix removed.
 | Identifier | Form |
 | ---------- | ---- |
 | Block, transaction hash | 64 hex characters, in the usual reversed (display) order |
-| Height, index, start, output index | Decimal, no leading zeros |
+| Height, index, start, output index | Decimal, optionally with leading zeros or `+` |
 | Address | An address, encoded with the [`[wallet]`](../configuration/reference#6-wallet) prefixes |
 | Script hash | 64 hex characters, the SHA-256 of an output script, not reversed |
+
+An invalid optional last segment, the `{txid}` of `/{key}/txs/chain/{txid}`,
+the `{start}` of `/block/{hash}/txs/{start}` or the `{height}` of
+`/blocks/{height}`, is ignored.
 
 ### 2.2 Formats
 
@@ -324,8 +328,9 @@ Submits a package of up to 25 transactions to the memory pool.
 POST /txs/package
 ```
 
-The body is a JSON array of transactions as hex. The response is that of
-bitcoind's `submitpackage`:
+The body is a JSON array of transactions as hex. The query parameters
+`maxfeerate` and `maxburnamount` are accepted, each a number, and
+ignored. The response is that of bitcoind's `submitpackage`:
 
 ```json
 {

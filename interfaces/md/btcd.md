@@ -225,7 +225,8 @@ Ends `notifynewtransactions`. **Parameters:** none.
 Sets the addresses and outputs whose transactions
 `filteredblockconnected` and `rescanblocks` report. **Parameters:**
 `reload`, `addresses`, `outpoints`, where each outpoint is
-`{"hash", "index"}`. With `reload`, the filter is replaced; otherwise it
+`{"hash", "index"}`. A null list is read as empty, as in each method
+below. With `reload`, the filter is replaced; otherwise it
 is added to. Only blocks confirmed later match. Outputs do not require
 the address index.
 
@@ -233,7 +234,9 @@ the address index.
 
 The transactions matching `loadtxfilter` in blocks. **Parameters:**
 `blockhashes`. **Result:** `[{"hash", "transactions"}]`, for each block
-with a match, as hex. Requires the address index.
+with a match, as hex. Requires the address index. A block that is not
+confirmed returns -5, and one that is not the child of the block before
+it in the list returns -8.
 
 ### notifyreceived
 

@@ -90,8 +90,9 @@ one with an unknown parameter name with `invalid_parameter`, and one with
 a missing or extra parameter with `misc_error`, and the connection is
 kept. A message that cannot be read is answered with -32700 (parse error),
 or -32600 (invalid request) when it is not a valid request, and the
-connection is closed. bitcoind accepts some types that `bs` does not, such
-as a boolean for `getrawtransaction` verbosity or a quoted amount.
+connection is closed. An amount is a number or a string containing a
+number, such as `"0.1"` or `"1e-8"`, and one that is negative or not exact
+to 8 decimal places is answered with `type_error`.
 
 ### 2.3 Credentials
 
@@ -222,7 +223,8 @@ A block. **Parameters:** `blockhash`, `verbosity` (1).
 | 2 | The block, with transaction objects and fees |
 | 3 | As 2, with each input's `prevout` |
 
-Verbosity is a number. Values below 0 are read as 0, and above 3 as 3.
+Verbosity is a number, or a boolean read as 0 (`false`) or 1 (`true`),
+and may be named `verbose`. Values below 0 are read as 0, and above 3 as 3.
 The `coinbase_tx` field is not included. A block that is not confirmed has
 `confirmations` of -1.
 
@@ -466,33 +468,32 @@ A transaction, confirmed or unconfirmed. **Parameters:** `txid`,
 | 1 | The transaction, with its block and confirmations |
 | 2 | As 1, with each input's `prevout` and the fee |
 
-No transaction index setting is required. Verbosity is a number, not a
-boolean.
+No transaction index setting is required. Verbosity is a number, or a
+boolean read as 0 (`false`) or 1 (`true`), and may be named `verbose`.
 
 ### sendrawtransaction
 
 Submits a transaction to the memory pool. **Parameters:** `hexstring`,
-`maxfeerate`, `maxburnamount` (both ignored). **Result:** the
+`maxfeerate`, `maxburnamount` (amounts, both ignored). **Result:** the
 transaction hash. The pool accepts transactions only when the node is
 current.
 
 ### testmempoolaccept
 
 Tests whether transactions would be accepted to the memory pool.
-**Parameters:** `rawtxs`, `maxfeerate` (ignored). **Result:** for each,
+**Parameters:** `rawtxs`, `maxfeerate` (an amount, ignored). **Result:** for each,
 `{"txid", "wtxid", "allowed", "reject-reason"}`. The transactions are
 tested as one package.
 
 ### submitpackage
 
 Submits a package of up to 25 transactions to the memory pool.
-**Parameters:** `package`, `maxfeerate`, `maxburnamount` (both ignored).
+**Parameters:** `package`, `maxfeerate`, `maxburnamount` (amounts, both ignored).
 
 ### createrawtransaction
 
 Creates an unsigned transaction. **Parameters:** `inputs`, `outputs`,
-`locktime` (0), `replaceable` (`true`), `version` (2). Amounts are
-numbers, not strings.
+`locktime` (0), `replaceable` (`true`), `version` (2).
 
 ### decoderawtransaction
 

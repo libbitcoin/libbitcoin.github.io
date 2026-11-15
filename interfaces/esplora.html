@@ -548,7 +548,7 @@ a prefix, such as <code>/api</code>, needs that prefix removed.</p>
 </tr>
 <tr>
 <td>Height, index, start, output index</td>
-<td>Decimal, no leading zeros</td>
+<td>Decimal, optionally with leading zeros or <code>+</code></td>
 </tr>
 <tr>
 <td>Address</td>
@@ -560,6 +560,9 @@ a prefix, such as <code>/api</code>, needs that prefix removed.</p>
 </tr>
 </tbody>
 </table></div>
+<p>An invalid optional last segment, the <code>{txid}</code> of <code>/{key}/txs/chain/{txid}</code>,
+the <code>{start}</code> of <code>/block/{hash}/txs/{start}</code> or the <code>{height}</code> of
+<code>/blocks/{height}</code>, is ignored.</p>
 <h3 id="22-formats">2.2 Formats<a class="anchor" href="#22-formats" aria-label="Link to this section">#</a></h3>
 <p>The format is fixed by the path. There is no format query and the
 <code>Accept</code> header is not consulted.</p>
@@ -814,8 +817,9 @@ text, and the pool accepts transactions only when the node is current.</p>
 <p>Submits a package of up to 25 transactions to the memory pool.</p>
 <pre><code>POST /txs/package
 </code></pre>
-<p>The body is a JSON array of transactions as hex. The response is that of
-bitcoind's <code>submitpackage</code>:</p>
+<p>The body is a JSON array of transactions as hex. The query parameters
+<code>maxfeerate</code> and <code>maxburnamount</code> are accepted, each a number, and
+ignored. The response is that of bitcoind's <code>submitpackage</code>:</p>
 <pre><code class="language-json">{
     &quot;package_msg&quot;: &quot;success&quot;,
     &quot;tx-results&quot;: {
