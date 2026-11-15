@@ -52,7 +52,6 @@ the last repository in each build.
 | [libbitcoin-node](https://github.com/libbitcoin/libbitcoin-node) | [![Expanded](https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml/badge.svg)](https://github.com/libbitcoin/libbitcoin-node/actions/workflows/ci-expanded.yml) | 4 | 111 |
 | [libbitcoin-server](https://github.com/libbitcoin/libbitcoin-server) | [![Expanded](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml/badge.svg)](https://github.com/libbitcoin/libbitcoin-server/actions/workflows/ci-expanded.yml) | 5 | 111 |
 | [libbitcoin-explorer](https://github.com/libbitcoin/libbitcoin-explorer) | [![Expanded](https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml/badge.svg)](https://github.com/libbitcoin/libbitcoin-explorer/actions/workflows/ci-expanded.yml) | 3 | 115 |
-| [libbitcoin-build](https://github.com/libbitcoin/libbitcoin-build) | | | |
 
 ## 3. Releases
 
