@@ -90,7 +90,7 @@ its build assumes is therefore never directed to that build.
 | `sse41` | SSE4.1 |
 | `shani` | SHA-NI, x86-64-v2 and AES-NI |
 | `avx2` | AVX2, x86-64-v3 and AES-NI |
-| `avx512` | AVX-512 (F, BW, VL), x86-64-v4 and AES-NI |
+| `avx512` | AVX-512 (F, BW, VL), x86-64-v4 and AES-NI, and is not an Intel processor that throttles AVX-512 (Skylake-SP, Cascade Lake, Cooper Lake, Xeon Phi) |
 | `avxifma` | AVX-IFMA, and the `avx2` and `shani` tags |
 | `avx512ifma` | AVX-512 IFMA, and the `avx512` and `shani` tags |
 | `sha2` | NEON SHA2 and NEON AES |
@@ -113,7 +113,7 @@ For example:
 | Intel Haswell to Comet Lake | `sse41`, `avx2` | `bs-linux-x64-avx2` |
 | AMD Zen to Zen 3, Intel Alder Lake, Raptor Lake | `sse41`, `avx2`, `shani` | `bs-linux-x64-avx2-shani` |
 | Intel Lunar Lake, Arrow Lake, Sierra Forest | `sse41`, `avx2`, `shani`, `avxifma` | `bs-linux-x64-avxifma` |
-| Intel Skylake-SP, Cascade Lake | `sse41`, `avx2`, `avx512` | `bs-linux-x64-avx512` |
+| Intel Skylake-SP, Cascade Lake, Cooper Lake | `sse41`, `avx2` | `bs-linux-x64-avx2` |
 | Intel Ice Lake, Tiger Lake, Sapphire Rapids, AMD Zen 4, Zen 5 | `sse41`, `avx2`, `avx512`, `shani`, `avx512ifma` | `bs-linux-x64-avx512ifma` |
 | Raspberry Pi 4 (Cortex-A72, no cryptographic extensions) | | `bs-linux-arm64` |
 | Raspberry Pi 5 (Cortex-A76), AWS Graviton2 | `sha2` | `bs-linux-arm64-sha2` |

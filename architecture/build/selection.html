@@ -602,7 +602,7 @@ its build assumes is therefore never directed to that build.</p>
 </tr>
 <tr>
 <td><code>avx512</code></td>
-<td>AVX-512 (F, BW, VL), x86-64-v4 and AES-NI</td>
+<td>AVX-512 (F, BW, VL), x86-64-v4 and AES-NI, and is not an Intel processor that throttles AVX-512 (Skylake-SP, Cascade Lake, Cooper Lake, Xeon Phi)</td>
 </tr>
 <tr>
 <td><code>avxifma</code></td>
@@ -682,9 +682,9 @@ its build assumes is therefore never directed to that build.</p>
 <td><code>bs-linux-x64-avxifma</code></td>
 </tr>
 <tr>
-<td>Intel Skylake-SP, Cascade Lake</td>
-<td><code>sse41</code>, <code>avx2</code>, <code>avx512</code></td>
-<td><code>bs-linux-x64-avx512</code></td>
+<td>Intel Skylake-SP, Cascade Lake, Cooper Lake</td>
+<td><code>sse41</code>, <code>avx2</code></td>
+<td><code>bs-linux-x64-avx2</code></td>
 </tr>
 <tr>
 <td>Intel Ice Lake, Tiger Lake, Sapphire Rapids, AMD Zen 4, Zen 5</td>
