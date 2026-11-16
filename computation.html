@@ -355,8 +355,8 @@
         <a href="performance/crypto-sha-stork.png"><img src="performance/crypto-sha-stork.png" alt="SHA family: comparative, Ryzen 7 7840HS" loading="lazy"></a>
       </figure>
       <figure class="shot">
-        <h3>SHA family: comparative, Xeon W-3245</h3>
-        <a href="performance/crypto-sha-bigmac.png"><img src="performance/crypto-sha-bigmac.png" alt="SHA family: comparative, Xeon W-3245" loading="lazy"></a>
+        <h3>SHA family: comparative, Xeon W-3245 (AVX2 build)</h3>
+        <a href="performance/crypto-sha-bigmac.png"><img src="performance/crypto-sha-bigmac.png" alt="SHA family: comparative, Xeon W-3245 (AVX2 build)" loading="lazy"></a>
       </figure>
     </div>
 
@@ -464,7 +464,7 @@ neon........ platform:1 compiled:1.
 cuda........ platform:0 compiled:1.
 cuda ecc.... platform:0 enabled:0.</pre></figure>
     </div>
-    <p class="lede after">Platform is what the processor or GPU supports, compiled is what the build includes. A feature with platform 1 and compiled 0 is available but unused, and is enabled by building with its option. CUDA ECC reports whether the GPU has error correcting memory enabled, which is required for strict equivalence of GPU and CPU signature verification. It is enabled by the GPU owner.</p>
+    <p class="lede after">Platform is what the processor or GPU supports, compiled is what the build includes. A feature with platform 1 and compiled 0 is available but unused, and is enabled by building with its option. AVX-512 reports platform 0 on Intel processors that throttle it (Skylake-SP, Cascade Lake, Cooper Lake, Xeon Phi), but a build that includes it, such as a <code>--hardware-optimized</code> build on one of them, uses it. CUDA ECC reports whether the GPU has error correcting memory enabled, which is required for strict equivalence of GPU and CPU signature verification. It is enabled by the GPU owner.</p>
   </section>
 
   <section>
