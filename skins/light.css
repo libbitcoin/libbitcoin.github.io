@@ -1,0 +1,35 @@
+:root {
+  color-scheme: light;
+  --paper: #f5f3ed; --surface: #ffffff;
+  --ink: #222923; --ink-2: #526052; --ink-3: #7a857a;
+  --rule: #d6d2c6; --rule-soft: #e4e0d6;
+  --accent: #9b4430; --heading: #9c4a04; --proposed: #0369a1;
+  --yes: #047857; --partial: #9c4a04; --pending: #1d4ed8;
+  --rejected: #be123c; --scope: #7a857a; --wip: #7e22ce;
+  --edge: rgba(155, 68, 48, .3);
+  --shadow: 0 1px 2px rgba(34, 41, 35, .08), 0 8px 24px -16px rgba(34, 41, 35, .3);
+}
+
+html { background: var(--paper); }
+body { background: var(--paper); }
+
+.doc code { color: #854d0e; }
+.doc pre, .scroller, .mermaid, .doc img { border-color: var(--edge); }
+
+.hljs-keyword, .hljs-built_in, .hljs-meta, .hljs-type, .hljs-name { color: #9b4430; }
+.hljs-literal, .hljs-number { color: #9c4a04; }
+.hljs-string { color: #047857; }
+.hljs-title, .hljs-title.function_, .hljs-params, .hljs-tag .hljs-attr { color: #0369a1; }
+
+.doc .download a, .doc .button a { color: #ffffff; }
+.doc .download a:hover, .doc .download a:focus, .doc .button a:hover, .doc .button a:focus { background: #b85a0a; }
+
+.mermaid svg .node rect, .mermaid svg .node polygon, .mermaid svg .node circle, .mermaid svg .node path, .mermaid svg rect.actor { stroke: var(--accent) !important; fill: var(--paper) !important; }
+.mermaid svg .cluster rect { stroke: var(--rule) !important; fill: var(--surface) !important; }
+.mermaid svg .flowchart-link, .mermaid svg .edgePath path, .mermaid svg .messageLine0, .mermaid svg .messageLine1, .mermaid svg .actor-line { stroke: var(--ink-2) !important; }
+.mermaid svg marker path, .mermaid svg .arrowheadPath { fill: var(--ink-2) !important; stroke: var(--ink-2) !important; }
+.mermaid svg .edgeLabel rect, .mermaid svg .edgeLabels rect { fill: var(--surface) !important; }
+.mermaid svg rect.note { fill: var(--paper) !important; stroke: var(--ink-3) !important; }
+.mermaid svg marker#sequencenumber circle { fill: var(--accent) !important; stroke: var(--accent) !important; }
+.mermaid svg text.sequenceNumber { fill: var(--surface) !important; }
+.mermaid svg text, .mermaid svg text.actor, .mermaid svg text.actor tspan { fill: var(--ink) !important; stroke: none !important; }

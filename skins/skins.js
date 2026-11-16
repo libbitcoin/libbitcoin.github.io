@@ -1,11 +1,10 @@
 (function () {
   'use strict';
-  var SKINS = [['moon', 'Moon'], ['spec', 'Spec'], ['classic', 'Classic']];
+  var SKINS = [['classic', 'Classic'], ['light', 'Light'], ['midnight', 'Midnight']];
   var DEFAULT = 'classic';
   var base = document.currentScript.src;
 
-  // A skin given in the query (?skin=name) is remembered and enables the
-  // selector; ?skin=off forgets it.
+  // A skin given in the query (?skin=name) is remembered; ?skin=off forgets it.
   var skin = new URLSearchParams(location.search).get('skin');
   try {
     if (skin === 'off') localStorage.removeItem('skin');
@@ -13,7 +12,6 @@
     else localStorage.setItem('skin', skin);
   } catch (_) {}
   var known = SKINS.some(function (s) { return s[0] === skin; });
-  var selectable = known;
   if (!known) skin = DEFAULT;
 
   // A chosen skin other than the default is kept in the address so that a
@@ -73,10 +71,10 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     var menu = document.querySelector('.menu.site');
-    if (!menu || !selectable) return;
+    if (!menu) return;
     var select = document.createElement('select');
     select.className = 'skin';
-    select.setAttribute('aria-label', 'Skin');
+    select.setAttribute('aria-label', 'Theme');
     SKINS.forEach(function (s) {
       select.add(new Option(s[1], s[0], false, s[0] === skin));
     });

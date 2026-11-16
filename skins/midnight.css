@@ -1,0 +1,33 @@
+:root {
+  color-scheme: dark;
+  --paper: #0e1525; --surface: #141e32;
+  --ink: #e6edf7; --ink-2: #a9bad0; --ink-3: #6b7d96;
+  --rule: #24324d; --rule-soft: #1b263d;
+  --accent: #a5b4fc; --heading: #7dd3fc; --proposed: #5eead4;
+  --edge: rgba(165, 180, 252, .3);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+}
+
+html { background: var(--paper); }
+body { background: var(--paper); }
+
+.doc code { color: #93c5fd; }
+.doc pre, .scroller, .mermaid, .doc img { border-color: var(--edge); }
+
+.hljs-keyword, .hljs-built_in, .hljs-meta, .hljs-type, .hljs-name { color: #a5b4fc; }
+.hljs-literal, .hljs-number { color: #7dd3fc; }
+.hljs-string { color: #86efac; }
+.hljs-title, .hljs-title.function_, .hljs-params, .hljs-tag .hljs-attr { color: #e0f2fe; }
+
+.doc .download a, .doc .button a { color: #0e1525; }
+.doc .download a:hover, .doc .download a:focus, .doc .button a:hover, .doc .button a:focus { background: #bae6fd; }
+
+.mermaid svg .node rect, .mermaid svg .node polygon, .mermaid svg .node circle, .mermaid svg .node path, .mermaid svg rect.actor { stroke: var(--accent) !important; fill: var(--paper) !important; }
+.mermaid svg .cluster rect { stroke: var(--rule) !important; fill: var(--surface) !important; }
+.mermaid svg .flowchart-link, .mermaid svg .edgePath path, .mermaid svg .messageLine0, .mermaid svg .messageLine1, .mermaid svg .actor-line { stroke: var(--ink-2) !important; }
+.mermaid svg marker path, .mermaid svg .arrowheadPath { fill: var(--ink-2) !important; stroke: var(--ink-2) !important; }
+.mermaid svg .edgeLabel rect, .mermaid svg .edgeLabels rect { fill: var(--surface) !important; }
+.mermaid svg rect.note { fill: var(--paper) !important; stroke: var(--ink-3) !important; }
+.mermaid svg marker#sequencenumber circle { fill: var(--accent) !important; stroke: var(--accent) !important; }
+.mermaid svg text.sequenceNumber { fill: var(--paper) !important; }
+.mermaid svg text, .mermaid svg text.actor, .mermaid svg text.actor tspan { fill: var(--ink) !important; stroke: none !important; }
