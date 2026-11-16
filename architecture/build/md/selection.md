@@ -88,7 +88,7 @@ its build assumes is therefore never directed to that build.
 | Tag | Reported when the processor has |
 | --- | ------------------------------- |
 | `sse41` | SSE4.1 |
-| `shani` | SHA extensions, x86-64-v2 and AES-NI |
+| `shani` | SHA-NI, x86-64-v2 and AES-NI |
 | `avx2` | AVX2, x86-64-v3 and AES-NI |
 | `avx512` | AVX-512 (F, BW, VL), x86-64-v4 and AES-NI |
 | `avxifma` | AVX-IFMA, and the `avx2` and `shani` tags |

@@ -52,9 +52,9 @@ extension of the build machine's CPU instead.
 | `--enable-sse41` | SSE4.1 |
 | `--enable-avx2` | AVX2 (implies AES-NI) |
 | `--enable-avx512` | AVX-512 (F, BW, VL) (implies AVX2 and AES-NI) |
-| `--enable-avxifma` | AVX-IFMA (implies AVX2, SHA extensions and AES-NI) |
-| `--enable-avx512ifma` | AVX-512 IFMA (implies AVX-512, AVX2, SHA extensions and AES-NI) |
-| `--enable-shani` | SHA extensions (implies AES-NI) |
+| `--enable-avxifma` | AVX-IFMA (implies AVX2, SHA-NI and AES-NI) |
+| `--enable-avx512ifma` | AVX-512 IFMA (implies AVX-512, AVX2, SHA-NI and AES-NI) |
+| `--enable-shani` | SHA-NI (implies AES-NI) |
 | `--enable-sha512` | SHA512 extensions (implies AVX2) |
 | `--enable-aesni` | AES-NI and PCLMULQDQ |
 | `--enable-vaes` | VAES and VPCLMULQDQ (implies AES-NI and AVX2) |

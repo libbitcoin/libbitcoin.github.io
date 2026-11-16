@@ -41,14 +41,14 @@ the hardware extensions it requires, if any. Windows builds end in `.exe`.
 | ----- | --------- |
 | `x64` | |
 | `x64-sse41` | SSE4.1 |
-| `x64-shani` | SHA extensions, AES-NI |
+| `x64-shani` | SHA-NI, AES-NI |
 | `x64-avx2` | AVX2, AES-NI |
-| `x64-avx2-shani` | AVX2, SHA extensions, AES-NI |
-| `x64-avxifma` | AVX-IFMA, AVX2, SHA extensions, AES-NI |
+| `x64-avx2-shani` | AVX2, SHA-NI, AES-NI |
+| `x64-avxifma` | AVX-IFMA, AVX2, SHA-NI, AES-NI |
 | `x64-avx512` | AVX-512, AVX2, AES-NI |
-| `x64-avx512-shani` | AVX-512, AVX2, SHA extensions, AES-NI |
-| `x64-avx512-avxifma` | AVX-512, AVX-IFMA, AVX2, SHA extensions, AES-NI |
-| `x64-avx512ifma` | AVX-512 IFMA, AVX-512, AVX2, SHA extensions, AES-NI |
+| `x64-avx512-shani` | AVX-512, AVX2, SHA-NI, AES-NI |
+| `x64-avx512-avxifma` | AVX-512, AVX-IFMA, AVX2, SHA-NI, AES-NI |
+| `x64-avx512ifma` | AVX-512 IFMA, AVX-512, AVX2, SHA-NI, AES-NI |
 | `arm64` | |
 | `arm64-sha2` | ARMv8 SHA-2, AES |
 | `arm64-sha3` | ARMv8.2 SHA-3 (used for SHA-512), ARMv8 SHA-2, AES |
