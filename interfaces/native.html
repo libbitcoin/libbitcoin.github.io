@@ -752,7 +752,6 @@ discoverable by interrogating the node over P2P.</p>
         &quot;filter&quot;: true,
         &quot;silent&quot;: null,
         &quot;turbo&quot;: true,
-        &quot;witness&quot;: true,
         &quot;pruned&quot;: 0
     },
     &quot;node&quot;: {
@@ -761,8 +760,7 @@ discoverable by interrogating the node over P2P.</p>
         &quot;blocks&quot;: true,
         &quot;witness&quot;: true,
         &quot;filters&quot;: false,
-        &quot;privacy&quot;: true,
-        &quot;fees&quot;: true
+        &quot;privacy&quot;: true
     },
     &quot;wallet&quot;: {
         &quot;p2kh&quot;: 0,
@@ -842,10 +840,6 @@ discoverable by interrogating the node over P2P.</p>
 <td><code>database.turbo</code></td>
 </tr>
 <tr>
-<td><code>store.witness</code></td>
-<td><code>node.require_witness</code>, which determines whether witnesses are stored</td>
-</tr>
-<tr>
 <td><code>store.pruned</code></td>
 <td>The height above which blocks are not pruned, or <code>0</code></td>
 </tr>
@@ -872,10 +866,6 @@ discoverable by interrogating the node over P2P.</p>
 <tr>
 <td><code>node.privacy</code></td>
 <td><code>node.provide_privacy</code></td>
-</tr>
-<tr>
-<td><code>node.fees</code></td>
-<td>Fee estimation is enabled (<code>peer.enable_relay</code>)</td>
 </tr>
 <tr>
 <td><code>wallet.p2kh</code></td>

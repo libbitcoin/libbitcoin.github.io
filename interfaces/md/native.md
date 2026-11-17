@@ -221,7 +221,6 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "filter": true,
         "silent": null,
         "turbo": true,
-        "witness": true,
         "pruned": 0
     },
     "node": {
@@ -230,8 +229,7 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "blocks": true,
         "witness": true,
         "filters": false,
-        "privacy": true,
-        "fees": true
+        "privacy": true
     },
     "wallet": {
         "p2kh": 0,
@@ -293,7 +291,6 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 | `store.filter` | Client filters are enabled |
 | `store.silent` | The height from which the silent payment index starts, or `null` if it is disabled |
 | `store.turbo` | `database.turbo` |
-| `store.witness` | `node.require_witness`, which determines whether witnesses are stored |
 | `store.pruned` | The height above which blocks are not pruned, or `0` |
 | `node.network` | The network whose genesis block is configured (`mainnet`, `testnet3`, `testnet4`, `testnet5`, `regtest` or `signet`), or empty if none |
 | `node.limited` | `node.limited_blocks` |
@@ -301,7 +298,6 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 | `node.witness` | `node.provide_witness` |
 | `node.filters` | `node.provide_filters` |
 | `node.privacy` | `node.provide_privacy` |
-| `node.fees` | Fee estimation is enabled (`peer.enable_relay`) |
 | `wallet.p2kh` | `wallet.p2kh_prefix` |
 | `wallet.p2sh` | `wallet.p2sh_prefix` |
 | `wallet.wif` | `wallet.wif_prefix` |
