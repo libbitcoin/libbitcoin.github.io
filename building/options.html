@@ -413,7 +413,7 @@ the <code>Option-&lt;name&gt;</code> property.</p>
 </tr>
 <tr>
 <td><code>--hardware-optimized</code></td>
-<td>Optimize for the build machine's CPU (<code>-march=native -mtune=native</code>), with <code>--build-config</code>. See <a href="#2-hardware-options">Hardware options</a>. Not used by the presets script, whose <code>-native</code> presets do the same.</td>
+<td>Optimize for the build machine's CPU (<code>-march=native -mtune=native</code>), with <code>--build-config</code>. See <a href="#2-hardware-options">Hardware options</a>. Not used by the presets script (see <a href="#presets">Presets</a>).</td>
 </tr>
 <tr>
 <td><code>--noninteractive</code></td>
@@ -426,19 +426,20 @@ the <code>Option-&lt;name&gt;</code> property.</p>
 </tbody>
 </table></div>
 <p>Any other option is passed to each library's configure step, which is how
-the options below are given.</p>
+the GPU and feature options below are given.</p>
 <h2 id="2-hardware-options">2. Hardware options<a class="anchor" href="#2-hardware-options" aria-label="Link to this section">#</a></h2>
 <p>Each option compiles code that uses an instruction set extension. A <code>bs</code>
 built with an option runs only on CPUs that have the extension. Run
 <code>bs --hardware</code> on the target machine to see which it has, and do not
-enable an option it lacks.</p>
-<p>All are off by default. <code>--hardware-optimized</code> (§1), or a <code>-native</code>
-preset, enables every extension of the build machine's CPU instead.</p>
+enable an option it lacks. All are off by default.</p>
+<p><code>install-gnu.sh</code> and <code>install-cmake.sh</code> take these options.
+<code>--hardware-optimized</code> (§1) enables every extension of the build
+machine's CPU instead, and cannot be combined with them.</p>
 <blockquote>
-<p><strong>Portability:</strong> a build with <code>--hardware-optimized</code> or a <code>-native</code>
-preset runs only on CPUs that have every instruction set extension of
-the machine it was built on. To build for other machines, omit it, and
-enable only the extensions they all have.</p>
+<p><strong>Portability:</strong> a build with <code>--hardware-optimized</code> runs only on CPUs
+that have every instruction set extension of the machine it was built
+on. To build for other machines, omit it, and enable only the
+extensions they all have.</p>
 </blockquote>
 <h3 id="x86">x86<a class="anchor" href="#x86" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
@@ -450,39 +451,39 @@ enable only the extensions they all have.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>--enable-sse41</code></td>
+<td><code>--hardware-sse41</code></td>
 <td>SSE4.1</td>
 </tr>
 <tr>
-<td><code>--enable-avx2</code></td>
+<td><code>--hardware-avx2</code></td>
 <td>AVX2 (implies AES-NI)</td>
 </tr>
 <tr>
-<td><code>--enable-avx512</code></td>
+<td><code>--hardware-avx512</code></td>
 <td>AVX-512 (F, BW, VL) (implies AVX2 and AES-NI)</td>
 </tr>
 <tr>
-<td><code>--enable-avxifma</code></td>
+<td><code>--hardware-avxifma</code></td>
 <td>AVX-IFMA (implies AVX2, SHA-NI and AES-NI)</td>
 </tr>
 <tr>
-<td><code>--enable-avx512ifma</code></td>
+<td><code>--hardware-avx512ifma</code></td>
 <td>AVX-512 IFMA (implies AVX-512, AVX2, SHA-NI and AES-NI)</td>
 </tr>
 <tr>
-<td><code>--enable-shani</code></td>
+<td><code>--hardware-shani</code></td>
 <td>SHA-NI (implies AES-NI)</td>
 </tr>
 <tr>
-<td><code>--enable-sha512</code></td>
+<td><code>--hardware-sha512</code></td>
 <td>SHA512 extensions (implies AVX2)</td>
 </tr>
 <tr>
-<td><code>--enable-aesni</code></td>
+<td><code>--hardware-aesni</code></td>
 <td>AES-NI and PCLMULQDQ</td>
 </tr>
 <tr>
-<td><code>--enable-vaes</code></td>
+<td><code>--hardware-vaes</code></td>
 <td>VAES and VPCLMULQDQ (implies AES-NI and AVX2)</td>
 </tr>
 </tbody>
@@ -510,19 +511,21 @@ enable only the extensions they all have.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The ARM options are options of <code>install-gnu.sh</code> and <code>install-cmake.sh</code>,
-not of the presets script. Each option and the options
-it implies combine into one target flag, <code>-march=armv8-a+&lt;extensions&gt;</code>
-(<code>armv8.2-a</code> with <code>--hardware-sha3</code>), added to <code>CFLAGS</code> and <code>CXXFLAGS</code>.
-For example, <code>--hardware-sha2</code> builds with <code>-march=armv8-a+aes+sha2</code>, and
-<code>--hardware-sha3</code> with <code>-march=armv8.2-a+aes+sha2+sha3</code>. They cannot be
-combined with <code>--hardware-optimized</code>.</p>
-<p>The configure and CMake options <code>--enable-sha2</code>, <code>--enable-sha3</code> and
-<code>--enable-aes</code> add no flags, and imply the same options as their install
-script options. Each checks that the compiler flags enable its extension,
-and configure fails if they do not. When building without the install
-script, give your own <code>-march</code> or <code>-mcpu</code> in <code>CFLAGS</code> and <code>CXXFLAGS</code>,
-including every implied extension, with the matching <code>--enable</code> options.</p>
+<h3 id="presets">Presets<a class="anchor" href="#presets" aria-label="Link to this section">#</a></h3>
+<p>The presets script has no hardware options. A preset builds for every
+CPU of its architecture. A <code>-native</code> preset, such as
+<code>nix-gnu-release-static-native</code>, builds for the build machine's CPU, and
+like <code>--hardware-optimized</code> is not portable. For a build that uses chosen
+extensions, use <code>install-gnu.sh</code> or <code>install-cmake.sh</code>.</p>
+<h3 id="without-the-install-scripts">Without the install scripts<a class="anchor" href="#without-the-install-scripts" aria-label="Link to this section">#</a></h3>
+<p>Configure and CMake use the same names: <code>--hardware-avx2</code> is
+<code>--enable-avx2</code> to configure and <code>-Denable-avx2=ON</code> to CMake, each with
+the same implied options. On ARM these add no compiler flags. They check
+that the compiler flags enable the extension, and fail if they do not.
+Give your own <code>-march</code> or <code>-mcpu</code> in <code>CFLAGS</code> and <code>CXXFLAGS</code>, including
+every implied extension: the install scripts use
+<code>-march=armv8-a+aes+sha2</code> for <code>--hardware-sha2</code> and
+<code>-march=armv8.2-a+aes+sha2+sha3</code> for <code>--hardware-sha3</code>.</p>
 <h3 id="gpu">GPU<a class="anchor" href="#gpu" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
 <thead>

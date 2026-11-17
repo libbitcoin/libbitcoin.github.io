@@ -23,41 +23,42 @@ the `Option-<name>` property.
 | `--build-skip-test-run` | Build the tests without running them. |
 | `--build-parallel=<n>` | Number of parallel jobs (default the number of CPUs). |
 | `--build-post-install-clean` | Remove dependency build files after installing. |
-| `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). Not used by the presets script, whose `-native` presets do the same. |
+| `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). Not used by the presets script (see [Presets](#presets)). |
 | `--noninteractive` | Do not prompt. |
 | `--verbose` | Display the commands run. |
 
 Any other option is passed to each library's configure step, which is how
-the options below are given.
+the GPU and feature options below are given.
 
 ## 2. Hardware options
 
 Each option compiles code that uses an instruction set extension. A `bs`
 built with an option runs only on CPUs that have the extension. Run
 `bs --hardware` on the target machine to see which it has, and do not
-enable an option it lacks.
+enable an option it lacks. All are off by default.
 
-All are off by default. `--hardware-optimized` (§1), or a `-native`
-preset, enables every extension of the build machine's CPU instead.
+`install-gnu.sh` and `install-cmake.sh` take these options.
+`--hardware-optimized` (§1) enables every extension of the build
+machine's CPU instead, and cannot be combined with them.
 
-> **Portability:** a build with `--hardware-optimized` or a `-native`
-> preset runs only on CPUs that have every instruction set extension of
-> the machine it was built on. To build for other machines, omit it, and
-> enable only the extensions they all have.
+> **Portability:** a build with `--hardware-optimized` runs only on CPUs
+> that have every instruction set extension of the machine it was built
+> on. To build for other machines, omit it, and enable only the
+> extensions they all have.
 
 ### x86
 
 | Option | Instructions |
 | ------ | ------------ |
-| `--enable-sse41` | SSE4.1 |
-| `--enable-avx2` | AVX2 (implies AES-NI) |
-| `--enable-avx512` | AVX-512 (F, BW, VL) (implies AVX2 and AES-NI) |
-| `--enable-avxifma` | AVX-IFMA (implies AVX2, SHA-NI and AES-NI) |
-| `--enable-avx512ifma` | AVX-512 IFMA (implies AVX-512, AVX2, SHA-NI and AES-NI) |
-| `--enable-shani` | SHA-NI (implies AES-NI) |
-| `--enable-sha512` | SHA512 extensions (implies AVX2) |
-| `--enable-aesni` | AES-NI and PCLMULQDQ |
-| `--enable-vaes` | VAES and VPCLMULQDQ (implies AES-NI and AVX2) |
+| `--hardware-sse41` | SSE4.1 |
+| `--hardware-avx2` | AVX2 (implies AES-NI) |
+| `--hardware-avx512` | AVX-512 (F, BW, VL) (implies AVX2 and AES-NI) |
+| `--hardware-avxifma` | AVX-IFMA (implies AVX2, SHA-NI and AES-NI) |
+| `--hardware-avx512ifma` | AVX-512 IFMA (implies AVX-512, AVX2, SHA-NI and AES-NI) |
+| `--hardware-shani` | SHA-NI (implies AES-NI) |
+| `--hardware-sha512` | SHA512 extensions (implies AVX2) |
+| `--hardware-aesni` | AES-NI and PCLMULQDQ |
+| `--hardware-vaes` | VAES and VPCLMULQDQ (implies AES-NI and AVX2) |
 
 ### ARM
 
@@ -67,20 +68,24 @@ preset, enables every extension of the build machine's CPU instead.
 | `--hardware-sha3` | ARMv8.2 SHA-3, used for SHA-512 (implies SHA-1/SHA-256 and AES) |
 | `--hardware-aes` | ARMv8 AES and PMULL |
 
-The ARM options are options of `install-gnu.sh` and `install-cmake.sh`,
-not of the presets script. Each option and the options
-it implies combine into one target flag, `-march=armv8-a+<extensions>`
-(`armv8.2-a` with `--hardware-sha3`), added to `CFLAGS` and `CXXFLAGS`.
-For example, `--hardware-sha2` builds with `-march=armv8-a+aes+sha2`, and
-`--hardware-sha3` with `-march=armv8.2-a+aes+sha2+sha3`. They cannot be
-combined with `--hardware-optimized`.
+### Presets
 
-The configure and CMake options `--enable-sha2`, `--enable-sha3` and
-`--enable-aes` add no flags, and imply the same options as their install
-script options. Each checks that the compiler flags enable its extension,
-and configure fails if they do not. When building without the install
-script, give your own `-march` or `-mcpu` in `CFLAGS` and `CXXFLAGS`,
-including every implied extension, with the matching `--enable` options.
+The presets script has no hardware options. A preset builds for every
+CPU of its architecture. A `-native` preset, such as
+`nix-gnu-release-static-native`, builds for the build machine's CPU, and
+like `--hardware-optimized` is not portable. For a build that uses chosen
+extensions, use `install-gnu.sh` or `install-cmake.sh`.
+
+### Without the install scripts
+
+Configure and CMake use the same names: `--hardware-avx2` is
+`--enable-avx2` to configure and `-Denable-avx2=ON` to CMake, each with
+the same implied options. On ARM these add no compiler flags. They check
+that the compiler flags enable the extension, and fail if they do not.
+Give your own `-march` or `-mcpu` in `CFLAGS` and `CXXFLAGS`, including
+every implied extension: the install scripts use
+`-march=armv8-a+aes+sha2` for `--hardware-sha2` and
+`-march=armv8.2-a+aes+sha2+sha3` for `--hardware-sha3`.
 
 ### GPU
 

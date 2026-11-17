@@ -492,7 +492,7 @@ $ ./builds/gnu/install-gnu.sh --prefix=$HOME/libbitcoin --build-config=release -
 <p>The result is <code>~/libbitcoin/bin/bx</code>. On Windows, see <a href="windows.html">Windows</a>.</p>
 <h2 id="6-hardware-options">6. Hardware options<a class="anchor" href="#6-hardware-options" aria-label="Link to this section">#</a></h2>
 <p>By default <code>bs</code> and <code>bx</code> are built for the baseline instruction set of its
-architecture (AVX2 by default on Windows, which can be lowered). Options such as <code>--enable-avx2</code> or <code>--enable-shani</code> make them
+architecture (AVX2 by default on Windows, which can be lowered). Options such as <code>--hardware-avx2</code> or <code>--hardware-shani</code> make them
 faster on CPUs that have those instructions, and unable to run on CPUs
 that do not. <code>--hardware-optimized</code> enables all that the build machine
 supports, so its builds run only on CPUs with the same extensions. Run

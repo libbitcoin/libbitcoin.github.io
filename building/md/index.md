@@ -83,7 +83,7 @@ The result is `~/libbitcoin/bin/bx`. On Windows, see [Windows](windows).
 ## 6. Hardware options
 
 By default `bs` and `bx` are built for the baseline instruction set of its
-architecture (AVX2 by default on Windows, which can be lowered). Options such as `--enable-avx2` or `--enable-shani` make them
+architecture (AVX2 by default on Windows, which can be lowered). Options such as `--hardware-avx2` or `--hardware-shani` make them
 faster on CPUs that have those instructions, and unable to run on CPUs
 that do not. `--hardware-optimized` enables all that the build machine
 supports, so its builds run only on CPUs with the same extensions. Run
