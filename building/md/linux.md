@@ -60,7 +60,9 @@ $ ./builds/cmake/install-cmake.sh --prefix=$HOME/libbitcoin --build-config=relea
 
 A preset selects the configuration and link by name:
 `nix-gnu-debug-static`, `nix-gnu-debug-shared`, `nix-gnu-release-static`
-or `nix-gnu-release-shared`.
+or `nix-gnu-release-shared`. Each also has a `-native` form, such as
+`nix-gnu-release-static-native`, that builds for the build machine's CPU
+(`-march=native -mtune=native`).
 
 ```
 $ ./builds/cmake/install-presets.sh --build-preset=nix-gnu-release-static

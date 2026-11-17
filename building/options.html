@@ -413,7 +413,7 @@ the <code>Option-&lt;name&gt;</code> property.</p>
 </tr>
 <tr>
 <td><code>--hardware-optimized</code></td>
-<td>Optimize for the build machine's CPU (<code>-march=native -mtune=native</code>), with <code>--build-config</code>. See <a href="#2-hardware-options">Hardware options</a>.</td>
+<td>Optimize for the build machine's CPU (<code>-march=native -mtune=native</code>), with <code>--build-config</code>. See <a href="#2-hardware-options">Hardware options</a>. Not used by the presets script, whose <code>-native</code> presets do the same.</td>
 </tr>
 <tr>
 <td><code>--noninteractive</code></td>
@@ -432,13 +432,13 @@ the options below are given.</p>
 built with an option runs only on CPUs that have the extension. Run
 <code>bs --hardware</code> on the target machine to see which it has, and do not
 enable an option it lacks.</p>
-<p>All are off by default. <code>--hardware-optimized</code> (§1) enables every
-extension of the build machine's CPU instead.</p>
+<p>All are off by default. <code>--hardware-optimized</code> (§1), or a <code>-native</code>
+preset, enables every extension of the build machine's CPU instead.</p>
 <blockquote>
-<p><strong>Portability:</strong> a build with <code>--hardware-optimized</code> runs only on CPUs
-that have every instruction set extension of the machine it was built
-on. To build for other machines, omit it, and enable only the
-extensions they all have.</p>
+<p><strong>Portability:</strong> a build with <code>--hardware-optimized</code> or a <code>-native</code>
+preset runs only on CPUs that have every instruction set extension of
+the machine it was built on. To build for other machines, omit it, and
+enable only the extensions they all have.</p>
 </blockquote>
 <h3 id="x86">x86<a class="anchor" href="#x86" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
@@ -510,7 +510,8 @@ extensions they all have.</p>
 </tr>
 </tbody>
 </table></div>
-<p>The ARM options are install script options. Each option and the options
+<p>The ARM options are options of <code>install-gnu.sh</code> and <code>install-cmake.sh</code>,
+not of the presets script. Each option and the options
 it implies combine into one target flag, <code>-march=armv8-a+&lt;extensions&gt;</code>
 (<code>armv8.2-a</code> with <code>--hardware-sha3</code>), added to <code>CFLAGS</code> and <code>CXXFLAGS</code>.
 For example, <code>--hardware-sha2</code> builds with <code>-march=armv8-a+aes+sha2</code>, and

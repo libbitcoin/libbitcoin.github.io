@@ -421,6 +421,9 @@ was built with.</p>
 </tr>
 </tbody>
 </table></div>
+<p>Each has a <code>-native</code> form (<code>nix-gnu-release-static-native</code> and so on)
+that adds <code>-march=native -mtune=native</code>, building for the build
+machine's CPU.</p>
 <h3 id="visual-studio">Visual Studio<a class="anchor" href="#visual-studio" aria-label="Link to this section">#</a></h3>
 <p>Requires Visual Studio 2026 (MSVC toolset v145). The solution exposes the
 <code>StaticDebug</code> and <code>StaticRelease</code> configurations for x64, Win32 and

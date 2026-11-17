@@ -30,6 +30,10 @@ Requires CMake 3.30 or later. The presets are:
 | `nix-gnu-release-static` | Release | Static |
 | `nix-gnu-release-shared` | Release | Shared |
 
+Each has a `-native` form (`nix-gnu-release-static-native` and so on)
+that adds `-march=native -mtune=native`, building for the build
+machine's CPU.
+
 ### Visual Studio
 
 Requires Visual Studio 2026 (MSVC toolset v145). The solution exposes the

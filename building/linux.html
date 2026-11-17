@@ -389,7 +389,9 @@ A prefix in the home directory does not.</p>
 <h2 id="4-cmake-presets">4. CMake presets<a class="anchor" href="#4-cmake-presets" aria-label="Link to this section">#</a></h2>
 <p>A preset selects the configuration and link by name:
 <code>nix-gnu-debug-static</code>, <code>nix-gnu-debug-shared</code>, <code>nix-gnu-release-static</code>
-or <code>nix-gnu-release-shared</code>.</p>
+or <code>nix-gnu-release-shared</code>. Each also has a <code>-native</code> form, such as
+<code>nix-gnu-release-static-native</code>, that builds for the build machine's CPU
+(<code>-march=native -mtune=native</code>).</p>
 <pre class="console"><code>$ ./builds/cmake/install-presets.sh --build-preset=nix-gnu-release-static
 </code></pre>
 <p>The presets script chooses the install location itself, and the result

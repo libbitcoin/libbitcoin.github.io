@@ -23,7 +23,7 @@ the `Option-<name>` property.
 | `--build-skip-test-run` | Build the tests without running them. |
 | `--build-parallel=<n>` | Number of parallel jobs (default the number of CPUs). |
 | `--build-post-install-clean` | Remove dependency build files after installing. |
-| `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). |
+| `--hardware-optimized` | Optimize for the build machine's CPU (`-march=native -mtune=native`), with `--build-config`. See [Hardware options](#2-hardware-options). Not used by the presets script, whose `-native` presets do the same. |
 | `--noninteractive` | Do not prompt. |
 | `--verbose` | Display the commands run. |
 
@@ -37,13 +37,13 @@ built with an option runs only on CPUs that have the extension. Run
 `bs --hardware` on the target machine to see which it has, and do not
 enable an option it lacks.
 
-All are off by default. `--hardware-optimized` (§1) enables every
-extension of the build machine's CPU instead.
+All are off by default. `--hardware-optimized` (§1), or a `-native`
+preset, enables every extension of the build machine's CPU instead.
 
-> **Portability:** a build with `--hardware-optimized` runs only on CPUs
-> that have every instruction set extension of the machine it was built
-> on. To build for other machines, omit it, and enable only the
-> extensions they all have.
+> **Portability:** a build with `--hardware-optimized` or a `-native`
+> preset runs only on CPUs that have every instruction set extension of
+> the machine it was built on. To build for other machines, omit it, and
+> enable only the extensions they all have.
 
 ### x86
 
@@ -67,7 +67,8 @@ extension of the build machine's CPU instead.
 | `--hardware-sha3` | ARMv8.2 SHA-3, used for SHA-512 (implies SHA-1/SHA-256 and AES) |
 | `--hardware-aes` | ARMv8 AES and PMULL |
 
-The ARM options are install script options. Each option and the options
+The ARM options are options of `install-gnu.sh` and `install-cmake.sh`,
+not of the presets script. Each option and the options
 it implies combine into one target flag, `-march=armv8-a+<extensions>`
 (`armv8.2-a` with `--hardware-sha3`), added to `CFLAGS` and `CXXFLAGS`.
 For example, `--hardware-sha2` builds with `-march=armv8-a+aes+sha2`, and

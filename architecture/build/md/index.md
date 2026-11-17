@@ -75,7 +75,7 @@ generator resolves it against the registrar.
 | --------- | -------- |
 | `dependency` | For each library and external dependency: its source (GitHub owner and tag, archive URL, NuGet package), its build methods (`gnu`, `cmake`, `preset`, `msbuild`, `nuget`), the options used when it is built as a dependency, and its CMake package and target (`bitcoin::system`) |
 | `build-options` | The install script options (`--build-config`, `--build-link`, `--prefix`, `--build-limit`, `--hardware-optimized` and others), with variable names, types and help text |
-| `presets` | The CMake presets (`nix-gnu-debug-static` and so on), composed from base, debug, release, static and shared settings |
+| `presets` | The CMake presets (`nix-gnu-debug-static` and so on), composed from base, debug, release, static, shared and native settings |
 | `actions` | The GitHub actions used by the workflows, pinned by commit hash |
 
 A `toolchain` element defines the Visual Studio toolset (`v145`), the
