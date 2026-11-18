@@ -8,10 +8,10 @@ and no GPU.
 
 <div id="server-status"></div>
 
-| Host | Address | mainnet | testnet3 | testnet4 | testnet5 |
-| ---- | ------- | ------- | -------- | -------- | -------- |
-| wormer.libbitcoin.net | 72.65.246.83 | – | – | – | – |
-| carmine.libbitcoin.net | 72.65.246.84 | – | – | – | – |
+| Host | Address | mainnet | testnet3 | testnet4 | testnet5 | signet |
+| ---- | ------- | ------- | -------- | -------- | -------- | ------ |
+| wormer.libbitcoin.net | 72.65.246.83 | – | – | – | – | – |
+| carmine.libbitcoin.net | 72.65.246.84 | – | – | – | – | – |
 
 <div id="server-details"></div>
 
@@ -21,10 +21,12 @@ and no GPU.
 | [wormer](https://wormer.libbitcoin.net:18143) | testnet3 | – | – | – | – | – | – |
 | [wormer](https://wormer.libbitcoin.net:48143) | testnet4 | – | – | – | – | – | – |
 | [wormer](https://wormer.libbitcoin.net:58143) | testnet5 | – | – | – | – | – | – |
+| [wormer](https://wormer.libbitcoin.net:38143) | signet | – | – | – | – | – | – |
 | [carmine](https://carmine.libbitcoin.net:8143) | mainnet | – | – | – | – | – | – |
 | [carmine](https://carmine.libbitcoin.net:18143) | testnet3 | – | – | – | – | – | – |
 | [carmine](https://carmine.libbitcoin.net:48143) | testnet4 | – | – | – | – | – | – |
 | [carmine](https://carmine.libbitcoin.net:58143) | testnet5 | – | – | – | – | – | – |
+| [carmine](https://carmine.libbitcoin.net:38143) | signet | – | – | – | – | – | – |
 
 <div id="server-p2p"></div>
 
@@ -34,23 +36,25 @@ and no GPU.
 | wormer | testnet3 | – | – | – | – | – | – | – | – | – | – |
 | wormer | testnet4 | – | – | – | – | – | – | – | – | – | – |
 | wormer | testnet5 | – | – | – | – | – | – | – | – | – | – |
+| wormer | signet | – | – | – | – | – | – | – | – | – | – |
 | carmine | mainnet | – | – | – | – | – | – | – | – | – | – |
 | carmine | testnet3 | – | – | – | – | – | – | – | – | – | – |
 | carmine | testnet4 | – | – | – | – | – | – | – | – | – | – |
 | carmine | testnet5 | – | – | – | – | – | – | – | – | – | – |
+| carmine | signet | – | – | – | – | – | – | – | – | – | – |
 
 <div id="server-scan"></div>
 
-| Service | mainnet | testnet3 | testnet4 | testnet5 |
-| ------- | ------- | -------- | -------- | -------- |
-| P2P | 8333 / 8333 | 18333 / 18333 | 48333 / 48333 | 18353 / 18353 |
-| ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 | 58380 / 58343 |
-| Native | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 | 58180 / 58143 |
-| Bitcoind | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 | 58280 / 58243 |
-| BTCD | 8480 / 8443 | 18480 / 18443 | 48480 / 48443 | 58480 / 58443 |
-| Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 | 58580 / 58543 |
-| Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 | 58680 / 58643 |
-| Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 | 58780 / 58743 |
+| Service | mainnet | testnet3 | testnet4 | testnet5 | signet |
+| ------- | ------- | -------- | -------- | -------- | ------ |
+| P2P | 8333 / 8333 | 18333 / 18333 | 48333 / 48333 | 18353 / 18353 | 38333 / 38333 |
+| ZMQ | 8380 / 8343 | 18380 / 18343 | 48380 / 48343 | 58380 / 58343 | 38380 / 38343 |
+| Native | 8180 / 8143 | 18180 / 18143 | 48180 / 48143 | 58180 / 58143 | 38180 / 38143 |
+| Bitcoind | 8280 / 8243 | 18280 / 18243 | 48280 / 48243 | 58280 / 58243 | 38280 / 38243 |
+| BTCD | 8480 / 8443 | 18480 / 18443 | 48480 / 48443 | 58480 / 58443 | 38480 / 38443 |
+| Electrum | 8580 / 8543 | 18580 / 18543 | 48580 / 48543 | 58580 / 58543 | 38580 / 38543 |
+| Sparrow | 8680 / 8643 | 18680 / 18643 | 48680 / 48643 | 58680 / 58643 | 38680 / 38643 |
+| Esplora | 8780 / 8743 | 18780 / 18743 | 48780 / 48743 | 58780 / 58743 | 38780 / 38743 |
 
 To connect to a secure ZMQ port, a client must be configured with the server's public key:
 
@@ -144,7 +148,8 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
     mainnet: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
     testnet3: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
     testnet4: "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043",
-    testnet5: "00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497"
+    testnet5: "00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497",
+    signet: "00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6"
   };
   var paths = {
     "Native": "/v1/block/height/0?format=json",
@@ -262,9 +267,9 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
   var details = document.getElementById("server-details");
   var table = details && details.nextElementSibling;
   if (table) {
-    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000, testnet5: 50000 };
+    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000, testnet5: 50000, signet: 30000 };
     var mark = function (cell, text, state, tip) { cell.textContent = text; cell.className = state; hint(cell, tip); };
-    var taproot = { mainnet: 709632, testnet3: 2011968, testnet4: 0, testnet5: 0 };
+    var taproot = { mainnet: 709632, testnet3: 2011968, testnet4: 0, testnet5: 0, signet: 0 };
     var window_ = 24 * 60 * 60 * 1000;
     var tops = {};
     var agree = function (chain, row, hash) {

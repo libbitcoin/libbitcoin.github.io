@@ -370,6 +370,7 @@ and no GPU.</p>
 <th>testnet3</th>
 <th>testnet4</th>
 <th>testnet5</th>
+<th>signet</th>
 </tr>
 </thead>
 <tbody>
@@ -380,10 +381,12 @@ and no GPU.</p>
 <td>–</td>
 <td>–</td>
 <td>–</td>
+<td>–</td>
 </tr>
 <tr>
 <td>carmine.libbitcoin.net</td>
 <td>72.65.246.84</td>
+<td>–</td>
 <td>–</td>
 <td>–</td>
 <td>–</td>
@@ -448,6 +451,16 @@ and no GPU.</p>
 <td>–</td>
 </tr>
 <tr>
+<td><a href="https://wormer.libbitcoin.net:38143">wormer</a></td>
+<td>signet</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
+<tr>
 <td><a href="https://carmine.libbitcoin.net:8143">carmine</a></td>
 <td>mainnet</td>
 <td>–</td>
@@ -480,6 +493,16 @@ and no GPU.</p>
 <tr>
 <td><a href="https://carmine.libbitcoin.net:58143">carmine</a></td>
 <td>testnet5</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
+<tr>
+<td><a href="https://carmine.libbitcoin.net:38143">carmine</a></td>
+<td>signet</td>
 <td>–</td>
 <td>–</td>
 <td>–</td>
@@ -566,6 +589,20 @@ and no GPU.</p>
 <td>–</td>
 </tr>
 <tr>
+<td>wormer</td>
+<td>signet</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
+<tr>
 <td>carmine</td>
 <td>mainnet</td>
 <td>–</td>
@@ -621,6 +658,20 @@ and no GPU.</p>
 <td>–</td>
 <td>–</td>
 </tr>
+<tr>
+<td>carmine</td>
+<td>signet</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
 </tbody>
 </table></div>
 <div id="server-scan"></div>
@@ -633,6 +684,7 @@ and no GPU.</p>
 <th>testnet3</th>
 <th>testnet4</th>
 <th>testnet5</th>
+<th>signet</th>
 </tr>
 </thead>
 <tbody>
@@ -642,6 +694,7 @@ and no GPU.</p>
 <td>18333 / 18333</td>
 <td>48333 / 48333</td>
 <td>18353 / 18353</td>
+<td>38333 / 38333</td>
 </tr>
 <tr>
 <td>ZMQ</td>
@@ -649,6 +702,7 @@ and no GPU.</p>
 <td>18380 / 18343</td>
 <td>48380 / 48343</td>
 <td>58380 / 58343</td>
+<td>38380 / 38343</td>
 </tr>
 <tr>
 <td>Native</td>
@@ -656,6 +710,7 @@ and no GPU.</p>
 <td>18180 / 18143</td>
 <td>48180 / 48143</td>
 <td>58180 / 58143</td>
+<td>38180 / 38143</td>
 </tr>
 <tr>
 <td>Bitcoind</td>
@@ -663,6 +718,7 @@ and no GPU.</p>
 <td>18280 / 18243</td>
 <td>48280 / 48243</td>
 <td>58280 / 58243</td>
+<td>38280 / 38243</td>
 </tr>
 <tr>
 <td>BTCD</td>
@@ -670,6 +726,7 @@ and no GPU.</p>
 <td>18480 / 18443</td>
 <td>48480 / 48443</td>
 <td>58480 / 58443</td>
+<td>38480 / 38443</td>
 </tr>
 <tr>
 <td>Electrum</td>
@@ -677,6 +734,7 @@ and no GPU.</p>
 <td>18580 / 18543</td>
 <td>48580 / 48543</td>
 <td>58580 / 58543</td>
+<td>38580 / 38543</td>
 </tr>
 <tr>
 <td>Sparrow</td>
@@ -684,6 +742,7 @@ and no GPU.</p>
 <td>18680 / 18643</td>
 <td>48680 / 48643</td>
 <td>58680 / 58643</td>
+<td>38680 / 38643</td>
 </tr>
 <tr>
 <td>Esplora</td>
@@ -691,6 +750,7 @@ and no GPU.</p>
 <td>18780 / 18743</td>
 <td>48780 / 48743</td>
 <td>58780 / 58743</td>
+<td>38780 / 38743</td>
 </tr>
 </tbody>
 </table></div>
@@ -798,7 +858,8 @@ and no GPU.</p>
     mainnet: "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
     testnet3: "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
     testnet4: "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043",
-    testnet5: "00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497"
+    testnet5: "00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497",
+    signet: "00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6"
   };
   var paths = {
     "Native": "/v1/block/height/0?format=json",
@@ -916,9 +977,9 @@ and no GPU.</p>
   var details = document.getElementById("server-details");
   var table = details && details.nextElementSibling;
   if (table) {
-    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000, testnet5: 50000 };
+    var offsets = { mainnet: 0, testnet3: 10000, testnet4: 40000, testnet5: 50000, signet: 30000 };
     var mark = function (cell, text, state, tip) { cell.textContent = text; cell.className = state; hint(cell, tip); };
-    var taproot = { mainnet: 709632, testnet3: 2011968, testnet4: 0, testnet5: 0 };
+    var taproot = { mainnet: 709632, testnet3: 2011968, testnet4: 0, testnet5: 0, signet: 0 };
     var window_ = 24 * 60 * 60 * 1000;
     var tops = {};
     var agree = function (chain, row, hash) {
