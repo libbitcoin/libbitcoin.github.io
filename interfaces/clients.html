@@ -61,6 +61,8 @@
     --ink: #ededed; --ink-2: #cfcfcf; --ink-3: #6a7282;
     --rule: #3a3c33; --rule-soft: #2e302a;
     --accent: #c85637; --heading: #ffa022; --proposed: #66d9ef;
+    --yes: #00bb7f; --partial: #ffa022; --pending: #4f8dff;
+    --rejected: #ff2357; --scope: #6a7282;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
@@ -149,6 +151,12 @@
   .doc .proposed, .doc .proposed code, .doc .proposed-line, .doc .proposed-line span { color: var(--proposed); }
   .doc td code { white-space: nowrap; }
   .doc .nw { white-space: nowrap; }
+  .doc .works { color: var(--yes); }
+  .doc .partial { color: var(--partial); }
+  .doc .blocked { color: var(--rejected); }
+  .doc .retest { color: var(--pending); }
+  .doc .expected { color: var(--proposed); }
+  .doc .no { color: var(--scope); }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
@@ -367,27 +375,27 @@ use the same interfaces but have not yet been tested.</p>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;">✔</td>
+<td style="text-align: center;"><span class="works">✔</span></td>
 <td>Works: the client did its job end to end.</td>
 </tr>
 <tr>
-<td style="text-align: center;">◑</td>
+<td style="text-align: center;"><span class="partial">◑</span></td>
 <td>Partial: some of its features fail.</td>
 </tr>
 <tr>
-<td style="text-align: center;">✘</td>
+<td style="text-align: center;"><span class="blocked">✘</span></td>
 <td>Blocked: it fails.</td>
 </tr>
 <tr>
-<td style="text-align: center;">↻</td>
+<td style="text-align: center;"><span class="retest">↻</span></td>
 <td>Retest: the failure is fixed in <code>bs</code>, and the client has not been run again.</td>
 </tr>
 <tr>
-<td style="text-align: center;">○</td>
+<td style="text-align: center;"><span class="expected">○</span></td>
 <td>Expected: untested, but every method the client uses is served.</td>
 </tr>
 <tr>
-<td style="text-align: center;">⊘</td>
+<td style="text-align: center;"><span class="no">⊘</span></td>
 <td>No: the client requires methods on that interface that <code>bs</code> does not serve, such as bitcoind's wallet methods (see <a href="#node-wallet-clients">Node wallet clients</a>).</td>
 </tr>
 </tbody>
@@ -423,9 +431,9 @@ Each client links to its notes (§3).</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -443,7 +451,7 @@ Each client links to its notes (§3).</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 </tr>
 <tr>
 <td><a href="#lnd">lnd</a> (btcd)</td>
@@ -456,7 +464,7 @@ Each client links to its notes (§3).</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Partial">◑</span></td>
+<td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 </tr>
@@ -466,8 +474,8 @@ Each client links to its notes (§3).</p>
 <td></td>
 <td><span class="nw">2026-10</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -481,9 +489,9 @@ Each client links to its notes (§3).</p>
 <td>2.3.0</td>
 <td><span class="nw">2026-11-16</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="No">⊘</span></td>
+<td style="text-align: center;"><span class="no" title="No">⊘</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -495,15 +503,15 @@ Each client links to its notes (§3).</p>
 <td>Wallet analysis</td>
 <td>1.0.1</td>
 <td><span class="nw">2026-11-16</span></td>
-<td style="text-align: center;"><span title="Blocked">✘</span></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="blocked" title="Blocked">✘</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 </tr>
 <tr>
 <td><a href="#kassiber">kassiber</a></td>
@@ -511,13 +519,13 @@ Each client links to its notes (§3).</p>
 <td>0.22.78</td>
 <td><span class="nw">2026-11-06</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="No">⊘</span></td>
+<td style="text-align: center;"><span class="no" title="No">⊘</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Blocked">✘</span></td>
+<td style="text-align: center;"><span class="blocked" title="Blocked">✘</span></td>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
@@ -526,13 +534,13 @@ Each client links to its notes (§3).</p>
 <td>0.1.0</td>
 <td><span class="nw">2026-11-16</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Partial">◑</span></td>
+<td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Partial">◑</span></td>
+<td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
@@ -543,9 +551,9 @@ Each client links to its notes (§3).</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Blocked">✘</span></td>
+<td style="text-align: center;"><span class="blocked" title="Blocked">✘</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -556,9 +564,9 @@ Each client links to its notes (§3).</p>
 <td>3.3.2</td>
 <td><span class="nw">2026-11-17</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -578,7 +586,7 @@ Each client links to its notes (§3).</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 </tr>
 </tbody>
 </table></div>
@@ -606,7 +614,7 @@ is not a test.</p>
 <td><a href="https://electrum.org">Electrum</a></td>
 <td>Wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -619,7 +627,7 @@ is not a test.</p>
 <td><a href="https://bluewallet.io">BlueWallet</a></td>
 <td>Wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -632,7 +640,7 @@ is not a test.</p>
 <td><a href="https://nunchuk.io">Nunchuk</a></td>
 <td>Wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -645,7 +653,7 @@ is not a test.</p>
 <td><a href="https://stackwallet.com">Stack Wallet</a></td>
 <td>Wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -658,7 +666,7 @@ is not a test.</p>
 <td><a href="https://blockstream.com/app/">Blockstream app</a></td>
 <td>Wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -671,7 +679,7 @@ is not a test.</p>
 <td><a href="https://bitbox.swiss/app/">BitBoxApp</a></td>
 <td>Hardware wallet app</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -684,7 +692,7 @@ is not a test.</p>
 <td><a href="https://trezor.io/trezor-suite">Trezor Suite</a></td>
 <td>Hardware wallet app</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -697,9 +705,9 @@ is not a test.</p>
 <td><a href="https://wizardsardine.com/liana/">Liana</a></td>
 <td>Wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="No">⊘</span></td>
+<td style="text-align: center;"><span class="no" title="No">⊘</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -712,18 +720,18 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 </tr>
 <tr>
 <td><a href="https://aqua.net">Aqua</a></td>
 <td>Wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -736,7 +744,7 @@ is not a test.</p>
 <td><a href="https://phoenix.acinq.co">Phoenix</a></td>
 <td>Lightning wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -749,7 +757,7 @@ is not a test.</p>
 <td><a href="https://bitkit.to">Bitkit</a></td>
 <td>Lightning wallet</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -769,7 +777,7 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 </tr>
 <tr>
 <td><a href="https://blixtwallet.com">Blixt</a></td>
@@ -782,7 +790,7 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 </tr>
 <tr>
 <td><a href="https://albyhub.com">Alby Hub</a></td>
@@ -794,7 +802,7 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
@@ -803,7 +811,7 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -819,7 +827,7 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Partial">◑</span></td>
+<td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 </tr>
@@ -827,39 +835,39 @@ is not a test.</p>
 <td><a href="https://lightningdevkit.org">LDK Node</a></td>
 <td>Lightning library</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
 <td><a href="https://bitcoindevkit.org">BDK</a></td>
 <td>Wallet library</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 </tr>
 <tr>
 <td><a href="https://fedimint.org">Fedimint</a></td>
 <td>Federation</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
@@ -868,22 +876,22 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 </tr>
 <tr>
 <td><a href="https://ashigaru.rs">Ashigaru Dojo</a></td>
 <td>Wallet backend</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -894,20 +902,20 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 </tr>
 <tr>
 <td><a href="https://github.com/janoside/btc-rpc-explorer">BTC RPC Explorer</a></td>
 <td>Explorer</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -920,7 +928,7 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="Expected">○</span></td>
+<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -938,7 +946,7 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span title="No">⊘</span></td>
+<td style="text-align: center;"><span class="no" title="No">⊘</span></td>
 </tr>
 </tbody>
 </table></div>

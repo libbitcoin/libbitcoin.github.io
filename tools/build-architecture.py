@@ -407,6 +407,8 @@ STYLE = """
     --ink: #ededed; --ink-2: #cfcfcf; --ink-3: #6a7282;
     --rule: #3a3c33; --rule-soft: #2e302a;
     --accent: #c85637; --heading: #ffa022; --proposed: #66d9ef;
+    --yes: #00bb7f; --partial: #ffa022; --pending: #4f8dff;
+    --rejected: #ff2357; --scope: #6a7282;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
@@ -495,6 +497,12 @@ STYLE = """
   .doc .proposed, .doc .proposed code, .doc .proposed-line, .doc .proposed-line span { color: var(--proposed); }
   .doc td code { white-space: nowrap; }
   .doc .nw { white-space: nowrap; }
+  .doc .works { color: var(--yes); }
+  .doc .partial { color: var(--partial); }
+  .doc .blocked { color: var(--rejected); }
+  .doc .retest { color: var(--pending); }
+  .doc .expected { color: var(--proposed); }
+  .doc .no { color: var(--scope); }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
