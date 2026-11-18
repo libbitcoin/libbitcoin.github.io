@@ -19,7 +19,7 @@ interface the client does not use.
 Results are for the `bs` master branch on the date given, on mainnet.
 Each client links to its notes (§3).
 
-| Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [JSON-RPC](bitcoind-rpc) | [REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
+| Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | ------- | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [lnd](#lnd), bitcoind backend | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | Works | | Works | | | |
 | [lnd](#lnd), neutrino backend | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | | | Works |
@@ -38,7 +38,7 @@ Each client links to its notes (§3).
 Expected compatibility, from each client's source or documentation. It
 is not a test.
 
-| Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [JSON-RPC](bitcoind-rpc) | [REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
+| Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [Electrum](https://electrum.org) | Wallet | | Expected | | | | | | | |
 | [BlueWallet](https://bluewallet.io) | Wallet | | Expected | | | | | | | |
@@ -133,7 +133,7 @@ reports under `store`, so it finds no address index and stays on
 Electrum, with the same results. With that check adjusted, its address,
 output and transaction queries all gave the same results as Electrum.
 
-JSON-RPC (`scantxoutset`, `getrawtransaction`) and client filters over
+Bitcoind JSON-RPC (`scantxoutset`, `getrawtransaction`) and client filters over
 P2P were not tested. Its import of xpubs from a node wallet
 (`listdescriptors`) requires a node wallet.
 
@@ -143,7 +143,7 @@ P2P were not tested. Its import of xpubs from a node wallet
 server, with amounts, fees and timestamps. **Esplora:** a client fault.
 The client computes script hashes in Electrum byte order, reversed, for
 Esplora's `/scripthash/` paths, which take them unreversed, so it finds
-no transactions on any Esplora server. **JSON-RPC:** requires bitcoind
+no transactions on any Esplora server. **Bitcoind JSON-RPC:** requires bitcoind
 wallet methods (`createwallet`, `importdescriptors`, `listwallets`).
 
 ### rbitcoin-space
@@ -160,7 +160,7 @@ minutes, and the explorer's other address requests wait meanwhile.
 
 ### Fulcrum
 
-Fulcrum requires a `Content-Length` header on each JSON-RPC response, and
+Fulcrum requires a `Content-Length` header on each bitcoind JSON-RPC response, and
 `bs` sends single responses with chunked transfer encoding, which
 HTTP/1.1 allows. With a test build that sized single responses, Fulcrum
 indexed half of mainnet (to height 483,000) at about 9 blocks a second,
@@ -170,7 +170,7 @@ so Fulcrum is not needed in front of it.
 ### mempool
 
 The mempool backend in its `electrum` mode, which reads blocks,
-transactions and the pool over JSON-RPC and addresses over Electrum.
+transactions and the pool over bitcoind JSON-RPC and addresses over Electrum.
 It indexed the latest blocks, followed new ones, loaded the pool and
 served fee recommendations. Against mempool.space: block headers,
 transaction lists, transactions, their hex and merkle proofs, the
@@ -205,7 +205,7 @@ through 1.7. Core Lightning calls `bitcoin-cli` for `getnetworkinfo`
 `gettxout`, `sendrawtransaction` and `getpeerinfo`, and
 `getblockfrompeer` only for pruned nodes. electrs refuses a node that
 reports `pruned`. Wasabi, Zeus, Blixt and BDK (Kyoto) require client
-filters. LDK Node reads blocks over REST with JSON-RPC for the rest.
+filters. LDK Node reads blocks over REST with bitcoind JSON-RPC for the rest.
 Bitkit takes an Electrum server over TCP or TLS. Aqua takes one for
 bitcoin only over TLS, with a certificate valid for the host name.
 Alby Hub's built-in node (LDK) takes an Esplora server
@@ -219,7 +219,7 @@ node wallet. Floresta requires Utreexo proofs from its peers.
 Some clients keep their wallet in the node, and call bitcoind's wallet
 methods to create it, import descriptors or addresses, list and lock
 unspent outputs, fund, sign and send. `bs` does not implement the
-wallet methods (see [JSON-RPC](bitcoind-rpc#11-methods-not-served)), and
+wallet methods (see [bitcoind JSON-RPC](bitcoind-rpc#11-methods-not-served)), and
 these clients have no other backend, so they cannot be run on `bs`:
 
 | Client | Kind | Wallet methods required |
@@ -227,9 +227,9 @@ these clients have no other backend, so they cannot be run on `bs`:
 | [Eclair](https://github.com/ACINQ/eclair) | Lightning node | `fundrawtransaction`, `walletprocesspsbt`, `listunspent`, `lockunspent`, `getnewaddress`, `sendtoaddress`, … |
 | [JoinMarket](https://github.com/JoinMarket-Org/joinmarket-clientserver) | Coinjoin | `importmulti` (legacy wallet), or `importdescriptors` in JoinMarket-NG, and `listunspent` |
 
-Liana, Specter Desktop and kassiber also need a node wallet on JSON-RPC,
+Liana, Specter Desktop and kassiber also need a node wallet on bitcoind JSON-RPC,
 and work over Electrum instead, so they stay in the matrices with **No**
-on JSON-RPC.
+on bitcoind JSON-RPC.
 
 Floresta's **No** is unrelated: it requires Utreexo proofs from its P2P
 peers, which `bs` does not provide.

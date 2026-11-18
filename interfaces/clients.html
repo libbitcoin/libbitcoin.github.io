@@ -378,7 +378,7 @@ Each client links to its notes (§3).</p>
 <th style="text-align: center;"><a href="native.html">Native</a></th>
 <th style="text-align: center;"><a href="electrum.html">Electrum</a></th>
 <th style="text-align: center;"><a href="sparrow.html">Sparrow</a></th>
-<th style="text-align: center;"><a href="bitcoind-rpc.html">JSON-RPC</a></th>
+<th style="text-align: center;"><a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a></th>
 <th style="text-align: center;"><a href="bitcoind-rest.html">REST</a></th>
 <th style="text-align: center;"><a href="zeromq.html">ZMQ</a></th>
 <th style="text-align: center;"><a href="btcd.html">BTCD</a></th>
@@ -565,7 +565,7 @@ is not a test.</p>
 <th style="text-align: center;"><a href="native.html">Native</a></th>
 <th style="text-align: center;"><a href="electrum.html">Electrum</a></th>
 <th style="text-align: center;"><a href="sparrow.html">Sparrow</a></th>
-<th style="text-align: center;"><a href="bitcoind-rpc.html">JSON-RPC</a></th>
+<th style="text-align: center;"><a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a></th>
 <th style="text-align: center;"><a href="bitcoind-rest.html">REST</a></th>
 <th style="text-align: center;"><a href="zeromq.html">ZMQ</a></th>
 <th style="text-align: center;"><a href="btcd.html">BTCD</a></th>
@@ -966,7 +966,7 @@ transactions and headers from the Native REST interface. It looks for
 reports under <code>store</code>, so it finds no address index and stays on
 Electrum, with the same results. With that check adjusted, its address,
 output and transaction queries all gave the same results as Electrum.</p>
-<p>JSON-RPC (<code>scantxoutset</code>, <code>getrawtransaction</code>) and client filters over
+<p>Bitcoind JSON-RPC (<code>scantxoutset</code>, <code>getrawtransaction</code>) and client filters over
 P2P were not tested. Its import of xpubs from a node wallet
 (<code>listdescriptors</code>) requires a node wallet.</p>
 <h3 id="kassiber">kassiber<a class="anchor" href="#kassiber" aria-label="Link to this section">#</a></h3>
@@ -974,7 +974,7 @@ P2P were not tested. Its import of xpubs from a node wallet
 server, with amounts, fees and timestamps. <strong>Esplora:</strong> a client fault.
 The client computes script hashes in Electrum byte order, reversed, for
 Esplora's <code>/scripthash/</code> paths, which take them unreversed, so it finds
-no transactions on any Esplora server. <strong>JSON-RPC:</strong> requires bitcoind
+no transactions on any Esplora server. <strong>Bitcoind JSON-RPC:</strong> requires bitcoind
 wallet methods (<code>createwallet</code>, <code>importdescriptors</code>, <code>listwallets</code>).</p>
 <h3 id="rbitcoin-space">rbitcoin-space<a class="anchor" href="#rbitcoin-space" aria-label="Link to this section">#</a></h3>
 <p>Blocks, transactions, outspends, fee estimates, mining pool and hash rate
@@ -987,7 +987,7 @@ are now served, and have not been run again. An Esplora
 address with a very long history is served in full, which can take
 minutes, and the explorer's other address requests wait meanwhile.</p>
 <h3 id="fulcrum">Fulcrum<a class="anchor" href="#fulcrum" aria-label="Link to this section">#</a></h3>
-<p>Fulcrum requires a <code>Content-Length</code> header on each JSON-RPC response, and
+<p>Fulcrum requires a <code>Content-Length</code> header on each bitcoind JSON-RPC response, and
 <code>bs</code> sends single responses with chunked transfer encoding, which
 HTTP/1.1 allows. With a test build that sized single responses, Fulcrum
 indexed half of mainnet (to height 483,000) at about 9 blocks a second,
@@ -995,7 +995,7 @@ with ZMQ block notifications. <code>bs</code> serves the Electrum interface itse
 so Fulcrum is not needed in front of it.</p>
 <h3 id="mempool">mempool<a class="anchor" href="#mempool" aria-label="Link to this section">#</a></h3>
 <p>The mempool backend in its <code>electrum</code> mode, which reads blocks,
-transactions and the pool over JSON-RPC and addresses over Electrum.
+transactions and the pool over bitcoind JSON-RPC and addresses over Electrum.
 It indexed the latest blocks, followed new ones, loaded the pool and
 served fee recommendations. Against mempool.space: block headers,
 transaction lists, transactions, their hex and merkle proofs, the
@@ -1024,7 +1024,7 @@ through 1.7. Core Lightning calls <code>bitcoin-cli</code> for <code>getnetworki
 <code>gettxout</code>, <code>sendrawtransaction</code> and <code>getpeerinfo</code>, and
 <code>getblockfrompeer</code> only for pruned nodes. electrs refuses a node that
 reports <code>pruned</code>. Wasabi, Zeus, Blixt and BDK (Kyoto) require client
-filters. LDK Node reads blocks over REST with JSON-RPC for the rest.
+filters. LDK Node reads blocks over REST with bitcoind JSON-RPC for the rest.
 Bitkit takes an Electrum server over TCP or TLS. Aqua takes one for
 bitcoin only over TLS, with a certificate valid for the host name.
 Alby Hub's built-in node (LDK) takes an Esplora server
@@ -1036,7 +1036,7 @@ node wallet. Floresta requires Utreexo proofs from its peers.</p>
 <p>Some clients keep their wallet in the node, and call bitcoind's wallet
 methods to create it, import descriptors or addresses, list and lock
 unspent outputs, fund, sign and send. <code>bs</code> does not implement the
-wallet methods (see <a href="bitcoind-rpc.html#11-methods-not-served">JSON-RPC</a>), and
+wallet methods (see <a href="bitcoind-rpc.html#11-methods-not-served">bitcoind JSON-RPC</a>), and
 these clients have no other backend, so they cannot be run on <code>bs</code>:</p>
 <div class="scroller"><table>
 <thead>
@@ -1059,9 +1059,9 @@ these clients have no other backend, so they cannot be run on <code>bs</code>:</
 </tr>
 </tbody>
 </table></div>
-<p>Liana, Specter Desktop and kassiber also need a node wallet on JSON-RPC,
+<p>Liana, Specter Desktop and kassiber also need a node wallet on bitcoind JSON-RPC,
 and work over Electrum instead, so they stay in the matrices with <strong>No</strong>
-on JSON-RPC.</p>
+on bitcoind JSON-RPC.</p>
 <p>Floresta's <strong>No</strong> is unrelated: it requires Utreexo proofs from its P2P
 peers, which <code>bs</code> does not provide.</p>
   </article>
