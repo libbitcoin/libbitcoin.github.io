@@ -118,16 +118,16 @@ rate = 1
 size = 0
 
 [table.filter_bk]
-# The number of buckets in the filter_bk table head, defaults to '0' (0 disables).
-buckets = 0
+# The number of buckets in the filter_bk table head, defaults to '950001'.
+buckets = 950001
 # The percentage expansion of the filter_bk table body, defaults to '1'.
 rate = 1
 # The minimum allocation of the filter_bk table body, defaults to '0'.
 size = 0
 
 [table.filter_tx]
-# The number of buckets in the filter_tx table head, defaults to '0' (0 disables).
-buckets = 0
+# The number of buckets in the filter_tx table head, defaults to '950001'.
+buckets = 950001
 # The percentage expansion of the filter_tx table body, defaults to '1'.
 rate = 1
 # The minimum allocation of the filter_tx table body, defaults to '0'.
@@ -541,7 +541,7 @@ maximum_concurrency = 50000
 maximum_height = 0
 # Serve blocks to network connections, defaults to 'true'.
 provide_blocks = true
-# Serve client filters to network connections, defaults to 'false'.
+# Serve client filters to network connections, indexed only if set at store creation, defaults to 'false'.
 provide_filters = false
 # Provide opportunistic connection encryption, defaults to 'true'.
 provide_privacy = true

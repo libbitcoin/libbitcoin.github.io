@@ -512,7 +512,8 @@ stateDiagram-v2
 <li><strong>open</strong> takes the process lock (an OS file lock) and creates
   <code>flush.lock</code>, which exists only while the store is open
   (<code>impl/store/store_open.ipp:29-118</code>, <code>locks/flush_lock.hpp</code>). It loads
-  the envelope before any table and fails on a schema mismatch. Stored
+  the envelope before any table, migrates an older migratable schema by
+  rewriting the envelope, and fails on any other schema mismatch. Stored
   bucket counts and filter k override configuration.</li>
 <li><strong>close</strong> writes each table's body count into its head, unloads and
   closes every storage, and removes <code>flush.lock</code> only if no storage

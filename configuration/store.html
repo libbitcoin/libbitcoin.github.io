@@ -471,11 +471,11 @@ by name:</p>
 </tr>
 <tr>
 <td><code>[table.*]</code></td>
-<td><code>buckets</code> of <code>header</code>, <code>tx</code>, <code>ins</code>, <code>outs</code>, <code>duplicate</code>, <code>pool</code> and <code>wtxid</code>, and whether client filters are enabled</td>
+<td><code>buckets</code> of <code>header</code>, <code>tx</code>, <code>ins</code>, <code>outs</code>, <code>duplicate</code>, <code>pool</code> and <code>wtxid</code></td>
 </tr>
 <tr>
 <td><code>[node]</code></td>
-<td><code>limited_blocks</code> and <code>silent_start_height</code></td>
+<td><code>limited_blocks</code>, <code>provide_filters</code>, <code>require_witness</code> and <code>silent_start_height</code></td>
 </tr>
 </tbody>
 </table></div>
@@ -491,15 +491,53 @@ only those in the configuration file:</p>
   different memory, and a store moved to another machine keeps its
   counts.</li>
 </ul>
-<p>A different top checkpoint is logged but not replaced, and client filters
-cannot be added to a store created without them. To change any of these
-settings, create a new store. The setups that depend on
-them, from milestone sync and pruning to disabling the address index,
-take effect only on a new store.</p>
-<p>Of these values, <code>bs -s</code> reads only the network from an existing store.
-For the others it shows the values the configuration produces on the
-machine it runs on, and the store's values replace them when the store
-opens, each logged as above.</p>
+<p>A different top checkpoint is logged but not replaced. To change any of
+these settings, create a new store. The setups that depend on them, from
+milestone sync and pruning to client filters and disabling the address
+index, take effect only on a new store.</p>
+<p>The optional indexes are decided at creation:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Indexed when the store is created with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client filters</td>
+<td><code>node.provide_filters = true</code></td>
+</tr>
+<tr>
+<td>Silent payments</td>
+<td><code>node.silent_start_height</code> below its default</td>
+</tr>
+<tr>
+<td>Address</td>
+<td><code>table.outs.buckets</code> above 0 (the default)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The tables of an index not enabled at creation are created empty. A
+store created with client filters can stop serving them, with
+<code>provide_filters = false</code>, which only drops the service bit. On a store
+created without them, <code>provide_filters = true</code> stops <code>bs</code> at startup with
+<code>client filters are not indexed by the store</code>.</p>
+<p>The store's values are applied before the configuration is checked, so
+checks such as <code>client filters require unpruned blocks</code> test the store's
+values, and <code>bs -s</code> shows them for an existing store.</p>
+<h2 id="4-schema-migration">4. Schema migration<a class="anchor" href="#4-schema-migration" aria-label="Link to this section">#</a></h2>
+<p>A store records the schema of the <code>bs</code> that created it. A store of the
+compiled schema opens as is. A store of an older schema that <code>bs</code> can
+migrate is upgraded when it opens, with no snapshot and no operator step,
+and the upgrade is logged:</p>
+<pre><code>Database schema 4.0.31.0 migrated to compiled schema 4.0.32.0.
+</code></pre>
+<p>A setting the older schema did not record takes its configured value at
+migration: a store migrated from 4.0.31 takes <code>node.require_witness</code> from
+the configuration. If the disk has no room for the upgrade, the open fails
+as disk full and the store is unchanged. A store older than the oldest
+migratable schema (4.0.31) must be recreated.</p>
   </article>
 
   <nav class="pager"><a href="public.html">&larr; Community Servers</a><a href="services.html">Service Settings &rarr;</a></nav>

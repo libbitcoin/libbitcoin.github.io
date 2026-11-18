@@ -149,11 +149,11 @@ govern the store; configuration is consumed only at creation.
 
 | Group | Content |
 | ----- | ------- |
-| schema | version, 4 × u32; open fails on mismatch |
+| schema | version, 4 × u32; an older migratable schema is migrated at open, any other mismatch fails |
 | system | fork flags, subsidy, retarget and timing parameters, activation heights, checkpoints, milestone |
 | database | interval depth; bucket counts and filter k for header, ins, outs, tx, duplicate, pool, wtxid |
 | network | limited_blocks, provide_filters |
-| node | silent_start_height (`max_uint32` = disabled) |
+| node | require_witness, silent_start_height (`max_uint32` = disabled) |
 | state | pooling, scan_frontier, latch_tx (rewritten in place by `set_pooling`) |
 
 ---
@@ -165,10 +165,12 @@ govern the store; configuration is consumed only at creation.
 | filter_bk | array_map, by header link | 3 / 24 | 64 | BIP157 filter hash 32, filter header 32 |
 | filter_tx | array_map slab, by header link | 5 / 40 | ≥ 1 | BIP158 filter, varint length prefixed |
 
-Filters are enabled when both tables have buckets
-(`impl/query/extent.ipp:319-322`). The address search is enabled when
+Filters are enabled by `provide_filters` in the envelope
+(`impl/query/extent.ipp:319-322`), and their tables are created empty
+without it. The address search is enabled when
 `outs` has buckets (`extent.ipp:312-316`). Silent-payment scanning is
-enabled by `silent_start_height` in the envelope (`extent.ipp:325-328`).
+enabled by `silent_start_height` in the envelope (`extent.ipp:325-328`),
+and the scan table is created empty without it.
 
 ---
 

@@ -688,7 +688,7 @@ govern the store; configuration is consumed only at creation.</p>
 <tbody>
 <tr>
 <td>schema</td>
-<td>version, 4 × u32; open fails on mismatch</td>
+<td>version, 4 × u32; an older migratable schema is migrated at open, any other mismatch fails</td>
 </tr>
 <tr>
 <td>system</td>
@@ -704,7 +704,7 @@ govern the store; configuration is consumed only at creation.</p>
 </tr>
 <tr>
 <td>node</td>
-<td>silent_start_height (<code>max_uint32</code> = disabled)</td>
+<td>require_witness, silent_start_height (<code>max_uint32</code> = disabled)</td>
 </tr>
 <tr>
 <td>state</td>
@@ -741,10 +741,12 @@ govern the store; configuration is consumed only at creation.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Filters are enabled when both tables have buckets
-(<code>impl/query/extent.ipp:319-322</code>). The address search is enabled when
+<p>Filters are enabled by <code>provide_filters</code> in the envelope
+(<code>impl/query/extent.ipp:319-322</code>), and their tables are created empty
+without it. The address search is enabled when
 <code>outs</code> has buckets (<code>extent.ipp:312-316</code>). Silent-payment scanning is
-enabled by <code>silent_start_height</code> in the envelope (<code>extent.ipp:325-328</code>).</p>
+enabled by <code>silent_start_height</code> in the envelope (<code>extent.ipp:325-328</code>),
+and the scan table is created empty without it.</p>
 <hr />
 <h2 id="6-hash-heads-and-their-filters">6. Hash heads and their filters<a class="anchor" href="#6-hash-heads-and-their-filters" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>

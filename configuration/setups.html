@@ -632,16 +632,11 @@ one address.</p>
 <h2 id="12-client-filters-bip157158">12. Client filters (BIP157/158)<a class="anchor" href="#12-client-filters-bip157158" aria-label="Link to this section">#</a></h2>
 <pre><code class="language-ini"><span class="section">[node]</span>
 provide_filters = true
-
-<span class="section">[table.filter_bk]</span>
-buckets = 950001
-
-<span class="section">[table.filter_tx]</span>
-buckets = 950001
 </code></pre>
-<p>Any count above 0 on both tables enables the client filters index. The
-value given initializes the index to entries for that many blocks, but
-the index grows as required.</p>
+<p>A store created with <code>provide_filters</code> indexes client filters. A store
+created without it cannot serve them, and <code>provide_filters = true</code> then
+stops <code>bs</code> at startup. Client filters require unpruned blocks
+(<code>node.limited_blocks = false</code>).</p>
 <blockquote>
 <p><strong>Fixed at store creation.</strong> The value is recorded in the store when
 the store is created. Each time the store is opened, the recorded
@@ -899,7 +894,8 @@ maximum_chunk_depth = 25
 <ul>
 <li><code>node.limited_blocks</code> prunes blocks under the milestone (<a href="#2-milestone-sync">Milestone sync</a>), and the
   node then serves only blocks above it.</li>
-<li><code>node.provide_filters</code> also requires the client filter tables (<a href="#12-client-filters-bip157158">Client filters (BIP157/158)</a>).</li>
+<li><code>node.provide_filters</code> requires a store created with it (<a href="#12-client-filters-bip157158">Client filters (BIP157/158)</a>).</li>
+<li><code>node.require_witness</code> is fixed at store creation (<a href="store.html#3-settings-fixed-at-store-creation">Settings fixed at store creation</a>).</li>
 <li><code>node.delay_inbound</code> refuses inbound peers, and client services other
   than <code>[admin]</code>, until the chain is current.</li>
 <li><code>pool.minimum_fee_rate</code> is the lowest fee rate, in BTC per thousand

@@ -301,17 +301,12 @@ Beyond the standard Esplora interface, `bs` provides:
 ```ini
 [node]
 provide_filters = true
-
-[table.filter_bk]
-buckets = 950001
-
-[table.filter_tx]
-buckets = 950001
 ```
 
-Any count above 0 on both tables enables the client filters index. The
-value given initializes the index to entries for that many blocks, but
-the index grows as required.
+A store created with `provide_filters` indexes client filters. A store
+created without it cannot serve them, and `provide_filters = true` then
+stops `bs` at startup. Client filters require unpruned blocks
+(`node.limited_blocks = false`).
 
 > **Fixed at store creation.** The value is recorded in the store when
 > the store is created. Each time the store is opened, the recorded
@@ -587,7 +582,8 @@ maximum_chunk_depth = 25
 
 - `node.limited_blocks` prunes blocks under the milestone ([Milestone sync](#2-milestone-sync)), and the
   node then serves only blocks above it.
-- `node.provide_filters` also requires the client filter tables ([Client filters (BIP157/158)](#12-client-filters-bip157158)).
+- `node.provide_filters` requires a store created with it ([Client filters (BIP157/158)](#12-client-filters-bip157158)).
+- `node.require_witness` is fixed at store creation ([Settings fixed at store creation](store#3-settings-fixed-at-store-creation)).
 - `node.delay_inbound` refuses inbound peers, and client services other
   than `[admin]`, until the chain is current.
 - `pool.minimum_fee_rate` is the lowest fee rate, in BTC per thousand

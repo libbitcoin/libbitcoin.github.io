@@ -77,8 +77,8 @@ The captured settings are:
 | `[bitcoin]` | `network`, the chain parameters, soft fork activations, the milestone, the top checkpoint and `signet_challenge` |
 | `[forks]` | all |
 | `[database]` | `interval_depth` |
-| `[table.*]` | `buckets` of `header`, `tx`, `ins`, `outs`, `duplicate`, `pool` and `wtxid`, and whether client filters are enabled |
-| `[node]` | `limited_blocks` and `silent_start_height` |
+| `[table.*]` | `buckets` of `header`, `tx`, `ins`, `outs`, `duplicate`, `pool` and `wtxid` |
+| `[node]` | `limited_blocks`, `provide_filters`, `require_witness` and `silent_start_height` |
 
 The values captured are those in effect when the store is created, not
 only those in the configuration file:
@@ -92,13 +92,42 @@ only those in the configuration file:
   different memory, and a store moved to another machine keeps its
   counts.
 
-A different top checkpoint is logged but not replaced, and client filters
-cannot be added to a store created without them. To change any of these
-settings, create a new store. The setups that depend on
-them, from milestone sync and pruning to disabling the address index,
-take effect only on a new store.
+A different top checkpoint is logged but not replaced. To change any of
+these settings, create a new store. The setups that depend on them, from
+milestone sync and pruning to client filters and disabling the address
+index, take effect only on a new store.
 
-Of these values, `bs -s` reads only the network from an existing store.
-For the others it shows the values the configuration produces on the
-machine it runs on, and the store's values replace them when the store
-opens, each logged as above.
+The optional indexes are decided at creation:
+
+| Index | Indexed when the store is created with |
+| ----- | -------------------------------------- |
+| Client filters | `node.provide_filters = true` |
+| Silent payments | `node.silent_start_height` below its default |
+| Address | `table.outs.buckets` above 0 (the default) |
+
+The tables of an index not enabled at creation are created empty. A
+store created with client filters can stop serving them, with
+`provide_filters = false`, which only drops the service bit. On a store
+created without them, `provide_filters = true` stops `bs` at startup with
+`client filters are not indexed by the store`.
+
+The store's values are applied before the configuration is checked, so
+checks such as `client filters require unpruned blocks` test the store's
+values, and `bs -s` shows them for an existing store.
+
+## 4. Schema migration
+
+A store records the schema of the `bs` that created it. A store of the
+compiled schema opens as is. A store of an older schema that `bs` can
+migrate is upgraded when it opens, with no snapshot and no operator step,
+and the upgrade is logged:
+
+```
+Database schema 4.0.31.0 migrated to compiled schema 4.0.32.0.
+```
+
+A setting the older schema did not record takes its configured value at
+migration: a store migrated from 4.0.31 takes `node.require_witness` from
+the configuration. If the disk has no room for the upgrade, the open fails
+as disk full and the store is unchanged. A store older than the oldest
+migratable schema (4.0.31) must be recreated.
