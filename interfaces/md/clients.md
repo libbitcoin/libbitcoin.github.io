@@ -19,7 +19,7 @@ interface the client does not use.
 Results are for the `bs` master branch on the date given, on mainnet.
 Each client links to its notes (§3).
 
-| Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
+| Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [Bitcoind REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | ------- | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [lnd](#lnd), bitcoind backend | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | Works | | Works | | | |
 | [lnd](#lnd), neutrino backend | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | | | Works |
@@ -38,7 +38,7 @@ Each client links to its notes (§3).
 Expected compatibility, from each client's source or documentation. It
 is not a test.
 
-| Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
+| Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [Bitcoind REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [Electrum](https://electrum.org) | Wallet | | Expected | | | | | | | |
 | [BlueWallet](https://bluewallet.io) | Wallet | | Expected | | | | | | | |
@@ -205,7 +205,7 @@ through 1.7. Core Lightning calls `bitcoin-cli` for `getnetworkinfo`
 `gettxout`, `sendrawtransaction` and `getpeerinfo`, and
 `getblockfrompeer` only for pruned nodes. electrs refuses a node that
 reports `pruned`. Wasabi, Zeus, Blixt and BDK (Kyoto) require client
-filters. LDK Node reads blocks over REST with bitcoind JSON-RPC for the rest.
+filters. LDK Node reads blocks over bitcoind REST with bitcoind JSON-RPC for the rest.
 Bitkit takes an Electrum server over TCP or TLS. Aqua takes one for
 bitcoin only over TLS, with a certificate valid for the host name.
 Alby Hub's built-in node (LDK) takes an Esplora server

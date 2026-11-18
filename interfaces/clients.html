@@ -379,7 +379,7 @@ Each client links to its notes (§3).</p>
 <th style="text-align: center;"><a href="electrum.html">Electrum</a></th>
 <th style="text-align: center;"><a href="sparrow.html">Sparrow</a></th>
 <th style="text-align: center;"><a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a></th>
-<th style="text-align: center;"><a href="bitcoind-rest.html">REST</a></th>
+<th style="text-align: center;"><a href="bitcoind-rest.html">Bitcoind REST</a></th>
 <th style="text-align: center;"><a href="zeromq.html">ZMQ</a></th>
 <th style="text-align: center;"><a href="btcd.html">BTCD</a></th>
 <th style="text-align: center;"><a href="esplora.html">Esplora</a></th>
@@ -566,7 +566,7 @@ is not a test.</p>
 <th style="text-align: center;"><a href="electrum.html">Electrum</a></th>
 <th style="text-align: center;"><a href="sparrow.html">Sparrow</a></th>
 <th style="text-align: center;"><a href="bitcoind-rpc.html">Bitcoind JSON-RPC</a></th>
-<th style="text-align: center;"><a href="bitcoind-rest.html">REST</a></th>
+<th style="text-align: center;"><a href="bitcoind-rest.html">Bitcoind REST</a></th>
 <th style="text-align: center;"><a href="zeromq.html">ZMQ</a></th>
 <th style="text-align: center;"><a href="btcd.html">BTCD</a></th>
 <th style="text-align: center;"><a href="esplora.html">Esplora</a></th>
@@ -1024,7 +1024,7 @@ through 1.7. Core Lightning calls <code>bitcoin-cli</code> for <code>getnetworki
 <code>gettxout</code>, <code>sendrawtransaction</code> and <code>getpeerinfo</code>, and
 <code>getblockfrompeer</code> only for pruned nodes. electrs refuses a node that
 reports <code>pruned</code>. Wasabi, Zeus, Blixt and BDK (Kyoto) require client
-filters. LDK Node reads blocks over REST with bitcoind JSON-RPC for the rest.
+filters. LDK Node reads blocks over bitcoind REST with bitcoind JSON-RPC for the rest.
 Bitkit takes an Electrum server over TCP or TLS. Aqua takes one for
 bitcoin only over TLS, with a certificate valid for the host name.
 Alby Hub's built-in node (LDK) takes an Esplora server
