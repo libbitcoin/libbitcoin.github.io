@@ -927,8 +927,8 @@ cgminer, Braiins OS and the Stratum V2 reference translator.</p>
 P2TR), restart with addresses, graph sync and channel validation, and
 wallet recovery work. ZMQ blocks arrive within a second of validation.</p>
 <p><strong>neutrino backend:</strong> recovery of a wallet from 2019 (366,000 blocks) took
-about 15 minutes and found every reference transaction. Requires
-<code>node.provide_filters</code> and client filter tables.</p>
+about 15 minutes and found every reference transaction. Requires a store
+created with <code>node.provide_filters</code>.</p>
 <p><strong>btcd backend:</strong> the chain syncs, but once the wallet has an address, lnd
 calls the deprecated <a href="btcd.html#rescan"><code>rescan</code></a> with addresses, which <code>bs</code>
 does not serve, and the wallet never finishes syncing. Two client changes
@@ -962,7 +962,7 @@ same values, heights and spending transactions as the public server.</p>
 <p><strong>Native REST:</strong> SatSage recognizes <code>bs</code> by <code>libbitcoin</code> in the
 <code>server.version</code> name, and would then read addresses, outputs,
 transactions and headers from the Native REST interface. It looks for
-<code>address</code> at the top level of <a href="native.html"><code>configuration</code></a>, which <code>bs</code> now
+<code>address</code> at the top level of <a href="native.html#configuration"><code>configuration</code></a>, which <code>bs</code> now
 reports under <code>store</code>, so it finds no address index and stays on
 Electrum, with the same results. With that check adjusted, its address,
 output and transaction queries all gave the same results as Electrum.</p>
@@ -980,9 +980,10 @@ wallet methods (<code>createwallet</code>, <code>importdescriptors</code>, <code
 <p>Blocks, transactions, outspends, fee estimates, mining pool and hash rate
 views, and address pages work. The fee recommendation and memory pool
 views fail: <a href="bitcoind-rpc.html#getmempoolentry"><code>getmempoolentry</code></a> lacks
-<code>chunkweight</code> (bitcoind 31) and <code>vsize_bip141</code> (not in bitcoind),
-<code>getmempoolcluster</code> and <code>getblocktemplate</code> await the version 5 pool
-(-33), and <code>getmempoolfeeratediagram</code> is not served (-32601). An Esplora
+<code>chunkweight</code> (bitcoind 31), <code>getmempoolcluster</code> awaits the version 5
+pool (-33), and <code>getmempoolfeeratediagram</code> is not served (-32601).
+<code>vsize_bip141</code> and <a href="bitcoind-rpc.html#getblocktemplate"><code>getblocktemplate</code></a>
+are now served, and have not been run again. An Esplora
 address with a very long history is served in full, which can take
 minutes, and the explorer's other address requests wait meanwhile.</p>
 <h3 id="fulcrum">Fulcrum<a class="anchor" href="#fulcrum" aria-label="Link to this section">#</a></h3>

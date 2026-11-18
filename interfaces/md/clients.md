@@ -85,8 +85,8 @@ P2TR), restart with addresses, graph sync and channel validation, and
 wallet recovery work. ZMQ blocks arrive within a second of validation.
 
 **neutrino backend:** recovery of a wallet from 2019 (366,000 blocks) took
-about 15 minutes and found every reference transaction. Requires
-`node.provide_filters` and client filter tables.
+about 15 minutes and found every reference transaction. Requires a store
+created with `node.provide_filters`.
 
 **btcd backend:** the chain syncs, but once the wallet has an address, lnd
 calls the deprecated [`rescan`](btcd#rescan) with addresses, which `bs`
@@ -128,7 +128,7 @@ same values, heights and spending transactions as the public server.
 **Native REST:** SatSage recognizes `bs` by `libbitcoin` in the
 `server.version` name, and would then read addresses, outputs,
 transactions and headers from the Native REST interface. It looks for
-`address` at the top level of [`configuration`](native), which `bs` now
+`address` at the top level of [`configuration`](native#configuration), which `bs` now
 reports under `store`, so it finds no address index and stays on
 Electrum, with the same results. With that check adjusted, its address,
 output and transaction queries all gave the same results as Electrum.
@@ -151,9 +151,10 @@ wallet methods (`createwallet`, `importdescriptors`, `listwallets`).
 Blocks, transactions, outspends, fee estimates, mining pool and hash rate
 views, and address pages work. The fee recommendation and memory pool
 views fail: [`getmempoolentry`](bitcoind-rpc#getmempoolentry) lacks
-`chunkweight` (bitcoind 31) and `vsize_bip141` (not in bitcoind),
-`getmempoolcluster` and `getblocktemplate` await the version 5 pool
-(-33), and `getmempoolfeeratediagram` is not served (-32601). An Esplora
+`chunkweight` (bitcoind 31), `getmempoolcluster` awaits the version 5
+pool (-33), and `getmempoolfeeratediagram` is not served (-32601).
+`vsize_bip141` and [`getblocktemplate`](bitcoind-rpc#getblocktemplate)
+are now served, and have not been run again. An Esplora
 address with a very long history is served in full, which can take
 minutes, and the explorer's other address requests wait meanwhile.
 

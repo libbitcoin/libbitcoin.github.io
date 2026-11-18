@@ -547,6 +547,16 @@ descriptors, to a PSBT. **Parameters:** `psbt`, `descriptors` (`[]`).
 
 ## 6. Mining
 
+### getblocktemplate
+
+A template of the block above the confirmed top, from the pool (BIP22,
+BIP145). **Parameters:** `template_request`, which must declare the
+`segwit` rule in `rules`. Only `template` mode is served, without
+proposals or long polling. Each transaction carries `data`, `txid`,
+`hash`, `depends`, `fee`, `sigops` and `weight`, and the result carries
+`default_witness_commitment` once segwit is active. Until the node is
+current and pooling, the error is -10.
+
 ### getmininginfo
 
 The mining state. **Parameters:** none. `networkhashps` is computed from
@@ -704,7 +714,8 @@ none. Every topic is published on every `[zmq]` address.
 | Methods | Reason | Error |
 | ------- | ------ | ----- |
 | Wallet methods, `signrawtransactionwithkey`, `descriptorprocesspsbt`, `signmessagewithprivkey` | Signing belongs in the wallet, so private keys never reach the server | -32601 |
-| `getblocktemplate`, `submitblock`, `prioritisetransaction`, `getprioritisedtransactions`, `getmempoolcluster` | Mining and prioritisation order pool transactions by their dependencies, which requires the transaction graph of the version 5 pool | -33 |
+| `submitblock` | The node accepts only blocks that it requests, so a submitted block has no path into the chain | -33 |
+| `prioritisetransaction`, `getprioritisedtransactions`, `getmempoolcluster` | Prioritisation and clusters order pool transactions by their dependencies, which requires the transaction graph of the version 5 pool | -33 |
 | `invalidateblock`, `reconsiderblock` | The store does not record a valid block as invalid by command | -32601 |
 | `pruneblockchain` | Dynamic pruning is not supported | -1 |
 | `dumptxoutset`, `loadtxoutset` | These serve assumeutxo, which starts a node from an output set it has not validated | -32601 |

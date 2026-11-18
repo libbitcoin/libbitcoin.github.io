@@ -978,6 +978,14 @@ tested as one package.</p>
 <p>Adds the previous outputs, and the scripts and derivations of matching
 descriptors, to a PSBT. <strong>Parameters:</strong> <code>psbt</code>, <code>descriptors</code> (<code>[]</code>).</p>
 <h2 id="6-mining">6. Mining<a class="anchor" href="#6-mining" aria-label="Link to this section">#</a></h2>
+<h3 id="getblocktemplate">getblocktemplate<a class="anchor" href="#getblocktemplate" aria-label="Link to this section">#</a></h3>
+<p>A template of the block above the confirmed top, from the pool (BIP22,
+BIP145). <strong>Parameters:</strong> <code>template_request</code>, which must declare the
+<code>segwit</code> rule in <code>rules</code>. Only <code>template</code> mode is served, without
+proposals or long polling. Each transaction carries <code>data</code>, <code>txid</code>,
+<code>hash</code>, <code>depends</code>, <code>fee</code>, <code>sigops</code> and <code>weight</code>, and the result carries
+<code>default_witness_commitment</code> once segwit is active. Until the node is
+current and pooling, the error is -10.</p>
 <h3 id="getmininginfo">getmininginfo<a class="anchor" href="#getmininginfo" aria-label="Link to this section">#</a></h3>
 <p>The mining state. <strong>Parameters:</strong> none. <code>networkhashps</code> is computed from
 the difficulty. <code>pooledtx</code> is 0, and <code>blockmintxfee</code> is the maximum.</p>
@@ -1083,8 +1091,13 @@ none. Every topic is published on every <code>[zmq]</code> address.</p>
 <td>-32601</td>
 </tr>
 <tr>
-<td><code>getblocktemplate</code>, <code>submitblock</code>, <code>prioritisetransaction</code>, <code>getprioritisedtransactions</code>, <code>getmempoolcluster</code></td>
-<td>Mining and prioritisation order pool transactions by their dependencies, which requires the transaction graph of the version 5 pool</td>
+<td><code>submitblock</code></td>
+<td>The node accepts only blocks that it requests, so a submitted block has no path into the chain</td>
+<td>-33</td>
+</tr>
+<tr>
+<td><code>prioritisetransaction</code>, <code>getprioritisedtransactions</code>, <code>getmempoolcluster</code></td>
+<td>Prioritisation and clusters order pool transactions by their dependencies, which requires the transaction graph of the version 5 pool</td>
 <td>-33</td>
 </tr>
 <tr>
