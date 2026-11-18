@@ -23,5 +23,8 @@ Each interface reaches all of its protocols on one port, and their secure
 forms (TLS, or CurveZMQ for ZMTPS) on another. P2P serves P2P and P2PS
 (BIP324) on one port.
 
+[Client Compatibility](clients) records which clients have been run
+against each interface.
+
 To enable an interface, and to secure it, see
 [Configuration](../configuration/index).
