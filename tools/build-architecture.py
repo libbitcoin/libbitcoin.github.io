@@ -75,6 +75,7 @@ SITE_MENU = [
         ("interfaces/esplora.html", "Esplora"),
         ("interfaces/stratum-v1.html", "Stratum v1"),
         ("interfaces/stratum-v2.html", "Stratum v2"),
+        ("interfaces/clients.html", "Client Compatibility"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
@@ -394,6 +395,7 @@ SECTIONS = {
             ("esplora", "Esplora"),
             ("stratum-v1", "Stratum v1"),
             ("stratum-v2", "Stratum v2"),
+            ("clients", "Client Compatibility"),
         ],
     },
 }
