@@ -32,8 +32,10 @@
     'border: 1px solid var(--rule); border-radius: 3px; padding: 2px 6px; cursor: pointer; }' +
     '.menu .skin:hover, .menu .skin:focus { color: var(--heading); }' +
     '.menu .skin option { background: var(--surface); color: var(--ink); }' +
-    '.doc p, .lede { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }' +
-    '@media (max-width: 760px) { .doc p, .lede { text-align: left; } }' +
+    '.doc p, .lede, .first p, .history p, .method p, .svc-note, .doc .banner ' +
+    '{ text-align: justify; -webkit-hyphens: auto; hyphens: auto; }' +
+    '@media (max-width: 760px) { .doc p, .lede, .first p, .history p, .method p, ' +
+    '.svc-note, .doc .banner { text-align: left; } }' +
     'a { -webkit-user-drag: none; }' +
     '</style>');
 
