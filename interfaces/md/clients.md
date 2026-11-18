@@ -6,13 +6,16 @@ for each client, the interfaces it uses and how it fares on each against
 `bs`: first the clients that have been run against `bs`, then those that
 use the same interfaces but have not yet been tested.
 
-**Works**: the client did its job end to end. **Partial**: some of its
-features fail. **Blocked**: it fails. **Retest**: the failure is fixed in
-`bs`, and the client has not been run again. **Expected**: untested, but
-every method the client uses is served. **No**: the client requires
-methods on that interface that `bs` does not serve, such as bitcoind's
-wallet methods (see [Node wallet clients](#node-wallet-clients)). A blank cell is an
-interface the client does not use.
+| Cell | Result |
+| :-: | ------ |
+| ✔ | Works: the client did its job end to end. |
+| ◑ | Partial: some of its features fail. |
+| ✘ | Blocked: it fails. |
+| ↻ | Retest: the failure is fixed in `bs`, and the client has not been run again. |
+| ○ | Expected: untested, but every method the client uses is served. |
+| ⊘ | No: the client requires methods on that interface that `bs` does not serve, such as bitcoind's wallet methods (see [Node wallet clients](#node-wallet-clients)). |
+
+A blank cell is an interface the client does not use.
 
 ## 1. Tested
 
@@ -21,17 +24,17 @@ Each client links to its notes (§3).
 
 | Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | ------- | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [lnd](#lnd) (bitcoind) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | Works | | Works | | | |
-| [lnd](#lnd) (neutrino) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | | | Works |
-| [lnd](#lnd) (btcd) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | Partial | | |
-| [Sparrow Wallet](#sparrow-wallet) | Wallet | | <span class="nw">2026-10</span> | | Works | Works | | | | | | |
-| [Specter Desktop](#specter-desktop) | Wallet | 2.3.0 | <span class="nw">2026-11-16</span> | | Works | | No | | | | | |
-| [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | Blocked | Works | | Expected | | | | | Expected |
-| [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | Works | | No | | | | Blocked | |
-| [rbitcoin-space](#rbitcoin-space) | Explorer | 0.1.0 | <span class="nw">2026-11-16</span> | | Works | | Partial | | | | Partial | |
-| [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | Blocked | | Works | | | |
-| [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-17</span> | | Works | | Works | | | | | |
-| [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | Works |
+| [lnd](#lnd) (bitcoind) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | <span title="Works">✔</span> | | <span title="Works">✔</span> | | | |
+| [lnd](#lnd) (neutrino) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | | | <span title="Works">✔</span> |
+| [lnd](#lnd) (btcd) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | <span title="Partial">◑</span> | | |
+| [Sparrow Wallet](#sparrow-wallet) | Wallet | | <span class="nw">2026-10</span> | | <span title="Works">✔</span> | <span title="Works">✔</span> | | | | | | |
+| [Specter Desktop](#specter-desktop) | Wallet | 2.3.0 | <span class="nw">2026-11-16</span> | | <span title="Works">✔</span> | | <span title="No">⊘</span> | | | | | |
+| [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span title="Blocked">✘</span> | <span title="Works">✔</span> | | <span title="Expected">○</span> | | | | | <span title="Expected">○</span> |
+| [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span title="Works">✔</span> | | <span title="No">⊘</span> | | | | <span title="Blocked">✘</span> | |
+| [rbitcoin-space](#rbitcoin-space) | Explorer | 0.1.0 | <span class="nw">2026-11-16</span> | | <span title="Works">✔</span> | | <span title="Partial">◑</span> | | | | <span title="Partial">◑</span> | |
+| [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span title="Blocked">✘</span> | | <span title="Works">✔</span> | | | |
+| [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-17</span> | | <span title="Works">✔</span> | | <span title="Works">✔</span> | | | | | |
+| [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span title="Works">✔</span> |
 
 ## 2. Untested
 
@@ -40,32 +43,32 @@ is not a test.
 
 | Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [Electrum](https://electrum.org) | Wallet | | Expected | | | | | | | |
-| [BlueWallet](https://bluewallet.io) | Wallet | | Expected | | | | | | | |
-| [Nunchuk](https://nunchuk.io) | Wallet | | Expected | | | | | | | |
-| [Stack Wallet](https://stackwallet.com) | Wallet | | Expected | | | | | | | |
-| [Blockstream app](https://blockstream.com/app/) | Wallet | | Expected | | | | | | | |
-| [BitBoxApp](https://bitbox.swiss/app/) | Hardware wallet app | | Expected | | | | | | | |
-| [Trezor Suite](https://trezor.io/trezor-suite) | Hardware wallet app | | Expected | | | | | | | |
-| [Liana](https://wizardsardine.com/liana/) | Wallet | | Expected | | No | | | | | |
-| [Wasabi Wallet](https://wasabiwallet.io) | Wallet | | | | Expected | | | | | Expected |
-| [Aqua](https://aqua.net) | Wallet | | Expected | | | | | | | |
-| [Phoenix](https://phoenix.acinq.co) | Lightning wallet | | Expected | | | | | | | |
-| [Bitkit](https://bitkit.to) | Lightning wallet | | Expected | | | | | | | |
-| [Zeus](https://zeusln.com) | Lightning wallet | | | | | | | | | Expected |
-| [Blixt](https://blixtwallet.com) | Lightning wallet | | | | | | | | | Expected |
-| [Alby Hub](https://albyhub.com) | Lightning node | | | | | | | | Expected | |
-| [Core Lightning](https://corelightning.org) | Lightning node | | | | Expected | | | | | |
-| [btcwallet](https://github.com/btcsuite/btcwallet) | Wallet daemon | | | | | | | Partial | | |
-| [LDK Node](https://lightningdevkit.org) | Lightning library | | Expected | | Expected | Expected | | | Expected | |
-| [BDK](https://bitcoindevkit.org) | Wallet library | | Expected | | Expected | | | | Expected | Expected |
-| [Fedimint](https://fedimint.org) | Federation | | Expected | | Expected | | | | Expected | |
-| [BTCPay Server](https://btcpayserver.org) | Payment processor | | | | Expected | | | | | Expected |
-| [Ashigaru Dojo](https://ashigaru.rs) | Wallet backend | | Expected | | Expected | | Expected | | | |
-| [electrs](https://github.com/romanz/electrs) | Electrum server | | | | Expected | | | | | Expected |
-| [BTC RPC Explorer](https://github.com/janoside/btc-rpc-explorer) | Explorer | | Expected | | Expected | | | | | |
-| [ord](https://github.com/ordinals/ord) | Index | | | | Expected | | | | | |
-| [Floresta](https://github.com/getfloresta/Floresta) | Utreexo node | | | | | | | | | No |
+| [Electrum](https://electrum.org) | Wallet | | <span title="Expected">○</span> | | | | | | | |
+| [BlueWallet](https://bluewallet.io) | Wallet | | <span title="Expected">○</span> | | | | | | | |
+| [Nunchuk](https://nunchuk.io) | Wallet | | <span title="Expected">○</span> | | | | | | | |
+| [Stack Wallet](https://stackwallet.com) | Wallet | | <span title="Expected">○</span> | | | | | | | |
+| [Blockstream app](https://blockstream.com/app/) | Wallet | | <span title="Expected">○</span> | | | | | | | |
+| [BitBoxApp](https://bitbox.swiss/app/) | Hardware wallet app | | <span title="Expected">○</span> | | | | | | | |
+| [Trezor Suite](https://trezor.io/trezor-suite) | Hardware wallet app | | <span title="Expected">○</span> | | | | | | | |
+| [Liana](https://wizardsardine.com/liana/) | Wallet | | <span title="Expected">○</span> | | <span title="No">⊘</span> | | | | | |
+| [Wasabi Wallet](https://wasabiwallet.io) | Wallet | | | | <span title="Expected">○</span> | | | | | <span title="Expected">○</span> |
+| [Aqua](https://aqua.net) | Wallet | | <span title="Expected">○</span> | | | | | | | |
+| [Phoenix](https://phoenix.acinq.co) | Lightning wallet | | <span title="Expected">○</span> | | | | | | | |
+| [Bitkit](https://bitkit.to) | Lightning wallet | | <span title="Expected">○</span> | | | | | | | |
+| [Zeus](https://zeusln.com) | Lightning wallet | | | | | | | | | <span title="Expected">○</span> |
+| [Blixt](https://blixtwallet.com) | Lightning wallet | | | | | | | | | <span title="Expected">○</span> |
+| [Alby Hub](https://albyhub.com) | Lightning node | | | | | | | | <span title="Expected">○</span> | |
+| [Core Lightning](https://corelightning.org) | Lightning node | | | | <span title="Expected">○</span> | | | | | |
+| [btcwallet](https://github.com/btcsuite/btcwallet) | Wallet daemon | | | | | | | <span title="Partial">◑</span> | | |
+| [LDK Node](https://lightningdevkit.org) | Lightning library | | <span title="Expected">○</span> | | <span title="Expected">○</span> | <span title="Expected">○</span> | | | <span title="Expected">○</span> | |
+| [BDK](https://bitcoindevkit.org) | Wallet library | | <span title="Expected">○</span> | | <span title="Expected">○</span> | | | | <span title="Expected">○</span> | <span title="Expected">○</span> |
+| [Fedimint](https://fedimint.org) | Federation | | <span title="Expected">○</span> | | <span title="Expected">○</span> | | | | <span title="Expected">○</span> | |
+| [BTCPay Server](https://btcpayserver.org) | Payment processor | | | | <span title="Expected">○</span> | | | | | <span title="Expected">○</span> |
+| [Ashigaru Dojo](https://ashigaru.rs) | Wallet backend | | <span title="Expected">○</span> | | <span title="Expected">○</span> | | <span title="Expected">○</span> | | | |
+| [electrs](https://github.com/romanz/electrs) | Electrum server | | | | <span title="Expected">○</span> | | | | | <span title="Expected">○</span> |
+| [BTC RPC Explorer](https://github.com/janoside/btc-rpc-explorer) | Explorer | | <span title="Expected">○</span> | | <span title="Expected">○</span> | | | | | |
+| [ord](https://github.com/ordinals/ord) | Index | | | | <span title="Expected">○</span> | | | | | |
+| [Floresta](https://github.com/getfloresta/Floresta) | Utreexo node | | | | | | | | | <span title="No">⊘</span> |
 
 Custodial wallets, and wallets bound to their provider's backend, have
 no server setting and are not listed. Node platforms such as Umbrel,
