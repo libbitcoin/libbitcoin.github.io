@@ -13,7 +13,7 @@ block 1.
 | ---- | ------ |
 | [BIP 95](https://github.com/bitcoin/bips/blob/master/bip-0095.md) | Draft (version 0.3.0) |
 | Genesis block | Mined 2026-11-14 05:03 UTC, committing to mainnet block 975,744; hash `00000000000008c1637e7d3252dc1c333d4546fd6fff6a474b200d674a91d497` ([BIP 95 parameters](https://github.com/bitcoin/bips/pull/2356), pending merge) |
-| Network | Live; no DNS seeds |
+| Network | Live; seeded by the [community servers](public) |
 | `bs` | `-n testnet5`, with the defaults below; not yet released |
 | [Community servers](public) | Serving testnet5 |
 
@@ -92,6 +92,8 @@ bind = 0.0.0.0:18353
 [outbound]
 connect_batch_size = 10
 connections = 50
+seed = carmine.libbitcoin.net:18353
+seed = wormer.libbitcoin.net:18353
 
 [node]
 maximum_concurrency = 100000
@@ -140,8 +142,7 @@ buckets = 150001
 - `bitcoin.proof_of_work_limit` is `0x1a0fffff`, a higher minimum
   difficulty than mainnet's.
 - `peer.identifier` is the testnet5 network magic (`FIVE`).
-- `[outbound]` has no seeds, so the node finds no peers by itself. Name
-  peers in `[manual]` (see [Configuration](#configuration)).
+- `[outbound]` seeds from the community servers ([Community servers](public)).
 - `[wallet]` sets the testnet address and key prefixes used by the server
   ([Settings Reference](reference#6-wallet)).
 - `[table.*]` sizes the store as for testnet4, at 150,000 blocks.
@@ -154,18 +155,14 @@ The `[forks]` settings are those of mainnet: `forks.difficult = true`
 
 ## Configuration
 
-A configuration file is needed only to change a default. With no seeds,
-testnet5 needs at least one peer named in `[manual]`. The block explorer
-is off by default, and the admin console is served locally by default, on
-port 58080. This recommended file connects to a peer and serves the block
-explorer locally:
+A configuration file is needed only to change a default. The block
+explorer is off by default, and the admin console is served locally by
+default, on port 58080. This recommended file serves the block explorer
+locally:
 
 ```ini
 [bitcoin]
 network = testnet5
-
-[manual]
-peer = <host>:18353
 
 [native]
 bind = 127.0.0.1

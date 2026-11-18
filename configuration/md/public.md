@@ -4,7 +4,7 @@
 
 The libbitcoin community maintains two public `bs` servers. Both have
 two AMD EPYC 7F32 processors (Zen 2), 16 cores and 32 threads in all,
-and no GPU.
+and no GPU. They are the first default seeds of every network but regtest.
 
 <div id="server-status"></div>
 

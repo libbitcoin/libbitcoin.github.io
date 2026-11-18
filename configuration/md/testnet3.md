@@ -65,6 +65,8 @@ wif_prefix = 239
 witness_prefix = tb
 
 [outbound]
+seed = carmine.libbitcoin.net:18333
+seed = wormer.libbitcoin.net:18333
 seed = testnet-seed.bitcoin.jonasschnelli.ch:18333
 seed = seed.tbtc.petertodd.net:18333
 seed = seed.testnet.bitcoin.sprovoost.nl:18333

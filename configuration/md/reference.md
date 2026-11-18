@@ -688,6 +688,8 @@ password =
 # The send rate limit in bytes per second, defaults to '0' (network controls).
 rate_limit = 0
 # A seed node for initializing the host pool, multiple allowed.
+seed = carmine.libbitcoin.net:8333
+seed = wormer.libbitcoin.net:8333
 seed = seed.bitcoin.sipa.be:8333
 seed = dnsseed.bluematt.me:8333
 seed = seed.bitcoin.jonasschnelli.ch:8333

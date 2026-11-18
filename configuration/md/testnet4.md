@@ -71,6 +71,8 @@ witness_prefix = tb
 bind = 0.0.0.0:48333
 
 [outbound]
+seed = carmine.libbitcoin.net:48333
+seed = wormer.libbitcoin.net:48333
 seed = seed.testnet4.bitcoin.sprovoost.nl:48333
 seed = seed.testnet4.wiz.biz:48333
 connect_batch_size = 10

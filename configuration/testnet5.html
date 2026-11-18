@@ -380,7 +380,7 @@ block 1.</p>
 </tr>
 <tr>
 <td>Network</td>
-<td>Live; no DNS seeds</td>
+<td>Live; seeded by the <a href="public.html">community servers</a></td>
 </tr>
 <tr>
 <td><code>bs</code></td>
@@ -459,6 +459,8 @@ bind = 0.0.0.0:18353
 <span class="section">[outbound]</span>
 connect_batch_size = 10
 connections = 50
+seed = carmine.libbitcoin.net:18353
+seed = wormer.libbitcoin.net:18353
 
 <span class="section">[node]</span>
 maximum_concurrency = 100000
@@ -507,8 +509,7 @@ buckets = 150001
 <li><code>bitcoin.proof_of_work_limit</code> is <code>0x1a0fffff</code>, a higher minimum
   difficulty than mainnet's.</li>
 <li><code>peer.identifier</code> is the testnet5 network magic (<code>FIVE</code>).</li>
-<li><code>[outbound]</code> has no seeds, so the node finds no peers by itself. Name
-  peers in <code>[manual]</code> (see <a href="#configuration">Configuration</a>).</li>
+<li><code>[outbound]</code> seeds from the community servers (<a href="public.html">Community servers</a>).</li>
 <li><code>[wallet]</code> sets the testnet address and key prefixes used by the server
   (<a href="reference.html#6-wallet">Settings Reference</a>).</li>
 <li><code>[table.*]</code> sizes the store as for testnet4, at 150,000 blocks.</li>
@@ -519,16 +520,12 @@ buckets = 150001
 (no minimum difficulty blocks), and <code>forks.time_warp_patch</code> and
 <code>forks.block_storm_patch</code> off, since BIP 54 replaces the testnet4 rules.</p>
 <h2 id="configuration">Configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h2>
-<p>A configuration file is needed only to change a default. With no seeds,
-testnet5 needs at least one peer named in <code>[manual]</code>. The block explorer
-is off by default, and the admin console is served locally by default, on
-port 58080. This recommended file connects to a peer and serves the block
-explorer locally:</p>
+<p>A configuration file is needed only to change a default. The block
+explorer is off by default, and the admin console is served locally by
+default, on port 58080. This recommended file serves the block explorer
+locally:</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>
 network = testnet5
-
-<span class="section">[manual]</span>
-peer = &lt;host&gt;:18353
 
 <span class="section">[native]</span>
 bind = 127.0.0.1

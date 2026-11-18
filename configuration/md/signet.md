@@ -73,6 +73,8 @@ witness_prefix = tb
 bind = 0.0.0.0:38333
 
 [outbound]
+seed = carmine.libbitcoin.net:38333
+seed = wormer.libbitcoin.net:38333
 seed = seed.signet.bitcoin.sprovoost.nl:38333
 seed = seed.signet.achownodes.xyz:38333
 
