@@ -19,11 +19,11 @@ interface the client does not use.
 Results are for the `bs` master branch on the date given, on mainnet.
 Each client links to its notes (§3).
 
-| Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [Bitcoind REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
+| Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | ------- | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [lnd](#lnd), bitcoind backend | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | Works | | Works | | | |
-| [lnd](#lnd), neutrino backend | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | | | Works |
-| [lnd](#lnd), btcd backend | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | Partial | | |
+| [lnd](#lnd) (bitcoind) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | Works | | Works | | | |
+| [lnd](#lnd) (neutrino) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | | | Works |
+| [lnd](#lnd) (btcd) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | Partial | | |
 | [Sparrow Wallet](#sparrow-wallet) | Wallet | | <span class="nw">2026-10</span> | | Works | Works | | | | | | |
 | [Specter Desktop](#specter-desktop) | Wallet | 2.3.0 | <span class="nw">2026-11-16</span> | | Works | | No | | | | | |
 | [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | Blocked | Works | | Expected | | | | | Expected |
@@ -38,7 +38,7 @@ Each client links to its notes (§3).
 Expected compatibility, from each client's source or documentation. It
 is not a test.
 
-| Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind JSON-RPC](bitcoind-rpc) | [Bitcoind REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
+| Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | [Electrum](https://electrum.org) | Wallet | | Expected | | | | | | | |
 | [BlueWallet](https://bluewallet.io) | Wallet | | Expected | | | | | | | |
