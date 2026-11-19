@@ -860,8 +860,10 @@ messages only if it was built in. The <code>[log]</code> settings do not apply h
 </table></div>
 <p><code>validate_usecs</code> is fired only for a block validated alone, and
 <code>top_usecs</code>, from a candidate header to its block organized as the
-confirmed top, only for a single block above a current top. <code>pool_rows</code>
-counts every row of the pool table at each organized block, including
+confirmed top, only for a single block above a current top. <code>pool_rows</code>,
+<code>pool_block_in_usecs</code> and <code>pool_block_out_usecs</code> are fired at each
+organized or reorganized block only while the pool is indexing (relay
+enabled). <code>pool_rows</code> counts every row of the pool table, including
 transactions that cannot confirm, so it exceeds the <code>size</code> of
 <a href="bitcoind-rpc.html#getmempoolinfo"><code>getmempoolinfo</code></a>. <code>tx_dropped</code> is the size
 of a transaction set for which a peer was dropped.</p>

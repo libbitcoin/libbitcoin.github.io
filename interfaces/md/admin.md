@@ -224,8 +224,10 @@ Streams the node's events, of the types selected by the filter.
 
 `validate_usecs` is fired only for a block validated alone, and
 `top_usecs`, from a candidate header to its block organized as the
-confirmed top, only for a single block above a current top. `pool_rows`
-counts every row of the pool table at each organized block, including
+confirmed top, only for a single block above a current top. `pool_rows`,
+`pool_block_in_usecs` and `pool_block_out_usecs` are fired at each
+organized or reorganized block only while the pool is indexing (relay
+enabled). `pool_rows` counts every row of the pool table, including
 transactions that cannot confirm, so it exceeds the `size` of
 [`getmempoolinfo`](bitcoind-rpc#getmempoolinfo). `tx_dropped` is the size
 of a transaction set for which a peer was dropped.
