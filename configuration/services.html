@@ -644,7 +644,7 @@ each connection separately.</p>
 </tr>
 <tr>
 <td><code>minimum_buffer</code></td>
-<td>Buffer memory a connection keeps for reading requests, and for writing JSON responses. A buffer expanded beyond this by a large request or response is trimmed back to this size once it is idle.</td>
+<td>Buffer memory a connection keeps for reading requests, and for writing responses. A buffer expanded beyond this by a large request or response is trimmed back to this size once it is idle. While more messages are waiting to be sent to a connection, small ones are held in the write buffer, up to this size, and sent together in one write, each still a whole message in order.</td>
 </tr>
 <tr>
 <td><code>maximum_buffer</code></td>

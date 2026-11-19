@@ -330,6 +330,17 @@ its HTTP header and first chunk within one entry
 (`proxy::handle_http_header_write()`). No other write can start between
 the parts of a message, which is what prevents interleaving.
 
+While more than one entry is queued, the socket holds the writes of the
+current entry in its retained write buffer (`socket::hold()`), and writes
+them with those of a later entry in one socket write
+(`socket::transmit()`). A held write completes when it is held, and a write
+that does not fit the remainder of `minimum_response` is written at once,
+preceded by those held. Before the completion of the last queued entry, the
+proxy releases whatever remains held (`socket::release()`). Messages remain
+whole and in order, and a stream of small notifications costs one socket
+write per buffer of them rather than one per message. P2PS and ZMTP write
+through their own streams and do not hold.
+
 ```mermaid
 flowchart LR
     A["send / notify\nany thread"] --> B["dispatch to\nchannel strand"]
@@ -782,7 +793,8 @@ the caller as `channel_stopped`.
 | Setting (`settings::tcp_server`) | Default | Use |
 | -------------------------------- | ------- | --- |
 | `maximum_request` | `max_payload` | Bound on one read (body, HTTP body, WebSocket message, P2P payload, ZMTP frame) |
-| `minimum_buffer` | 4 KiB | Size retained buffers are reduced to when idle |
+| `minimum_buffer` | 4 KiB | Size retained read buffers are reduced to when idle |
+| `minimum_response` | `minimum_buffer` | Size the retained write buffer is reduced to when idle, and the bound of held writes (section 2.3); not configurable |
 | `maximum_buffer` | 64 KiB | Bound of the retained JSON serialization buffer |
 | `connect_timeout_seconds` | 0 (network default) | Inbound handshake bound, outbound connect bound |
 
@@ -857,7 +869,7 @@ when the buffer holds nothing but line breaks.
 
 The `http_*` operations read and write whole messages: `http_read` parses
 the header and body, and `http_write` serializes the response, its JSON body
-through the socket's retained buffer, which is reduced to `minimum_buffer`
+through the socket's retained buffer, which is reduced to `minimum_response`
 when the write completes. Batched JSON-RPC is read and written
 progressively instead, without materializing the batch:
 
@@ -915,7 +927,10 @@ unsent pong answers only the most recent ping), and a close from the peer is
 answered with its close code, after which the socket shuts down its send
 side and the read completes with `websocket_closed`. Frames are written
 unmasked with a header from `ws::serialize_header()` (`ws/frame.hpp`), from
-a queue in order, so control frames queue behind data frames.
+a queue in order. A control frame is written apart from held data frames
+(section 2.3), so a pong can precede data frames queued before it, and data
+frames still held when a close from the peer is answered are not sent. A
+lazy stop sends held data frames before its close frame.
 
 | Operation | WebSocket behavior |
 | --------- | ------------------ |

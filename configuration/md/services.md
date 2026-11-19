@@ -202,5 +202,5 @@ each connection separately.
 | Setting | Purpose |
 | ------- | ------- |
 | `maximum_request` | Largest request accepted, in bytes, by every service: an HTTP body, a websocket message, an Electrum JSON-RPC message, a ZMQ frame, or a P2P message (`[inbound]`, `[outbound]` and `[manual]`). A larger request closes the connection. This protects against denial of service by bounding the memory a client can make the server allocate. |
-| `minimum_buffer` | Buffer memory a connection keeps for reading requests, and for writing JSON responses. A buffer expanded beyond this by a large request or response is trimmed back to this size once it is idle. |
+| `minimum_buffer` | Buffer memory a connection keeps for reading requests, and for writing responses. A buffer expanded beyond this by a large request or response is trimmed back to this size once it is idle. While more messages are waiting to be sent to a connection, small ones are held in the write buffer, up to this size, and sent together in one write, each still a whole message in order. |
 | `maximum_buffer` | Size of the buffer a JSON response is written through. A larger response is sent in pieces of this size, so it limits the memory per connection, not the response size. |
