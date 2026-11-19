@@ -1057,8 +1057,10 @@ and no GPU. They are the first default seeds of every network but regtest.</p>
         });
       };
       get("/v1/top?format=json").then(function (text) {
-        row.cells[2].textContent = Number(text).toLocaleString("en-US");
-        return get("/v1/block/height/" + Number(text) + "/header?format=json");
+        var top = JSON.parse(text);
+        var height = typeof top === "number" ? top : top.confirmed.height;
+        row.cells[2].textContent = height.toLocaleString("en-US");
+        return get("/v1/block/height/" + height + "/header?format=json");
       }).then(function (text) {
         var header = JSON.parse(text);
         var current = header.timestamp * 1000 >= Date.now() - window_;
