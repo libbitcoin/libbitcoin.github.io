@@ -190,12 +190,12 @@ Streams the node's events, of the types selected by the filter.
 | 7 | `block_unconfirmable` | Height |
 | 8 | `validate_bypassed` | Height |
 | 9 | `confirm_bypassed` | Height |
-| 10 | `tx_archived` | Count |
+| 10 | `tx_archived` | Fee rate, satoshis per virtual kilobyte |
 | 11 | `tx_validated` | Count |
 | 12 | `tx_invalidated` | Count |
 | 13 | `block_organized` | Height |
 | 14 | `block_reorganized` | Height |
-| 15 | `template_issued` | Count |
+| 15 | `template_issued` | Transaction count |
 | 16 | `snapshot_secs` | Seconds |
 | 17 | `prune_msecs` | Milliseconds |
 | 18 | `reload_msecs` | Milliseconds |
@@ -208,6 +208,27 @@ Streams the node's events, of the types selected by the filter.
 | 25 | `schnorr_secs` | Seconds |
 | 26 | `silent_secs` | Seconds |
 | 27 | `validate_usecs` | Microseconds |
+| 28 | `top_usecs` | Microseconds |
+| 29 | `pool_rows` | Row count |
+| 30 | `pool_submit_usecs` | Microseconds |
+| 31 | `pool_coverage_usecs` | Microseconds |
+| 32 | `pool_connect_usecs` | Microseconds |
+| 33 | `pool_admit_usecs` | Microseconds |
+| 34 | `pool_compact_usecs` | Microseconds |
+| 35 | `pool_block_in_usecs` | Microseconds |
+| 36 | `pool_block_out_usecs` | Microseconds |
+| 37 | `pool_context_usecs` | Microseconds |
+| 38 | `pool_template_usecs` | Microseconds |
+| 39 | `pool_project_usecs` | Microseconds |
+| 40 | `tx_dropped` | Transaction count |
+
+`validate_usecs` is fired only for a block validated alone, and
+`top_usecs`, from a candidate header to its block organized as the
+confirmed top, only for a single block above a current top. `pool_rows`
+counts every row of the pool table at each organized block, including
+transactions that cannot confirm, so it exceeds the `size` of
+[`getmempoolinfo`](bitcoind-rpc#getmempoolinfo). `tx_dropped` is the size
+of a transaction set for which a peer was dropped.
 
 ```json
 {"event": 3, "value": 920001, "time": 1792987200123}

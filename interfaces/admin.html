@@ -704,7 +704,7 @@ messages only if it was built in. The <code>[log]</code> settings do not apply h
 <tr>
 <td>10</td>
 <td><code>tx_archived</code></td>
-<td>Count</td>
+<td>Fee rate, satoshis per virtual kilobyte</td>
 </tr>
 <tr>
 <td>11</td>
@@ -729,7 +729,7 @@ messages only if it was built in. The <code>[log]</code> settings do not apply h
 <tr>
 <td>15</td>
 <td><code>template_issued</code></td>
-<td>Count</td>
+<td>Transaction count</td>
 </tr>
 <tr>
 <td>16</td>
@@ -791,8 +791,80 @@ messages only if it was built in. The <code>[log]</code> settings do not apply h
 <td><code>validate_usecs</code></td>
 <td>Microseconds</td>
 </tr>
+<tr>
+<td>28</td>
+<td><code>top_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>29</td>
+<td><code>pool_rows</code></td>
+<td>Row count</td>
+</tr>
+<tr>
+<td>30</td>
+<td><code>pool_submit_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>31</td>
+<td><code>pool_coverage_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>32</td>
+<td><code>pool_connect_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>33</td>
+<td><code>pool_admit_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>34</td>
+<td><code>pool_compact_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>35</td>
+<td><code>pool_block_in_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>36</td>
+<td><code>pool_block_out_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>37</td>
+<td><code>pool_context_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>38</td>
+<td><code>pool_template_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>39</td>
+<td><code>pool_project_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>40</td>
+<td><code>tx_dropped</code></td>
+<td>Transaction count</td>
+</tr>
 </tbody>
 </table></div>
+<p><code>validate_usecs</code> is fired only for a block validated alone, and
+<code>top_usecs</code>, from a candidate header to its block organized as the
+confirmed top, only for a single block above a current top. <code>pool_rows</code>
+counts every row of the pool table at each organized block, including
+transactions that cannot confirm, so it exceeds the <code>size</code> of
+<a href="bitcoind-rpc.html#getmempoolinfo"><code>getmempoolinfo</code></a>. <code>tx_dropped</code> is the size
+of a transaction set for which a peer was dropped.</p>
 <pre><code class="language-json">{&quot;event&quot;: 3, &quot;value&quot;: 920001, &quot;time&quot;: 1792987200123}
 </code></pre>
 <p><code>time</code> is in milliseconds since the epoch.</p>

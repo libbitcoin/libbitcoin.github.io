@@ -262,9 +262,12 @@ current.
 ### cmpctblock
 
 A compact block. `bs` rebuilds received compact blocks from its memory
-pool, and downloads the full block when more than
-`node.compact_missing_percent` (default 50) of it is missing. It sends a
-compact block for each confirmed block to peers in high bandwidth mode.
+pool. It downloads the full block at once when more than
+`node.compact_missing_percent` (default 50) of it is missing, or when the
+rebuilt block fails its merkle root or witness commitment check, and
+otherwise after `node.compact_timeout_seconds` (default 10) if the fill has
+not completed, such as while awaiting `blocktxn`. It sends a compact block
+for each confirmed block to peers in high bandwidth mode.
 
 ### getblocktxn
 

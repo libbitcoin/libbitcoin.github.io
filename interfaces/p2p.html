@@ -777,9 +777,12 @@ bandwidth mode after the handshake, and in high bandwidth mode once
 current.</p>
 <h3 id="cmpctblock">cmpctblock<a class="anchor" href="#cmpctblock" aria-label="Link to this section">#</a></h3>
 <p>A compact block. <code>bs</code> rebuilds received compact blocks from its memory
-pool, and downloads the full block when more than
-<code>node.compact_missing_percent</code> (default 50) of it is missing. It sends a
-compact block for each confirmed block to peers in high bandwidth mode.</p>
+pool. It downloads the full block at once when more than
+<code>node.compact_missing_percent</code> (default 50) of it is missing, or when the
+rebuilt block fails its merkle root or witness commitment check, and
+otherwise after <code>node.compact_timeout_seconds</code> (default 10) if the fill has
+not completed, such as while awaiting <code>blocktxn</code>. It sends a compact block
+for each confirmed block to peers in high bandwidth mode.</p>
 <h3 id="getblocktxn">getblocktxn<a class="anchor" href="#getblocktxn" aria-label="Link to this section">#</a></h3>
 <p>Requests the transactions missing from a compact block.</p>
 <h3 id="blocktxn">blocktxn<a class="anchor" href="#blocktxn" aria-label="Link to this section">#</a></h3>

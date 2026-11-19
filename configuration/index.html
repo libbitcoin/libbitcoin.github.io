@@ -384,6 +384,9 @@ configuration file, otherwise the network whose built-in genesis block is
 the configured <code>bitcoin.genesis_block</code>, otherwise mainnet. It sets the
 defaults and the directory, and any setting in the configuration file
 replaces its default.</p>
+<p>Each line of the configuration file is a <code>[section]</code>, a <code>name = value</code>
+setting, or blank. A <code>#</code> begins a comment to the end of its line. Any other
+line, or an unknown setting, stops <code>bs</code> before it starts.</p>
 <p>Until the chain is current, only the admin site accepts connections. P2P peers, the block explorer and the other client services
 wait (<a href="services.html#until-current">Until current</a>).</p>
 <h2 id="2-pages">2. Pages<a class="anchor" href="#2-pages" aria-label="Link to this section">#</a></h2>

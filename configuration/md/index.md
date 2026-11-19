@@ -32,6 +32,10 @@ the configured `bitcoin.genesis_block`, otherwise mainnet. It sets the
 defaults and the directory, and any setting in the configuration file
 replaces its default.
 
+Each line of the configuration file is a `[section]`, a `name = value`
+setting, or blank. A `#` begins a comment to the end of its line. Any other
+line, or an unknown setting, stops `bs` before it starts.
+
 Until the chain is current, only the admin site accepts connections. P2P peers, the block explorer and the other client services
 wait ([Until current](services#until-current)).
 
