@@ -286,6 +286,7 @@
         <a href="../configuration/setups.html">Common Setups</a>
         <a href="../configuration/ports.html">Conventional Ports</a>
         <a href="../configuration/store.html">Store Settings</a>
+        <a href="../configuration/migration.html">Store Migration</a>
         <a href="../configuration/services.html">Service Settings</a>
         <a href="../configuration/performance.html">Performance Settings</a>
         <a href="../configuration/reference.html">Settings Reference</a>
@@ -352,6 +353,7 @@
     <a href="ports.html">Conventional Ports</a>
     <a href="public.html">Community Servers</a>
     <a href="store.html">Store Settings</a>
+    <a href="migration.html">Store Migration</a>
     <a href="services.html">Service Settings</a>
     <a href="performance.html">Performance Settings</a>
     <a href="reference.html">Settings Reference</a>
@@ -426,6 +428,11 @@
 <td>Restore from the most recent snapshot</td>
 </tr>
 <tr>
+<td></td>
+<td><code>-t</code>, <code>--transform</code></td>
+<td>Migrate the store to the compiled schema, snapshot it, and exit (<a href="migration.html">Store Migration</a>)</td>
+</tr>
+<tr>
 <td>Service</td>
 <td><code>-d</code>, <code>--daemon &lt;value&gt;</code></td>
 <td>Install (<code>true</code>) or uninstall (<code>false</code>) as a daemon/service</td>
@@ -478,7 +485,7 @@ network = testnet4
 <p>Display command line help:</p>
 <pre class="console"><code>$ bs -h
 
-Usage: bs [-abfhiklmrsvw] [--config value] [--daemon value] [--net value]
+Usage: bs [-abfhiklmrstvw] [--config value] [--daemon value] [--net value]
 [--user value]
 
 Info: Runs a full node bitcoin server.
@@ -500,6 +507,7 @@ Options (named):
                      to the configured network.
 -r [--restore]       Restore from most recent snapshot.
 -s [--settings]      Display all configuration settings.
+-t [--transform]     Migrate the store to the compiled schema.
 -u [--user]          Daemon logon credential, defaults to system account.
 -v [--version]       Display version information.
 -w [--hardware]      Display hardware compatibility.

@@ -16,6 +16,7 @@ All options, grouped by purpose:
 | Store | `-m`, `--make` | Create a new store in the configured directory, without running |
 | | `-b`, `--backup` | Snapshot the store (also available live from the console) |
 | | `-r`, `--restore` | Restore from the most recent snapshot |
+| | `-t`, `--transform` | Migrate the store to the compiled schema, snapshot it, and exit ([Store Migration](migration)) |
 | Service | `-d`, `--daemon <value>` | Install (`true`) or uninstall (`false`) as a daemon/service |
 | | `-u`, `--user <credential>` | Daemon logon credential (defaults to the system account) |
 | Store scans | `-i`, `--information` | Display store information |
@@ -53,7 +54,7 @@ Display command line help:
 ```
 $ bs -h
 
-Usage: bs [-abfhiklmrsvw] [--config value] [--daemon value] [--net value]
+Usage: bs [-abfhiklmrstvw] [--config value] [--daemon value] [--net value]
 [--user value]
 
 Info: Runs a full node bitcoin server.
@@ -75,6 +76,7 @@ Options (named):
                      to the configured network.
 -r [--restore]       Restore from most recent snapshot.
 -s [--settings]      Display all configuration settings.
+-t [--transform]     Migrate the store to the compiled schema.
 -u [--user]          Daemon logon credential, defaults to system account.
 -v [--version]       Display version information.
 -w [--hardware]      Display hardware compatibility.
