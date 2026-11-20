@@ -853,7 +853,22 @@ messages only if it was built in. The <code>[log]</code> settings do not apply h
 </tr>
 <tr>
 <td>40</td>
+<td><code>pool_confirmable_usecs</code></td>
+<td>Microseconds</td>
+</tr>
+<tr>
+<td>41</td>
 <td><code>tx_dropped</code></td>
+<td>Transaction count</td>
+</tr>
+<tr>
+<td>42</td>
+<td><code>tx_refused</code></td>
+<td>Transaction count</td>
+</tr>
+<tr>
+<td>43</td>
+<td><code>tx_unserved</code></td>
 <td>Transaction count</td>
 </tr>
 </tbody>
@@ -866,7 +881,9 @@ organized or reorganized block only while the pool is indexing (relay
 enabled). <code>pool_rows</code> counts every row of the pool table, including
 transactions that cannot confirm, so it exceeds the <code>size</code> of
 <a href="bitcoind-rpc.html#getmempoolinfo"><code>getmempoolinfo</code></a>. <code>tx_dropped</code> is the size
-of a transaction set for which a peer was dropped.</p>
+of a transaction set for which a peer was dropped, <code>tx_refused</code> the size of
+a set not admitted in full for which the peer was kept, and <code>tx_unserved</code>
+the count of requested transactions that a peer did not send.</p>
 <pre><code class="language-json">{&quot;event&quot;: 3, &quot;value&quot;: 920001, &quot;time&quot;: 1792987200123}
 </code></pre>
 <p><code>time</code> is in milliseconds since the epoch.</p>

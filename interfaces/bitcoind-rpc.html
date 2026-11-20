@@ -996,7 +996,8 @@ proposals or long polling. Each transaction carries <code>data</code>, <code>txi
 current and pooling, the error is -10.</p>
 <h3 id="getmininginfo">getmininginfo<a class="anchor" href="#getmininginfo" aria-label="Link to this section">#</a></h3>
 <p>The mining state. <strong>Parameters:</strong> none. <code>networkhashps</code> is computed from
-the difficulty. <code>pooledtx</code> is 0, and <code>blockmintxfee</code> is the maximum.</p>
+the difficulty. <code>pooledtx</code> is the count of confirmable pool transactions,
+and <code>blockmintxfee</code> is <code>pool.minimum_fee_rate</code>.</p>
 <h3 id="getnetworkhashps">getnetworkhashps<a class="anchor" href="#getnetworkhashps" aria-label="Link to this section">#</a></h3>
 <p>The hash rate over a window of blocks. <strong>Parameters:</strong> <code>nblocks</code> (120),
 <code>height</code> (the top).</p>

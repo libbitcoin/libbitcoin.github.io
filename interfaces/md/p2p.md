@@ -257,7 +257,7 @@ Answers a `getdata` for an object `bs` does not have. Without
 
 Enables compact blocks (BIP152), version 2. `bs` sends it in low
 bandwidth mode after the handshake, and in high bandwidth mode once
-current.
+current, to at most three peers.
 
 ### cmpctblock
 

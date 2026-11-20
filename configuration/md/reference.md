@@ -718,8 +718,8 @@ Connections peers make to the node: listening addresses, count, and I2P.
 bind = 0.0.0.0:8333
 # The time limit for connection establishment, defaults to '0' (network controls).
 connect_timeout_seconds = 0
-# The target number of incoming network connections, defaults to '100'.
-connections = 100
+# The target number of incoming network connections, defaults to '200'.
+connections = 200
 # Allow connections from the node to itself, defaults to 'false'.
 enable_loopback = false
 # The age limit for any connection, defaults to '60' (0 disables).

@@ -560,7 +560,8 @@ current and pooling, the error is -10.
 ### getmininginfo
 
 The mining state. **Parameters:** none. `networkhashps` is computed from
-the difficulty. `pooledtx` is 0, and `blockmintxfee` is the maximum.
+the difficulty. `pooledtx` is the count of confirmable pool transactions,
+and `blockmintxfee` is `pool.minimum_fee_rate`.
 
 ### getnetworkhashps
 

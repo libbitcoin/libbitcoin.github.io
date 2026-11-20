@@ -220,7 +220,10 @@ Streams the node's events, of the types selected by the filter.
 | 37 | `pool_context_usecs` | Microseconds |
 | 38 | `pool_template_usecs` | Microseconds |
 | 39 | `pool_project_usecs` | Microseconds |
-| 40 | `tx_dropped` | Transaction count |
+| 40 | `pool_confirmable_usecs` | Microseconds |
+| 41 | `tx_dropped` | Transaction count |
+| 42 | `tx_refused` | Transaction count |
+| 43 | `tx_unserved` | Transaction count |
 
 `validate_usecs` is fired only for a block validated alone, and
 `top_usecs`, from a candidate header to its block organized as the
@@ -230,7 +233,9 @@ organized or reorganized block only while the pool is indexing (relay
 enabled). `pool_rows` counts every row of the pool table, including
 transactions that cannot confirm, so it exceeds the `size` of
 [`getmempoolinfo`](bitcoind-rpc#getmempoolinfo). `tx_dropped` is the size
-of a transaction set for which a peer was dropped.
+of a transaction set for which a peer was dropped, `tx_refused` the size of
+a set not admitted in full for which the peer was kept, and `tx_unserved`
+the count of requested transactions that a peer did not send.
 
 ```json
 {"event": 3, "value": 920001, "time": 1792987200123}
