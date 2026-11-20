@@ -10,6 +10,7 @@ sync and query speed.
 | `network.threads` | `0` | Threads that run the network: peer and client connections. `0` uses one per hardware thread, at most 32. |
 | `node.threads` | `0` | Threads that validate blocks. `0` uses one per hardware thread, which is two per core on a processor with hyperthreading (SMT). |
 | `node.thread_priority` | `true` | Run validation threads at high priority, ahead of other programs. `false` leaves them at normal priority. |
+| `log.thread_priority` | `false` | Run the log thread at normal priority. `false` runs it at low priority, so logging yields to validation. |
 | `database.turbo` | `true` | Allow a single client query to use all processors, so large queries return sooner. |
 
 ## 2. Signature verification and silent payment indexing

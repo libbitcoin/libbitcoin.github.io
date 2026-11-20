@@ -58,6 +58,8 @@ quitting = false
 remote = true
 # Enable session logging, defaults to 'true'.
 session = true
+# Set the log thread to normal processing priority, defaults to 'false'.
+thread_priority = false
 # Enable verbose logging, defaults to 'false'.
 verbose = false
 ```

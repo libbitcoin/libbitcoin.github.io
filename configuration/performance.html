@@ -392,6 +392,11 @@ sync and query speed.</p>
 <td>Run validation threads at high priority, ahead of other programs. <code>false</code> leaves them at normal priority.</td>
 </tr>
 <tr>
+<td><code>log.thread_priority</code></td>
+<td><code>false</code></td>
+<td>Run the log thread at normal priority. <code>false</code> runs it at low priority, so logging yields to validation.</td>
+</tr>
+<tr>
 <td><code>database.turbo</code></td>
 <td><code>true</code></td>
 <td>Allow a single client query to use all processors, so large queries return sooner.</td>
