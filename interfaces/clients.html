@@ -529,21 +529,6 @@ Each client links to its notes (§3).</p>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
-<td><a href="#rbitcoin-space">rbitcoin-space</a></td>
-<td>Explorer</td>
-<td>0.1.0</td>
-<td><span class="nw">2026-11-16</span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
-<td style="text-align: center;"></td>
-</tr>
-<tr>
 <td><a href="#fulcrum">Fulcrum</a></td>
 <td>Electrum server</td>
 <td>2.1.3</td>
@@ -1012,16 +997,6 @@ The client computes script hashes in Electrum byte order, reversed, for
 Esplora's <code>/scripthash/</code> paths, which take them unreversed, so it finds
 no transactions on any Esplora server. <strong>Bitcoind JSON-RPC:</strong> requires bitcoind
 wallet methods (<code>createwallet</code>, <code>importdescriptors</code>, <code>listwallets</code>).</p>
-<h3 id="rbitcoin-space">rbitcoin-space<a class="anchor" href="#rbitcoin-space" aria-label="Link to this section">#</a></h3>
-<p>Blocks, transactions, outspends, fee estimates, mining pool and hash rate
-views, and address pages work. The fee recommendation and memory pool
-views fail: <a href="bitcoind-rpc.html#getmempoolentry"><code>getmempoolentry</code></a> lacks
-<code>chunkweight</code> (bitcoind 31), <code>getmempoolcluster</code> awaits the version 5
-pool (-33), and <code>getmempoolfeeratediagram</code> is not served (-32601).
-<code>vsize_bip141</code> and <a href="bitcoind-rpc.html#getblocktemplate"><code>getblocktemplate</code></a>
-are now served, and have not been run again. An Esplora
-address with a very long history is served in full, which can take
-minutes, and the explorer's other address requests wait meanwhile.</p>
 <h3 id="fulcrum">Fulcrum<a class="anchor" href="#fulcrum" aria-label="Link to this section">#</a></h3>
 <p>Fulcrum requires a <code>Content-Length</code> header on each bitcoind JSON-RPC response, and
 <code>bs</code> sends single responses with chunked transfer encoding, which

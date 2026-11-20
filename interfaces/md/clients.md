@@ -31,7 +31,6 @@ Each client links to its notes (§3).
 | [Specter Desktop](#specter-desktop) | Wallet | 2.3.0 | <span class="nw">2026-11-16</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | | |
 | [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span class="blocked" title="Blocked">✘</span> | <span class="works" title="Works">✔</span> | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
-| [rbitcoin-space](#rbitcoin-space) | Explorer | 0.1.0 | <span class="nw">2026-11-16</span> | | <span class="works" title="Works">✔</span> | | <span class="partial" title="Partial">◑</span> | | | | <span class="partial" title="Partial">◑</span> | |
 | [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span class="blocked" title="Blocked">✘</span> | | <span class="works" title="Works">✔</span> | | | |
 | [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-17</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
 | [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
@@ -148,18 +147,6 @@ The client computes script hashes in Electrum byte order, reversed, for
 Esplora's `/scripthash/` paths, which take them unreversed, so it finds
 no transactions on any Esplora server. **Bitcoind JSON-RPC:** requires bitcoind
 wallet methods (`createwallet`, `importdescriptors`, `listwallets`).
-
-### rbitcoin-space
-
-Blocks, transactions, outspends, fee estimates, mining pool and hash rate
-views, and address pages work. The fee recommendation and memory pool
-views fail: [`getmempoolentry`](bitcoind-rpc#getmempoolentry) lacks
-`chunkweight` (bitcoind 31), `getmempoolcluster` awaits the version 5
-pool (-33), and `getmempoolfeeratediagram` is not served (-32601).
-`vsize_bip141` and [`getblocktemplate`](bitcoind-rpc#getblocktemplate)
-are now served, and have not been run again. An Esplora
-address with a very long history is served in full, which can take
-minutes, and the explorer's other address requests wait meanwhile.
 
 ### Fulcrum
 
