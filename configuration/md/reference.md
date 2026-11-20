@@ -812,8 +812,8 @@ inactivity_minutes = 10
 key_pass =
 # The path to the server private key file (.PEM), defaults to empty.
 key_path =
-# The maximum write backlog of a channel, defaults to '10485760'.
-maximum_backlog = 10485760
+# The maximum write backlog of a channel, defaults to '1073741824'.
+maximum_backlog = 1073741824
 # The maximum json response buffer size, defaults to '65536'.
 maximum_buffer = 65536
 # The maximum allowed request size, defaults to '4000000'.

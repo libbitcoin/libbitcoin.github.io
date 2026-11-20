@@ -44,14 +44,16 @@ hashes and indexes that form the next request's URL:
 
 ## 1. Paths
 
-Every path, and the method it calls. `{block}` is `hash/{block hash}` or
-`height/{height}`.
+Every path, and the method it calls. `{chain}` is `confirmed` or
+`candidate`, and `{block}` is `hash/{block hash}` or `{chain}/{height}`.
 
 | Path | Method |
 | ---- | ------ |
 | `/v1/configuration` | [`configuration`](#configuration) |
 | `/v1/top` | [`top`](#top) |
 | `/v1/top/subscribe` | [`top_subscribe`](#top_subscribe) |
+| `/v1/top/{chain}` | [`top_chain`](#top_chain) |
+| `/v1/top/{chain}/height` | [`top_height`](#top_height) |
 | `/v1/block/{block}` | [`block`](#block) |
 | `/v1/block/{block}/header` | [`block_header`](#block_header) |
 | `/v1/block/{block}/header/context` | [`block_header_context`](#block_header_context) |
@@ -93,7 +95,7 @@ http://localhost:8180/v1/{object}/{identifier}/{component}?format={format}
 
 ```
 $ curl "http://localhost:8180/v1/top?format=json"
-{"confirmed":{"hash":"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f","height":0},"candidate":{"hash":"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f","height":0}}
+{"confirmed":{"hash":"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f","height":0,"header":{"hash":"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f","version":1,"previous":"0000000000000000000000000000000000000000000000000000000000000000","merkle_root":"4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b","timestamp":1231006505,"bits":486604799,"nonce":2083236893}},"candidate":{"hash":"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f","height":0,"header":{"hash":"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f","version":1,"previous":"0000000000000000000000000000000000000000000000000000000000000000","merkle_root":"4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b","timestamp":1231006505,"bits":486604799,"nonce":2083236893}}}
 ```
 
 ### 2.1 Identifiers
@@ -134,7 +136,6 @@ formats, and an unsupported one is refused with 406.
 | Option | Default | Applies to | Purpose |
 | ------ | ------- | ---------- | ------- |
 | `witness` | `true` | block, transaction and input methods | `false` omits witness data |
-| `candidate` | `false` | block methods by height | `true` finds the height on the candidate chain |
 | `turbo` | `true` | address methods | `false` runs the query on one thread, as when `database.turbo` is off |
 | `stop` | `false` | subscribe methods | `true` ends the subscription |
 
@@ -326,21 +327,40 @@ Formats: `json`, `data`, `text`.
 {
     "confirmed": {
         "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-        "height": 0
+        "height": 0,
+        "header": {
+            "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+            "version": 1,
+            "previous": "0000000000000000000000000000000000000000000000000000000000000000",
+            "merkle_root": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+            "timestamp": 1231006505,
+            "bits": 486604799,
+            "nonce": 2083236893
+        }
     },
     "candidate": {
         "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-        "height": 0
+        "height": 0,
+        "header": {
+            "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+            "version": 1,
+            "previous": "0000000000000000000000000000000000000000000000000000000000000000",
+            "merkle_root": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+            "timestamp": 1231006505,
+            "bits": 486604799,
+            "nonce": 2083236893
+        }
     }
 }
 ```
 
-`data` is the confirmed top and then the candidate top, each its block
-hash (32 bytes) and its height (4 bytes, little-endian), 72 bytes in all.
-For these tops, `text` is:
+Each top is its block hash, its height and its header. `data` is the
+confirmed top and then the candidate top, each its block hash (32 bytes),
+its height (4 bytes, little-endian) and its header (80 bytes), 232 bytes
+in all. For these tops, `text` is:
 
 ```
-6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000006fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d619000000000000000000
+6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c
 ```
 
 The candidate chain is the chain of headers the node is working toward,
@@ -366,19 +386,68 @@ chain is regressed or disorganized:
 
 ```
 → /v1/top/subscribe
-← {"confirmed":{"hash":"…","height":9},"candidate":{"hash":"…","height":12}}
-← {"confirmed":{"hash":"…","height":10},"candidate":{"hash":"…","height":12}}
+← {"confirmed":{"hash":"…","height":9,"header":{…}},"candidate":{"hash":"…","height":12,"header":{…}}}
+← {"confirmed":{"hash":"…","height":10,"header":{…}},"candidate":{"hash":"…","height":12,"header":{…}}}
 → /v1/top/subscribe?stop=true
 ←
 ```
 
+### top_chain
+
+The top block of one chain.
+
+```
+/v1/top/{chain}
+```
+
+Formats: `json`, `data`, `text`.
+
+```
+$ curl "http://localhost:8180/v1/top/confirmed?format=json"
+```
+
+```json
+{
+    "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+    "height": 0,
+    "header": {
+        "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+        "version": 1,
+        "previous": "0000000000000000000000000000000000000000000000000000000000000000",
+        "merkle_root": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+        "timestamp": 1231006505,
+        "bits": 486604799,
+        "nonce": 2083236893
+    }
+}
+```
+
+The top is as for `top`, so `data` is 116 bytes.
+
+### top_height
+
+The height of the top block of one chain.
+
+```
+/v1/top/{chain}/height
+```
+
+Formats: `json`, `data`, `text`.
+
+```
+$ curl "http://localhost:8180/v1/top/candidate/height?format=json"
+0
+```
+
+`data` is the height in 4 bytes, little-endian.
+
 ## 4. Blocks
 
-In the block paths below, `{block}` is `hash/{block hash}` or
-`height/{height}`. A hash finds any stored block, and a height finds the
-block at that height on the confirmed chain, or with `candidate=true` on
-the candidate chain. A hash ignores `candidate`. Near the candidate top, a block's transactions may not
-be downloaded or its filter computed yet, and those are not found.
+In the block paths below, `{block}` is `hash/{block hash}`,
+`confirmed/{height}` or `candidate/{height}`. A hash finds any stored
+block, and a height finds the block at that height on the named chain.
+Near the candidate top, a block's transactions may not be downloaded or
+its filter computed yet, and those are not found.
 
 ### block
 
@@ -388,10 +457,10 @@ A block.
 /v1/block/{block}
 ```
 
-Formats: `json`, `data`, `text`. Options: `witness`, `candidate`.
+Formats: `json`, `data`, `text`. Options: `witness`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/0?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/0?format=json"
 ```
 
 ```json
@@ -445,10 +514,10 @@ A block header.
 /v1/block/{block}/header
 ```
 
-Formats: `json`, `data`, `text`. Options: `candidate`.
+Formats: `json`, `data`, `text`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/0/header?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/0/header?format=json"
 ```
 
 ```json
@@ -479,10 +548,10 @@ the soft forks active at its height.
 /v1/block/{block}/header/context
 ```
 
-Formats: `json`. Options: `candidate`.
+Formats: `json`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/1/header/context?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/1/header/context?format=json"
 ```
 
 ```json
@@ -538,10 +607,10 @@ Sizes, value and reward of a block.
 /v1/block/{block}/details
 ```
 
-Formats: `json`. Options: `candidate`.
+Formats: `json`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/1/details?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/1/details?format=json"
 ```
 
 ```json
@@ -582,10 +651,10 @@ The transaction hashes of a block, in order.
 /v1/block/{block}/txs
 ```
 
-Formats: `json`, `data`, `text`. Options: `candidate`.
+Formats: `json`, `data`, `text`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/0/txs?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/0/txs?format=json"
 ```
 
 ```json
@@ -604,10 +673,10 @@ The transaction at a position in a block.
 /v1/block/{block}/tx/{position}
 ```
 
-Formats: `json`, `data`, `text`. Options: `witness`, `candidate`.
+Formats: `json`, `data`, `text`. Options: `witness`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/0/tx/0?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/0/tx/0?format=json"
 ```
 
 The response is the transaction, as for [`tx`](#tx).
@@ -621,10 +690,10 @@ The BIP158 client filter of a block. Requires client filters
 /v1/block/{block}/filter/{type}
 ```
 
-Formats: `json`, `data`, `text`. Options: `candidate`.
+Formats: `json`, `data`, `text`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/0/filter/0?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/0/filter/0?format=json"
 ```
 
 ```json
@@ -639,10 +708,10 @@ The hash of a block's client filter.
 /v1/block/{block}/filter/{type}/hash
 ```
 
-Formats: `json`, `data`, `text`. Options: `candidate`.
+Formats: `json`, `data`, `text`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/0/filter/0/hash?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/0/filter/0/hash?format=json"
 ```
 
 ```json
@@ -658,10 +727,10 @@ all those before it.
 /v1/block/{block}/filter/{type}/header
 ```
 
-Formats: `json`, `data`, `text`. Options: `candidate`.
+Formats: `json`, `data`, `text`.
 
 ```
-$ curl "http://localhost:8180/v1/block/height/0/filter/0/header?format=json"
+$ curl "http://localhost:8180/v1/block/confirmed/0/filter/0/header?format=json"
 ```
 
 ```json

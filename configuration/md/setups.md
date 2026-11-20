@@ -133,7 +133,7 @@ chosen with `format=` or the `Accept` header:
 For example, the genesis block header as JSON:
 
 ```
-http://localhost:8180/v1/block/height/0/header?format=json
+http://localhost:8180/v1/block/confirmed/0/header?format=json
 ```
 
 returns:

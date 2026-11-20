@@ -416,8 +416,8 @@ hashes and indexes that form the next request's URL:</p>
 <li>An output gives the inputs that spend it.</li>
 </ul>
 <h2 id="1-paths">1. Paths<a class="anchor" href="#1-paths" aria-label="Link to this section">#</a></h2>
-<p>Every path, and the method it calls. <code>{block}</code> is <code>hash/{block hash}</code> or
-<code>height/{height}</code>.</p>
+<p>Every path, and the method it calls. <code>{chain}</code> is <code>confirmed</code> or
+<code>candidate</code>, and <code>{block}</code> is <code>hash/{block hash}</code> or <code>{chain}/{height}</code>.</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -437,6 +437,14 @@ hashes and indexes that form the next request's URL:</p>
 <tr>
 <td><code>/v1/top/subscribe</code></td>
 <td><a href="#top_subscribe"><code>top_subscribe</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/top/{chain}</code></td>
+<td><a href="#top_chain"><code>top_chain</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/top/{chain}/height</code></td>
+<td><a href="#top_height"><code>top_height</code></a></td>
 </tr>
 <tr>
 <td><code>/v1/block/{block}</code></td>
@@ -562,7 +570,7 @@ binding (default port 8180):</p>
 <pre><code>http://localhost:8180/v1/{object}/{identifier}/{component}?format={format}
 </code></pre>
 <pre class="console"><code>$ curl &quot;http://localhost:8180/v1/top?format=json&quot;
-{&quot;confirmed&quot;:{&quot;hash&quot;:&quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,&quot;height&quot;:0},&quot;candidate&quot;:{&quot;hash&quot;:&quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,&quot;height&quot;:0}}
+{&quot;confirmed&quot;:{&quot;hash&quot;:&quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,&quot;height&quot;:0,&quot;header&quot;:{&quot;hash&quot;:&quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,&quot;version&quot;:1,&quot;previous&quot;:&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;,&quot;merkle_root&quot;:&quot;4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b&quot;,&quot;timestamp&quot;:1231006505,&quot;bits&quot;:486604799,&quot;nonce&quot;:2083236893}},&quot;candidate&quot;:{&quot;hash&quot;:&quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,&quot;height&quot;:0,&quot;header&quot;:{&quot;hash&quot;:&quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,&quot;version&quot;:1,&quot;previous&quot;:&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;,&quot;merkle_root&quot;:&quot;4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b&quot;,&quot;timestamp&quot;:1231006505,&quot;bits&quot;:486604799,&quot;nonce&quot;:2083236893}}}
 </code></pre>
 <h3 id="21-identifiers">2.1 Identifiers<a class="anchor" href="#21-identifiers" aria-label="Link to this section">#</a></h3>
 <div class="scroller"><table>
@@ -651,12 +659,6 @@ formats, and an unsupported one is refused with 406.</p>
 <td><code>true</code></td>
 <td>block, transaction and input methods</td>
 <td><code>false</code> omits witness data</td>
-</tr>
-<tr>
-<td><code>candidate</code></td>
-<td><code>false</code></td>
-<td>block methods by height</td>
-<td><code>true</code> finds the height on the candidate chain</td>
 </tr>
 <tr>
 <td><code>turbo</code></td>
@@ -961,18 +963,37 @@ discoverable by interrogating the node over P2P.</p>
 <pre><code class="language-json">{
     &quot;confirmed&quot;: {
         &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
-        &quot;height&quot;: 0
+        &quot;height&quot;: 0,
+        &quot;header&quot;: {
+            &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
+            &quot;version&quot;: 1,
+            &quot;previous&quot;: &quot;0000000000000000000000000000000000000000000000000000000000000000&quot;,
+            &quot;merkle_root&quot;: &quot;4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b&quot;,
+            &quot;timestamp&quot;: 1231006505,
+            &quot;bits&quot;: 486604799,
+            &quot;nonce&quot;: 2083236893
+        }
     },
     &quot;candidate&quot;: {
         &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
-        &quot;height&quot;: 0
+        &quot;height&quot;: 0,
+        &quot;header&quot;: {
+            &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
+            &quot;version&quot;: 1,
+            &quot;previous&quot;: &quot;0000000000000000000000000000000000000000000000000000000000000000&quot;,
+            &quot;merkle_root&quot;: &quot;4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b&quot;,
+            &quot;timestamp&quot;: 1231006505,
+            &quot;bits&quot;: 486604799,
+            &quot;nonce&quot;: 2083236893
+        }
     }
 }
 </code></pre>
-<p><code>data</code> is the confirmed top and then the candidate top, each its block
-hash (32 bytes) and its height (4 bytes, little-endian), 72 bytes in all.
-For these tops, <code>text</code> is:</p>
-<pre><code>6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000006fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d619000000000000000000
+<p>Each top is its block hash, its height and its header. <code>data</code> is the
+confirmed top and then the candidate top, each its block hash (32 bytes),
+its height (4 bytes, little-endian) and its header (80 bytes), 232 bytes
+in all. For these tops, <code>text</code> is:</p>
+<pre><code>6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c
 </code></pre>
 <p>The candidate chain is the chain of headers the node is working toward,
 and it runs ahead of the confirmed chain during sync. The two tops can be
@@ -989,23 +1010,54 @@ are sent again each time a block is confirmed, the confirmed chain is
 reorganized, headers are added to the candidate chain, or the candidate
 chain is regressed or disorganized:</p>
 <pre><code>→ /v1/top/subscribe
-← {&quot;confirmed&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:9},&quot;candidate&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12}}
-← {&quot;confirmed&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:10},&quot;candidate&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12}}
+← {&quot;confirmed&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:9,&quot;header&quot;:{…}},&quot;candidate&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12,&quot;header&quot;:{…}}}
+← {&quot;confirmed&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:10,&quot;header&quot;:{…}},&quot;candidate&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12,&quot;header&quot;:{…}}}
 → /v1/top/subscribe?stop=true
 ←
 </code></pre>
+<h3 id="top_chain">top_chain<a class="anchor" href="#top_chain" aria-label="Link to this section">#</a></h3>
+<p>The top block of one chain.</p>
+<pre><code>/v1/top/{chain}
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/top/confirmed?format=json&quot;
+</code></pre>
+<pre><code class="language-json">{
+    &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
+    &quot;height&quot;: 0,
+    &quot;header&quot;: {
+        &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
+        &quot;version&quot;: 1,
+        &quot;previous&quot;: &quot;0000000000000000000000000000000000000000000000000000000000000000&quot;,
+        &quot;merkle_root&quot;: &quot;4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b&quot;,
+        &quot;timestamp&quot;: 1231006505,
+        &quot;bits&quot;: 486604799,
+        &quot;nonce&quot;: 2083236893
+    }
+}
+</code></pre>
+<p>The top is as for <code>top</code>, so <code>data</code> is 116 bytes.</p>
+<h3 id="top_height">top_height<a class="anchor" href="#top_height" aria-label="Link to this section">#</a></h3>
+<p>The height of the top block of one chain.</p>
+<pre><code>/v1/top/{chain}/height
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/top/candidate/height?format=json&quot;
+0
+</code></pre>
+<p><code>data</code> is the height in 4 bytes, little-endian.</p>
 <h2 id="4-blocks">4. Blocks<a class="anchor" href="#4-blocks" aria-label="Link to this section">#</a></h2>
-<p>In the block paths below, <code>{block}</code> is <code>hash/{block hash}</code> or
-<code>height/{height}</code>. A hash finds any stored block, and a height finds the
-block at that height on the confirmed chain, or with <code>candidate=true</code> on
-the candidate chain. A hash ignores <code>candidate</code>. Near the candidate top, a block's transactions may not
-be downloaded or its filter computed yet, and those are not found.</p>
+<p>In the block paths below, <code>{block}</code> is <code>hash/{block hash}</code>,
+<code>confirmed/{height}</code> or <code>candidate/{height}</code>. A hash finds any stored
+block, and a height finds the block at that height on the named chain.
+Near the candidate top, a block's transactions may not be downloaded or
+its filter computed yet, and those are not found.</p>
 <h3 id="block">block<a class="anchor" href="#block" aria-label="Link to this section">#</a></h3>
 <p>A block.</p>
 <pre><code>/v1/block/{block}
 </code></pre>
-<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>witness</code>, <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/0?format=json&quot;
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>witness</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0?format=json&quot;
 </code></pre>
 <pre><code class="language-json">{
     &quot;header&quot;: {
@@ -1051,8 +1103,8 @@ be downloaded or its filter computed yet, and those are not found.</p>
 <p>A block header.</p>
 <pre><code>/v1/block/{block}/header
 </code></pre>
-<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/0/header?format=json&quot;
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/header?format=json&quot;
 </code></pre>
 <pre><code class="language-json">{
     &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
@@ -1073,8 +1125,8 @@ be downloaded or its filter computed yet, and those are not found.</p>
 the soft forks active at its height.</p>
 <pre><code>/v1/block/{block}/header/context
 </code></pre>
-<p>Formats: <code>json</code>. Options: <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/1/header/context?format=json&quot;
+<p>Formats: <code>json</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/1/header/context?format=json&quot;
 </code></pre>
 <pre><code class="language-json">{
     &quot;hash&quot;: &quot;00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048&quot;,
@@ -1122,8 +1174,8 @@ activation, and the other forks activate later in the chain.</p>
 <p>Sizes, value and reward of a block.</p>
 <pre><code>/v1/block/{block}/details
 </code></pre>
-<p>Formats: <code>json</code>. Options: <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/1/details?format=json&quot;
+<p>Formats: <code>json</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/1/details?format=json&quot;
 </code></pre>
 <pre><code class="language-json">{
     &quot;hash&quot;: &quot;00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048&quot;,
@@ -1191,8 +1243,8 @@ activation, and the other forks activate later in the chain.</p>
 <p>The transaction hashes of a block, in order.</p>
 <pre><code>/v1/block/{block}/txs
 </code></pre>
-<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/0/txs?format=json&quot;
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/txs?format=json&quot;
 </code></pre>
 <pre><code class="language-json">[
     &quot;4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b&quot;
@@ -1203,8 +1255,8 @@ activation, and the other forks activate later in the chain.</p>
 <p>The transaction at a position in a block.</p>
 <pre><code>/v1/block/{block}/tx/{position}
 </code></pre>
-<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>witness</code>, <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/0/tx/0?format=json&quot;
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>witness</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/tx/0?format=json&quot;
 </code></pre>
 <p>The response is the transaction, as for <a href="#tx"><code>tx</code></a>.</p>
 <h3 id="block_filter">block_filter<a class="anchor" href="#block_filter" aria-label="Link to this section">#</a></h3>
@@ -1212,8 +1264,8 @@ activation, and the other forks activate later in the chain.</p>
 (<code>node.provide_filters</code>).</p>
 <pre><code>/v1/block/{block}/filter/{type}
 </code></pre>
-<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/0/filter/0?format=json&quot;
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/filter/0?format=json&quot;
 </code></pre>
 <pre><code class="language-json">&quot;019dfca8&quot;
 </code></pre>
@@ -1221,8 +1273,8 @@ activation, and the other forks activate later in the chain.</p>
 <p>The hash of a block's client filter.</p>
 <pre><code>/v1/block/{block}/filter/{type}/hash
 </code></pre>
-<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/0/filter/0/hash?format=json&quot;
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/filter/0/hash?format=json&quot;
 </code></pre>
 <pre><code class="language-json">&quot;c03705b2d6fb76a59664f1d63fe8fdbb2dc076d18175fdc51d11c43afaf78a4c&quot;
 </code></pre>
@@ -1231,8 +1283,8 @@ activation, and the other forks activate later in the chain.</p>
 all those before it.</p>
 <pre><code>/v1/block/{block}/filter/{type}/header
 </code></pre>
-<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>candidate</code>.</p>
-<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/height/0/filter/0/header?format=json&quot;
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/filter/0/header?format=json&quot;
 </code></pre>
 <pre><code class="language-json">&quot;21584579b7eb08997773e5aeff3a7f932700042d0ed2a6129012b7d7ae81b750&quot;
 </code></pre>
