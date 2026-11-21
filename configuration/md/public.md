@@ -152,7 +152,7 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
     signet: "00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6"
   };
   var paths = {
-    "Native": "/v1/block/height/0?format=json",
+    "Native": function (chain) { return "/v1/block/hash/" + genesis[chain] + "?format=json"; },
     "Bitcoind": function (chain) { return "/rest/block/" + genesis[chain] + ".json"; },
     "Esplora": function (chain) { return "/block/" + genesis[chain]; }
   };
@@ -341,9 +341,12 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
         var top = JSON.parse(text);
         var height = typeof top === "number" ? top : top.confirmed.height;
         row.cells[2].textContent = height.toLocaleString("en-US");
-        return get("/v1/block/height/" + height + "/header?format=json");
-      }).then(function (text) {
-        var header = JSON.parse(text);
+        if (top.confirmed && top.confirmed.header) return top.confirmed.header;
+        var header = function (text) { return JSON.parse(text); };
+        return get("/v1/block/confirmed/" + height + "/header?format=json").then(header).catch(function () {
+          return get("/v1/block/height/" + height + "/header?format=json").then(header);
+        });
+      }).then(function (header) {
         var current = header.timestamp * 1000 >= Date.now() - window_;
         settle(host + " " + chain, current);
         row.cells[2].className = current ? "scan-up" : "scan-some";
