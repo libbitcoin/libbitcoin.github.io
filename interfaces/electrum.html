@@ -801,9 +801,10 @@ the same as 1.4 for Bitcoin. <code>blockchain.scripthash.unsubscribe</code> is a
 in 1.4.2.</p>
 <h3 id="22-messages">2.2 Messages<a class="anchor" href="#22-messages" aria-label="Link to this section">#</a></h3>
 <p>Messages are JSON-RPC requests, responses and notifications. Version 2.0
-is recommended, and 1.0 is accepted. A 1.0 request must have <code>params</code> as
-an array and an <code>id</code>. A 2.0 request may name its parameters, using the
-names given in each method's section.</p>
+is recommended, and 1.0 is accepted. A 1.0 request has <code>params</code> as an
+array, or omits it for none, and an <code>id</code>. A 2.0 request may name its
+parameters, using the names given in each method's section.
+Notifications are always sent as 2.0.</p>
 <pre><code class="language-json">{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;method&quot;: &quot;blockchain.block.header&quot;, &quot;params&quot;: [1]}
 </code></pre>
 <pre><code class="language-json">{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;result&quot;: &quot;010000006fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000982051fd1e4ba744bbbe680e1fee14677ba1a3c3540bf7b1cdb606e857233e0e61bc6649ffff001d01e36299&quot;}

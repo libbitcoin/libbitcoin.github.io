@@ -48,16 +48,19 @@ $ curl --user user:pass -d '{"jsonrpc":"2.0","id":1,"method":"getblockcount","pa
 ```
 
 - Parameters are positional (an array) or named (an object), with the
-  names given in each method's section.
+  names given in each method's section. As by bitcoind, the members of an
+  `options` parameter may be named directly, and `args` names an array of
+  the leading positional parameters.
 - A request may be a batch, an array of requests answered in order.
 - A version 2.0 request without an `id` is a notification: it is run, and
   answered with HTTP 204 and no body.
-- A version 1.0 request (no `jsonrpc`) must have an `id`, and is answered
-  with both `result` and `error`.
+- A version 1.0 request (no `jsonrpc`) may omit `id`, read as null, and
+  `params`, read as empty, and is answered with both `result` and `error`.
 
 ### 2.2 Errors
 
-An error carries bitcoind's code, and its name as the message:
+An error carries bitcoind's code, and its name as the message, except
+where a method gives bitcoind's own message:
 
 ```json
 {"jsonrpc": "2.0", "id": 1, "error": {"code": -8, "message": "invalid_parameter"}}
@@ -77,6 +80,7 @@ An error carries bitcoind's code, and its name as the message:
 | -27 | `already_in_utxo_set` |
 | -29 | `node_not_connected` |
 | -33 | `client_mempool_disabled` |
+| -37 | `limit_exceeded` |
 | -32601 | `method_not_found` |
 | -32602 | `invalid_params` |
 | -32603 | `internal_error` |
@@ -309,7 +313,9 @@ deployments bip34, bip66, bip65, csv and segwit, as configured.
 The receives and spends of descriptors, in blocks and in the memory
 pool. **Parameters:** `blockhashes` (`[]`), `scanobjects` (`[]`),
 `include_mempool` (`true`). `include_mempool` requires the address index,
-and returns -1 without it. Blocks are reported in the order given.
+and returns -1 without it. Blocks are reported in the order given. More
+than `bitcoind.maximum_history` entries for a descriptor returns -37
+(`limit_exceeded`).
 
 ### getdifficulty
 
@@ -341,7 +347,8 @@ Statistics of the unspent outputs. **Parameters:** `hash_type`
 
 This scans the store, and may take a long time. It returns the fields of
 both of bitcoind's forms, with and without the index, at any height and
-with any hash type. `muhash` and `none` are also accepted.
+with any hash type. `muhash` and `none` are also accepted. It requires
+`bitcoind.enable_utxo`, and returns -32601 without it.
 
 ### scantxoutset
 
@@ -354,8 +361,11 @@ The unspent outputs of descriptors. **Parameters:** `action`,
 | `status` | `null` |
 | `abort` | `false` |
 
-With the address index, each script is found directly. Without it, the
-store is scanned. `desc` in the result is inferred from the script.
+With the address index, each script is found directly, and `txouts` is
+0. Without it, the store is scanned, which requires
+`bitcoind.enable_utxo`, and returns -32601 without it. `desc` in the
+result is inferred from the script. More than `bitcoind.maximum_history`
+entries for a script returns -37 (`limit_exceeded`).
 
 ### scanblocks
 
@@ -420,7 +430,7 @@ The size and fee policy of the pool. **Parameters:** none.
 ### getrawmempool
 
 The transactions in the pool. **Parameters:** `verbose` (`false`),
-`mempool_sequence` (`false`). `mempool_sequence` is always 1.
+`mempool_sequence` (`false`). `mempool_sequence` is always 0.
 
 ### getmempoolentry
 
@@ -476,14 +486,20 @@ boolean read as 0 (`false`) or 1 (`true`), and may be named `verbose`.
 Submits a transaction to the memory pool. **Parameters:** `hexstring`,
 `maxfeerate`, `maxburnamount` (amounts, both ignored). **Result:** the
 transaction hash. The pool accepts transactions only when the node is
-current.
+current. Errors carry bitcoind's messages: "TX decode failed. Make sure
+the tx has at least one input." (-22), "Inputs missing or spent" (-25),
+"Transaction outputs already in utxo set" (-27), and otherwise the reject
+reason (-26).
 
 ### testmempoolaccept
 
 Tests whether transactions would be accepted to the memory pool.
 **Parameters:** `rawtxs`, `maxfeerate` (an amount, ignored). **Result:** for each,
 `{"txid", "wtxid", "allowed", "reject-reason"}`. The transactions are
-tested as one package.
+tested as one package. As by bitcoind, `reject-reason` is
+`txn-already-in-mempool` for a pooled transaction, `txn-already-known` for
+a confirmed one with an unspent output, `missing-inputs` for unknown or
+spent inputs, and otherwise the reject reason.
 
 ### submitpackage
 
@@ -568,6 +584,15 @@ and `blockmintxfee` is `pool.minimum_fee_rate`.
 The hash rate over a window of blocks. **Parameters:** `nblocks` (120),
 `height` (the top).
 
+### submitblock
+
+Submits a block (BIP22). **Parameters:** `hexdata`, `dummy` (ignored).
+**Result:** `null` when the block is accepted, `duplicate`,
+`duplicate-invalid`, `duplicate-inconclusive` or `inconclusive`, or the
+reject reason. A block that cannot be decoded returns -22. The result is
+sent once the block is found confirmable or not, and a block that does
+not then extend the candidate chain is `inconclusive`.
+
 ### submitheader
 
 Submits a block header. **Parameters:** `hexdata`. **Result:** `null`.
@@ -586,7 +611,9 @@ The number of peer connections. **Parameters:** none.
 
 ### getpeerinfo
 
-The connected peers. **Parameters:** none.
+The connected peers. **Parameters:** none. `presynced_headers`,
+`synced_headers` and `synced_blocks` are -1, and `inflight` and
+`permissions` are empty, as they are not tracked per peer.
 
 ### getnettotals
 
@@ -715,7 +742,6 @@ none. Every topic is published on every `[zmq]` address.
 | Methods | Reason | Error |
 | ------- | ------ | ----- |
 | Wallet methods, `signrawtransactionwithkey`, `descriptorprocesspsbt`, `signmessagewithprivkey` | Signing belongs in the wallet, so private keys never reach the server | -32601 |
-| `submitblock` | The node accepts only blocks that it requests, so a submitted block has no path into the chain | -33 |
 | `prioritisetransaction`, `getprioritisedtransactions`, `getmempoolcluster` | Prioritisation and clusters order pool transactions by their dependencies, which requires the transaction graph of the version 5 pool | -33 |
 | `invalidateblock`, `reconsiderblock` | The store does not record a valid block as invalid by command | -32601 |
 | `pruneblockchain` | Dynamic pruning is not supported | -1 |

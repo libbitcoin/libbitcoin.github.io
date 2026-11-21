@@ -760,8 +760,12 @@ disconnected.</p>
 <code>inv</code>. While not current, the <code>inv</code> is empty.</p>
 <h3 id="inv">inv<a class="anchor" href="#inv" aria-label="Link to this section">#</a></h3>
 <p>Announces blocks and transactions by hash, up to 50,000. <code>bs</code> announces
-each block once it is confirmed, while current, and each transaction
-accepted to its memory pool.</p>
+each block once it is confirmed, while current. It relays transactions to
+up to 64 peers, one relay slot each. Once transactions are accepted to its
+memory pool, each of those peers is sent what it lacks of them and of
+their unconfirmed ancestors, parents first, as one package where the
+package clears the peer's <code>feefilter</code>. A low fee parent is thereby sent
+with the child that pays for it.</p>
 <h3 id="getdata">getdata<a class="anchor" href="#getdata" aria-label="Link to this section">#</a></h3>
 <p>Requests blocks or transactions by hash, up to 50,000. <code>bs</code> downloads
 blocks in parallel across peers, and drops peers that are much slower than
@@ -792,14 +796,24 @@ for each confirmed block to peers in high bandwidth mode.</p>
 <h3 id="tx">tx<a class="anchor" href="#tx" aria-label="Link to this section">#</a></h3>
 <p>A transaction. <code>bs</code> requests announced transactions while current, and
 adds them to its memory pool. A peer that sends a transaction that was not
-requested is disconnected.</p>
+requested, or any transaction while sent the maximum <code>feefilter</code>, is
+disconnected. A peer is not disconnected for a transaction refused for
+its fee.</p>
 <h3 id="feefilter">feefilter<a class="anchor" href="#feefilter" aria-label="Link to this section">#</a></h3>
-<p>The minimum fee rate of transactions to announce (BIP133). <code>bs</code> sends
-<code>pool.minimum_fee_rate</code> while current, and the maximum otherwise. It does
-not announce transactions below a peer's rate.</p>
+<p>The minimum fee rate of transactions to announce (BIP133). While current,
+<code>bs</code> sends 0 to a peer that holds a relay slot, so the peer announces every
+transaction, since <code>bs</code> accepts a transaction by what covers it (such as a
+parent paying for its child, or a child for its parent), not by its own
+rate. It sends the maximum (21 million BTC) to a peer without a slot, and
+to every peer while not current, which asks for no transactions. It
+announces to a peer only packages that clear the peer's rate, and a fall
+of that rate sends the peer what then clears it.</p>
 <h3 id="mempool">mempool<a class="anchor" href="#mempool" aria-label="Link to this section">#</a></h3>
 <p>Requests the hashes of the memory pool (BIP35), answered by <code>inv</code>.
-Ignored unless <code>peer.enable_memory_pool</code> is set.</p>
+Ignored unless <code>peer.enable_memory_pool</code> is set. The answer is what the
+peer lacks of the pool, as packages that clear its <code>feefilter</code>, as for
+relay. With <code>manual.request_mempool</code>, <code>bs</code> sends <code>mempool</code> to each manual
+peer once relaying.</p>
 <h2 id="8-client-filters">8. Client filters<a class="anchor" href="#8-client-filters" aria-label="Link to this section">#</a></h2>
 <p>These require <code>node.provide_filters</code> (BIP157), and are ignored without it.
 Only basic filters are served.</p>

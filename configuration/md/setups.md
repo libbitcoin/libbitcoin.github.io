@@ -574,6 +574,7 @@ delay_inbound = true
 
 [pool]
 minimum_fee_rate = 0.000001
+cutoff_rate = 0
 bytes_per_sigop = 20
 maximum_outcomes = 1024
 coinbase_weight = 2000
@@ -598,6 +599,11 @@ maximum_chunk_depth = 25
   conflicting transactions to keep. A transaction whose conflicts with
   pooled transactions have more outcomes is not accepted. A block template
   or fee estimate uses the best outcome among at most this many.
+- `pool.cutoff_rate` is the fee rate, in BTC per thousand virtual bytes,
+  charged for block space when a block template chooses among conflicting
+  transactions. At 0 the choice is by total fee. It may not exceed
+  `pool.minimum_fee_rate`, or `bs` stops with "cutoff rate exceeds the
+  minimum fee rate".
 - `pool.coinbase_weight` is the weight reserved in a block template for
   the miner's coinbase transaction.
 - `pool.maximum_chunk_depth` limits the generations of ancestors that

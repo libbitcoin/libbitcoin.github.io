@@ -573,6 +573,8 @@ The transaction pool: fee policy, conflict resolution, and the block template.
 bytes_per_sigop = 20
 # Declared weight of the miner's coinbase transaction, defaults to '2000'.
 coinbase_weight = 2000
+# Fee rate on space when resolving template conflicts, defaults to '0'.
+cutoff_rate = 0
 # Maximum ancestor depth of a block template chunk, defaults to '25'.
 maximum_chunk_depth = 25
 # Maximum conflict outcomes evaluated to accept a transaction, defaults to '1024'.
@@ -770,6 +772,8 @@ minimum_buffer = 4096
 password =
 # A persistent peer node, multiple allowed.
 #peer =
+# Request the memory pool of manual peers once relaying, defaults to 'false'.
+request_mempool = false
 # The send rate limit in bytes per second, defaults to '0' (network controls).
 rate_limit = 0
 # The socks5 proxy endpoint (port required).
@@ -802,12 +806,12 @@ connections = 10
 #credential =
 # The path of the default source page, defaults to 'index.html'.
 default = index.html
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
+# The maximum connection duration, defaults to '0'.
+expiration_minutes = 0
 # The host name (http verification), multiple allowed, defaults to empty (disabled).
 #host =
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
+# The idle timeout (http keep-alive), defaults to '0'.
+inactivity_minutes = 0
 # The password to decrypt the server private key file (.PEM), optional.
 key_pass =
 # The path to the server private key file (.PEM), defaults to empty.
@@ -816,6 +820,8 @@ key_path =
 maximum_backlog = 1073741824
 # The maximum json response buffer size, defaults to '65536'.
 maximum_buffer = 65536
+# The maximum number of address history entries, defaults to '1000000'.
+maximum_history = 1000000
 # The maximum allowed request size, defaults to '4000000'.
 maximum_request = 4000000
 # The minimum retained read buffer size, defaults to '4096'.
@@ -868,6 +874,8 @@ key_path =
 maximum_backlog = 1048576
 # The maximum json response buffer size, defaults to '65536'.
 maximum_buffer = 65536
+# The maximum number of address history entries, defaults to '1000000'.
+maximum_history = 1000000
 # The maximum allowed request size, defaults to '4000000'.
 maximum_request = 4000000
 # The minimum retained read buffer size, defaults to '4096'.
@@ -906,6 +914,8 @@ connect_timeout_seconds = 0
 connections = 0
 # The 'username:password[:method,...]' authorization (not secure), multiple allowed.
 #credential =
+# Enable utxo set queries, disabling connection timeouts, defaults to 'false'.
+enable_utxo = false
 # The maximum connection duration, defaults to '60'.
 expiration_minutes = 60
 # The host name (http verification), multiple allowed, defaults to empty (disabled).
@@ -920,6 +930,8 @@ key_path =
 maximum_backlog = 1048576
 # The maximum json response buffer size, defaults to '65536'.
 maximum_buffer = 65536
+# The maximum number of address history entries, defaults to '1000000'.
+maximum_history = 1000000
 # The maximum allowed request size, defaults to '8004096'.
 maximum_request = 8004096
 # The minimum retained read buffer size, defaults to '4096'.
@@ -990,6 +1002,8 @@ connect_timeout_seconds = 0
 connections = 0
 # The 'username:password[:method,...]' authorization (not secure), multiple allowed.
 #credential =
+# Enable utxo set queries, disabling connection timeouts, defaults to 'false'.
+enable_utxo = false
 # The maximum connection duration, defaults to '60'.
 expiration_minutes = 60
 # The host name (http verification), multiple allowed, defaults to empty (disabled).

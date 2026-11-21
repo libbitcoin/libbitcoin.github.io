@@ -85,9 +85,10 @@ in 1.4.2.
 ### 2.2 Messages
 
 Messages are JSON-RPC requests, responses and notifications. Version 2.0
-is recommended, and 1.0 is accepted. A 1.0 request must have `params` as
-an array and an `id`. A 2.0 request may name its parameters, using the
-names given in each method's section.
+is recommended, and 1.0 is accepted. A 1.0 request has `params` as an
+array, or omits it for none, and an `id`. A 2.0 request may name its
+parameters, using the names given in each method's section.
+Notifications are always sent as 2.0.
 
 ```json
 {"jsonrpc": "2.0", "id": 1, "method": "blockchain.block.header", "params": [1]}

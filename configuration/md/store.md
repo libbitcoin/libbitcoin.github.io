@@ -118,16 +118,17 @@ values, and `bs -s` shows them for an existing store.
 ## 4. Schema migration
 
 A store records the schema of the `bs` that created it. A store of the
-compiled schema opens as is. A store of an older schema that `bs` can
-migrate is upgraded when it opens, with no snapshot and no operator step,
-and the upgrade is logged:
+compiled schema opens as is. A store of an older schema is migrated to the
+compiled schema, as described on [Store Migration](migration).
+
+## 5. Fault lock
+
+A fault of the node, such as a failure to write the store, fault locks
+the store. The node does not resume, and on the next start `bs` refuses to
+open the store, as does `--restore`:
 
 ```
-Database schema 4.0.31.0 migrated to compiled schema 4.0.32.0.
+The application (or underlying operating system or hardware) produced an unrecoverable error prior to shutdown. The cause is not knowable to the application.
 ```
 
-A setting the older schema did not record takes its configured value at
-migration: a store migrated from 4.0.31 takes `node.require_witness` from
-the configuration. If the disk has no room for the upgrade, the open fails
-as disk full and the store is unchanged. A store older than the oldest
-migratable schema (4.0.31) must be recreated.
+A fault locked store must be recreated.

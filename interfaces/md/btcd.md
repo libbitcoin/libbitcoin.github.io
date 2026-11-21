@@ -57,7 +57,16 @@ Address search and address watches require the address index, and return
 
 A connection, with its subscriptions and watches, lasts up to
 `btcd.expiration_minutes` (default 60). Set it to 0 for a subscriber that
-stays connected.
+stays connected. `btcd.enable_utxo` enables utxo set queries, as
+`bitcoind.enable_utxo` does, and disables both connection timeouts.
+
+A request without an `id`, or with a null `id`, is neither run nor
+answered, whatever its version or method: over HTTP/S it gets 204 and no
+body, it is left out of a batch's response, and over WS/S or TCP/S
+nothing is sent. A credential limited to some methods applies to every
+method of the connection, the bitcoind methods included, and any other
+method returns -32603 (internal error) over HTTP/S, with HTTP 200, and
+-32602 (invalid params) over WS/S and TCP/S.
 
 ## 3. Connection
 

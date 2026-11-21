@@ -485,7 +485,7 @@ to `false`.
 | ----- | -------- |
 | `verbose=true` | An object keyed by transaction hash, with each transaction's size, fees, ancestors and descendants |
 | `verbose=false` | An array of transaction hashes |
-| `verbose=false&mempool_sequence=true` | `{"txids": [...], "mempool_sequence": 1}` |
+| `verbose=false&mempool_sequence=true` | `{"txids": [...], "mempool_sequence": 0}` |
 
 An empty pool returns `{}`, or `[]` with `verbose=false`. `verbose=true`
 with `mempool_sequence=true` returns 400.

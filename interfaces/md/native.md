@@ -575,7 +575,6 @@ $ curl "http://localhost:8180/v1/block/confirmed/1/header/context?format=json"
         "bip34": false,
         "bip66": false,
         "bip65": false,
-        "bip90": false,
         "bip68": false,
         "bip112": false,
         "bip113": false,

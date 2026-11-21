@@ -459,7 +459,15 @@ range is not configurable on <code>[btcd]</code>.</p>
 <a href="../configuration/reference.html#6-wallet"><code>[wallet]</code></a> prefixes.</p>
 <p>A connection, with its subscriptions and watches, lasts up to
 <code>btcd.expiration_minutes</code> (default 60). Set it to 0 for a subscriber that
-stays connected.</p>
+stays connected. <code>btcd.enable_utxo</code> enables utxo set queries, as
+<code>bitcoind.enable_utxo</code> does, and disables both connection timeouts.</p>
+<p>A request without an <code>id</code>, or with a null <code>id</code>, is neither run nor
+answered, whatever its version or method: over HTTP/S it gets 204 and no
+body, it is left out of a batch's response, and over WS/S or TCP/S
+nothing is sent. A credential limited to some methods applies to every
+method of the connection, the bitcoind methods included, and any other
+method returns -32603 (internal error) over HTTP/S, with HTTP 200, and
+-32602 (invalid params) over WS/S and TCP/S.</p>
 <h2 id="3-connection">3. Connection<a class="anchor" href="#3-connection" aria-label="Link to this section">#</a></h2>
 <h3 id="authenticate">authenticate<a class="anchor" href="#authenticate" aria-label="Link to this section">#</a></h3>
 <p>Authenticates a WS/S or TCP/S connection in-band, as btcd clients do.

@@ -234,8 +234,12 @@ Requests the hashes of up to 500 blocks following a locator, answered by
 ### inv
 
 Announces blocks and transactions by hash, up to 50,000. `bs` announces
-each block once it is confirmed, while current, and each transaction
-accepted to its memory pool.
+each block once it is confirmed, while current. It relays transactions to
+up to 64 peers, one relay slot each. Once transactions are accepted to its
+memory pool, each of those peers is sent what it lacks of them and of
+their unconfirmed ancestors, parents first, as one package where the
+package clears the peer's `feefilter`. A low fee parent is thereby sent
+with the child that pays for it.
 
 ### getdata
 
@@ -283,18 +287,28 @@ The transactions requested by `getblocktxn`.
 
 A transaction. `bs` requests announced transactions while current, and
 adds them to its memory pool. A peer that sends a transaction that was not
-requested is disconnected.
+requested, or any transaction while sent the maximum `feefilter`, is
+disconnected. A peer is not disconnected for a transaction refused for
+its fee.
 
 ### feefilter
 
-The minimum fee rate of transactions to announce (BIP133). `bs` sends
-`pool.minimum_fee_rate` while current, and the maximum otherwise. It does
-not announce transactions below a peer's rate.
+The minimum fee rate of transactions to announce (BIP133). While current,
+`bs` sends 0 to a peer that holds a relay slot, so the peer announces every
+transaction, since `bs` accepts a transaction by what covers it (such as a
+parent paying for its child, or a child for its parent), not by its own
+rate. It sends the maximum (21 million BTC) to a peer without a slot, and
+to every peer while not current, which asks for no transactions. It
+announces to a peer only packages that clear the peer's rate, and a fall
+of that rate sends the peer what then clears it.
 
 ### mempool
 
 Requests the hashes of the memory pool (BIP35), answered by `inv`.
-Ignored unless `peer.enable_memory_pool` is set.
+Ignored unless `peer.enable_memory_pool` is set. The answer is what the
+peer lacks of the pool, as packages that clear its `feefilter`, as for
+relay. With `manual.request_mempool`, `bs` sends `mempool` to each manual
+peer once relaying.
 
 ## 8. Client filters
 

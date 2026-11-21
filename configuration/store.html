@@ -539,16 +539,15 @@ checks such as <code>client filters require unpruned blocks</code> test the stor
 values, and <code>bs -s</code> shows them for an existing store.</p>
 <h2 id="4-schema-migration">4. Schema migration<a class="anchor" href="#4-schema-migration" aria-label="Link to this section">#</a></h2>
 <p>A store records the schema of the <code>bs</code> that created it. A store of the
-compiled schema opens as is. A store of an older schema that <code>bs</code> can
-migrate is upgraded when it opens, with no snapshot and no operator step,
-and the upgrade is logged:</p>
-<pre><code>Database schema 4.0.31.0 migrated to compiled schema 4.0.32.0.
+compiled schema opens as is. A store of an older schema is migrated to the
+compiled schema, as described on <a href="migration.html">Store Migration</a>.</p>
+<h2 id="5-fault-lock">5. Fault lock<a class="anchor" href="#5-fault-lock" aria-label="Link to this section">#</a></h2>
+<p>A fault of the node, such as a failure to write the store, fault locks
+the store. The node does not resume, and on the next start <code>bs</code> refuses to
+open the store, as does <code>--restore</code>:</p>
+<pre><code>The application (or underlying operating system or hardware) produced an unrecoverable error prior to shutdown. The cause is not knowable to the application.
 </code></pre>
-<p>A setting the older schema did not record takes its configured value at
-migration: a store migrated from 4.0.31 takes <code>node.require_witness</code> from
-the configuration. If the disk has no room for the upgrade, the open fails
-as disk full and the store is unchanged. A store older than the oldest
-migratable schema (4.0.31) must be recreated.</p>
+<p>A fault locked store must be recreated.</p>
   </article>
 
   <nav class="pager"><a href="public.html">&larr; Community Servers</a><a href="migration.html">Store Migration &rarr;</a></nav>

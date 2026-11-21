@@ -184,8 +184,8 @@ so the only removal `R` covers is a transaction made unconfirmable by a
 confirmed conflict, for which `R` is not yet sent.
 
 The pool sequence is 8 bytes, little-endian. It counts the `A`
-notifications of the connection, and is not bitcoind's
-`mempool_sequence`.
+notifications of the connection from 1, and is not bitcoind's
+`mempool_sequence`, which `bs` reports as 0.
 
 In a reorganization, each removed block is published with `D` from the
 top down, then each added block with `C` from the fork up.

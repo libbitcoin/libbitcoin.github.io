@@ -582,8 +582,8 @@ confirmed conflict. <code>bs</code> does not evict, expire or replace transactio
 so the only removal <code>R</code> covers is a transaction made unconfirmable by a
 confirmed conflict, for which <code>R</code> is not yet sent.</p>
 <p>The pool sequence is 8 bytes, little-endian. It counts the <code>A</code>
-notifications of the connection, and is not bitcoind's
-<code>mempool_sequence</code>.</p>
+notifications of the connection from 1, and is not bitcoind's
+<code>mempool_sequence</code>, which <code>bs</code> reports as 0.</p>
 <p>In a reorganization, each removed block is published with <code>D</code> from the
 top down, then each added block with <code>C</code> from the fork up.</p>
   </article>
