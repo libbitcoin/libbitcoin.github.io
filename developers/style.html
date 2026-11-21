@@ -790,7 +790,26 @@ argument, not a cast:</p>
 const auto top = shift_left&lt;uint32_t&gt;(byte, subtract(bits&lt;uint32_t&gt;, byte_bits));
 </code></pre>
 <h2 id="7-errors-and-assertions">7. Errors and assertions<a class="anchor" href="#7-errors-and-assertions" aria-label="Link to this section">#</a></h2>
+<p>The code does not defend against its own defects. A failure surfaces
+where it occurs, so that it is fixed rather than carried.</p>
 <ul>
+<li><strong>Fail fast, not defensively.</strong> Do not guard against a condition the
+  design excludes, such as a null the caller never passes or an index the
+  caller has bounded. Declare it with <code>BC_ASSERT</code>. A violation is a defect
+  to fix, not a case to handle.</li>
+<li><strong>Never suppress an error.</strong> Every error is returned or handled as what
+  it is. Never discard a code, return success on failure, or substitute a
+  default for a failed result.</li>
+<li><strong>No exception handling.</strong> Errors are values, a <code>code</code> or a <code>bool</code>.
+  libbitcoin throws no exceptions of its own and uses no <code>try</code>/<code>catch</code>
+  (structured exception handling) for control flow. Where a standard or
+  dependency API reports failure only by throwing, catch at that call
+  alone, the specific type where the API names one, and translate it to a
+  code.</li>
+<li><strong>Maximal <code>noexcept</code>.</strong> Every function is <code>NOEXCEPT</code> (section 3). In
+  release builds <code>NOEXCEPT</code> is <code>noexcept</code>, so an exception that escapes
+  terminates the process at its source rather than unwinding through code
+  that never planned for it. In debug builds it is empty.</li>
 <li><strong>Never collapse error conditions.</strong> When you expect a specific failure,
   test for that one (<code>errno == ENOSPC</code>). Every other failure is a different
   condition, normally a fault.</li>

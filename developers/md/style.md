@@ -344,6 +344,26 @@ const auto top = shift_left<uint32_t>(byte, subtract(bits<uint32_t>, byte_bits))
 
 ## 7. Errors and assertions
 
+The code does not defend against its own defects. A failure surfaces
+where it occurs, so that it is fixed rather than carried.
+
+- **Fail fast, not defensively.** Do not guard against a condition the
+  design excludes, such as a null the caller never passes or an index the
+  caller has bounded. Declare it with `BC_ASSERT`. A violation is a defect
+  to fix, not a case to handle.
+- **Never suppress an error.** Every error is returned or handled as what
+  it is. Never discard a code, return success on failure, or substitute a
+  default for a failed result.
+- **No exception handling.** Errors are values, a `code` or a `bool`.
+  libbitcoin throws no exceptions of its own and uses no `try`/`catch`
+  (structured exception handling) for control flow. Where a standard or
+  dependency API reports failure only by throwing, catch at that call
+  alone, the specific type where the API names one, and translate it to a
+  code.
+- **Maximal `noexcept`.** Every function is `NOEXCEPT` (section 3). In
+  release builds `NOEXCEPT` is `noexcept`, so an exception that escapes
+  terminates the process at its source rather than unwinding through code
+  that never planned for it. In debug builds it is empty.
 - **Never collapse error conditions.** When you expect a specific failure,
   test for that one (`errno == ENOSPC`). Every other failure is a different
   condition, normally a fault.
