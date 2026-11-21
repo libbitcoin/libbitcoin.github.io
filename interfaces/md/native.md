@@ -60,6 +60,8 @@ Every path, and the method it calls. `{chain}` is `confirmed` or
 | `/v1/block/{block}/details` | [`block_details`](#block_details) |
 | `/v1/block/{block}/txs` | [`block_txs`](#block_txs) |
 | `/v1/block/{block}/tx/{position}` | [`block_tx`](#block_tx) |
+| `/v1/block/{block}/tx/{position}/input/{index}/script` | [`block_tx_input_script`](#block_tx_input_script) |
+| `/v1/block/{block}/tx/{position}/output/{index}/script` | [`block_tx_output_script`](#block_tx_output_script) |
 | `/v1/block/{block}/filter/{type}` | [`block_filter`](#block_filter) |
 | `/v1/block/{block}/filter/{type}/hash` | [`block_filter_hash`](#block_filter_hash) |
 | `/v1/block/{block}/filter/{type}/header` | [`block_filter_header`](#block_filter_header) |
@@ -680,6 +682,46 @@ $ curl "http://localhost:8180/v1/block/confirmed/0/tx/0?format=json"
 ```
 
 The response is the transaction, as for [`tx`](#tx).
+
+### block_tx_input_script
+
+The script of an input of the transaction at a position in a block.
+
+```
+/v1/block/{block}/tx/{position}/input/{index}/script
+```
+
+Formats: `json`, `data`, `text`.
+
+```
+$ curl "http://localhost:8180/v1/block/confirmed/0/tx/0/input/0/script?format=json"
+```
+
+```json
+"[ffff001d] [04] [5468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73]"
+```
+
+The response is the script, as for [`input_script`](#input_script).
+
+### block_tx_output_script
+
+The script of an output of the transaction at a position in a block.
+
+```
+/v1/block/{block}/tx/{position}/output/{index}/script
+```
+
+Formats: `json`, `data`, `text`.
+
+```
+$ curl "http://localhost:8180/v1/block/confirmed/0/tx/0/output/0/script?format=json"
+```
+
+```json
+"[04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f] checksig"
+```
+
+The response is the script, as for [`output_script`](#output_script).
 
 ### block_filter
 

@@ -472,6 +472,14 @@ hashes and indexes that form the next request's URL:</p>
 <td><a href="#block_tx"><code>block_tx</code></a></td>
 </tr>
 <tr>
+<td><code>/v1/block/{block}/tx/{position}/input/{index}/script</code></td>
+<td><a href="#block_tx_input_script"><code>block_tx_input_script</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/block/{block}/tx/{position}/output/{index}/script</code></td>
+<td><a href="#block_tx_output_script"><code>block_tx_output_script</code></a></td>
+</tr>
+<tr>
 <td><code>/v1/block/{block}/filter/{type}</code></td>
 <td><a href="#block_filter"><code>block_filter</code></a></td>
 </tr>
@@ -1260,6 +1268,26 @@ activation, and the other forks activate later in the chain.</p>
 <pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/tx/0?format=json&quot;
 </code></pre>
 <p>The response is the transaction, as for <a href="#tx"><code>tx</code></a>.</p>
+<h3 id="block_tx_input_script">block_tx_input_script<a class="anchor" href="#block_tx_input_script" aria-label="Link to this section">#</a></h3>
+<p>The script of an input of the transaction at a position in a block.</p>
+<pre><code>/v1/block/{block}/tx/{position}/input/{index}/script
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/tx/0/input/0/script?format=json&quot;
+</code></pre>
+<pre><code class="language-json">&quot;[ffff001d] [04] [5468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73]&quot;
+</code></pre>
+<p>The response is the script, as for <a href="#input_script"><code>input_script</code></a>.</p>
+<h3 id="block_tx_output_script">block_tx_output_script<a class="anchor" href="#block_tx_output_script" aria-label="Link to this section">#</a></h3>
+<p>The script of an output of the transaction at a position in a block.</p>
+<pre><code>/v1/block/{block}/tx/{position}/output/{index}/script
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/0/tx/0/output/0/script?format=json&quot;
+</code></pre>
+<pre><code class="language-json">&quot;[04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f] checksig&quot;
+</code></pre>
+<p>The response is the script, as for <a href="#output_script"><code>output_script</code></a>.</p>
 <h3 id="block_filter">block_filter<a class="anchor" href="#block_filter" aria-label="Link to this section">#</a></h3>
 <p>The BIP158 client filter of a block. Requires client filters
 (<code>node.provide_filters</code>).</p>
