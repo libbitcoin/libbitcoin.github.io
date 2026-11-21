@@ -32,7 +32,7 @@ Each client links to its notes (§3).
 | [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span class="blocked" title="Blocked">✘</span> | <span class="works" title="Works">✔</span> | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
 | [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span class="blocked" title="Blocked">✘</span> | | <span class="works" title="Works">✔</span> | | | |
-| [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-17</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
+| [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-21</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
 | [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
 
 ## 2. Untested
@@ -164,15 +164,37 @@ transactions and the pool over bitcoind JSON-RPC and addresses over Electrum.
 It indexed the latest blocks, followed new ones, loaded the pool and
 served fee recommendations. Against mempool.space: block headers,
 transaction lists, transactions, their hex and merkle proofs, the
-confirmation status of transactions, fee recommendations and the 126
-unspent outputs of an address all identical.
+confirmation status of transactions, fee recommendations, projected
+blocks and the 126 unspent outputs of an address all identical.
+
+The pool loaded without errors and held the same transactions as the
+`bs` pool (17,054). For 40 sampled pool transactions the fee, weight,
+size and status matched [`getmempoolentry`](bitcoind-rpc#getmempoolentry),
+and the ancestors and descendants matched
+[`getmempoolancestors`](bitcoind-rpc#getmempoolancestors) and
+[`getmempooldescendants`](bitcoind-rpc#getmempooldescendants), except
+where `bs` holds two spends of one output: mempool links one spender,
+so it lists one relative fewer. Address pool totals are zero until
+[libbitcoin/libbitcoin-database#1094](https://github.com/libbitcoin/libbitcoin-database/pull/1094),
+as the Electrum balance returned no unconfirmed amount.
 
 The differences from mempool.space are those of this backend mode,
 and the same with Bitcoin Core: spent outputs without the spending
-transaction, address totals without output counts, address histories
-in pages of 10, and no block status. The pool held fewer transactions
+transaction, address totals without output counts (received shows the
+balance, sent shows zero), address histories in pages of 10, and no
+block status. Each page reads the full address history, so an address
+of 462,000 transactions exceeds the frontend's 60 s timeout, although
+`bs` answers its history in under 4 s. The pool held fewer transactions
 than mempool.space, which reflects the pool of the node, not the
-interface.
+interface; it was within 10% of the pool of Bitcoin Core 32.1 on the
+same host.
+
+The `esplora` mode of mempool, which lifts these limits, is not
+supported. It calls endpoints of mempool's own electrs fork that are not
+part of the [Esplora](esplora) API. `bs` serves `POST /internal/txs`,
+`POST /internal/mempool/txs` and the two `/internal/txs/outspends`
+lookups, but not `GET /internal/mempool/txs` (the pool in pages),
+`GET /internal/block/{hash}/txs` or `GET /address/{address}/txs/summary`.
 
 The backend makes one request per transaction, and per input for its
 previous output, one after another, so it should run close to the node:
