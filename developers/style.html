@@ -800,16 +800,18 @@ where it occurs, so that it is fixed rather than carried.</p>
 <li><strong>Never suppress an error.</strong> Every error is returned or handled as what
   it is. Never discard a code, return success on failure, or substitute a
   default for a failed result.</li>
-<li><strong>No exception handling.</strong> Errors are values, a <code>code</code> or a <code>bool</code>.
-  libbitcoin throws no exceptions of its own and uses no <code>try</code>/<code>catch</code>
-  (structured exception handling) for control flow. Where a standard or
-  dependency API reports failure only by throwing, catch at that call
-  alone, the specific type where the API names one, and translate it to a
-  code.</li>
+<li><strong>No structured exception handling.</strong> Errors are values, a <code>code</code> or a
+  <code>bool</code>, and are never thrown and caught for control flow. libbitcoin
+  throws no exceptions of its own. Where an external API (the standard
+  library or the platform) reports failure only by throwing, catch at that
+  call alone and translate it to a code. Iostreams report parse failures
+  this way, which brings in the JSON and property wrappers that read and
+  write through them, for standard file and console streaming.</li>
 <li><strong>Maximal <code>noexcept</code>.</strong> Every function is <code>NOEXCEPT</code> (section 3). In
-  release builds <code>NOEXCEPT</code> is <code>noexcept</code>, so an exception that escapes
-  terminates the process at its source rather than unwinding through code
-  that never planned for it. In debug builds it is empty.</li>
+  release builds <code>NOEXCEPT</code> is <code>noexcept</code>, for performance: the compiler
+  does not prepare every call to unwind. An exception that escapes
+  terminates the process at its source, and a core dump still holds the
+  stack. In debug builds <code>NOEXCEPT</code> is empty.</li>
 <li><strong>Never collapse error conditions.</strong> When you expect a specific failure,
   test for that one (<code>errno == ENOSPC</code>). Every other failure is a different
   condition, normally a fault.</li>

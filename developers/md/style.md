@@ -354,16 +354,18 @@ where it occurs, so that it is fixed rather than carried.
 - **Never suppress an error.** Every error is returned or handled as what
   it is. Never discard a code, return success on failure, or substitute a
   default for a failed result.
-- **No exception handling.** Errors are values, a `code` or a `bool`.
-  libbitcoin throws no exceptions of its own and uses no `try`/`catch`
-  (structured exception handling) for control flow. Where a standard or
-  dependency API reports failure only by throwing, catch at that call
-  alone, the specific type where the API names one, and translate it to a
-  code.
+- **No structured exception handling.** Errors are values, a `code` or a
+  `bool`, and are never thrown and caught for control flow. libbitcoin
+  throws no exceptions of its own. Where an external API (the standard
+  library or the platform) reports failure only by throwing, catch at that
+  call alone and translate it to a code. Iostreams report parse failures
+  this way, which brings in the JSON and property wrappers that read and
+  write through them, for standard file and console streaming.
 - **Maximal `noexcept`.** Every function is `NOEXCEPT` (section 3). In
-  release builds `NOEXCEPT` is `noexcept`, so an exception that escapes
-  terminates the process at its source rather than unwinding through code
-  that never planned for it. In debug builds it is empty.
+  release builds `NOEXCEPT` is `noexcept`, for performance: the compiler
+  does not prepare every call to unwind. An exception that escapes
+  terminates the process at its source, and a core dump still holds the
+  stack. In debug builds `NOEXCEPT` is empty.
 - **Never collapse error conditions.** When you expect a specific failure,
   test for that one (`errno == ENOSPC`). Every other failure is a different
   condition, normally a fault.
