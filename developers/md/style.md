@@ -355,12 +355,12 @@ where it occurs, so that it is fixed rather than carried.
   it is. Never discard a code, return success on failure, or substitute a
   default for a failed result.
 - **No structured exception handling.** Errors are values, a `code` or a
-  `bool`, and are never thrown and caught for control flow. libbitcoin
-  throws no exceptions of its own. Where an external API (the standard
-  library or the platform) reports failure only by throwing, catch at that
-  call alone and translate it to a code. Iostreams report parse failures
-  this way, which brings in the JSON and property wrappers that read and
-  write through them, for standard file and console streaming.
+  `bool`, and are never thrown and caught for control flow. Exceptions
+  are used only where an external API (the standard library or the
+  platform) requires them: throw where it expects a throw, catch at the
+  call where it throws, and translate to a code. Iostreams report parse
+  failures this way, which brings in the JSON and property wrappers that
+  read and write through them, for standard file and console streaming.
 - **Maximal `noexcept`.** Every function is `NOEXCEPT` (section 3). In
   release builds `NOEXCEPT` is `noexcept`, for performance: the compiler
   does not prepare every call to unwind. An exception that escapes
