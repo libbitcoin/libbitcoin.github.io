@@ -338,15 +338,9 @@ To connect to a secure ZMQ port, a client must be configured with the server's p
         });
       };
       get("/v1/top?format=json").then(function (text) {
-        var top = JSON.parse(text);
-        var height = typeof top === "number" ? top : top.confirmed.height;
-        row.cells[2].textContent = height.toLocaleString("en-US");
-        if (top.confirmed && top.confirmed.header) return top.confirmed.header;
-        var header = function (text) { return JSON.parse(text); };
-        return get("/v1/block/confirmed/" + height + "/header?format=json").then(header).catch(function () {
-          return get("/v1/block/height/" + height + "/header?format=json").then(header);
-        });
-      }).then(function (header) {
+        var top = JSON.parse(text).confirmed;
+        row.cells[2].textContent = top.height.toLocaleString("en-US");
+        var header = top.header;
         var current = header.timestamp * 1000 >= Date.now() - window_;
         settle(host + " " + chain, current);
         row.cells[2].className = current ? "scan-up" : "scan-some";
