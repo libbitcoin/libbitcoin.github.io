@@ -26,5 +26,8 @@ forms (TLS, or CurveZMQ for ZMTPS) on another. P2P serves P2P and P2PS
 [Client Compatibility](clients) records which clients have been run
 against each interface.
 
+[Standards Deviations](deviations) records where the interfaces depart
+from HTTP, TLS, WebSocket, JSON and JSON-RPC, and for which clients.
+
 To enable an interface, and to secure it, see
 [Configuration](../configuration/index).

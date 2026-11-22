@@ -77,6 +77,7 @@ SITE_MENU = [
         ("interfaces/stratum-v1.html", "Stratum v1"),
         ("interfaces/stratum-v2.html", "Stratum v2"),
         ("interfaces/clients.html", "Client Compatibility"),
+        ("interfaces/deviations.html", "Standards Deviations"),
     ]),
     ("Client", [
         ("client/commands.html", "BX Commands"),
@@ -398,6 +399,7 @@ SECTIONS = {
             ("stratum-v1", "Stratum v1"),
             ("stratum-v2", "Stratum v2"),
             ("clients", "Client Compatibility"),
+            ("deviations", "Standards Deviations"),
         ],
     },
 }
