@@ -442,8 +442,10 @@ can subscribe to any of them. bitcoind instead binds an address for each
 topic, set by its <code>-zmqpub</code> options.</p>
 <p>A subscription is a topic prefix. The empty prefix subscribes to every
 topic, and <code>raw</code> to both <code>rawblock</code> and <code>rawtx</code>. Topics with no
-subscription are not sent. Cancelling a prefix stops every topic it
-matches, even one also matched by another subscription.</p>
+subscription are not sent. Each subscription counts, and a cancel
+removes one subscription of the same prefix, so a topic is sent while any
+remaining subscription matches it. Subscribing to a prefix twice requires
+two cancels.</p>
 <p><code>zmq.maximum_subscriptions</code> (default 100) limits the subscribe
 commands of one connection. Each counts, and each cancel releases one.
 Exceeding it closes the connection.</p>

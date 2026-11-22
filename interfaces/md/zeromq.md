@@ -45,8 +45,10 @@ topic, set by its `-zmqpub` options.
 
 A subscription is a topic prefix. The empty prefix subscribes to every
 topic, and `raw` to both `rawblock` and `rawtx`. Topics with no
-subscription are not sent. Cancelling a prefix stops every topic it
-matches, even one also matched by another subscription.
+subscription are not sent. Each subscription counts, and a cancel
+removes one subscription of the same prefix, so a topic is sent while any
+remaining subscription matches it. Subscribing to a prefix twice requires
+two cancels.
 
 `zmq.maximum_subscriptions` (default 100) limits the subscribe
 commands of one connection. Each counts, and each cancel releases one.
