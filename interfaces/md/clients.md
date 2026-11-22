@@ -24,16 +24,16 @@ Each client links to its notes (§3).
 
 | Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | ------- | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
+| [BTCPay Server](#btcpay-server) | Payment processor | 2.4.7 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | | | | <span class="works" title="Works">✔</span> |
+| [Electrum](#electrum) | Wallet | 4.8.4 | <span class="nw">2026-11-22</span> | | <span class="partial" title="Partial">◑</span> | | | | | | | |
+| [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span class="blocked" title="Blocked">✘</span> | | <span class="works" title="Works">✔</span> | | | |
+| [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
 | [lnd](#lnd) | Lightning node | 0.21.8 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | <span class="partial" title="Partial">◑</span> | | <span class="works" title="Works">✔</span> |
+| [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-21</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
+| [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span class="blocked" title="Blocked">✘</span> | <span class="works" title="Works">✔</span> | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [Sparrow Wallet](#sparrow-wallet) | Wallet | | <span class="nw">2026-10</span> | | <span class="works" title="Works">✔</span> | <span class="works" title="Works">✔</span> | | | | | | |
 | [Specter Desktop](#specter-desktop) | Wallet | 2.3.0 | <span class="nw">2026-11-16</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | | |
-| [Electrum](#electrum) | Wallet | 4.8.4 | <span class="nw">2026-11-22</span> | | <span class="partial" title="Partial">◑</span> | | | | | | | |
-| [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span class="blocked" title="Blocked">✘</span> | <span class="works" title="Works">✔</span> | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
-| [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
-| [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span class="blocked" title="Blocked">✘</span> | | <span class="works" title="Works">✔</span> | | | |
-| [BTCPay Server](#btcpay-server) | Payment processor | 2.4.7 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | | | | <span class="works" title="Works">✔</span> |
-| [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-21</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
-| [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
 
 ## 2. Untested
 
@@ -42,30 +42,30 @@ is not a test.
 
 | Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [BlueWallet](https://bluewallet.io) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Nunchuk](https://nunchuk.io) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Stack Wallet](https://stackwallet.com) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Blockstream app](https://blockstream.com/app/) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [BitBoxApp](https://bitbox.swiss/app/) | Hardware wallet app | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Trezor Suite](https://trezor.io/trezor-suite) | Hardware wallet app | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Liana](https://wizardsardine.com/liana/) | Wallet | | <span class="expected" title="Expected">○</span> | | <span class="no" title="No">⊘</span> | | | | | |
-| [Wasabi Wallet](https://wasabiwallet.io) | Wallet | | | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
-| [Aqua](https://aqua.net) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Phoenix](https://phoenix.acinq.co) | Lightning wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Bitkit](https://bitkit.to) | Lightning wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
-| [Zeus](https://zeusln.com) | Lightning wallet | | | | | | | | | <span class="expected" title="Expected">○</span> |
-| [Blixt](https://blixtwallet.com) | Lightning wallet | | | | | | | | | <span class="expected" title="Expected">○</span> |
 | [Alby Hub](https://albyhub.com) | Lightning node | | | | | | | | <span class="expected" title="Expected">○</span> | |
-| [Core Lightning](https://corelightning.org) | Lightning node | | | | <span class="expected" title="Expected">○</span> | | | | | |
-| [btcwallet](https://github.com/btcsuite/btcwallet) | Wallet daemon | | | | | | | <span class="partial" title="Partial">◑</span> | | |
-| [LDK Node](https://lightningdevkit.org) | Lightning library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> | | | <span class="expected" title="Expected">○</span> | |
-| [BDK](https://bitcoindevkit.org) | Wallet library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> |
-| [Fedimint](https://fedimint.org) | Federation | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | |
+| [Aqua](https://aqua.net) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [Ashigaru Dojo](https://ashigaru.rs) | Wallet backend | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | |
-| [electrs](https://github.com/romanz/electrs) | Electrum server | | | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
+| [BDK](https://bitcoindevkit.org) | Wallet library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> |
+| [BitBoxApp](https://bitbox.swiss/app/) | Hardware wallet app | | <span class="expected" title="Expected">○</span> | | | | | | | |
+| [Bitkit](https://bitkit.to) | Lightning wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
+| [Blixt](https://blixtwallet.com) | Lightning wallet | | | | | | | | | <span class="expected" title="Expected">○</span> |
+| [Blockstream app](https://blockstream.com/app/) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
+| [BlueWallet](https://bluewallet.io) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [BTC RPC Explorer](https://github.com/janoside/btc-rpc-explorer) | Explorer | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | | |
-| [ord](https://github.com/ordinals/ord) | Index | | | | <span class="expected" title="Expected">○</span> | | | | | |
+| [btcwallet](https://github.com/btcsuite/btcwallet) | Wallet daemon | | | | | | | <span class="partial" title="Partial">◑</span> | | |
+| [Core Lightning](https://corelightning.org) | Lightning node | | | | <span class="expected" title="Expected">○</span> | | | | | |
+| [electrs](https://github.com/romanz/electrs) | Electrum server | | | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
+| [Fedimint](https://fedimint.org) | Federation | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | |
 | [Floresta](https://github.com/getfloresta/Floresta) | Utreexo node | | | | | | | | | <span class="no" title="No">⊘</span> |
+| [LDK Node](https://lightningdevkit.org) | Lightning library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> | | | <span class="expected" title="Expected">○</span> | |
+| [Liana](https://wizardsardine.com/liana/) | Wallet | | <span class="expected" title="Expected">○</span> | | <span class="no" title="No">⊘</span> | | | | | |
+| [Nunchuk](https://nunchuk.io) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
+| [ord](https://github.com/ordinals/ord) | Index | | | | <span class="expected" title="Expected">○</span> | | | | | |
+| [Phoenix](https://phoenix.acinq.co) | Lightning wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
+| [Stack Wallet](https://stackwallet.com) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
+| [Trezor Suite](https://trezor.io/trezor-suite) | Hardware wallet app | | <span class="expected" title="Expected">○</span> | | | | | | | |
+| [Wasabi Wallet](https://wasabiwallet.io) | Wallet | | | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
+| [Zeus](https://zeusln.com) | Lightning wallet | | | | | | | | | <span class="expected" title="Expected">○</span> |
 
 Custodial wallets, and wallets bound to their provider's backend, have
 no server setting and are not listed. Node platforms such as Umbrel,
