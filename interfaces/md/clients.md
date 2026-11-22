@@ -24,14 +24,14 @@ Each client links to its notes (§3).
 
 | Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | ------- | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [lnd](#lnd) (bitcoind) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | |
-| [lnd](#lnd) (neutrino) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
-| [lnd](#lnd) (btcd) | Lightning node | 0.21.6 | <span class="nw">2026-11-07</span> | | | | | | | <span class="partial" title="Partial">◑</span> | | |
+| [lnd](#lnd) | Lightning node | 0.21.8 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | <span class="partial" title="Partial">◑</span> | | <span class="works" title="Works">✔</span> |
 | [Sparrow Wallet](#sparrow-wallet) | Wallet | | <span class="nw">2026-10</span> | | <span class="works" title="Works">✔</span> | <span class="works" title="Works">✔</span> | | | | | | |
 | [Specter Desktop](#specter-desktop) | Wallet | 2.3.0 | <span class="nw">2026-11-16</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | | |
+| [Electrum](#electrum) | Wallet | 4.8.4 | <span class="nw">2026-11-22</span> | | <span class="partial" title="Partial">◑</span> | | | | | | | |
 | [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span class="blocked" title="Blocked">✘</span> | <span class="works" title="Works">✔</span> | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
 | [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span class="blocked" title="Blocked">✘</span> | | <span class="works" title="Works">✔</span> | | | |
+| [BTCPay Server](#btcpay-server) | Payment processor | 2.4.7 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | | | | <span class="works" title="Works">✔</span> |
 | [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-21</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
 | [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
 
@@ -42,7 +42,6 @@ is not a test.
 
 | Client | Kind | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| [Electrum](https://electrum.org) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [BlueWallet](https://bluewallet.io) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [Nunchuk](https://nunchuk.io) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [Stack Wallet](https://stackwallet.com) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
@@ -62,7 +61,6 @@ is not a test.
 | [LDK Node](https://lightningdevkit.org) | Lightning library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> | | | <span class="expected" title="Expected">○</span> | |
 | [BDK](https://bitcoindevkit.org) | Wallet library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> |
 | [Fedimint](https://fedimint.org) | Federation | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | |
-| [BTCPay Server](https://btcpayserver.org) | Payment processor | | | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [Ashigaru Dojo](https://ashigaru.rs) | Wallet backend | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | |
 | [electrs](https://github.com/romanz/electrs) | Electrum server | | | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [BTC RPC Explorer](https://github.com/janoside/btc-rpc-explorer) | Explorer | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | | |
@@ -101,6 +99,15 @@ both open. With them, a 368,000-block wallet rescan found the same 397
 transactions as the neutrino backend, and the lnd integration suite gives
 identical results against btcd with and without them.
 
+**Retest with 0.21.8:** sync, `newaddress` and restart work on the
+bitcoind and neutrino backends, and the chain notifier delivered every
+confirmation and spend notification for pool transactions when their
+block arrived. Republishing a transaction that is already pooled or
+confirmed (`wallet publishtx`) succeeds on the bitcoind backend. On the
+btcd backend it fails, because the [btcd](btcd) interface reports
+bitcoind's reject reasons (`txn-already-in-mempool`, `txn-already-known`)
+and btcwallet maps only btcd's texts for that backend.
+
 ### Sparrow Wallet
 
 Wallets load, and silent payment wallets are scanned and notified over
@@ -117,6 +124,19 @@ and the same balance. Spectrum makes its requests one at a time, so its
 sync time grows with the round trip time to the server. In Core mode
 Specter keeps its wallets in the node, which requires bitcoind's wallet
 methods.
+
+### Electrum
+
+A watch-only wallet of 45 addresses (P2PKH, P2SH, P2WPKH, P2WSH, P2TR,
+from 2015 to the pool, up to 150 transactions each) synced in 30
+seconds. All 541 transactions it shared with a public Electrum server
+were identical in amount, fee, height, position and confirmations, the
+confirmed balance matched, and the wallet verified every header and
+merkle proof. Partial for the pool: a transaction that has left the
+`bs` pool, such as the loser of a double spend, is still reported as
+unconfirmed by `blockchain.scripthash.get_mempool` and `listunspent`,
+and `blockchain.scripthash.get_balance` reports no unconfirmed amount.
+Sending was not tested.
 
 ### SatSage
 
@@ -157,6 +177,18 @@ indexed half of mainnet (to height 483,000) at about 9 blocks a second,
 with ZMQ block notifications. `bs` serves the Electrum interface itself,
 so Fulcrum is not needed in front of it.
 
+### BTCPay Server
+
+BTCPay Server 2.4.7 with NBXplorer 2.6.23, whose indexer reads the chain
+and pool over P2P and checks them over bitcoind JSON-RPC. NBXplorer
+synced, and the store, wallet, invoice addresses and the UTXO rescan of
+an xpub (`scantxoutset`, identical outputs to Bitcoin Core) worked. Every
+five minutes NBXplorer tests its pending transactions with
+[`testmempoolaccept`](bitcoind-rpc#testmempoolaccept), and `bs` gives
+Bitcoin Core's reject reasons for pooled, confirmed and conflicted
+transactions, so pending payments stay pending. NBXplorer warns that it
+is not whitelisted by the node, which is harmless.
+
 ### mempool
 
 The mempool backend in its `electrum` mode, which reads blocks,
@@ -174,9 +206,8 @@ and the ancestors and descendants matched
 [`getmempoolancestors`](bitcoind-rpc#getmempoolancestors) and
 [`getmempooldescendants`](bitcoind-rpc#getmempooldescendants), except
 where `bs` holds two spends of one output: mempool links one spender,
-so it lists one relative fewer. Address pool totals are zero until
-[libbitcoin/libbitcoin-database#1094](https://github.com/libbitcoin/libbitcoin-database/pull/1094),
-as the Electrum balance returned no unconfirmed amount.
+so it lists one relative fewer. Address pool totals are zero, as the
+Electrum balance reports no unconfirmed amount.
 
 The differences from mempool.space are those of this backend mode,
 and the same with Bitcoin Core: spent outputs without the spending
