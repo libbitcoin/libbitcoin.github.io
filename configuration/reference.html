@@ -904,16 +904,28 @@ use_gpu = true
 <pre><code class="language-ini"><span class="section">[pool]</span>
 <span class="comment"># Virtual bytes charged per signature operation, defaults to '20'.</span>
 bytes_per_sigop = 20
+<span class="comment"># Declared sigops of the miner's coinbase transaction, defaults to '400'.</span>
+coinbase_sigops = 400
 <span class="comment"># Declared weight of the miner's coinbase transaction, defaults to '2000'.</span>
 coinbase_weight = 2000
 <span class="comment"># Fee rate on space when resolving template conflicts, defaults to '0'.</span>
 cutoff_rate = 0
+<span class="comment"># Seconds that fee estimates share a projection of the pool, defaults to '7' (0 disables).</span>
+estimate_cache_seconds = 7
+<span class="comment"># Virtual bytes of block room below a fee estimate's rate, defaults to '1000'.</span>
+estimate_room = 1000
 <span class="comment"># Maximum ancestor depth of a block template chunk, defaults to '25'.</span>
 maximum_chunk_depth = 25
 <span class="comment"># Maximum conflict outcomes evaluated to accept a transaction, defaults to '1024'.</span>
 maximum_outcomes = 1024
 <span class="comment"># Minimum fee rate for non-conflicting tx acceptance, defaults to '0.000001'.</span>
 minimum_fee_rate = 0.000001
+<span class="comment"># Satoshis of fee increase a block template must exceed to be replaced, defaults to '0'.</span>
+template_fee_increase = 0
+<span class="comment"># Seconds between replacements of a demanded block template, defaults to '30' (0 disables).</span>
+template_interval_seconds = 30
+<span class="comment"># Set the transaction pool thread to high processing priority, defaults to 'true'.</span>
+thread_priority = true
 </code></pre>
 <h2 id="8-network">8. <code>[network]</code><a class="anchor" href="#8-network" aria-label="Link to this section">#</a></h2>
 <p>Settings shared by all P2P connections: threads, connection timing, send rate, and address allow and deny lists.</p>
@@ -972,12 +984,16 @@ handshake_timeout_seconds = 15
 identifier = 3652501241
 <span class="comment"># The advertised services that cause a peer to be dropped, defaults to '268435632'.</span>
 invalid_services = 268435632
+<span class="comment"># Maximum unanswered tx requests of a peer before it is dropped, defaults to '500000'.</span>
+maximum_requests = 500000
 <span class="comment"># The maximum allowable channel clock skew, defaults to '120'.</span>
 maximum_skew_minutes = 120
 <span class="comment"># The maximum network protocol version, defaults to '70016'.</span>
 protocol_maximum = 70016
 <span class="comment"># The minimum network protocol version, defaults to '31800'.</span>
 protocol_minimum = 31800
+<span class="comment"># Seconds a peer has to answer its oldest tx request, defaults to '60' (0 disables).</span>
+request_timeout_seconds = 60
 <span class="comment"># The node user agent string, defaults to '/libbitcoin:4.0.10444/'.</span>
 user_agent = /libbitcoin:4.0.10444/
 <span class="comment"># Validate the checksum of network messages, defaults to 'false'.</span>

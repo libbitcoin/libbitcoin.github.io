@@ -571,16 +571,28 @@ The transaction pool: fee policy, conflict resolution, and the block template.
 [pool]
 # Virtual bytes charged per signature operation, defaults to '20'.
 bytes_per_sigop = 20
+# Declared sigops of the miner's coinbase transaction, defaults to '400'.
+coinbase_sigops = 400
 # Declared weight of the miner's coinbase transaction, defaults to '2000'.
 coinbase_weight = 2000
 # Fee rate on space when resolving template conflicts, defaults to '0'.
 cutoff_rate = 0
+# Seconds that fee estimates share a projection of the pool, defaults to '7' (0 disables).
+estimate_cache_seconds = 7
+# Virtual bytes of block room below a fee estimate's rate, defaults to '1000'.
+estimate_room = 1000
 # Maximum ancestor depth of a block template chunk, defaults to '25'.
 maximum_chunk_depth = 25
 # Maximum conflict outcomes evaluated to accept a transaction, defaults to '1024'.
 maximum_outcomes = 1024
 # Minimum fee rate for non-conflicting tx acceptance, defaults to '0.000001'.
 minimum_fee_rate = 0.000001
+# Satoshis of fee increase a block template must exceed to be replaced, defaults to '0'.
+template_fee_increase = 0
+# Seconds between replacements of a demanded block template, defaults to '30' (0 disables).
+template_interval_seconds = 30
+# Set the transaction pool thread to high processing priority, defaults to 'true'.
+thread_priority = true
 ```
 
 ## 8. `[network]`
@@ -647,12 +659,16 @@ handshake_timeout_seconds = 15
 identifier = 3652501241
 # The advertised services that cause a peer to be dropped, defaults to '268435632'.
 invalid_services = 268435632
+# Maximum unanswered tx requests of a peer before it is dropped, defaults to '500000'.
+maximum_requests = 500000
 # The maximum allowable channel clock skew, defaults to '120'.
 maximum_skew_minutes = 120
 # The maximum network protocol version, defaults to '70016'.
 protocol_maximum = 70016
 # The minimum network protocol version, defaults to '31800'.
 protocol_minimum = 31800
+# Seconds a peer has to answer its oldest tx request, defaults to '60' (0 disables).
+request_timeout_seconds = 60
 # The node user agent string, defaults to '/libbitcoin:4.0.10444/'.
 user_agent = /libbitcoin:4.0.10444/
 # Validate the checksum of network messages, defaults to 'false'.
