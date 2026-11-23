@@ -522,6 +522,13 @@ known departures.</p>
 <td>Rejected: every HTTP/1.1 response is chunked (<a href="clients.html#fulcrum">Client Compatibility</a>)</td>
 </tr>
 <tr>
+<td>Rust <code>jsonrpc</code> crate</td>
+<td>HTTP/1.1 (<a href="https://www.rfc-editor.org/rfc/rfc9112.txt">RFC 9112 §6.1</a>)</td>
+<td>A client reads a chunked response body.</td>
+<td>Its default transport does not, so neither do <code>bitcoincore-rpc</code> and the clients built on it, such as BDK and electrs. bitcoind never sends one.</td>
+<td>Rejected: every HTTP/1.1 response is chunked (<a href="clients.html#bdk">Client Compatibility</a>)</td>
+</tr>
+<tr>
 <td>bitcoind clients</td>
 <td>JSON (<a href="https://www.rfc-editor.org/rfc/rfc8259.txt">RFC 8259 §6</a>)</td>
 <td>A number may be written with a fraction or exponent.</td>
@@ -529,11 +536,11 @@ known departures.</p>
 <td>Accommodated: integers are written without either</td>
 </tr>
 <tr>
-<td>bitcoind clients</td>
+<td>Core Lightning</td>
 <td>JSON (<a href="https://www.rfc-editor.org/rfc/rfc8259.txt">RFC 8259 §6</a>)</td>
 <td>A number may be written with any number of fraction digits.</td>
-<td>Some refuse an amount that is not an eight place decimal. bitcoind writes exactly eight places.</td>
-<td>Accommodated: amounts are written in bitcoin with exactly eight places, such as <code>0.00010000</code></td>
+<td>Refuses an amount that is not an eight place decimal. bitcoind writes exactly eight places.</td>
+<td>Accommodated: amounts are written in bitcoin with exactly eight places, such as <code>0.00010000</code> (<a href="clients.html#core-lightning">Client Compatibility</a>)</td>
 </tr>
 <tr>
 <td>bitcoind clients</td>

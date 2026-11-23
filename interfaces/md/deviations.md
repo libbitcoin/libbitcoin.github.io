@@ -74,8 +74,9 @@ Where a client departs from a standard.
 | Client | Standard | Requirement | Departure | bs |
 | ------ | -------- | ----------- | --------- | -- |
 | Fulcrum | HTTP/1.1 ([RFC 9112 §6.1](https://www.rfc-editor.org/rfc/rfc9112.txt)) | A client reads a chunked response body. | Fulcrum does not. bitcoind never sends one. | Rejected: every HTTP/1.1 response is chunked ([Client Compatibility](clients#fulcrum)) |
+| Rust `jsonrpc` crate | HTTP/1.1 ([RFC 9112 §6.1](https://www.rfc-editor.org/rfc/rfc9112.txt)) | A client reads a chunked response body. | Its default transport does not, so neither do `bitcoincore-rpc` and the clients built on it, such as BDK and electrs. bitcoind never sends one. | Rejected: every HTTP/1.1 response is chunked ([Client Compatibility](clients#bdk)) |
 | bitcoind clients | JSON ([RFC 8259 §6](https://www.rfc-editor.org/rfc/rfc8259.txt)) | A number may be written with a fraction or exponent. | Some refuse an integer so written. bitcoind writes neither. | Accommodated: integers are written without either |
-| bitcoind clients | JSON ([RFC 8259 §6](https://www.rfc-editor.org/rfc/rfc8259.txt)) | A number may be written with any number of fraction digits. | Some refuse an amount that is not an eight place decimal. bitcoind writes exactly eight places. | Accommodated: amounts are written in bitcoin with exactly eight places, such as `0.00010000` |
+| Core Lightning | JSON ([RFC 8259 §6](https://www.rfc-editor.org/rfc/rfc8259.txt)) | A number may be written with any number of fraction digits. | Refuses an amount that is not an eight place decimal. bitcoind writes exactly eight places. | Accommodated: amounts are written in bitcoin with exactly eight places, such as `0.00010000` ([Client Compatibility](clients#core-lightning)) |
 | bitcoind clients | JSON ([RFC 8259 §6](https://www.rfc-editor.org/rfc/rfc8259.txt)) | A number may be written with an exponent. | Some refuse a floating point value so written. bitcoind writes fixed notation. | Accommodated: other floating point values are written in fixed notation |
 
 JSON has one number type. `1`, `1.0` and `1.00000000` are the same
