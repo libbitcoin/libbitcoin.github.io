@@ -484,27 +484,36 @@ boolean read as 0 (`false`) or 1 (`true`), and may be named `verbose`.
 ### sendrawtransaction
 
 Submits a transaction to the memory pool. **Parameters:** `hexstring`,
-`maxfeerate`, `maxburnamount` (amounts, both ignored). **Result:** the
-transaction hash. The pool accepts transactions only when the node is
-current. Errors carry bitcoind's messages: "TX decode failed. Make sure
-the tx has at least one input." (-22), "Inputs missing or spent" (-25),
+`maxfeerate` (0.10 bitcoin per thousand virtual bytes, 0 disables),
+`maxburnamount` (0). **Result:** the transaction hash. The pool accepts
+transactions only when the node is current. Errors carry bitcoind's
+messages: "TX decode failed. Make sure the tx has at least one input."
+(-22), "Unspendable output exceeds maximum configured by user
+(maxburnamount)" (-25), "Fee exceeds maximum configured by user (e.g.
+-maxtxfee, maxfeerate)" (-25), "Inputs missing or spent" (-25),
 "Transaction outputs already in utxo set" (-27), and otherwise the reject
 reason (-26).
 
 ### testmempoolaccept
 
 Tests whether transactions would be accepted to the memory pool.
-**Parameters:** `rawtxs`, `maxfeerate` (an amount, ignored). **Result:** for each,
+**Parameters:** `rawtxs`, `maxfeerate` (0.10 bitcoin per thousand
+virtual bytes, 0 disables). **Result:** for each,
 `{"txid", "wtxid", "allowed", "reject-reason"}`. The transactions are
 tested as one package. As by bitcoind, `reject-reason` is
 `txn-already-in-mempool` for a pooled transaction, `txn-already-known` for
 a confirmed one with an unspent output, `missing-inputs` for unknown or
-spent inputs, and otherwise the reject reason.
+spent inputs, `max-fee-exceeded` for one above `maxfeerate`, and
+otherwise the reject reason.
 
 ### submitpackage
 
 Submits a package of up to 25 transactions to the memory pool.
-**Parameters:** `package`, `maxfeerate`, `maxburnamount` (amounts, both ignored).
+**Parameters:** `package`, `maxfeerate` (0.10 bitcoin per thousand virtual
+bytes, 0 disables), `maxburnamount` (0). An unspendable output above
+`maxburnamount` is refused with "Unspendable output exceeds maximum
+configured by user (maxburnamount)" (-25), and a transaction whose fee
+rate exceeds `maxfeerate` fails the package with "max feerate exceeded".
 
 ### createrawtransaction
 
@@ -742,7 +751,7 @@ none. Every topic is published on every `[zmq]` address.
 | Methods | Reason | Error |
 | ------- | ------ | ----- |
 | Wallet methods, `signrawtransactionwithkey`, `descriptorprocesspsbt`, `signmessagewithprivkey` | Signing belongs in the wallet, so private keys never reach the server | -32601 |
-| `prioritisetransaction`, `getprioritisedtransactions`, `getmempoolcluster` | Prioritisation and clusters order pool transactions by their dependencies, which requires the transaction graph of the version 5 pool | -33 |
+| `prioritisetransaction`, `getprioritisedtransactions`, `getmempoolcluster` | Not yet implemented | -33 |
 | `invalidateblock`, `reconsiderblock` | The store does not record a valid block as invalid by command | -32601 |
 | `pruneblockchain` | Dynamic pruning is not supported | -1 |
 | `dumptxoutset`, `loadtxoutset` | These serve assumeutxo, which starts a node from an output set it has not validated | -32601 |

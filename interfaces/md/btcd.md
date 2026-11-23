@@ -296,7 +296,7 @@ btcd deprecates this method in favor of `loadtxfilter` with
 
 | Methods | Reason | Error |
 | ------- | ------ | ----- |
-| `generate`, `getgenerate`, `setgenerate`, `gethashespersec` | Mining awaits the transaction graph of the version 5 pool | -32601 |
+| `generate`, `getgenerate`, `setgenerate`, `gethashespersec` | Not yet implemented | -32601 |
 | `debuglevel` | Log levels are set by configuration | -32601 |
 
 ## 8. Differences from btcd

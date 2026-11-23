@@ -961,23 +961,32 @@ Transactions that are rejected are skipped.</p>
 boolean read as 0 (<code>false</code>) or 1 (<code>true</code>), and may be named <code>verbose</code>.</p>
 <h3 id="sendrawtransaction">sendrawtransaction<a class="anchor" href="#sendrawtransaction" aria-label="Link to this section">#</a></h3>
 <p>Submits a transaction to the memory pool. <strong>Parameters:</strong> <code>hexstring</code>,
-<code>maxfeerate</code>, <code>maxburnamount</code> (amounts, both ignored). <strong>Result:</strong> the
-transaction hash. The pool accepts transactions only when the node is
-current. Errors carry bitcoind's messages: "TX decode failed. Make sure
-the tx has at least one input." (-22), "Inputs missing or spent" (-25),
+<code>maxfeerate</code> (0.10 bitcoin per thousand virtual bytes, 0 disables),
+<code>maxburnamount</code> (0). <strong>Result:</strong> the transaction hash. The pool accepts
+transactions only when the node is current. Errors carry bitcoind's
+messages: "TX decode failed. Make sure the tx has at least one input."
+(-22), "Unspendable output exceeds maximum configured by user
+(maxburnamount)" (-25), "Fee exceeds maximum configured by user (e.g.
+-maxtxfee, maxfeerate)" (-25), "Inputs missing or spent" (-25),
 "Transaction outputs already in utxo set" (-27), and otherwise the reject
 reason (-26).</p>
 <h3 id="testmempoolaccept">testmempoolaccept<a class="anchor" href="#testmempoolaccept" aria-label="Link to this section">#</a></h3>
 <p>Tests whether transactions would be accepted to the memory pool.
-<strong>Parameters:</strong> <code>rawtxs</code>, <code>maxfeerate</code> (an amount, ignored). <strong>Result:</strong> for each,
+<strong>Parameters:</strong> <code>rawtxs</code>, <code>maxfeerate</code> (0.10 bitcoin per thousand
+virtual bytes, 0 disables). <strong>Result:</strong> for each,
 <code>{"txid", "wtxid", "allowed", "reject-reason"}</code>. The transactions are
 tested as one package. As by bitcoind, <code>reject-reason</code> is
 <code>txn-already-in-mempool</code> for a pooled transaction, <code>txn-already-known</code> for
 a confirmed one with an unspent output, <code>missing-inputs</code> for unknown or
-spent inputs, and otherwise the reject reason.</p>
+spent inputs, <code>max-fee-exceeded</code> for one above <code>maxfeerate</code>, and
+otherwise the reject reason.</p>
 <h3 id="submitpackage">submitpackage<a class="anchor" href="#submitpackage" aria-label="Link to this section">#</a></h3>
 <p>Submits a package of up to 25 transactions to the memory pool.
-<strong>Parameters:</strong> <code>package</code>, <code>maxfeerate</code>, <code>maxburnamount</code> (amounts, both ignored).</p>
+<strong>Parameters:</strong> <code>package</code>, <code>maxfeerate</code> (0.10 bitcoin per thousand virtual
+bytes, 0 disables), <code>maxburnamount</code> (0). An unspendable output above
+<code>maxburnamount</code> is refused with "Unspendable output exceeds maximum
+configured by user (maxburnamount)" (-25), and a transaction whose fee
+rate exceeds <code>maxfeerate</code> fails the package with "max feerate exceeded".</p>
 <h3 id="createrawtransaction">createrawtransaction<a class="anchor" href="#createrawtransaction" aria-label="Link to this section">#</a></h3>
 <p>Creates an unsigned transaction. <strong>Parameters:</strong> <code>inputs</code>, <code>outputs</code>,
 <code>locktime</code> (0), <code>replaceable</code> (<code>true</code>), <code>version</code> (2).</p>
@@ -1134,7 +1143,7 @@ none. Every topic is published on every <code>[zmq]</code> address.</p>
 </tr>
 <tr>
 <td><code>prioritisetransaction</code>, <code>getprioritisedtransactions</code>, <code>getmempoolcluster</code></td>
-<td>Prioritisation and clusters order pool transactions by their dependencies, which requires the transaction graph of the version 5 pool</td>
+<td>Not yet implemented</td>
 <td>-33</td>
 </tr>
 <tr>
