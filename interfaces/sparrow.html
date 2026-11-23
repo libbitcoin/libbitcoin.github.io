@@ -61,6 +61,8 @@
     --ink: #ededed; --ink-2: #cfcfcf; --ink-3: #6a7282;
     --rule: #3a3c33; --rule-soft: #2e302a;
     --accent: #c85637; --heading: #ffa022; --proposed: #66d9ef;
+    --yes: #00bb7f; --partial: #ffa022; --pending: #4f8dff;
+    --rejected: #ff2357; --scope: #6a7282;
     --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
@@ -149,12 +151,24 @@
   .doc .proposed, .doc .proposed code, .doc .proposed-line, .doc .proposed-line span { color: var(--proposed); }
   .doc td code { white-space: nowrap; }
   .doc .nw { white-space: nowrap; }
+  .doc .works { color: var(--yes); }
+  .doc .partial { color: var(--partial); }
+  .doc .blocked { color: var(--rejected); }
+  .doc .retest { color: var(--pending); }
+  .doc .expected { color: var(--proposed); }
+  .doc .no { color: var(--scope); }
   .doc table.keys th:first-child, .doc table.keys td:first-child { width: 6em; }
 
   .mermaid { background: var(--surface); border: 1px solid #c856374d; border-radius: 3px; padding: 14px; margin: 0 0 18px; overflow-x: auto; text-align: center; }
   .mermaid svg { max-width: 100%; height: auto; }
   .doc img { display: block; width: 100%; height: auto; margin: 0 0 18px; border: 1px solid #c856374d; border-radius: 3px; cursor: zoom-in; }
   .doc a.figure { cursor: zoom-in; }
+  .doc table.platforms { width: auto; margin: 0; }
+  .doc table.platforms td { vertical-align: middle; }
+  .doc table.platforms td.verify { padding-left: 0; white-space: nowrap; }
+  .doc table.platforms td.verify a { display: inline-block; margin-right: 8px; color: var(--ink-3); vertical-align: middle; }
+  .doc table.platforms td.verify a:hover, .doc table.platforms td.verify a:focus { color: var(--accent); }
+  .doc table.platforms td.verify svg { display: block; }
   .doc a:not(.figure) img { display: inline-block; width: auto; height: 20px; margin: 0; border: 0; border-radius: 0; cursor: pointer; vertical-align: middle; }
   .mermaid:not([data-processed]) { font-family: var(--mono); font-size: 12px; text-align: left; white-space: pre; color: var(--ink-3); }
   .mermaid p, .mermaid span, .mermaid div { margin: 0; max-width: none; }
@@ -272,6 +286,7 @@
         <a href="../configuration/setups.html">Common Setups</a>
         <a href="../configuration/ports.html">Conventional Ports</a>
         <a href="../configuration/store.html">Store Settings</a>
+        <a href="../configuration/migration.html">Store Migration</a>
         <a href="../configuration/services.html">Service Settings</a>
         <a href="../configuration/performance.html">Performance Settings</a>
         <a href="../configuration/reference.html">Settings Reference</a>
@@ -309,12 +324,14 @@
         <a href="../interfaces/stratum-v1.html">Stratum v1</a>
         <a href="../interfaces/stratum-v2.html">Stratum v2</a>
         <a href="../interfaces/clients.html">Client Compatibility</a>
+        <a href="../interfaces/deviations.html">Standards Deviations</a>
       </div></details>
       <details class="drop" name="site"><summary>Client</summary><div>
         <a href="../client/commands.html">BX Commands</a>
       </div></details>
       <details class="drop" name="site"><summary>Developers</summary><div>
         <a href="../developers/index.html">Overview</a>
+        <a href="../lib/index.html">Libraries</a>
         <a href="../developers/contributing.html">Contributing</a>
         <a href="../developers/style.html">Style Guide</a>
         <a href="../developers/testing.html">Test Practices</a>
@@ -343,6 +360,7 @@
     <a href="stratum-v1.html">Stratum v1</a>
     <a href="stratum-v2.html">Stratum v2</a>
     <a href="clients.html">Client Compatibility</a>
+    <a href="deviations.html">Standards Deviations</a>
   </nav>
 
   <article class="doc">
@@ -413,7 +431,7 @@ Electrum version.</p>
 silent_start_height = 709632
 
 <span class="section">[sparrow]</span>
-bind = 127.0.0.1:8680
+bind = 127.0.0.1
 connections = 10
 </code></pre>
 <p>A subscription finds the transactions that pay a wallet. The wallet then
