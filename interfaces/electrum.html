@@ -902,7 +902,7 @@ to WS/S.</p>
 <pre class="console"><code>$ curl -d '[{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:0,&quot;method&quot;:&quot;server.version&quot;,&quot;params&quot;:[&quot;curl&quot;,&quot;1.7&quot;]},{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;blockchain.block.header&quot;,&quot;params&quot;:[1]}]' &quot;http://localhost:8580/&quot;
 </code></pre>
 <pre><code class="language-json">[
-    {&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 0, &quot;result&quot;: [&quot;/libbitcoin:4.0.x/&quot;, &quot;1.7&quot;]},
+    {&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 0, &quot;result&quot;: [&quot;Libbitcoin 4.0&quot;, &quot;1.7&quot;]},
     {&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 1, &quot;result&quot;: &quot;010000006fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000982051fd1e4ba744bbbe680e1fee14677ba1a3c3540bf7b1cdb606e857233e0e61bc6649ffff001d01e36299&quot;}
 ]
 </code></pre>
@@ -1064,9 +1064,10 @@ credentials and limits.</p>
 the server's minimum. From 1.6, the server ignores further parameters.</p>
 <pre><code class="language-json">{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 0, &quot;method&quot;: &quot;server.version&quot;, &quot;params&quot;: [&quot;Electrum 4.7.0&quot;, [&quot;1.4&quot;, &quot;1.6&quot;]]}
 </code></pre>
-<pre><code class="language-json">{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 0, &quot;result&quot;: [&quot;/libbitcoin:4.0.x/&quot;, &quot;1.6&quot;]}
+<pre><code class="language-json">{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;id&quot;: 0, &quot;result&quot;: [&quot;Libbitcoin 4.0&quot;, &quot;1.6&quot;]}
 </code></pre>
-<p>The server name is <code>electrum.server_name</code>.</p>
+<p>The server name is <code>electrum.server_name</code>, by default <code>Libbitcoin</code>
+followed by the server version (major.minor).</p>
 <h3 id="serverbanner">server.banner<a class="anchor" href="#serverbanner" aria-label="Link to this section">#</a></h3>
 <p>The server's banner, <code>electrum.banner_message</code>.</p>
 <p><strong>Versions:</strong> 1.0+. <strong>Parameters:</strong> none. <strong>Result:</strong> a string.</p>
@@ -1079,7 +1080,7 @@ the server's minimum. From 1.6, the server ignores further parameters.</p>
 <pre><code class="language-json">{
     &quot;genesis_hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
     &quot;hosts&quot;: {&quot;electrum.example.com&quot;: {&quot;tcp_port&quot;: 50001, &quot;ssl_port&quot;: 50002}},
-    &quot;server_version&quot;: &quot;/libbitcoin:4.0.x/&quot;,
+    &quot;server_version&quot;: &quot;Libbitcoin 4.0&quot;,
     &quot;protocol_min&quot;: &quot;1.0&quot;,
     &quot;protocol_max&quot;: &quot;1.7&quot;,
     &quot;pruning&quot;: null,

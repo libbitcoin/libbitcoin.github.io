@@ -153,7 +153,7 @@ $ curl -d '[{"jsonrpc":"2.0","id":0,"method":"server.version","params":["curl","
 
 ```json
 [
-    {"jsonrpc": "2.0", "id": 0, "result": ["/libbitcoin:4.0.x/", "1.7"]},
+    {"jsonrpc": "2.0", "id": 0, "result": ["Libbitcoin 4.0", "1.7"]},
     {"jsonrpc": "2.0", "id": 1, "result": "010000006fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000982051fd1e4ba744bbbe680e1fee14677ba1a3c3540bf7b1cdb606e857233e0e61bc6649ffff001d01e36299"}
 ]
 ```
@@ -254,10 +254,11 @@ the server's minimum. From 1.6, the server ignores further parameters.
 ```
 
 ```json
-{"jsonrpc": "2.0", "id": 0, "result": ["/libbitcoin:4.0.x/", "1.6"]}
+{"jsonrpc": "2.0", "id": 0, "result": ["Libbitcoin 4.0", "1.6"]}
 ```
 
-The server name is `electrum.server_name`.
+The server name is `electrum.server_name`, by default `Libbitcoin`
+followed by the server version (major.minor).
 
 ### server.banner
 
@@ -281,7 +282,7 @@ The server's features.
 {
     "genesis_hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
     "hosts": {"electrum.example.com": {"tcp_port": 50001, "ssl_port": 50002}},
-    "server_version": "/libbitcoin:4.0.x/",
+    "server_version": "Libbitcoin 4.0",
     "protocol_min": "1.0",
     "protocol_max": "1.7",
     "pruning": null,

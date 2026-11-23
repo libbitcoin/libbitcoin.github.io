@@ -1118,8 +1118,8 @@ rate_limit = 0
 #self_bind =
 # Advertised secure host:port at which this server can be reached (defaults to empty).
 #self_safe =
-# String returned by server.version, defaults to '/libbitcoin:4.0.10444/'.
-server_name = /libbitcoin:4.0.10444/
+# String returned by server.version, defaults to 'Libbitcoin 4.0'.
+server_name = Libbitcoin 4.0
 ```
 
 ## 19. `[sparrow]`
@@ -1188,8 +1188,8 @@ rate_limit = 0
 #self_bind =
 # Advertised secure host:port at which this server can be reached (defaults to empty).
 #self_safe =
-# String returned by server.version, defaults to '/libbitcoin:4.0.10444/'.
-server_name = /libbitcoin:4.0.10444/
+# String returned by server.version, defaults to 'Libbitcoin 4.0'.
+server_name = Libbitcoin 4.0
 ```
 
 ## 20. `[esplora]`
