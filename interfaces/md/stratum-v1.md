@@ -64,6 +64,35 @@ no payout address (the largest address output, P2PKH for the sigops),
 and 608 and 0 with a P2WPKH payout address. A configured value governs,
 as for an external miner using [`getblocktemplate`](bitcoind-rpc#getblocktemplate).
 
+### Start difficulty
+
+A connection starts at `minimum_difficulty`, which is also its floor.
+At difficulty 1 a 100 TH/s machine finds tens of thousands of shares a
+second. Vardiff raises the difficulty fourfold every 16 shares, so it
+converges in seconds, but it opens with a flood of shares. For ASICs, set
+`minimum_difficulty` near the miner's rate, its hash rate times
+`share_interval_seconds` divided by 2<sup>32</sup>: about 230,000 for a
+100 TH/s machine at the default 10 seconds.
+
+```ini
+[stratum_v1]
+minimum_difficulty = 230000
+```
+
+A miner may also request its difficulty with
+[`mining.suggest_difficulty`](#miningsuggest_difficulty), which is
+floored at `minimum_difficulty`.
+
+### Connection limits
+
+`expiration_minutes` (default 60) closes every connection after that
+time, and the miner reconnects with new jobs and its difficulty reset.
+`inactivity_minutes` (default 10) closes a connection from which nothing
+has been read for that time; jobs sent to the miner do not count. Set
+`expiration_minutes = 0` for miners, and raise `inactivity_minutes` above
+the longest expected time between shares
+([Service Settings](../configuration/services#5-limits)).
+
 ## 2. Methods
 
 | Method | Direction | Purpose |

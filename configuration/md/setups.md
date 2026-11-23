@@ -855,3 +855,36 @@ self = 198.51.100.20
   address twice does not change it.
 - On Linux the same routing tables and rules are required, since replies
   leave from the address the connection arrived on.
+
+## 19. Solo mining
+
+Stratum v1 on its default port, 8880, mining to one address, for a
+miner on the local network ([Stratum v1](../interfaces/stratum-v1)):
+
+```ini
+[stratum_v1]
+bind = 0.0.0.0
+connections = 10
+payout_address = bc1q...
+minimum_difficulty = 230000
+expiration_minutes = 0
+inactivity_minutes = 60
+```
+
+Point the miner at `stratum+tcp://<host>:8880`, with any worker name and
+password. Each job is a template of the next block from the transaction
+pool, and a share that meets the network target is submitted as a block
+paying `payout_address`. Without `payout_address`, each miner's worker
+name, `<address>.<worker>`, is its payout.
+
+- `minimum_difficulty` is the starting difficulty and its floor. Set it
+  near the miner's rate (hash rate times `share_interval_seconds`, 10,
+  divided by 2<sup>32</sup>), here for about 100 TH/s; leave it at 1 for a
+  small miner ([Start difficulty](../interfaces/stratum-v1#start-difficulty)).
+- `expiration_minutes = 0` keeps a miner connected, and
+  `inactivity_minutes` must exceed the time between its shares.
+- Miners connect over raw TCP, which carries no credentials, so leave
+  `credential` unset and limit access by `bind` address or firewall
+  ([Authentication](services#3-authentication)).
+- Like the other services, the binding accepts connections only once the
+  chain is current ([Until current](services#until-current)).

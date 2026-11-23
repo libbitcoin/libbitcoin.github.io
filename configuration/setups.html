@@ -1128,6 +1128,35 @@ self = 198.51.100.20
 <li>On Linux the same routing tables and rules are required, since replies
   leave from the address the connection arrived on.</li>
 </ul>
+<h2 id="19-solo-mining">19. Solo mining<a class="anchor" href="#19-solo-mining" aria-label="Link to this section">#</a></h2>
+<p>Stratum v1 on its default port, 8880, mining to one address, for a
+miner on the local network (<a href="../interfaces/stratum-v1.html">Stratum v1</a>):</p>
+<pre><code class="language-ini"><span class="section">[stratum_v1]</span>
+bind = 0.0.0.0
+connections = 10
+payout_address = bc1q...
+minimum_difficulty = 230000
+expiration_minutes = 0
+inactivity_minutes = 60
+</code></pre>
+<p>Point the miner at <code>stratum+tcp://&lt;host&gt;:8880</code>, with any worker name and
+password. Each job is a template of the next block from the transaction
+pool, and a share that meets the network target is submitted as a block
+paying <code>payout_address</code>. Without <code>payout_address</code>, each miner's worker
+name, <code>&lt;address&gt;.&lt;worker&gt;</code>, is its payout.</p>
+<ul>
+<li><code>minimum_difficulty</code> is the starting difficulty and its floor. Set it
+  near the miner's rate (hash rate times <code>share_interval_seconds</code>, 10,
+  divided by 2<sup>32</sup>), here for about 100 TH/s; leave it at 1 for a
+  small miner (<a href="../interfaces/stratum-v1.html#start-difficulty">Start difficulty</a>).</li>
+<li><code>expiration_minutes = 0</code> keeps a miner connected, and
+  <code>inactivity_minutes</code> must exceed the time between its shares.</li>
+<li>Miners connect over raw TCP, which carries no credentials, so leave
+  <code>credential</code> unset and limit access by <code>bind</code> address or firewall
+  (<a href="services.html#3-authentication">Authentication</a>).</li>
+<li>Like the other services, the binding accepts connections only once the
+  chain is current (<a href="services.html#until-current">Until current</a>).</li>
+</ul>
   </article>
 
   <nav class="pager"><a href="file.html">&larr; Configuration File</a><a href="ports.html">Conventional Ports &rarr;</a></nav>

@@ -473,6 +473,28 @@ reserve exactly its space: weight 656 and 4 sigops with the defaults and
 no payout address (the largest address output, P2PKH for the sigops),
 and 608 and 0 with a P2WPKH payout address. A configured value governs,
 as for an external miner using <a href="bitcoind-rpc.html#getblocktemplate"><code>getblocktemplate</code></a>.</p>
+<h3 id="start-difficulty">Start difficulty<a class="anchor" href="#start-difficulty" aria-label="Link to this section">#</a></h3>
+<p>A connection starts at <code>minimum_difficulty</code>, which is also its floor.
+At difficulty 1 a 100 TH/s machine finds tens of thousands of shares a
+second. Vardiff raises the difficulty fourfold every 16 shares, so it
+converges in seconds, but it opens with a flood of shares. For ASICs, set
+<code>minimum_difficulty</code> near the miner's rate, its hash rate times
+<code>share_interval_seconds</code> divided by 2<sup>32</sup>: about 230,000 for a
+100 TH/s machine at the default 10 seconds.</p>
+<pre><code class="language-ini"><span class="section">[stratum_v1]</span>
+minimum_difficulty = 230000
+</code></pre>
+<p>A miner may also request its difficulty with
+<a href="#miningsuggest_difficulty"><code>mining.suggest_difficulty</code></a>, which is
+floored at <code>minimum_difficulty</code>.</p>
+<h3 id="connection-limits">Connection limits<a class="anchor" href="#connection-limits" aria-label="Link to this section">#</a></h3>
+<p><code>expiration_minutes</code> (default 60) closes every connection after that
+time, and the miner reconnects with new jobs and its difficulty reset.
+<code>inactivity_minutes</code> (default 10) closes a connection from which nothing
+has been read for that time; jobs sent to the miner do not count. Set
+<code>expiration_minutes = 0</code> for miners, and raise <code>inactivity_minutes</code> above
+the longest expected time between shares
+(<a href="../configuration/services.html#5-limits">Service Settings</a>).</p>
 <h2 id="2-methods">2. Methods<a class="anchor" href="#2-methods" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
 <thead>
