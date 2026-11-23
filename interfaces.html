@@ -759,20 +759,21 @@ const services = [
 },
 {
   id: 'stratum-v1', name: 'Stratum v1', doc: 'interfaces/stratum-v1.html',
-  note: '',
-  spec: { Transport: 'tcp/s', Framing: 'json-rpc 1.0, line', Auth: 'tls server, mutual; authorize', Channel: 'full duplex (notifications)' },
+  note: 'The Stratum v1 mining protocol, served as a solo pool. Each job is a template of the next block from the transaction pool, its coinbase pays the miner’s address or a configured one, and a share that meets the network target is submitted as a block. Difficulty is set per connection by vardiff. An http/s + ws/s transport is supported on the same port; jobs require tcp/s or ws/s.',
+  spec: { Transport: 'tcp/s, http/s, ws/s', Framing: 'json-rpc 1.0', Auth: 'tls server, mutual', Channel: 'full duplex (notifications)' },
   methods: [
-    ['mining.subscribe', N, 'v5 tx pool'],
-    ['mining.authorize', N, 'v5 tx pool'],
-    ['mining.submit', N, 'v5 tx pool'],
-    ['mining.configure', N, 'v5 tx pool'],
-    ['mining.set_difficulty', N, 'v5 tx pool'],
-    ['mining.notify', N, 'v5 tx pool'],
-    ['mining.extranonce.subscribe', N, 'v5 tx pool'],
-    ['mining.extranonce.unsubscribe', N, 'v5 tx pool'],
-    ['client.reconnect', N, 'v5 tx pool'],
-    ['client.hello', N, 'v5 tx pool'],
-    ['client.rejected', N, 'v5 tx pool']
+    ['mining.configure', Y, 'version rolling (bip310)'],
+    ['mining.subscribe', Y, ''],
+    ['mining.authorize', Y, 'worker name is payout address unless configured'],
+    ['mining.submit', Y, ''],
+    ['mining.suggest_difficulty', Y, 'floored at minimum difficulty'],
+    ['mining.suggest_target', Y, 'floored at minimum difficulty'],
+    ['mining.extranonce.subscribe', Y, 'extranonce does not change'],
+    ['mining.set_difficulty', Y, ''],
+    ['mining.notify', Y, ''],
+    ['mining.get_transactions', R, 'not implemented'],
+    ['mining.multi_version', R, 'not implemented'],
+    ['client.reconnect', R, 'not sent']
   ]
 },
 {
