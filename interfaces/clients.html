@@ -427,6 +427,21 @@ Each client links to its notes (§3).</p>
 </thead>
 <tbody>
 <tr>
+<td><a href="#bdk">BDK</a></td>
+<td>Wallet library</td>
+<td>4.0.0</td>
+<td><span class="nw">2026-11-22</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="blocked" title="Blocked">✘</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
+</tr>
+<tr>
 <td><a href="#bitcoin-core">Bitcoin Core</a></td>
 <td>Peer</td>
 <td>31.0</td>
@@ -455,6 +470,21 @@ Each client links to its notes (§3).</p>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"><span class="works" title="Works">✔</span></td>
+</tr>
+<tr>
+<td><a href="#core-lightning">Core Lightning</a></td>
+<td>Lightning node</td>
+<td>26.06.10</td>
+<td><span class="nw">2026-11-22</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
 </tr>
 <tr>
 <td><a href="#electrum">Electrum</a></td>
@@ -505,7 +535,7 @@ Each client links to its notes (§3).</p>
 <td><a href="#lnd">lnd</a></td>
 <td>Lightning node</td>
 <td>0.21.8</td>
-<td><span class="nw">2026-11-22</span></td>
+<td><span class="nw">2026-11-23</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -638,19 +668,6 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
-<td><a href="https://bitcoindevkit.org">BDK</a></td>
-<td>Wallet library</td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
-</tr>
-<tr>
 <td><a href="https://bitbox.swiss/app/">BitBoxApp</a></td>
 <td>Hardware wallet app</td>
 <td style="text-align: center;"></td>
@@ -742,25 +759,12 @@ is not a test.</p>
 <td style="text-align: center;"></td>
 </tr>
 <tr>
-<td><a href="https://corelightning.org">Core Lightning</a></td>
-<td>Lightning node</td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-</tr>
-<tr>
 <td><a href="https://github.com/romanz/electrs">electrs</a></td>
 <td>Electrum server</td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
+<td style="text-align: center;"><span class="blocked" title="Blocked">✘</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
@@ -941,10 +945,8 @@ identical results against btcd with and without them.</p>
 bitcoind and neutrino backends, and the chain notifier delivered every
 confirmation and spend notification for pool transactions when their
 block arrived. Republishing a transaction that is already pooled or
-confirmed (<code>wallet publishtx</code>) succeeds on the bitcoind backend. On the
-btcd backend it fails, because the <a href="btcd.html">btcd</a> interface reports
-bitcoind's reject reasons (<code>txn-already-in-mempool</code>, <code>txn-already-known</code>)
-and btcwallet maps only btcd's texts for that backend.</p>
+confirmed (<code>wallet publishtx</code>) succeeds on the bitcoind and btcd
+backends, as the <a href="btcd.html">btcd</a> interface reports btcd's reject reasons.</p>
 <h3 id="sparrow-wallet">Sparrow Wallet<a class="anchor" href="#sparrow-wallet" aria-label="Link to this section">#</a></h3>
 <p>Wallets load, and silent payment wallets are scanned and notified over
 <code>blockchain.silentpayments.subscribe</code>. Requires the address index, and
@@ -1047,6 +1049,34 @@ lookups, but not <code>GET /internal/mempool/txs</code> (the pool in pages),
 previous output, one after another, so it should run close to the node:
 at a round trip of 186 ms one block took several minutes, on the same
 host about a second.</p>
+<h3 id="core-lightning">Core Lightning<a class="anchor" href="#core-lightning" aria-label="Link to this section">#</a></h3>
+<p>Core Lightning calls <code>bitcoin-cli</code> for <code>getnetworkinfo</code>,
+<code>getblockchaininfo</code>, <code>getblockhash</code>, <code>getblock</code>, <code>estimatesmartfee</code>,
+<code>getmempoolinfo</code>, <code>gettxout</code>, <code>sendrawtransaction</code> and <code>getpeerinfo</code>,
+and requires amounts with exactly eight decimal places. Against an
+instance of the same version on Bitcoin Core 32.1: startup, chain
+height, fee rates, <code>newaddr</code>, <code>getrawblockbyheight</code>, <code>getutxout</code> (found
+and spent), <code>getchaininfo</code>, and <code>sendrawtransaction</code> of pooled and
+confirmed transactions all gave the same results. Core Lightning logs
+an unusual fee rate where the <code>bs</code> estimate for 100 blocks exceeds that
+for 12 blocks.</p>
+<h3 id="bdk">BDK<a class="anchor" href="#bdk" aria-label="Link to this section">#</a></h3>
+<p>With <code>bdk-cli</code>, full scans of BIP84 and BIP86 test wallets.
+<strong>Electrum</strong> and <strong>Esplora:</strong> 285 and 32 transactions, identical in
+content, heights, balance and next unused address to the public
+Blockstream servers. <strong>P2P:</strong> a light client on <code>bdk_kyoto</code> 0.17, with
+<code>bs</code> as its only peer, found the same transactions from client filters
+(with a wallet lookahead of 250, as the default of 25 drops some), and
+<code>bs</code> filters are byte-identical to BIP158 filters rebuilt from the
+blocks. Kyoto requests header announcements (<code>sendheaders</code>) before its
+header sync is complete, and drops a peer whose announcement of a new
+block does not connect to its partial chain, so a sync from a single
+peer can stop when a block arrives.</p>
+<p><strong>Bitcoind JSON-RPC:</strong> <code>bs</code> sends its responses with chunked transfer
+encoding, and the default transport of the Rust <code>jsonrpc</code> crate, used
+by <code>bitcoincore-rpc</code>, does not read chunked responses. A client change
+that uses the crate's <code>minreq</code> transport is open:
+<a href="https://github.com/bitcoindevkit/bdk-cli/issues/392">bitcoindevkit/bdk-cli#392</a>.</p>
 <h3 id="bitcoin-core">Bitcoin Core<a class="anchor" href="#bitcoin-core" aria-label="Link to this section">#</a></h3>
 <p>A differential test fed the same blocks, valid and invalid, to <code>bs</code> and
 to Bitcoin Core over P2P: 15 of 15 decisions identical. Reorganization
@@ -1054,13 +1084,10 @@ tests against Bitcoin Core on regtest (depths 1 to 1000, ties, double
 spends, restarts mid-reorganization): 35 of 35 passed.</p>
 <h3 id="untested-clients">Untested clients<a class="anchor" href="#untested-clients" aria-label="Link to this section">#</a></h3>
 <p>Electrum wallets negotiate protocol 1.4 to 1.6, and <code>bs</code> serves 1.0
-through 1.7. Core Lightning calls <code>bitcoin-cli</code> for <code>getnetworkinfo</code>
-(version 23.0 or later, <code>localrelay</code>), <code>getblockchaininfo</code>,
-<code>getblockhash</code>, <code>getblock</code> (0), <code>estimatesmartfee</code>, <code>getmempoolinfo</code>,
-<code>gettxout</code>, <code>sendrawtransaction</code> and <code>getpeerinfo</code>, and
-<code>getblockfrompeer</code> only for pruned nodes. electrs refuses a node that
-reports <code>pruned</code>. Wasabi, Zeus, Blixt and BDK (Kyoto) require client
-filters. LDK Node reads blocks over bitcoind REST with bitcoind JSON-RPC for the rest.
+through 1.7. electrs reads bitcoind JSON-RPC with the <code>simple_http</code>
+transport of the Rust <code>jsonrpc</code> crate, which does not read the chunked
+responses of <code>bs</code> (see <a href="#bdk">BDK</a>), and refuses a node that reports
+<code>pruned</code>. Wasabi, Zeus and Blixt require client filters. LDK Node reads blocks over bitcoind REST with bitcoind JSON-RPC for the rest.
 Bitkit takes an Electrum server over TCP or TLS. Aqua takes one for
 bitcoin only over TLS, with a certificate valid for the host name.
 Alby Hub's built-in node (LDK) takes an Esplora server

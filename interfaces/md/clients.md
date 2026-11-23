@@ -24,12 +24,14 @@ Each client links to its notes (§3).
 
 | Client | Kind | Version | Date | [Native](native) | [Electrum](electrum) | [Sparrow](sparrow) | [Bitcoind<br>JSON-RPC](bitcoind-rpc) | [Bitcoind<br>REST](bitcoind-rest) | [ZMQ](zeromq) | [BTCD](btcd) | [Esplora](esplora) | [P2P](p2p) |
 | ------ | ---- | ------- | ---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| [BDK](#bdk) | Wallet library | 4.0.0 | <span class="nw">2026-11-22</span> | | <span class="works" title="Works">✔</span> | | <span class="blocked" title="Blocked">✘</span> | | | | <span class="works" title="Works">✔</span> | <span class="works" title="Works">✔</span> |
 | [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
 | [BTCPay Server](#btcpay-server) | Payment processor | 2.4.7 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | | | | <span class="works" title="Works">✔</span> |
+| [Core Lightning](#core-lightning) | Lightning node | 26.06.10 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | | | | |
 | [Electrum](#electrum) | Wallet | 4.8.4 | <span class="nw">2026-11-22</span> | | <span class="partial" title="Partial">◑</span> | | | | | | | |
 | [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span class="blocked" title="Blocked">✘</span> | | <span class="works" title="Works">✔</span> | | | |
 | [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
-| [lnd](#lnd) | Lightning node | 0.21.8 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | <span class="partial" title="Partial">◑</span> | | <span class="works" title="Works">✔</span> |
+| [lnd](#lnd) | Lightning node | 0.21.8 | <span class="nw">2026-11-23</span> | | | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | <span class="partial" title="Partial">◑</span> | | <span class="works" title="Works">✔</span> |
 | [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-21</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
 | [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span class="blocked" title="Blocked">✘</span> | <span class="works" title="Works">✔</span> | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [Sparrow Wallet](#sparrow-wallet) | Wallet | | <span class="nw">2026-10</span> | | <span class="works" title="Works">✔</span> | <span class="works" title="Works">✔</span> | | | | | | |
@@ -45,7 +47,6 @@ is not a test.
 | [Alby Hub](https://albyhub.com) | Lightning node | | | | | | | | <span class="expected" title="Expected">○</span> | |
 | [Aqua](https://aqua.net) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [Ashigaru Dojo](https://ashigaru.rs) | Wallet backend | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | |
-| [BDK](https://bitcoindevkit.org) | Wallet library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> |
 | [BitBoxApp](https://bitbox.swiss/app/) | Hardware wallet app | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [Bitkit](https://bitkit.to) | Lightning wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [Blixt](https://blixtwallet.com) | Lightning wallet | | | | | | | | | <span class="expected" title="Expected">○</span> |
@@ -53,8 +54,7 @@ is not a test.
 | [BlueWallet](https://bluewallet.io) | Wallet | | <span class="expected" title="Expected">○</span> | | | | | | | |
 | [BTC RPC Explorer](https://github.com/janoside/btc-rpc-explorer) | Explorer | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | | |
 | [btcwallet](https://github.com/btcsuite/btcwallet) | Wallet daemon | | | | | | | <span class="partial" title="Partial">◑</span> | | |
-| [Core Lightning](https://corelightning.org) | Lightning node | | | | <span class="expected" title="Expected">○</span> | | | | | |
-| [electrs](https://github.com/romanz/electrs) | Electrum server | | | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
+| [electrs](https://github.com/romanz/electrs) | Electrum server | | | | <span class="blocked" title="Blocked">✘</span> | | | | | <span class="expected" title="Expected">○</span> |
 | [Fedimint](https://fedimint.org) | Federation | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | | | | <span class="expected" title="Expected">○</span> | |
 | [Floresta](https://github.com/getfloresta/Floresta) | Utreexo node | | | | | | | | | <span class="no" title="No">⊘</span> |
 | [LDK Node](https://lightningdevkit.org) | Lightning library | | <span class="expected" title="Expected">○</span> | | <span class="expected" title="Expected">○</span> | <span class="expected" title="Expected">○</span> | | | <span class="expected" title="Expected">○</span> | |
@@ -103,10 +103,8 @@ identical results against btcd with and without them.
 bitcoind and neutrino backends, and the chain notifier delivered every
 confirmation and spend notification for pool transactions when their
 block arrived. Republishing a transaction that is already pooled or
-confirmed (`wallet publishtx`) succeeds on the bitcoind backend. On the
-btcd backend it fails, because the [btcd](btcd) interface reports
-bitcoind's reject reasons (`txn-already-in-mempool`, `txn-already-known`)
-and btcwallet maps only btcd's texts for that backend.
+confirmed (`wallet publishtx`) succeeds on the bitcoind and btcd
+backends, as the [btcd](btcd) interface reports btcd's reject reasons.
 
 ### Sparrow Wallet
 
@@ -232,6 +230,39 @@ previous output, one after another, so it should run close to the node:
 at a round trip of 186 ms one block took several minutes, on the same
 host about a second.
 
+### Core Lightning
+
+Core Lightning calls `bitcoin-cli` for `getnetworkinfo`,
+`getblockchaininfo`, `getblockhash`, `getblock`, `estimatesmartfee`,
+`getmempoolinfo`, `gettxout`, `sendrawtransaction` and `getpeerinfo`,
+and requires amounts with exactly eight decimal places. Against an
+instance of the same version on Bitcoin Core 32.1: startup, chain
+height, fee rates, `newaddr`, `getrawblockbyheight`, `getutxout` (found
+and spent), `getchaininfo`, and `sendrawtransaction` of pooled and
+confirmed transactions all gave the same results. Core Lightning logs
+an unusual fee rate where the `bs` estimate for 100 blocks exceeds that
+for 12 blocks.
+
+### BDK
+
+With `bdk-cli`, full scans of BIP84 and BIP86 test wallets.
+**Electrum** and **Esplora:** 285 and 32 transactions, identical in
+content, heights, balance and next unused address to the public
+Blockstream servers. **P2P:** a light client on `bdk_kyoto` 0.17, with
+`bs` as its only peer, found the same transactions from client filters
+(with a wallet lookahead of 250, as the default of 25 drops some), and
+`bs` filters are byte-identical to BIP158 filters rebuilt from the
+blocks. Kyoto requests header announcements (`sendheaders`) before its
+header sync is complete, and drops a peer whose announcement of a new
+block does not connect to its partial chain, so a sync from a single
+peer can stop when a block arrives.
+
+**Bitcoind JSON-RPC:** `bs` sends its responses with chunked transfer
+encoding, and the default transport of the Rust `jsonrpc` crate, used
+by `bitcoincore-rpc`, does not read chunked responses. A client change
+that uses the crate's `minreq` transport is open:
+[bitcoindevkit/bdk-cli#392](https://github.com/bitcoindevkit/bdk-cli/issues/392).
+
 ### Bitcoin Core
 
 A differential test fed the same blocks, valid and invalid, to `bs` and
@@ -242,13 +273,10 @@ spends, restarts mid-reorganization): 35 of 35 passed.
 ### Untested clients
 
 Electrum wallets negotiate protocol 1.4 to 1.6, and `bs` serves 1.0
-through 1.7. Core Lightning calls `bitcoin-cli` for `getnetworkinfo`
-(version 23.0 or later, `localrelay`), `getblockchaininfo`,
-`getblockhash`, `getblock` (0), `estimatesmartfee`, `getmempoolinfo`,
-`gettxout`, `sendrawtransaction` and `getpeerinfo`, and
-`getblockfrompeer` only for pruned nodes. electrs refuses a node that
-reports `pruned`. Wasabi, Zeus, Blixt and BDK (Kyoto) require client
-filters. LDK Node reads blocks over bitcoind REST with bitcoind JSON-RPC for the rest.
+through 1.7. electrs reads bitcoind JSON-RPC with the `simple_http`
+transport of the Rust `jsonrpc` crate, which does not read the chunked
+responses of `bs` (see [BDK](#bdk)), and refuses a node that reports
+`pruned`. Wasabi, Zeus and Blixt require client filters. LDK Node reads blocks over bitcoind REST with bitcoind JSON-RPC for the rest.
 Bitkit takes an Electrum server over TCP or TLS. Aqua takes one for
 bitcoin only over TLS, with a certificate valid for the host name.
 Alby Hub's built-in node (LDK) takes an Esplora server
