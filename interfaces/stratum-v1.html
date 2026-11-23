@@ -364,16 +364,120 @@
   </nav>
 
   <article class="doc">
-<div class="banner"><strong>Stratum is planned for version 5.</strong></div>
-
-<p>Stratum v1 is the mining pool protocol in common use, by which a pool
-gives mining work to miners and receives their shares. Messages are
-JSON-RPC 1.0, one per line, over TCP/S.</p>
-<h2 id="1-messages">1. Messages<a class="anchor" href="#1-messages" aria-label="Link to this section">#</a></h2>
+<p>Stratum v1 is the mining protocol in common use, by which a pool gives
+work to miners and receives their shares. <code>bs</code> serves it on the
+<code>[stratum_v1]</code> binding as a solo pool: each job is a template of the next
+block from the <code>bs</code> transaction pool, its coinbase pays the miner's
+address (or the configured one), and a share that meets the network
+target is submitted as a block.</p>
+<p>Its protocols share one port, and their secure forms share another:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>Message</th>
+<th>Port</th>
+<th>Default</th>
+<th>Protocols</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clear (<code>bind</code>)</td>
+<td>8880</td>
+<td>TCP, HTTP, WS</td>
+</tr>
+<tr>
+<td>Secure (<code>safe</code>)</td>
+<td>8843</td>
+<td>TCPS, HTTPS, WSS</td>
+</tr>
+</tbody>
+</table></div>
+<p>Messages are JSON-RPC 1.0, one per line over TCP, one per frame over WS.
+Jobs and difficulty are sent as notifications, so a miner connects over
+TCP/S or WS/S. HTTP/S answers requests but sends no jobs.</p>
+<h2 id="1-setup">1. Setup<a class="anchor" href="#1-setup" aria-label="Link to this section">#</a></h2>
+<p>The service is disabled by default. Bind an address, allow connections,
+and optionally set the payout address:</p>
+<pre><code class="language-ini"><span class="section">[stratum_v1]</span>
+bind = 0.0.0.0:8880
+connections = 10
+payout_address = bc1q...
+</code></pre>
+<p>Point the miner at <code>stratum+tcp://&lt;host&gt;:8880</code>. Without
+<code>payout_address</code>, the worker name is the payout: the miner authorizes as
+<code>&lt;address&gt;</code> or <code>&lt;address&gt;.&lt;worker&gt;</code>. With <code>payout_address</code>, every block
+pays that address, and worker names are free.</p>
+<p>As with the other services, connections are refused until the chain is
+current (<a href="../configuration/services.html#until-current">Service Settings</a>),
+and <code>safe</code> serves TLS with <code>cert_path</code> and <code>key_path</code>
+(<a href="../configuration/services.html#2-secure-connections">Secure connections</a>).</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stratum_v1.payout_address</code></td>
+<td>empty</td>
+<td>Address paid by the coinbase; empty, the worker name</td>
+</tr>
+<tr>
+<td><code>stratum_v1.coinbase_tag</code></td>
+<td>empty</td>
+<td>Text carried by the coinbase input script (at most 75 bytes)</td>
+</tr>
+<tr>
+<td><code>stratum_v1.extranonce1_size</code></td>
+<td>4</td>
+<td>Coinbase extranonce bytes assigned to each connection (at least 4)</td>
+</tr>
+<tr>
+<td><code>stratum_v1.extranonce2_size</code></td>
+<td>4</td>
+<td>Coinbase extranonce bytes rolled by the miner</td>
+</tr>
+<tr>
+<td><code>stratum_v1.minimum_difficulty</code></td>
+<td>1</td>
+<td>Share difficulty first assigned, and its floor</td>
+</tr>
+<tr>
+<td><code>stratum_v1.share_interval_seconds</code></td>
+<td>10</td>
+<td>Target seconds between shares (0 fixes the difficulty)</td>
+</tr>
+<tr>
+<td><code>pool.template_interval_seconds</code></td>
+<td>30</td>
+<td>Seconds between replacements of the template (0 disables)</td>
+</tr>
+<tr>
+<td><code>pool.template_fee_increase</code></td>
+<td>0</td>
+<td>Satoshis of fees a replacement template must add</td>
+</tr>
+</tbody>
+</table></div>
+<p>Startup fails if <code>extranonce1_size</code> is below 4 (so that the prefixes of
+connections are distinct), <code>extranonce2_size</code> is zero, the tag exceeds 75
+bytes, the two extranonce sizes together exceed 75 bytes, the coinbase
+input script would exceed 100 bytes, or the minimum difficulty is not
+positive.</p>
+<p>With the service enabled, <code>pool.coinbase_weight</code> and
+<code>pool.coinbase_sigops</code> are derived from this coinbase, so that templates
+reserve exactly its space: weight 656 and 4 sigops with the defaults and
+no payout address (the largest address output, P2PKH for the sigops),
+and 608 and 0 with a P2WPKH payout address. A configured value governs,
+as for an external miner using <a href="bitcoind-rpc.html#getblocktemplate"><code>getblocktemplate</code></a>.</p>
+<h2 id="2-methods">2. Methods<a class="anchor" href="#2-methods" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Method</th>
 <th>Direction</th>
 <th>Purpose</th>
 </tr>
@@ -381,92 +485,256 @@ JSON-RPC 1.0, one per line, over TCP/S.</p>
 <tbody>
 <tr>
 <td><a href="#miningconfigure"><code>mining.configure</code></a></td>
-<td>Miner to pool</td>
-<td>Negotiates extensions, such as version rolling</td>
+<td>Miner to <code>bs</code></td>
+<td>Negotiates version rolling (BIP310)</td>
 </tr>
 <tr>
 <td><a href="#miningsubscribe"><code>mining.subscribe</code></a></td>
-<td>Miner to pool</td>
+<td>Miner to <code>bs</code></td>
 <td>Subscribes to work</td>
 </tr>
 <tr>
 <td><a href="#miningauthorize"><code>mining.authorize</code></a></td>
-<td>Miner to pool</td>
-<td>Authorizes a worker</td>
+<td>Miner to <code>bs</code></td>
+<td>Authorizes a worker, and its payout</td>
+</tr>
+<tr>
+<td><a href="#miningsubmit"><code>mining.submit</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Submits a share</td>
+</tr>
+<tr>
+<td><a href="#miningsuggest_difficulty"><code>mining.suggest_difficulty</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Requests a share difficulty</td>
+</tr>
+<tr>
+<td><a href="#miningsuggest_target"><code>mining.suggest_target</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Requests a share target</td>
+</tr>
+<tr>
+<td><a href="#miningextranoncesubscribe"><code>mining.extranonce.subscribe</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Accepted; the extranonce does not change</td>
+</tr>
+<tr>
+<td><a href="#miningget_transactions"><code>mining.get_transactions</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Not implemented (answered <code>20</code>)</td>
+</tr>
+<tr>
+<td><a href="#miningmulti_version"><code>mining.multi_version</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Not implemented (answered <code>20</code>)</td>
 </tr>
 <tr>
 <td><a href="#miningset_difficulty"><code>mining.set_difficulty</code></a></td>
-<td>Pool to miner</td>
+<td><code>bs</code> to miner</td>
 <td>Sets the share difficulty</td>
 </tr>
 <tr>
 <td><a href="#miningnotify"><code>mining.notify</code></a></td>
-<td>Pool to miner</td>
+<td><code>bs</code> to miner</td>
 <td>Sends a job</td>
-</tr>
-<tr>
-<td><a href="#miningsubmit"><code>mining.submit</code></a></td>
-<td>Miner to pool</td>
-<td>Submits a share</td>
-</tr>
-<tr>
-<td><a href="#miningextranoncesubscribe"><code>mining.extranonce.subscribe</code></a></td>
-<td>Miner to pool</td>
-<td>Accepts changes of extranonce</td>
-</tr>
-<tr>
-<td><a href="#miningextranonceunsubscribe"><code>mining.extranonce.unsubscribe</code></a></td>
-<td>Miner to pool</td>
-<td>Declines changes of extranonce</td>
-</tr>
-<tr>
-<td><a href="#clientreconnect"><code>client.reconnect</code></a></td>
-<td>Pool to miner</td>
-<td>Moves the miner to another server</td>
-</tr>
-<tr>
-<td><a href="#clienthello"><code>client.hello</code></a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><a href="#clientrejected"><code>client.rejected</code></a></td>
-<td></td>
-<td></td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="2-session">2. Session<a class="anchor" href="#2-session" aria-label="Link to this section">#</a></h2>
+<p>Jobs begin once the connection is both subscribed and authorized, in
+either order.</p>
 <h3 id="miningconfigure">mining.configure<a class="anchor" href="#miningconfigure" aria-label="Link to this section">#</a></h3>
-<p>Negotiates protocol extensions before subscribing (BIP310), such as
-version rolling, by which the miner varies bits of the block version.</p>
+<p><strong>Parameters:</strong> <code>extensions</code> (array of names), <code>parameters</code> (object).
+<code>version-rolling</code> is the only extension accepted; others are answered
+<code>false</code>. The mask is the requested <code>version-rolling.mask</code>, limited to the
+general purpose version bits (BIP320, <code>1fffe000</code>), or all of those bits
+if none is requested.</p>
+<pre><code class="language-json">{&quot;id&quot;: 1, &quot;method&quot;: &quot;mining.configure&quot;, &quot;params&quot;: [[&quot;version-rolling&quot;], {&quot;version-rolling.mask&quot;: &quot;1fffe000&quot;}]}
+{&quot;id&quot;: 1, &quot;result&quot;: {&quot;version-rolling&quot;: true, &quot;version-rolling.mask&quot;: &quot;1fffe000&quot;}, &quot;error&quot;: null}
+</code></pre>
 <h3 id="miningsubscribe">mining.subscribe<a class="anchor" href="#miningsubscribe" aria-label="Link to this section">#</a></h3>
-<p>Subscribes to work. The result gives the extranonce prefix assigned to
-the miner and the size of the extranonce it varies.</p>
+<p><strong>Parameters:</strong> <code>user_agent</code>, <code>session_id</code>, <code>host</code>, <code>port</code> (each
+optional or null, and ignored).
+<strong>Result:</strong> the subscriptions, the extranonce prefix of the connection
+(<code>extranonce1</code>, base16) and the size in bytes of the extranonce the miner
+rolls (<code>extranonce2</code>).</p>
+<pre><code class="language-json">{&quot;id&quot;: 2, &quot;method&quot;: &quot;mining.subscribe&quot;, &quot;params&quot;: [&quot;cgminer/4.12.1&quot;]}
+{&quot;id&quot;: 2, &quot;result&quot;: [[[&quot;mining.set_difficulty&quot;, &quot;0000000000000007&quot;], [&quot;mining.notify&quot;, &quot;0000000000000007&quot;]], &quot;07000000&quot;, 4], &quot;error&quot;: null}
+</code></pre>
+<p>The prefix is fixed for the life of the connection.</p>
 <h3 id="miningauthorize">mining.authorize<a class="anchor" href="#miningauthorize" aria-label="Link to this section">#</a></h3>
-<p>Authorizes a worker, by name and password, to submit shares.</p>
-<h3 id="miningextranoncesubscribe">mining.extranonce.subscribe<a class="anchor" href="#miningextranoncesubscribe" aria-label="Link to this section">#</a></h3>
-<p>Accepts later changes of the extranonce prefix from the pool.</p>
-<h3 id="miningextranonceunsubscribe">mining.extranonce.unsubscribe<a class="anchor" href="#miningextranonceunsubscribe" aria-label="Link to this section">#</a></h3>
-<p>Declines later changes of the extranonce prefix.</p>
-<h3 id="clientreconnect">client.reconnect<a class="anchor" href="#clientreconnect" aria-label="Link to this section">#</a></h3>
-<p>Asks the miner to reconnect, to the given server and port, after a
-wait.</p>
-<h3 id="clienthello">client.hello<a class="anchor" href="#clienthello" aria-label="Link to this section">#</a></h3>
-<p>To be documented with the implementation.</p>
-<h3 id="clientrejected">client.rejected<a class="anchor" href="#clientrejected" aria-label="Link to this section">#</a></h3>
-<p>To be documented with the implementation.</p>
-<h2 id="3-work">3. Work<a class="anchor" href="#3-work" aria-label="Link to this section">#</a></h2>
-<h3 id="miningset_difficulty">mining.set_difficulty<a class="anchor" href="#miningset_difficulty" aria-label="Link to this section">#</a></h3>
-<p>Sets the difficulty of the shares the miner submits, from the next job.</p>
-<h3 id="miningnotify">mining.notify<a class="anchor" href="#miningnotify" aria-label="Link to this section">#</a></h3>
-<p>Sends a job: the previous block hash, the two parts of the coinbase
-around the extranonce, the merkle branch, the version, the target and
-the time, and whether earlier jobs are void.</p>
+<p><strong>Parameters:</strong> <code>username</code>, <code>password</code> (optional or null, not
+checked).
+<strong>Result:</strong> <code>true</code>.</p>
+<p>Without <code>payout_address</code>, the username up to its first <code>.</code> must be an
+address of the chain, which the coinbase pays. The first worker
+authorized sets the payout of the connection; another worker on the same
+connection must pay the same address. An invalid address, or a different
+one, is answered <code>24</code> (Unauthorized worker).</p>
+<pre><code class="language-json">{&quot;id&quot;: 3, &quot;method&quot;: &quot;mining.authorize&quot;, &quot;params&quot;: [&quot;bc1qexampleaddress.rig1&quot;, &quot;x&quot;]}
+{&quot;id&quot;: 3, &quot;result&quot;: true, &quot;error&quot;: null}
+</code></pre>
 <h3 id="miningsubmit">mining.submit<a class="anchor" href="#miningsubmit" aria-label="Link to this section">#</a></h3>
-<p>Submits a share: the worker, the job, the extranonce varied by the
-miner, the time and the nonce, and with version rolling the version
-bits.</p>
+<p><strong>Parameters:</strong> <code>worker_name</code>, <code>job_id</code>, <code>extranonce2</code>, <code>ntime</code>, <code>nonce</code>,
+<code>version_bits</code> (optional, with version rolling). Each is base16:
+<code>extranonce2</code> of exactly <code>extranonce2_size</code> bytes, and the others of
+eight characters, most significant first. <strong>Result:</strong> <code>true</code>.</p>
+<pre><code class="language-json">{&quot;id&quot;: 4, &quot;method&quot;: &quot;mining.submit&quot;, &quot;params&quot;: [&quot;bc1qexampleaddress.rig1&quot;, &quot;00000002&quot;, &quot;00000000&quot;, &quot;6a1b2c3d&quot;, &quot;1a2b3c4d&quot;]}
+{&quot;id&quot;: 4, &quot;result&quot;: true, &quot;error&quot;: null}
+</code></pre>
+<p>The header is rebuilt from the job, the coinbase of <code>coinb1</code>,
+<code>extranonce1</code>, <code>extranonce2</code> and <code>coinb2</code>, and the submitted time, nonce
+and version. The version bits must lie within the negotiated mask, and
+the header must be valid in the context of the job: <code>ntime</code> past the
+median time past of the block, and no more than two hours
+(<code>bitcoin.timestamp_limit_seconds</code>) ahead of the present. Since the
+miner sets only header fields, a valid header makes a valid block.</p>
+<p>The share is accepted if its hash does not exceed the target of the
+job's difficulty: the difficulty one target (bits <code>1d00ffff</code>) divided by
+the difficulty. A share that also meets the network target is submitted
+as a block, and its outcome is logged; the miner's answer does not wait
+for it.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Code</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Other/Unknown</td>
+<td>20</td>
+<td>A parameter is malformed, version bits fall outside the mask, or the header is invalid; the connection is then closed</td>
+</tr>
+<tr>
+<td>Job not found</td>
+<td>21</td>
+<td>The job is unknown, or was dropped</td>
+</tr>
+<tr>
+<td>Duplicate share</td>
+<td>22</td>
+<td>The same header was submitted for the job</td>
+</tr>
+<tr>
+<td>Low difficulty share</td>
+<td>23</td>
+<td>The hash exceeds the share target</td>
+</tr>
+<tr>
+<td>Unauthorized worker</td>
+<td>24</td>
+<td>The worker is not authorized on the connection</td>
+</tr>
+<tr>
+<td>Not subscribed</td>
+<td>25</td>
+<td>The connection is not subscribed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Errors are positional, <code>[code, message, null]</code>:</p>
+<pre><code class="language-json">{&quot;id&quot;: 4, &quot;result&quot;: null, &quot;error&quot;: [23, &quot;Low difficulty share&quot;, null]}
+</code></pre>
+<h3 id="miningsuggest_difficulty">mining.suggest_difficulty<a class="anchor" href="#miningsuggest_difficulty" aria-label="Link to this section">#</a></h3>
+<p><strong>Parameters:</strong> <code>difficulty</code> (number). <strong>Result:</strong> <code>true</code>. The
+connection's difficulty becomes the suggestion, floored at
+<code>minimum_difficulty</code>, and the current job is sent again at it.</p>
+<h3 id="miningsuggest_target">mining.suggest_target<a class="anchor" href="#miningsuggest_target" aria-label="Link to this section">#</a></h3>
+<p><strong>Parameters:</strong> <code>target</code> (64 base16 characters). <strong>Result:</strong> <code>true</code>. As
+<code>mining.suggest_difficulty</code>, with the difficulty of the target. A
+malformed target is answered <code>20</code>.</p>
+<h3 id="miningextranoncesubscribe">mining.extranonce.subscribe<a class="anchor" href="#miningextranoncesubscribe" aria-label="Link to this section">#</a></h3>
+<p><strong>Parameters:</strong> none. <strong>Result:</strong> <code>true</code>. The extranonce prefix of a
+connection never changes, so no <code>mining.set_extranonce</code> follows.</p>
+<h3 id="miningget_transactions">mining.get_transactions<a class="anchor" href="#miningget_transactions" aria-label="Link to this section">#</a></h3>
+<p><strong>Parameters:</strong> <code>job_id</code>. Not implemented: answered
+<code>[20, "not_implemented", null]</code>.</p>
+<h3 id="miningmulti_version">mining.multi_version<a class="anchor" href="#miningmulti_version" aria-label="Link to this section">#</a></h3>
+<p><strong>Parameters:</strong> <code>version</code> (number). Not implemented: answered
+<code>[20, "not_implemented", null]</code>.</p>
+<h3 id="miningset_difficulty">mining.set_difficulty<a class="anchor" href="#miningset_difficulty" aria-label="Link to this section">#</a></h3>
+<p><strong>Parameters:</strong> <code>difficulty</code>. Sent before a job whose difficulty differs
+from the last sent, and so applies to that job and those that follow.</p>
+<pre><code class="language-json">{&quot;id&quot;: null, &quot;method&quot;: &quot;mining.set_difficulty&quot;, &quot;params&quot;: [1.0]}
+</code></pre>
+<h3 id="miningnotify">mining.notify<a class="anchor" href="#miningnotify" aria-label="Link to this section">#</a></h3>
+<p><strong>Parameters:</strong> <code>job_id</code>, <code>prevhash</code>, <code>coinb1</code>, <code>coinb2</code>,
+<code>merkle_branch</code>, <code>version</code>, <code>nbits</code>, <code>ntime</code>, <code>clean_jobs</code>.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>job_id</code></td>
+<td>Eight base16 characters, unique on the connection</td>
+</tr>
+<tr>
+<td><code>prevhash</code></td>
+<td>Previous block hash, in header order, each four byte word reversed</td>
+</tr>
+<tr>
+<td><code>coinb1</code></td>
+<td>Coinbase through the extranonce push opcode, without witness</td>
+</tr>
+<tr>
+<td><code>coinb2</code></td>
+<td>Coinbase following the extranonce, without witness</td>
+</tr>
+<tr>
+<td><code>merkle_branch</code></td>
+<td>Hashes from the coinbase to the merkle root, in header order</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>Block version, eight base16 characters</td>
+</tr>
+<tr>
+<td><code>nbits</code></td>
+<td>Network target, compact, eight base16 characters</td>
+</tr>
+<tr>
+<td><code>ntime</code></td>
+<td>Current time, at least one second past the median time past</td>
+</tr>
+<tr>
+<td><code>clean_jobs</code></td>
+<td><code>true</code> if the previous block changed, and earlier jobs are void</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-json">{&quot;id&quot;: null, &quot;method&quot;: &quot;mining.notify&quot;, &quot;params&quot;: [&quot;00000002&quot;, &quot;...&quot;, &quot;02000000010000...&quot;, &quot;ffffffff02...&quot;, [&quot;...&quot;], &quot;20000000&quot;, &quot;1703a30c&quot;, &quot;6a1b2c3d&quot;, true]}
+</code></pre>
+<p>A job is sent for each new template of the block above the confirmed
+top: on each new block, which voids earlier jobs, and while the block is
+pending, as the pool replaces the template
+(<code>pool.template_interval_seconds</code>), which does not. The last 16
+jobs of a connection are retained for shares.</p>
+<h2 id="3-coinbase-and-difficulty">3. Coinbase and difficulty<a class="anchor" href="#3-coinbase-and-difficulty" aria-label="Link to this section">#</a></h2>
+<p>The coinbase is version 2, with one input and two outputs. Its input
+script pushes the block height (BIP34), the <code>coinbase_tag</code> if any, and
+the extranonce of <code>extranonce1</code> and <code>extranonce2</code>. Its input sequence is
+not final (<code>fffffffe</code>) and its locktime is the previous height (BIP54). Its first output pays
+the subsidy and the template's fees to the payout address; the second
+commits to the block's witnesses (BIP141), with a null reserved value.</p>
+<p>The difficulty of a connection starts at <code>minimum_difficulty</code>. With a
+nonzero <code>share_interval_seconds</code>, it is retargeted after 16 accepted
+shares, or at the first share after 16 intervals: by the ratio of the
+target interval to the observed one, limited to between a quarter and
+four times, unchanged while that ratio is between 0.8 and 1.25, and never
+below <code>minimum_difficulty</code>.</p>
+<p>A connection that sends no shares cannot retarget, so its difficulty
+also decays: every four share intervals, if no share was accepted since
+the difficulty was last evaluated, the difficulty falls to a quarter, never
+below <code>minimum_difficulty</code>. With the defaults, an idle connection's
+difficulty is quartered every 40 seconds.</p>
+<p>A retarget or decay sends the current job again, with <code>clean_jobs</code>
+<code>false</code>, after <code>mining.set_difficulty</code>.</p>
   </article>
 
   <nav class="pager"><a href="esplora.html">&larr; Esplora</a><a href="stratum-v2.html">Stratum v2 &rarr;</a></nav>

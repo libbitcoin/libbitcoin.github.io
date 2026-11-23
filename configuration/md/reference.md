@@ -1245,3 +1245,57 @@ rate_limit = 0
 # The server name (http header), defaults to 'libbitcoin/4'.
 server = libbitcoin/4
 ```
+
+## 21. `[stratum_v1]`
+
+The Stratum v1 mining interface ([Stratum v1](../interfaces/stratum-v1)).
+
+```ini
+[stratum_v1]
+# IP address to bind, multiple allowed, defaults to empty (disabled).
+#bind =
+# The trusted client certificate directory (*.PEM), enables client authentication.
+cert_auth =
+# The path to the server certificate file (.PEM), defaults to empty.
+cert_path =
+# The text carried by the coinbase input script, defaults to empty.
+coinbase_tag =
+# Compress http response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
+# The time limit for connection establishment, defaults to '0' (network controls).
+connect_timeout_seconds = 0
+# The required maximum number of connections, defaults to '0'.
+connections = 0
+# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
+#credential =
+# The maximum connection duration, defaults to '60'.
+expiration_minutes = 60
+# The bytes of coinbase extranonce assigned to each channel, defaults to '4'.
+extranonce1_size = 4
+# The bytes of coinbase extranonce rolled by the miner, defaults to '4'.
+extranonce2_size = 4
+# The idle timeout (http keep-alive), defaults to '10'.
+inactivity_minutes = 10
+# The password to decrypt the server private key file (.PEM), optional.
+key_pass =
+# The path to the server private key file (.PEM), defaults to empty.
+key_path =
+# The maximum write backlog of a channel, defaults to '1048576'.
+maximum_backlog = 1048576
+# The maximum json response buffer size, defaults to '65536'.
+maximum_buffer = 65536
+# The maximum allowed request size, defaults to '8004096'.
+maximum_request = 8004096
+# The minimum retained read buffer size, defaults to '4096'.
+minimum_buffer = 4096
+# The share difficulty assigned to a channel, and its floor, defaults to '1'.
+minimum_difficulty = 1
+# The address paid by the coinbase, defaults to empty (the worker name).
+payout_address =
+# The send rate limit in bytes per second, defaults to '0' (network controls).
+rate_limit = 0
+# IP address to secure bind, multiple allowed, defaults to empty (disabled).
+#safe =
+# The target seconds between shares of a channel, defaults to '10' (0 fixes difficulty).
+share_interval_seconds = 10
+```
