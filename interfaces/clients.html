@@ -564,17 +564,17 @@ Each client links to its notes (§3).</p>
 <tr>
 <td><a href="#satsage">SatSage</a></td>
 <td>Wallet analysis</td>
-<td>1.0.1</td>
-<td><span class="nw">2026-11-16</span></td>
-<td style="text-align: center;"><span class="blocked" title="Blocked">✘</span></td>
+<td>1.0.2</td>
+<td><span class="nw">2026-11-23</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
+<td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
+<td style="text-align: center;"></td>
 <td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"><span class="expected" title="Expected">○</span></td>
+<td style="text-align: center;"><span class="works" title="Works">✔</span></td>
 </tr>
 <tr>
 <td><a href="#sparrow-wallet">Sparrow Wallet</a></td>
@@ -983,22 +983,27 @@ replacement confirms, is still reported as unconfirmed by
 such conflicts, but clients that rely on <code>listunspent</code> or <code>get_mempool</code>
 see outputs that cannot confirm.</p>
 <h3 id="satsage">SatSage<a class="anchor" href="#satsage" aria-label="Link to this section">#</a></h3>
-<p>A tax and holding period analyzer for xpub wallets. <strong>Electrum:</strong> the
-analysis of an address with 126 unspent outputs gave the same outputs,
-amounts and origin traces as a public Electrum server, and dated when
-each output arrived, which that server left unknown. The history scan of
-a BIP84 wallet (198 addresses) gave 146 of 146 received outputs with the
-same values, heights and spending transactions as the public server.</p>
+<p>A tax and holding period analyzer for xpub wallets. Each interface was
+compared with a public Electrum server, for an address with 127 unspent
+outputs and the history of a BIP84 wallet (300 addresses).</p>
 <p><strong>Native REST:</strong> SatSage recognizes <code>bs</code> by <code>libbitcoin</code> in the
-<code>server.version</code> name, and would then read addresses, outputs,
-transactions and headers from the Native REST interface. It looks for
-<code>address</code> at the top level of <a href="native.html#configuration"><code>configuration</code></a>, which <code>bs</code> now
-reports under <code>store</code>, so it finds no address index and stays on
-Electrum, with the same results. With that check adjusted, its address,
-output and transaction queries all gave the same results as Electrum.</p>
-<p>Bitcoind JSON-RPC (<code>scantxoutset</code>, <code>getrawtransaction</code>) and client filters over
-P2P were not tested. Its import of xpubs from a node wallet
-(<code>listdescriptors</code>) requires a node wallet.</p>
+<code>server.version</code> name and finds the address index in
+<a href="native.html#configuration"><code>configuration</code></a>. The outputs of the address,
+their transactions and their previous outputs were identical, 127 of 127.</p>
+<p><strong>Electrum:</strong> the outputs and transactions of the address were identical,
+and 146 of the 148 history entries. In the other two, SatSage names as
+the spender a transaction that lost a double spend and has left the <code>bs</code>
+pool, which <code>bs</code> still reports as unconfirmed (see <a href="#electrum">Electrum</a>),
+in place of the confirmed one.</p>
+<p><strong>Bitcoind JSON-RPC:</strong> <code>scantxoutset</code> returned the same 127 outputs, from
+the address index, and <code>getrawtransaction</code> the same transactions.</p>
+<p><strong>P2P:</strong> SatSage scans client filters and fetches the matching blocks
+from <code>bs</code> as its only peer. The scan was stopped after the newest blocks
+and the first 16,000 blocks from the SegWit height. Each of the 7 outputs
+it found is on the public server, and its one false positive was
+discarded.</p>
+<p>Its import of xpubs from a node wallet (<code>listdescriptors</code>) requires a
+node wallet.</p>
 <h3 id="kassiber">kassiber<a class="anchor" href="#kassiber" aria-label="Link to this section">#</a></h3>
 <p><strong>Electrum:</strong> 436 of 436 transactions identical to a public Fulcrum
 server, with amounts, fees and timestamps. <strong>Esplora:</strong> a client fault.

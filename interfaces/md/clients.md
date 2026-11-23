@@ -33,7 +33,7 @@ Each client links to its notes (§3).
 | [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
 | [lnd](#lnd) | Lightning node | 0.21.8 | <span class="nw">2026-11-23</span> | | | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | <span class="partial" title="Partial">◑</span> | | <span class="works" title="Works">✔</span> |
 | [mempool](#mempool) | Explorer | 3.3.2 | <span class="nw">2026-11-21</span> | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | | | | | |
-| [SatSage](#satsage) | Wallet analysis | 1.0.1 | <span class="nw">2026-11-16</span> | <span class="blocked" title="Blocked">✘</span> | <span class="works" title="Works">✔</span> | | <span class="expected" title="Expected">○</span> | | | | | <span class="expected" title="Expected">○</span> |
+| [SatSage](#satsage) | Wallet analysis | 1.0.2 | <span class="nw">2026-11-23</span> | <span class="works" title="Works">✔</span> | <span class="partial" title="Partial">◑</span> | | <span class="works" title="Works">✔</span> | | | | | <span class="works" title="Works">✔</span> |
 | [Sparrow Wallet](#sparrow-wallet) | Wallet | | <span class="nw">2026-10</span> | | <span class="works" title="Works">✔</span> | <span class="works" title="Works">✔</span> | | | | | | |
 | [Specter Desktop](#specter-desktop) | Wallet | 2.3.0 | <span class="nw">2026-11-16</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | | |
 
@@ -151,24 +151,32 @@ see outputs that cannot confirm.
 
 ### SatSage
 
-A tax and holding period analyzer for xpub wallets. **Electrum:** the
-analysis of an address with 126 unspent outputs gave the same outputs,
-amounts and origin traces as a public Electrum server, and dated when
-each output arrived, which that server left unknown. The history scan of
-a BIP84 wallet (198 addresses) gave 146 of 146 received outputs with the
-same values, heights and spending transactions as the public server.
+A tax and holding period analyzer for xpub wallets. Each interface was
+compared with a public Electrum server, for an address with 127 unspent
+outputs and the history of a BIP84 wallet (300 addresses).
 
 **Native REST:** SatSage recognizes `bs` by `libbitcoin` in the
-`server.version` name, and would then read addresses, outputs,
-transactions and headers from the Native REST interface. It looks for
-`address` at the top level of [`configuration`](native#configuration), which `bs` now
-reports under `store`, so it finds no address index and stays on
-Electrum, with the same results. With that check adjusted, its address,
-output and transaction queries all gave the same results as Electrum.
+`server.version` name and finds the address index in
+[`configuration`](native#configuration). The outputs of the address,
+their transactions and their previous outputs were identical, 127 of 127.
 
-Bitcoind JSON-RPC (`scantxoutset`, `getrawtransaction`) and client filters over
-P2P were not tested. Its import of xpubs from a node wallet
-(`listdescriptors`) requires a node wallet.
+**Electrum:** the outputs and transactions of the address were identical,
+and 146 of the 148 history entries. In the other two, SatSage names as
+the spender a transaction that lost a double spend and has left the `bs`
+pool, which `bs` still reports as unconfirmed (see [Electrum](#electrum)),
+in place of the confirmed one.
+
+**Bitcoind JSON-RPC:** `scantxoutset` returned the same 127 outputs, from
+the address index, and `getrawtransaction` the same transactions.
+
+**P2P:** SatSage scans client filters and fetches the matching blocks
+from `bs` as its only peer. The scan was stopped after the newest blocks
+and the first 16,000 blocks from the SegWit height. Each of the 7 outputs
+it found is on the public server, and its one false positive was
+discarded.
+
+Its import of xpubs from a node wallet (`listdescriptors`) requires a
+node wallet.
 
 ### kassiber
 
