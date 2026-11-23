@@ -92,8 +92,16 @@ general purpose version bits (BIP320, `1fffe000`), or all of those bits
 if none is requested.
 
 ```json
-{"id": 1, "method": "mining.configure", "params": [["version-rolling"], {"version-rolling.mask": "1fffe000"}]}
-{"id": 1, "result": {"version-rolling": true, "version-rolling.mask": "1fffe000"}, "error": null}
+{
+    "id": 1,
+    "method": "mining.configure",
+    "params": [["version-rolling"], {"version-rolling.mask": "1fffe000"}]
+}
+{
+    "id": 1,
+    "result": {"version-rolling": true, "version-rolling.mask": "1fffe000"},
+    "error": null
+}
 ```
 
 ### mining.subscribe
@@ -106,7 +114,18 @@ rolls (`extranonce2`).
 
 ```json
 {"id": 2, "method": "mining.subscribe", "params": ["cgminer/4.12.1"]}
-{"id": 2, "result": [[["mining.set_difficulty", "0000000000000007"], ["mining.notify", "0000000000000007"]], "07000000", 4], "error": null}
+{
+    "id": 2,
+    "result": [
+        [
+            ["mining.set_difficulty", "0000000000000007"],
+            ["mining.notify", "0000000000000007"]
+        ],
+        "07000000",
+        4
+    ],
+    "error": null
+}
 ```
 
 The prefix is fixed for the life of the connection.
@@ -124,7 +143,11 @@ connection must pay the same address. An invalid address, or a different
 one, is answered `24` (Unauthorized worker).
 
 ```json
-{"id": 3, "method": "mining.authorize", "params": ["bc1qexampleaddress.rig1", "x"]}
+{
+    "id": 3,
+    "method": "mining.authorize",
+    "params": ["bc1qexampleaddress.rig1", "x"]
+}
 {"id": 3, "result": true, "error": null}
 ```
 
@@ -136,7 +159,17 @@ one, is answered `24` (Unauthorized worker).
 eight characters, most significant first. **Result:** `true`.
 
 ```json
-{"id": 4, "method": "mining.submit", "params": ["bc1qexampleaddress.rig1", "00000002", "00000000", "6a1b2c3d", "1a2b3c4d"]}
+{
+    "id": 4,
+    "method": "mining.submit",
+    "params": [
+        "bc1qexampleaddress.rig1",
+        "00000002",
+        "00000000",
+        "6a1b2c3d",
+        "1a2b3c4d"
+    ]
+}
 {"id": 4, "result": true, "error": null}
 ```
 
@@ -223,7 +256,21 @@ from the last sent, and so applies to that job and those that follow.
 | `clean_jobs` | `true` if the previous block changed, and earlier jobs are void |
 
 ```json
-{"id": null, "method": "mining.notify", "params": ["00000002", "...", "02000000010000...", "ffffffff02...", ["..."], "20000000", "1703a30c", "6a1b2c3d", true]}
+{
+    "id": null,
+    "method": "mining.notify",
+    "params": [
+        "00000002",
+        "...",
+        "02000000010000...",
+        "feffffff02...",
+        ["..."],
+        "20000000",
+        "1703a30c",
+        "6a1b2c3d",
+        true
+    ]
+}
 ```
 
 A job is sent for each new template of the block above the confirmed

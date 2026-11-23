@@ -548,8 +548,16 @@ either order.</p>
 <code>false</code>. The mask is the requested <code>version-rolling.mask</code>, limited to the
 general purpose version bits (BIP320, <code>1fffe000</code>), or all of those bits
 if none is requested.</p>
-<pre><code class="language-json">{&quot;id&quot;: 1, &quot;method&quot;: &quot;mining.configure&quot;, &quot;params&quot;: [[&quot;version-rolling&quot;], {&quot;version-rolling.mask&quot;: &quot;1fffe000&quot;}]}
-{&quot;id&quot;: 1, &quot;result&quot;: {&quot;version-rolling&quot;: true, &quot;version-rolling.mask&quot;: &quot;1fffe000&quot;}, &quot;error&quot;: null}
+<pre><code class="language-json">{
+    &quot;id&quot;: 1,
+    &quot;method&quot;: &quot;mining.configure&quot;,
+    &quot;params&quot;: [[&quot;version-rolling&quot;], {&quot;version-rolling.mask&quot;: &quot;1fffe000&quot;}]
+}
+{
+    &quot;id&quot;: 1,
+    &quot;result&quot;: {&quot;version-rolling&quot;: true, &quot;version-rolling.mask&quot;: &quot;1fffe000&quot;},
+    &quot;error&quot;: null
+}
 </code></pre>
 <h3 id="miningsubscribe">mining.subscribe<a class="anchor" href="#miningsubscribe" aria-label="Link to this section">#</a></h3>
 <p><strong>Parameters:</strong> <code>user_agent</code>, <code>session_id</code>, <code>host</code>, <code>port</code> (each
@@ -558,7 +566,18 @@ optional or null, and ignored).
 (<code>extranonce1</code>, base16) and the size in bytes of the extranonce the miner
 rolls (<code>extranonce2</code>).</p>
 <pre><code class="language-json">{&quot;id&quot;: 2, &quot;method&quot;: &quot;mining.subscribe&quot;, &quot;params&quot;: [&quot;cgminer/4.12.1&quot;]}
-{&quot;id&quot;: 2, &quot;result&quot;: [[[&quot;mining.set_difficulty&quot;, &quot;0000000000000007&quot;], [&quot;mining.notify&quot;, &quot;0000000000000007&quot;]], &quot;07000000&quot;, 4], &quot;error&quot;: null}
+{
+    &quot;id&quot;: 2,
+    &quot;result&quot;: [
+        [
+            [&quot;mining.set_difficulty&quot;, &quot;0000000000000007&quot;],
+            [&quot;mining.notify&quot;, &quot;0000000000000007&quot;]
+        ],
+        &quot;07000000&quot;,
+        4
+    ],
+    &quot;error&quot;: null
+}
 </code></pre>
 <p>The prefix is fixed for the life of the connection.</p>
 <h3 id="miningauthorize">mining.authorize<a class="anchor" href="#miningauthorize" aria-label="Link to this section">#</a></h3>
@@ -570,7 +589,11 @@ address of the chain, which the coinbase pays. The first worker
 authorized sets the payout of the connection; another worker on the same
 connection must pay the same address. An invalid address, or a different
 one, is answered <code>24</code> (Unauthorized worker).</p>
-<pre><code class="language-json">{&quot;id&quot;: 3, &quot;method&quot;: &quot;mining.authorize&quot;, &quot;params&quot;: [&quot;bc1qexampleaddress.rig1&quot;, &quot;x&quot;]}
+<pre><code class="language-json">{
+    &quot;id&quot;: 3,
+    &quot;method&quot;: &quot;mining.authorize&quot;,
+    &quot;params&quot;: [&quot;bc1qexampleaddress.rig1&quot;, &quot;x&quot;]
+}
 {&quot;id&quot;: 3, &quot;result&quot;: true, &quot;error&quot;: null}
 </code></pre>
 <h3 id="miningsubmit">mining.submit<a class="anchor" href="#miningsubmit" aria-label="Link to this section">#</a></h3>
@@ -578,7 +601,17 @@ one, is answered <code>24</code> (Unauthorized worker).</p>
 <code>version_bits</code> (optional, with version rolling). Each is base16:
 <code>extranonce2</code> of exactly <code>extranonce2_size</code> bytes, and the others of
 eight characters, most significant first. <strong>Result:</strong> <code>true</code>.</p>
-<pre><code class="language-json">{&quot;id&quot;: 4, &quot;method&quot;: &quot;mining.submit&quot;, &quot;params&quot;: [&quot;bc1qexampleaddress.rig1&quot;, &quot;00000002&quot;, &quot;00000000&quot;, &quot;6a1b2c3d&quot;, &quot;1a2b3c4d&quot;]}
+<pre><code class="language-json">{
+    &quot;id&quot;: 4,
+    &quot;method&quot;: &quot;mining.submit&quot;,
+    &quot;params&quot;: [
+        &quot;bc1qexampleaddress.rig1&quot;,
+        &quot;00000002&quot;,
+        &quot;00000000&quot;,
+        &quot;6a1b2c3d&quot;,
+        &quot;1a2b3c4d&quot;
+    ]
+}
 {&quot;id&quot;: 4, &quot;result&quot;: true, &quot;error&quot;: null}
 </code></pre>
 <p>The header is rebuilt from the job, the coinbase of <code>coinb1</code>,
@@ -708,7 +741,21 @@ from the last sent, and so applies to that job and those that follow.</p>
 </tr>
 </tbody>
 </table></div>
-<pre><code class="language-json">{&quot;id&quot;: null, &quot;method&quot;: &quot;mining.notify&quot;, &quot;params&quot;: [&quot;00000002&quot;, &quot;...&quot;, &quot;02000000010000...&quot;, &quot;ffffffff02...&quot;, [&quot;...&quot;], &quot;20000000&quot;, &quot;1703a30c&quot;, &quot;6a1b2c3d&quot;, true]}
+<pre><code class="language-json">{
+    &quot;id&quot;: null,
+    &quot;method&quot;: &quot;mining.notify&quot;,
+    &quot;params&quot;: [
+        &quot;00000002&quot;,
+        &quot;...&quot;,
+        &quot;02000000010000...&quot;,
+        &quot;feffffff02...&quot;,
+        [&quot;...&quot;],
+        &quot;20000000&quot;,
+        &quot;1703a30c&quot;,
+        &quot;6a1b2c3d&quot;,
+        true
+    ]
+}
 </code></pre>
 <p>A job is sent for each new template of the block above the confirmed
 top: on each new block, which voids earlier jobs, and while the block is
