@@ -560,6 +560,11 @@ the longest expected time between shares
 <td><code>bs</code> to miner</td>
 <td>Sends a job</td>
 </tr>
+<tr>
+<td><a href="#clientreconnect"><code>client.reconnect</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Not sent</td>
+</tr>
 </tbody>
 </table></div>
 <p>Jobs begin once the connection is both subscribed and authorized, in
@@ -784,6 +789,8 @@ top: on each new block, which voids earlier jobs, and while the block is
 pending, as the pool replaces the template
 (<code>pool.template_interval_seconds</code>), which does not. The last 16
 jobs of a connection are retained for shares.</p>
+<h3 id="clientreconnect">client.reconnect<a class="anchor" href="#clientreconnect" aria-label="Link to this section">#</a></h3>
+<p>Not sent: <code>bs</code> does not move a miner to another server.</p>
 <h2 id="3-coinbase-and-difficulty">3. Coinbase and difficulty<a class="anchor" href="#3-coinbase-and-difficulty" aria-label="Link to this section">#</a></h2>
 <p>The coinbase is version 2, with one input and two outputs. Its input
 script pushes the block height (BIP34), the <code>coinbase_tag</code> if any, and

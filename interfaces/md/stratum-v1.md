@@ -108,6 +108,7 @@ the longest expected time between shares
 | [`mining.multi_version`](#miningmulti_version) | Miner to `bs` | Not implemented (answered `20`) |
 | [`mining.set_difficulty`](#miningset_difficulty) | `bs` to miner | Sets the share difficulty |
 | [`mining.notify`](#miningnotify) | `bs` to miner | Sends a job |
+| [`client.reconnect`](#clientreconnect) | `bs` to miner | Not sent |
 
 Jobs begin once the connection is both subscribed and authorized, in
 either order.
@@ -307,6 +308,10 @@ top: on each new block, which voids earlier jobs, and while the block is
 pending, as the pool replaces the template
 (`pool.template_interval_seconds`), which does not. The last 16
 jobs of a connection are retained for shares.
+
+### client.reconnect
+
+Not sent: `bs` does not move a miner to another server.
 
 ## 3. Coinbase and difficulty
 
