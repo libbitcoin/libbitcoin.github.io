@@ -490,7 +490,7 @@ Each client links to its notes (§3).</p>
 <td><a href="#electrum">Electrum</a></td>
 <td>Wallet</td>
 <td>4.8.4</td>
-<td><span class="nw">2026-11-22</span></td>
+<td><span class="nw">2026-11-23</span></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"><span class="partial" title="Partial">◑</span></td>
 <td style="text-align: center;"></td>
@@ -966,11 +966,22 @@ from 2015 to the pool, up to 150 transactions each) synced in 30
 seconds. All 541 transactions it shared with a public Electrum server
 were identical in amount, fee, height, position and confirmations, the
 confirmed balance matched, and the wallet verified every header and
-merkle proof. Partial for the pool: a transaction that has left the
-<code>bs</code> pool, such as the loser of a double spend, is still reported as
-unconfirmed by <code>blockchain.scripthash.get_mempool</code> and <code>listunspent</code>,
-and <code>blockchain.scripthash.get_balance</code> reports no unconfirmed amount.
-Sending was not tested.</p>
+merkle proof.</p>
+<p>Sending was tested on testnet5, with testnet5 added to Electrum
+(<a href="https://github.com/eynhaender/electrum/tree/feature/testnet5">eynhaender/electrum</a>).
+The wallet received coins, broadcast a payment through <code>bs</code>, which
+relayed it to other nodes within 20 seconds, and replaced it with a
+higher fee (RBF). The wallet showed the correct history and balance
+after the replacement confirmed.</p>
+<p>Partial for the pool: <code>blockchain.scripthash.get_balance</code> reports no
+unconfirmed amount. A replaced transaction stays in the <code>bs</code> pool next
+to its replacement, so <code>get_mempool</code> lists both and <code>listunspent</code>
+returns the outputs of both. A transaction that has left the pool, such
+as the loser of a double spend or a replaced transaction after its
+replacement confirms, is still reported as unconfirmed by
+<code>get_history</code>, <code>get_mempool</code> and <code>listunspent</code>. Electrum itself drops
+such conflicts, but clients that rely on <code>listunspent</code> or <code>get_mempool</code>
+see outputs that cannot confirm.</p>
 <h3 id="satsage">SatSage<a class="anchor" href="#satsage" aria-label="Link to this section">#</a></h3>
 <p>A tax and holding period analyzer for xpub wallets. <strong>Electrum:</strong> the
 analysis of an address with 126 unspent outputs gave the same outputs,

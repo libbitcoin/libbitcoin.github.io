@@ -28,7 +28,7 @@ Each client links to its notes (§3).
 | [Bitcoin Core](#bitcoin-core) | Peer | 31.0 | <span class="nw">2026-10-17</span> | | | | | | | | | <span class="works" title="Works">✔</span> |
 | [BTCPay Server](#btcpay-server) | Payment processor | 2.4.7 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | | | | <span class="works" title="Works">✔</span> |
 | [Core Lightning](#core-lightning) | Lightning node | 26.06.10 | <span class="nw">2026-11-22</span> | | | | <span class="works" title="Works">✔</span> | | | | | |
-| [Electrum](#electrum) | Wallet | 4.8.4 | <span class="nw">2026-11-22</span> | | <span class="partial" title="Partial">◑</span> | | | | | | | |
+| [Electrum](#electrum) | Wallet | 4.8.4 | <span class="nw">2026-11-23</span> | | <span class="partial" title="Partial">◑</span> | | | | | | | |
 | [Fulcrum](#fulcrum) | Electrum server | 2.1.3 | <span class="nw">2026-10-16</span> | | | | <span class="blocked" title="Blocked">✘</span> | | <span class="works" title="Works">✔</span> | | | |
 | [kassiber](#kassiber) | Accounting | 0.22.78 | <span class="nw">2026-11-06</span> | | <span class="works" title="Works">✔</span> | | <span class="no" title="No">⊘</span> | | | | <span class="blocked" title="Blocked">✘</span> | |
 | [lnd](#lnd) | Lightning node | 0.21.8 | <span class="nw">2026-11-23</span> | | | | <span class="works" title="Works">✔</span> | | <span class="works" title="Works">✔</span> | <span class="partial" title="Partial">◑</span> | | <span class="works" title="Works">✔</span> |
@@ -130,11 +130,24 @@ from 2015 to the pool, up to 150 transactions each) synced in 30
 seconds. All 541 transactions it shared with a public Electrum server
 were identical in amount, fee, height, position and confirmations, the
 confirmed balance matched, and the wallet verified every header and
-merkle proof. Partial for the pool: a transaction that has left the
-`bs` pool, such as the loser of a double spend, is still reported as
-unconfirmed by `blockchain.scripthash.get_mempool` and `listunspent`,
-and `blockchain.scripthash.get_balance` reports no unconfirmed amount.
-Sending was not tested.
+merkle proof.
+
+Sending was tested on testnet5, with testnet5 added to Electrum
+([eynhaender/electrum](https://github.com/eynhaender/electrum/tree/feature/testnet5)).
+The wallet received coins, broadcast a payment through `bs`, which
+relayed it to other nodes within 20 seconds, and replaced it with a
+higher fee (RBF). The wallet showed the correct history and balance
+after the replacement confirmed.
+
+Partial for the pool: `blockchain.scripthash.get_balance` reports no
+unconfirmed amount. A replaced transaction stays in the `bs` pool next
+to its replacement, so `get_mempool` lists both and `listunspent`
+returns the outputs of both. A transaction that has left the pool, such
+as the loser of a double spend or a replaced transaction after its
+replacement confirms, is still reported as unconfirmed by
+`get_history`, `get_mempool` and `listunspent`. Electrum itself drops
+such conflicts, but clients that rely on `listunspent` or `get_mempool`
+see outputs that cannot confirm.
 
 ### SatSage
 
