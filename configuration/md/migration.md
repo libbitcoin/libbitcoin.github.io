@@ -13,6 +13,8 @@ store must be recreated.
 | ---- | -- | ------ |
 | 4.0.30 | 4.0.31 | The transaction pool tables (`pool`, `spends` and `wtxid`, and the pool and spends indexes) are discarded and created empty, sized by the current configuration as for a new store. The pool refills from the network. Headers, transactions, inputs, outputs and indexes are unchanged. |
 | 4.0.31 | 4.0.32 | The `require_witness` setting is added to the settings stored at creation, from the current configuration. |
+| 4.0.32 | 4.0.33 | Each pruned block, and each of its transactions, is flagged as pruned in place, so queries refuse them by flag ([Querying pruned blocks](setups#querying-pruned-blocks)). The coinbase of a block pruned before this step remains without its script. |
+| 4.0.33 | 4.0.34 | The store records the last block applied to the transaction pool; a migrated store records none. |
 
 A store is migrated through each step in turn. Settings stored at
 creation still override configured settings, except where a step takes a

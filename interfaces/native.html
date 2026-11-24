@@ -714,7 +714,7 @@ take, or any other value, is refused with 400.</p>
 <h3 id="24-http-status-codes">2.4 HTTP status codes<a class="anchor" href="#24-http-status-codes" aria-label="Link to this section">#</a></h3>
 <p>Over HTTP, each response carries one of these statuses
 (<a href="https://www.rfc-editor.org/rfc/rfc9110.txt">RFC 9110 §15</a>). Over a websocket
-there is no status (§2.5).</p>
+there is no status (§2.6).</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -761,7 +761,18 @@ there is no status (§2.5).</p>
 </tr>
 </tbody>
 </table></div>
-<h3 id="25-websocket">2.5 Websocket<a class="anchor" href="#25-websocket" aria-label="Link to this section">#</a></h3>
+<h3 id="25-pruned-blocks">2.5 Pruned blocks<a class="anchor" href="#25-pruned-blocks" aria-label="Link to this section">#</a></h3>
+<p>Under pruning (<code>node.limited_blocks</code>), a block under the milestone is
+stored without the input scripts and witnesses of its transactions, other
+than the coinbase (<a href="../configuration/setups.html#querying-pruned-blocks">Querying pruned blocks</a>).
+Its header, transaction hashes, outputs, spends and details remain. A
+method that would return a whole pruned block or transaction, or a
+pruned input's script or witness, returns 404: <code>block</code>, <code>block_tx</code>,
+<code>block_tx_input_script</code>, <code>tx</code>, <code>input_script</code> and <code>input_witness</code>.
+<code>inputs</code> and <code>input</code> return the <code>point</code> and <code>sequence</code> of each pruned
+input, as JSON only. <code>configuration</code> gives the pruned height as
+<code>store.pruned</code>.</p>
+<h3 id="26-websocket">2.6 Websocket<a class="anchor" href="#26-websocket" aria-label="Link to this section">#</a></h3>
 <p>Upgrade any request on the native port to a websocket.</p>
 <ul>
 <li>Each frame sent is one request path and query.</li>
@@ -1517,6 +1528,16 @@ transaction.</p>
 </code></pre>
 <p><code>data</code> is the inputs in wire format, concatenated without a count, and
 without witness data.</p>
+<p>An input of a pruned transaction (<a href="#25-pruned-blocks">Pruned blocks</a>) has
+only its <code>point</code> and <code>sequence</code>, as JSON only:</p>
+<pre><code class="language-json">{
+    &quot;point&quot;: {
+        &quot;hash&quot;: &quot;...&quot;,
+        &quot;index&quot;: 0
+    },
+    &quot;sequence&quot;: 4294967295
+}
+</code></pre>
 <h3 id="input">input<a class="anchor" href="#input" aria-label="Link to this section">#</a></h3>
 <p>One input of a transaction.</p>
 <pre><code>/v1/input/{tx hash}/{index}

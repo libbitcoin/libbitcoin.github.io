@@ -154,7 +154,7 @@ take, or any other value, is refused with 400.
 
 Over HTTP, each response carries one of these statuses
 ([RFC 9110 §15](https://www.rfc-editor.org/rfc/rfc9110.txt)). Over a websocket
-there is no status (§2.5).
+there is no status (§2.6).
 
 | Status | Meaning |
 | ------ | ------- |
@@ -168,7 +168,20 @@ there is no status (§2.5).
 | 501 | A required index or feature is disabled (address index, client filters, transaction relay) |
 | 503 | The transaction pool is not yet open |
 
-### 2.5 Websocket
+### 2.5 Pruned blocks
+
+Under pruning (`node.limited_blocks`), a block under the milestone is
+stored without the input scripts and witnesses of its transactions, other
+than the coinbase ([Querying pruned blocks](../configuration/setups#querying-pruned-blocks)).
+Its header, transaction hashes, outputs, spends and details remain. A
+method that would return a whole pruned block or transaction, or a
+pruned input's script or witness, returns 404: `block`, `block_tx`,
+`block_tx_input_script`, `tx`, `input_script` and `input_witness`.
+`inputs` and `input` return the `point` and `sequence` of each pruned
+input, as JSON only. `configuration` gives the pruned height as
+`store.pruned`.
+
+### 2.6 Websocket
 
 Upgrade any request on the native port to a websocket.
 
@@ -990,6 +1003,19 @@ $ curl "http://localhost:8180/v1/input/4a5e1e4baab89f3a32518a88c31bc87f618f76673
 
 `data` is the inputs in wire format, concatenated without a count, and
 without witness data.
+
+An input of a pruned transaction ([Pruned blocks](#25-pruned-blocks)) has
+only its `point` and `sequence`, as JSON only:
+
+```json
+{
+    "point": {
+        "hash": "...",
+        "index": 0
+    },
+    "sequence": 4294967295
+}
+```
 
 ### input
 

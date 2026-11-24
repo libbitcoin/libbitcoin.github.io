@@ -251,6 +251,8 @@ not.
 ### block
 
 A block. A block that fails validation disconnects the peer that sent it.
+A block that `bs` has pruned ([Querying pruned blocks](../configuration/setups#querying-pruned-blocks))
+is not served, and is answered as not found.
 
 ### notfound
 

@@ -383,8 +383,9 @@ milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950
 </code></pre>
 <p>Pruning reduces download and store size under a milestone sync. With
 <code>node.limited_blocks</code>, blocks under the milestone are downloaded and stored
-without their input scripts and witnesses, and the node serves only
-blocks above the milestone to peers.</p>
+without the input scripts and witnesses of their transactions, other than
+the coinbase, which is stored whole. The node serves only blocks above the
+milestone to peers.</p>
 <pre><code class="language-ini"><span class="section">[node]</span>
 limited_blocks = true
 </code></pre>
@@ -395,6 +396,54 @@ values are used in place of the configured values, and a configured
 value that differs from its recorded value is logged. Changing them
 requires a new store (<a href="store.html#3-settings-fixed-at-store-creation">Settings fixed at store creation</a>).</p>
 </blockquote>
+<h3 id="querying-pruned-blocks">Querying pruned blocks<a class="anchor" href="#querying-pruned-blocks" aria-label="Link to this section">#</a></h3>
+<p>A pruned block keeps its header, its transaction hashes, every output,
+the outpoint and sequence of every input, its coinbase whole, and the
+sizes, values and fees of its transactions. So blocks and transactions
+can still be listed, outputs and spends followed, and details given, but
+a whole pruned block or transaction, or a pruned input's script or
+witness, cannot be served:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Refused for a pruned block or transaction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../interfaces/native.html#25-pruned-blocks">Native</a></td>
+<td><code>block</code>, <code>block_tx</code>, <code>block_tx_input_script</code>, <code>tx</code>, <code>input_script</code> and <code>input_witness</code> return 404. <code>inputs</code> and <code>input</code> return each input's <code>point</code> and <code>sequence</code>, as JSON only.</td>
+</tr>
+<tr>
+<td><a href="../interfaces/bitcoind-rpc.html">Bitcoind RPC</a></td>
+<td><code>getblock</code>, <code>getblockstats</code> and <code>getdescriptoractivity</code> return "Block not available (pruned data)" or -1; <code>getrawtransaction</code>, and <code>gettxspendingprevout</code> with <code>return_spending_tx</code>, return -5.</td>
+</tr>
+<tr>
+<td><a href="../interfaces/bitcoind-rest.html">Bitcoind REST</a></td>
+<td><code>block</code>, <code>block/notxdetails</code>, <code>blockpart</code> and <code>tx</code> return 404.</td>
+</tr>
+<tr>
+<td><a href="../interfaces/btcd.html">BTCD</a></td>
+<td><code>rescanblocks</code> and <code>searchrawtransactions</code> return -5.</td>
+</tr>
+<tr>
+<td><a href="../interfaces/electrum.html">Electrum</a></td>
+<td><code>blockchain.transaction.get</code> returns a daemon error.</td>
+</tr>
+<tr>
+<td><a href="../interfaces/esplora.html">Esplora</a></td>
+<td>A transaction, a raw block, a page of block transactions, or a page of address transactions that includes one, returns 404.</td>
+</tr>
+<tr>
+<td><a href="../interfaces/p2p.html#notfound">P2P</a></td>
+<td>A requested block is not served, as not found.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The coinbase of a block pruned before schema 4.0.33 was stored without
+its script, and is refused as well
+(<a href="migration.html">Store Migration</a>).</p>
 <h2 id="3-full-validation">3. Full validation<a class="anchor" href="#3-full-validation" aria-label="Link to this section">#</a></h2>
 <p>To validate every block, set the milestone to the genesis block:</p>
 <pre><code class="language-ini"><span class="section">[bitcoin]</span>

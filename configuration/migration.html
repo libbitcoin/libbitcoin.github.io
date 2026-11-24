@@ -393,6 +393,16 @@ store must be recreated.</p>
 <td>4.0.32</td>
 <td>The <code>require_witness</code> setting is added to the settings stored at creation, from the current configuration.</td>
 </tr>
+<tr>
+<td>4.0.32</td>
+<td>4.0.33</td>
+<td>Each pruned block, and each of its transactions, is flagged as pruned in place, so queries refuse them by flag (<a href="setups.html#querying-pruned-blocks">Querying pruned blocks</a>). The coinbase of a block pruned before this step remains without its script.</td>
+</tr>
+<tr>
+<td>4.0.33</td>
+<td>4.0.34</td>
+<td>The store records the last block applied to the transaction pool; a migrated store records none.</td>
+</tr>
 </tbody>
 </table></div>
 <p>A store is migrated through each step in turn. Settings stored at

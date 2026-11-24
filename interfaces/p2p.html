@@ -774,7 +774,9 @@ blocks in parallel across peers, and drops peers that are much slower than
 the rest. It serves blocks and transactions from its store, confirmed or
 not.</p>
 <h3 id="block">block<a class="anchor" href="#block" aria-label="Link to this section">#</a></h3>
-<p>A block. A block that fails validation disconnects the peer that sent it.</p>
+<p>A block. A block that fails validation disconnects the peer that sent it.
+A block that <code>bs</code> has pruned (<a href="../configuration/setups.html#querying-pruned-blocks">Querying pruned blocks</a>)
+is not served, and is answered as not found.</p>
 <h3 id="notfound">notfound<a class="anchor" href="#notfound" aria-label="Link to this section">#</a></h3>
 <p>Answers a <code>getdata</code> for an object <code>bs</code> does not have. Without
 <code>peer.enable_not_found</code>, the peer is disconnected instead.</p>

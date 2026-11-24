@@ -24,8 +24,9 @@ milestone = 000000000000000000010b93c9ea1c29fea277383f0f7d1f26de8b5802e885ff:950
 
 Pruning reduces download and store size under a milestone sync. With
 `node.limited_blocks`, blocks under the milestone are downloaded and stored
-without their input scripts and witnesses, and the node serves only
-blocks above the milestone to peers.
+without the input scripts and witnesses of their transactions, other than
+the coinbase, which is stored whole. The node serves only blocks above the
+milestone to peers.
 
 ```ini
 [node]
@@ -37,6 +38,29 @@ limited_blocks = true
 > values are used in place of the configured values, and a configured
 > value that differs from its recorded value is logged. Changing them
 > requires a new store ([Settings fixed at store creation](store#3-settings-fixed-at-store-creation)).
+
+### Querying pruned blocks
+
+A pruned block keeps its header, its transaction hashes, every output,
+the outpoint and sequence of every input, its coinbase whole, and the
+sizes, values and fees of its transactions. So blocks and transactions
+can still be listed, outputs and spends followed, and details given, but
+a whole pruned block or transaction, or a pruned input's script or
+witness, cannot be served:
+
+| Interface | Refused for a pruned block or transaction |
+| --------- | ----------------------------------------- |
+| [Native](../interfaces/native#25-pruned-blocks) | `block`, `block_tx`, `block_tx_input_script`, `tx`, `input_script` and `input_witness` return 404. `inputs` and `input` return each input's `point` and `sequence`, as JSON only. |
+| [Bitcoind RPC](../interfaces/bitcoind-rpc) | `getblock`, `getblockstats` and `getdescriptoractivity` return "Block not available (pruned data)" or -1; `getrawtransaction`, and `gettxspendingprevout` with `return_spending_tx`, return -5. |
+| [Bitcoind REST](../interfaces/bitcoind-rest) | `block`, `block/notxdetails`, `blockpart` and `tx` return 404. |
+| [BTCD](../interfaces/btcd) | `rescanblocks` and `searchrawtransactions` return -5. |
+| [Electrum](../interfaces/electrum) | `blockchain.transaction.get` returns a daemon error. |
+| [Esplora](../interfaces/esplora) | A transaction, a raw block, a page of block transactions, or a page of address transactions that includes one, returns 404. |
+| [P2P](../interfaces/p2p#notfound) | A requested block is not served, as not found. |
+
+The coinbase of a block pruned before schema 4.0.33 was stored without
+its script, and is refused as well
+([Store Migration](migration)).
 
 ## 3. Full validation
 
