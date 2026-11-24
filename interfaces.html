@@ -388,12 +388,17 @@ const services = [
     ['configuration', Y, 'json', 'v1'],
     ['top', Y, 'json, data, text', 'v1'],
     ['top_subscribe', Y, 'json', 'v1'],
+    ['top_chain', Y, 'json, data, text', 'v1'],
+    ['top_height', Y, 'json, data, text', 'v1'],
     ['block', Y, 'json, data, text; witness', 'v1'],
     ['block_header', Y, 'json, data, text', 'v1'],
     ['block_header_context', Y, 'json', 'v1'],
     ['block_details', Y, 'json', 'v1'],
     ['block_txs', Y, 'json, data, text', 'v1'],
+    ['block_txs_details', Y, 'json', 'v1'],
     ['block_tx', Y, 'json, data, text; witness', 'v1'],
+    ['block_tx_input_script', Y, 'json, data, text', 'v1'],
+    ['block_tx_output_script', Y, 'json, data, text', 'v1'],
     ['block_subscribe', Y, 'json, data, text', 'v1'],
     ['tx', Y, 'json, data, text; witness', 'v1'],
     ['tx_header', Y, 'json, data, text', 'v1'],
@@ -416,7 +421,12 @@ const services = [
     ['address_confirmed', Y, 'json, data, text; address index required', 'v1'],
     ['address_balance', Y, 'json, data, text; address index required', 'v1'],
     ['address_subscribe', Y, 'json; address index required', 'v1'],
-    ['address_unconfirmed', Y, 'json, data, text; address index required', 'v1']
+    ['address_unconfirmed', Y, 'json, data, text; address index required', 'v1'],
+    ['fees', Y, 'json; tx relay required', 'v1'],
+    ['template', Y, 'json; tx relay required', 'v1'],
+    ['template_txs', Y, 'json, data, text; tx relay required', 'v1'],
+    ['template_txs_details', Y, 'json; tx relay required', 'v1'],
+    ['template_subscribe', Y, 'json, data, text; tx relay required', 'v1']
   ]
 },
 {

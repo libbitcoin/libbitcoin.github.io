@@ -534,6 +534,12 @@ chosen with <code>format=</code> or the <code>Accept</code> header:</p>
 </tr>
 </tbody>
 </table></div>
+<p>Each block and template page has Previous and Next links across
+heights; Next from the confirmed top opens the template of the next
+block, and "Pool" in the navigation opens it directly. Its Details
+section draws the block's or template's transactions as a treemap, area
+by virtual size and color by fee rate, outlined by cluster, with a panel
+for each transaction.</p>
 <p>To serve a custom block explorer from a directory instead of the embedded
 site, set <code>folders.native</code>. A request for <code>/</code> returns <code>native.default</code>
 (<code>index.html</code>).</p>
@@ -541,7 +547,7 @@ site, set <code>folders.native</code>. A request for <code>/</code> returns <cod
 <ul>
 <li>HTTP and websocket on each port. Over a websocket, each frame is one
   request path, and the <code>subscribe</code> paths (top, block, transaction,
-  output and address) push notifications.</li>
+  output, address and template) push notifications.</li>
 <li>Data, text, JSON and HTML formats for each path.</li>
 <li>TLS on its <code>safe</code> addresses (<a href="services.html#2-secure-connections">Secure connections</a>), with optional client certificates
   (<a href="services.html#3-authentication">Authentication</a>).</li>

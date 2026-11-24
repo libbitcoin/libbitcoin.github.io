@@ -59,6 +59,7 @@ Every path, and the method it calls. `{chain}` is `confirmed` or
 | `/v1/block/{block}/header/context` | [`block_header_context`](#block_header_context) |
 | `/v1/block/{block}/details` | [`block_details`](#block_details) |
 | `/v1/block/{block}/txs` | [`block_txs`](#block_txs) |
+| `/v1/block/{block}/txs/details` | [`block_txs_details`](#block_txs_details) |
 | `/v1/block/{block}/tx/{position}` | [`block_tx`](#block_tx) |
 | `/v1/block/{block}/tx/{position}/input/{index}/script` | [`block_tx_input_script`](#block_tx_input_script) |
 | `/v1/block/{block}/tx/{position}/output/{index}/script` | [`block_tx_output_script`](#block_tx_output_script) |
@@ -85,6 +86,11 @@ Every path, and the method it calls. `{chain}` is `confirmed` or
 | `/v1/address/{script hash}/unconfirmed` | [`address_unconfirmed`](#address_unconfirmed) |
 | `/v1/address/{script hash}/balance` | [`address_balance`](#address_balance) |
 | `/v1/address/{script hash}/subscribe` | [`address_subscribe`](#address_subscribe) |
+| `/v1/fees` | [`fees`](#fees) |
+| `/v1/template/{height}` | [`template`](#template) |
+| `/v1/template/{height}/txs` | [`template_txs`](#template_txs) |
+| `/v1/template/{height}/txs/details` | [`template_txs_details`](#template_txs_details) |
+| `/v1/template/subscribe` | [`template_subscribe`](#template_subscribe) |
 
 ## 2. Calling pattern
 
@@ -116,7 +122,7 @@ $ curl "http://localhost:8180/v1/top?format=json"
 | `json` | `application/json` | The object as JSON |
 | `data` | `application/octet-stream` | The object's raw bytes, usually its wire serialization |
 | `text` | `text/plain` | The `data` bytes as hex |
-| `html` | `text/html` | The block explorer page |
+| `html` | `text/html` | The block explorer's page for the path |
 
 `format` takes precedence over the `Accept` header. Without `format`, the
 `Accept` header must name one of these media types exactly. Since `*/*`
@@ -159,7 +165,8 @@ there is no status (§2.5).
 | 404 | The object was not found |
 | 406 | The format is not supported by the method |
 | 500 | Store integrity fault |
-| 501 | A required index or feature is disabled (address index, client filters) |
+| 501 | A required index or feature is disabled (address index, client filters, transaction relay) |
+| 503 | The transaction pool is not yet open |
 
 ### 2.5 Websocket
 
@@ -665,6 +672,51 @@ $ curl "http://localhost:8180/v1/block/confirmed/0/txs?format=json"
 ```
 
 `data` is the 32 byte hashes concatenated, in internal order.
+
+### block_txs_details
+
+The sizes, value, fee and cluster of each transaction of a block, in
+order, the coinbase first.
+
+```
+/v1/block/{block}/txs/details
+```
+
+Formats: `json`.
+
+```
+$ curl "http://localhost:8180/v1/block/confirmed/1/txs/details?format=json"
+```
+
+```json
+[
+    {
+        "segregated": false,
+        "nominal": 134,
+        "maximal": 134,
+        "weight": 536,
+        "virtual": 134,
+        "value": 5000000000,
+        "spend": 5000000000,
+        "fee": 0,
+        "cluster": 0
+    }
+]
+```
+
+| Field | Meaning |
+| ----- | ------- |
+| `segregated` | The transaction has witness data |
+| `nominal`, `maximal` | Size without and with witness data |
+| `weight`, `virtual` | Weight and virtual size |
+| `value` | Total value of the inputs; for the coinbase, the block reward (subsidy and fees) |
+| `spend` | Total value of the outputs; for the coinbase, the reward claimed |
+| `fee` | `value` less `spend`; 0 for the coinbase |
+| `cluster` | Label of the transaction's cluster, numbered in order of first appearance |
+
+A cluster is a set of the block's transactions joined by spends among
+them: a transaction that spends an output of another in the block is in
+its cluster.
 
 ### block_tx
 
@@ -1173,3 +1225,120 @@ The address's outputs, as for [`address`](#address).
 ```
 
 Formats: `json`, `data`, `text`. Options: `turbo`, `stop`.
+
+## 9. Pool
+
+These answer from the transaction pool, so they require transaction
+relay (`peer.enable_relay`): without it they return 501, and until the
+pool opens, 503.
+
+### fees
+
+The fee rates of the confirmable transactions of the pool.
+
+```
+/v1/fees
+```
+
+Formats: `json`.
+
+```json
+{
+    "count": 17054,
+    "virtual": 9734212,
+    "fee": 41208733,
+    "histogram": [[12.5, 50211], [4.1, 50004], [1.0, 23119]]
+}
+```
+
+| Field | Meaning |
+| ----- | ------- |
+| `count` | Confirmable transactions |
+| `virtual` | Their total virtual size |
+| `fee` | Their total fee, in satoshis |
+| `histogram` | `[rate, virtual]` bins in descending fee rate (satoshis per virtual byte), each closed once it exceeds 50,000 virtual bytes |
+
+### template
+
+A summary of the template of the next block.
+
+```
+/v1/template/{height}
+```
+
+Formats: `json`.
+
+```json
+{
+    "height": 950001,
+    "count": 3412,
+    "virtual": 997921,
+    "weight": 3991684,
+    "fees": 2310441,
+    "clusters": 2987
+}
+```
+
+| Field | Meaning |
+| ----- | ------- |
+| `height` | Height of the block |
+| `count` | Transactions, without the coinbase |
+| `virtual`, `weight` | Virtual size and weight of those transactions |
+| `fees` | Their total fee |
+| `clusters` | Their clusters ([`block_txs_details`](#block_txs_details)) |
+
+Only the template of the next block, the confirmed top plus one, is
+held. Any other height returns 404.
+
+### template_txs
+
+The transaction hashes of the template, in block order.
+
+```
+/v1/template/{height}/txs
+```
+
+Formats: `json`, `data`, `text`.
+
+Position 0 is the coinbase, which the template does not contain, given
+as the null hash (64 zeros), so that each position is that of the mined
+block. `data` is the 32 byte hashes concatenated, in internal order.
+
+### template_txs_details
+
+The details of each transaction of the template, in block order, as for
+[`block_txs_details`](#block_txs_details).
+
+```
+/v1/template/{height}/txs/details
+```
+
+Formats: `json`.
+
+Position 0 models the coinbase from the space reserved for it
+(`pool.coinbase_weight`): `weight` is the reservation, `maximal` its size
+with witness, `nominal` its size without the witness and its commitment
+(527 and 444 at the default 2000), and `value` and `spend` are the block
+reward, the subsidy and the template's fees. Its `cluster` is 0, and
+the clusters of the transactions follow from 1.
+
+### template_subscribe
+
+A notification for each new template. Websocket only.
+
+```
+/v1/template/subscribe
+```
+
+Formats: `json`, `data`, `text`. Options: `stop`.
+
+```
+→ /v1/template/subscribe
+←
+← 950001
+```
+
+The reply is empty, and each new template then sends its height: a JSON
+number, or four bytes little-endian as `data`, or their hex as `text`.
+While subscribed, the node keeps building templates, replacing them on
+each new block and as the pool changes (`pool.template_interval_seconds`).

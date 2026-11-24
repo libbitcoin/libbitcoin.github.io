@@ -470,6 +470,10 @@ hashes and indexes that form the next request's URL:</p>
 <td><a href="#block_txs"><code>block_txs</code></a></td>
 </tr>
 <tr>
+<td><code>/v1/block/{block}/txs/details</code></td>
+<td><a href="#block_txs_details"><code>block_txs_details</code></a></td>
+</tr>
+<tr>
 <td><code>/v1/block/{block}/tx/{position}</code></td>
 <td><a href="#block_tx"><code>block_tx</code></a></td>
 </tr>
@@ -573,6 +577,26 @@ hashes and indexes that form the next request's URL:</p>
 <td><code>/v1/address/{script hash}/subscribe</code></td>
 <td><a href="#address_subscribe"><code>address_subscribe</code></a></td>
 </tr>
+<tr>
+<td><code>/v1/fees</code></td>
+<td><a href="#fees"><code>fees</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/template/{height}</code></td>
+<td><a href="#template"><code>template</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/template/{height}/txs</code></td>
+<td><a href="#template_txs"><code>template_txs</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/template/{height}/txs/details</code></td>
+<td><a href="#template_txs_details"><code>template_txs_details</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/template/subscribe</code></td>
+<td><a href="#template_subscribe"><code>template_subscribe</code></a></td>
+</tr>
 </tbody>
 </table></div>
 <h2 id="2-calling-pattern">2. Calling pattern<a class="anchor" href="#2-calling-pattern" aria-label="Link to this section">#</a></h2>
@@ -638,7 +662,7 @@ binding (default port 8180):</p>
 <tr>
 <td><code>html</code></td>
 <td><code>text/html</code></td>
-<td>The block explorer page</td>
+<td>The block explorer's page for the path</td>
 </tr>
 </tbody>
 </table></div>
@@ -729,7 +753,11 @@ there is no status (§2.5).</p>
 </tr>
 <tr>
 <td>501</td>
-<td>A required index or feature is disabled (address index, client filters)</td>
+<td>A required index or feature is disabled (address index, client filters, transaction relay)</td>
+</tr>
+<tr>
+<td>503</td>
+<td>The transaction pool is not yet open</td>
 </tr>
 </tbody>
 </table></div>
@@ -1261,6 +1289,69 @@ activation, and the other forks activate later in the chain.</p>
 ]
 </code></pre>
 <p><code>data</code> is the 32 byte hashes concatenated, in internal order.</p>
+<h3 id="block_txs_details">block_txs_details<a class="anchor" href="#block_txs_details" aria-label="Link to this section">#</a></h3>
+<p>The sizes, value, fee and cluster of each transaction of a block, in
+order, the coinbase first.</p>
+<pre><code>/v1/block/{block}/txs/details
+</code></pre>
+<p>Formats: <code>json</code>.</p>
+<pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/1/txs/details?format=json&quot;
+</code></pre>
+<pre><code class="language-json">[
+    {
+        &quot;segregated&quot;: false,
+        &quot;nominal&quot;: 134,
+        &quot;maximal&quot;: 134,
+        &quot;weight&quot;: 536,
+        &quot;virtual&quot;: 134,
+        &quot;value&quot;: 5000000000,
+        &quot;spend&quot;: 5000000000,
+        &quot;fee&quot;: 0,
+        &quot;cluster&quot;: 0
+    }
+]
+</code></pre>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>segregated</code></td>
+<td>The transaction has witness data</td>
+</tr>
+<tr>
+<td><code>nominal</code>, <code>maximal</code></td>
+<td>Size without and with witness data</td>
+</tr>
+<tr>
+<td><code>weight</code>, <code>virtual</code></td>
+<td>Weight and virtual size</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>Total value of the inputs; for the coinbase, the block reward (subsidy and fees)</td>
+</tr>
+<tr>
+<td><code>spend</code></td>
+<td>Total value of the outputs; for the coinbase, the reward claimed</td>
+</tr>
+<tr>
+<td><code>fee</code></td>
+<td><code>value</code> less <code>spend</code>; 0 for the coinbase</td>
+</tr>
+<tr>
+<td><code>cluster</code></td>
+<td>Label of the transaction's cluster, numbered in order of first appearance</td>
+</tr>
+</tbody>
+</table></div>
+<p>A cluster is a set of the block's transactions joined by spends among
+them: a transaction that spends an output of another in the block is in
+its cluster.</p>
 <h3 id="block_tx">block_tx<a class="anchor" href="#block_tx" aria-label="Link to this section">#</a></h3>
 <p>The transaction at a position in a block.</p>
 <pre><code>/v1/block/{block}/tx/{position}
@@ -1572,6 +1663,127 @@ concatenated. An address with no outputs returns 404.</p>
 <pre><code>/v1/address/{script hash}/subscribe
 </code></pre>
 <p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>turbo</code>, <code>stop</code>.</p>
+<h2 id="9-pool">9. Pool<a class="anchor" href="#9-pool" aria-label="Link to this section">#</a></h2>
+<p>These answer from the transaction pool, so they require transaction
+relay (<code>peer.enable_relay</code>): without it they return 501, and until the
+pool opens, 503.</p>
+<h3 id="fees">fees<a class="anchor" href="#fees" aria-label="Link to this section">#</a></h3>
+<p>The fee rates of the confirmable transactions of the pool.</p>
+<pre><code>/v1/fees
+</code></pre>
+<p>Formats: <code>json</code>.</p>
+<pre><code class="language-json">{
+    &quot;count&quot;: 17054,
+    &quot;virtual&quot;: 9734212,
+    &quot;fee&quot;: 41208733,
+    &quot;histogram&quot;: [[12.5, 50211], [4.1, 50004], [1.0, 23119]]
+}
+</code></pre>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count</code></td>
+<td>Confirmable transactions</td>
+</tr>
+<tr>
+<td><code>virtual</code></td>
+<td>Their total virtual size</td>
+</tr>
+<tr>
+<td><code>fee</code></td>
+<td>Their total fee, in satoshis</td>
+</tr>
+<tr>
+<td><code>histogram</code></td>
+<td><code>[rate, virtual]</code> bins in descending fee rate (satoshis per virtual byte), each closed once it exceeds 50,000 virtual bytes</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="template">template<a class="anchor" href="#template" aria-label="Link to this section">#</a></h3>
+<p>A summary of the template of the next block.</p>
+<pre><code>/v1/template/{height}
+</code></pre>
+<p>Formats: <code>json</code>.</p>
+<pre><code class="language-json">{
+    &quot;height&quot;: 950001,
+    &quot;count&quot;: 3412,
+    &quot;virtual&quot;: 997921,
+    &quot;weight&quot;: 3991684,
+    &quot;fees&quot;: 2310441,
+    &quot;clusters&quot;: 2987
+}
+</code></pre>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>height</code></td>
+<td>Height of the block</td>
+</tr>
+<tr>
+<td><code>count</code></td>
+<td>Transactions, without the coinbase</td>
+</tr>
+<tr>
+<td><code>virtual</code>, <code>weight</code></td>
+<td>Virtual size and weight of those transactions</td>
+</tr>
+<tr>
+<td><code>fees</code></td>
+<td>Their total fee</td>
+</tr>
+<tr>
+<td><code>clusters</code></td>
+<td>Their clusters (<a href="#block_txs_details"><code>block_txs_details</code></a>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Only the template of the next block, the confirmed top plus one, is
+held. Any other height returns 404.</p>
+<h3 id="template_txs">template_txs<a class="anchor" href="#template_txs" aria-label="Link to this section">#</a></h3>
+<p>The transaction hashes of the template, in block order.</p>
+<pre><code>/v1/template/{height}/txs
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<p>Position 0 is the coinbase, which the template does not contain, given
+as the null hash (64 zeros), so that each position is that of the mined
+block. <code>data</code> is the 32 byte hashes concatenated, in internal order.</p>
+<h3 id="template_txs_details">template_txs_details<a class="anchor" href="#template_txs_details" aria-label="Link to this section">#</a></h3>
+<p>The details of each transaction of the template, in block order, as for
+<a href="#block_txs_details"><code>block_txs_details</code></a>.</p>
+<pre><code>/v1/template/{height}/txs/details
+</code></pre>
+<p>Formats: <code>json</code>.</p>
+<p>Position 0 models the coinbase from the space reserved for it
+(<code>pool.coinbase_weight</code>): <code>weight</code> is the reservation, <code>maximal</code> its size
+with witness, <code>nominal</code> its size without the witness and its commitment
+(527 and 444 at the default 2000), and <code>value</code> and <code>spend</code> are the block
+reward, the subsidy and the template's fees. Its <code>cluster</code> is 0, and
+the clusters of the transactions follow from 1.</p>
+<h3 id="template_subscribe">template_subscribe<a class="anchor" href="#template_subscribe" aria-label="Link to this section">#</a></h3>
+<p>A notification for each new template. Websocket only.</p>
+<pre><code>/v1/template/subscribe
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>stop</code>.</p>
+<pre><code>→ /v1/template/subscribe
+←
+← 950001
+</code></pre>
+<p>The reply is empty, and each new template then sends its height: a JSON
+number, or four bytes little-endian as <code>data</code>, or their hex as <code>text</code>.
+While subscribed, the node keeps building templates, replacing them on
+each new block and as the pool changes (<code>pool.template_interval_seconds</code>).</p>
   </article>
 
   <nav class="pager"><a href="admin.html">&larr; Admin Console</a><a href="electrum.html">Electrum &rarr;</a></nav>

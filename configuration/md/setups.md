@@ -161,6 +161,13 @@ Query options, besides `format`:
 | `turbo=false` | address paths | Run the query on one thread instead of all (see `database.turbo`) |
 | `stop=true` | subscribe paths | End the subscription |
 
+Each block and template page has Previous and Next links across
+heights; Next from the confirmed top opens the template of the next
+block, and "Pool" in the navigation opens it directly. Its Details
+section draws the block's or template's transactions as a treemap, area
+by virtual size and color by fee rate, outlined by cluster, with a panel
+for each transaction.
+
 To serve a custom block explorer from a directory instead of the embedded
 site, set `folders.native`. A request for `/` returns `native.default`
 (`index.html`).
@@ -169,7 +176,7 @@ The native interface is libbitcoin's own, and provides:
 
 - HTTP and websocket on each port. Over a websocket, each frame is one
   request path, and the `subscribe` paths (top, block, transaction,
-  output and address) push notifications.
+  output, address and template) push notifications.
 - Data, text, JSON and HTML formats for each path.
 - TLS on its `safe` addresses ([Secure connections](services#2-secure-connections)), with optional client certificates
   ([Authentication](services#3-authentication)).
