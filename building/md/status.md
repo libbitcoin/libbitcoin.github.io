@@ -109,3 +109,53 @@ See [Distribution](../architecture/build/packaging#4-distribution).
 .scroller th:nth-child(2):not(:last-child) { width: 34%; }
 .scroller th:nth-child(2):nth-last-child(4) { width: 22%; }
 </style>
+
+<script>
+(function () {
+  var api = "https://api.github.com/repos/";
+  var life = 600000;
+  function get(url) {
+    return fetch(url, { headers: { Accept: "application/vnd.github+json" } }).then(function (response) {
+      if (!response.ok) throw new Error(response.status);
+      return response.json();
+    });
+  }
+  function remembered(key, make) {
+    try {
+      var hit = JSON.parse(localStorage.getItem(key) || "null");
+      if (hit && Date.now() - hit.time < life) return Promise.resolve(hit.value);
+    } catch (e) {}
+    return make().then(function (value) {
+      try { localStorage.setItem(key, JSON.stringify({ time: Date.now(), value: value })); } catch (e) {}
+      return value;
+    });
+  }
+  function count(repo, run) {
+    return get(api + repo + "/actions/runs/" + run + "/artifacts?per_page=100").then(function (data) {
+      var named = (data.artifacts || []).map(function (artifact) { return artifact.name.match(/^warnings-(\d+)$/); }).filter(Boolean)[0];
+      return named ? parseInt(named[1], 10) : 0;
+    });
+  }
+  function status(repo, workflow, query) {
+    return get(api + repo + "/actions/workflows/" + workflow + "/runs?status=completed&per_page=1" + query).then(function (data) {
+      var run = (data.workflow_runs || [])[0];
+      if (!run || run.conclusion !== "success") return { warnings: 0 };
+      return count(repo, run.id).then(function (warnings) { return { warnings: warnings, label: run.name }; });
+    });
+  }
+  function shield(text) {
+    return encodeURIComponent(text.replace(/-/g, "--").replace(/_/g, "__"));
+  }
+  document.querySelectorAll('img[src*="/actions/workflows/ci.yml/badge.svg"], img[src*="/actions/workflows/ci-expanded.yml/badge.svg"]').forEach(function (img) {
+    var parts = img.getAttribute("src").match(/github\.com\/([^\/]+\/[^\/]+)\/actions\/workflows\/([^\/]+)\/badge\.svg(?:\?(.*))?$/);
+    if (!parts) return;
+    var query = (parts[3] || "").split("&").filter(function (pair) { return /^(branch|event)=/.test(pair); }).map(function (pair) { return "&" + pair; }).join("");
+    if (query.indexOf("&branch=") < 0) query += "&branch=master";
+    remembered("badge:" + parts[1] + ":" + parts[2] + query, function () { return status(parts[1], parts[2], query); }).then(function (result) {
+      if (!result.warnings) return;
+      img.src = "https://img.shields.io/badge/" + shield(result.label) + "-warning-yellow?logo=github";
+      img.title = result.warnings + " compiler warning" + (result.warnings === 1 ? "" : "s") + " in the last completed run";
+    }, function () {});
+  });
+})();
+</script>
