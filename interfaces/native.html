@@ -450,6 +450,14 @@ hashes and indexes that form the next request's URL:</p>
 <td><a href="#top_height"><code>top_height</code></a></td>
 </tr>
 <tr>
+<td><code>/v1/headers/top</code></td>
+<td><a href="#headers_top"><code>headers_top</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/headers/{chain}/top</code></td>
+<td><a href="#top_chain"><code>top_chain</code></a></td>
+</tr>
+<tr>
 <td><code>/v1/block/{block}</code></td>
 <td><a href="#block"><code>block</code></a></td>
 </tr>
@@ -597,8 +605,19 @@ hashes and indexes that form the next request's URL:</p>
 <td><code>/v1/template/subscribe</code></td>
 <td><a href="#template_subscribe"><code>template_subscribe</code></a></td>
 </tr>
+<tr>
+<td><code>/v1/txs/unconfirmed</code></td>
+<td><a href="#txs_unconfirmed"><code>txs_unconfirmed</code></a></td>
+</tr>
+<tr>
+<td><code>/v1/txs/unconfirmed/details</code></td>
+<td><a href="#txs_unconfirmed_details"><code>txs_unconfirmed_details</code></a></td>
+</tr>
 </tbody>
 </table></div>
+<p><code>/v1/headers</code>, <code>/v1/headers/{chain}</code>, <code>/v1/txs</code>, <code>/v1/txs/details</code>,
+<code>/v1/txs/confirmed</code> and <code>/v1/txs/confirmed/details</code> are reserved and
+return 501.</p>
 <h2 id="2-calling-pattern">2. Calling pattern<a class="anchor" href="#2-calling-pattern" aria-label="Link to this section">#</a></h2>
 <p>Every request is a <code>GET</code> of a path under <code>/v1</code>, on the <code>[native]</code>
 binding (default port 8180):</p>
@@ -753,7 +772,7 @@ there is no status (§2.6).</p>
 </tr>
 <tr>
 <td>501</td>
-<td>A required index or feature is disabled (address index, client filters, transaction relay)</td>
+<td>A required index or feature is disabled (address index, client filters, transaction relay), or the path is reserved</td>
 </tr>
 <tr>
 <td>503</td>
@@ -798,8 +817,8 @@ async def main():
 
 asyncio.run(main())
 </code></pre>
-<p>The first reply is the current confirmed and candidate tops, followed by
-both again each time either chain changes (<a href="#top_subscribe">top_subscribe</a>).</p>
+<p>The first reply is the current tops, followed by the tops again each
+time either chain changes (<a href="#top_subscribe">top_subscribe</a>).</p>
 <h2 id="3-server">3. Server<a class="anchor" href="#3-server" aria-label="Link to this section">#</a></h2>
 <h3 id="configuration">configuration<a class="anchor" href="#configuration" aria-label="Link to this section">#</a></h3>
 <p>The store's contents, the node's and network's peer settings, the wallet
@@ -1006,12 +1025,13 @@ discoverable by interrogating the node over P2P.</p>
 </tbody>
 </table></div>
 <h3 id="top">top<a class="anchor" href="#top" aria-label="Link to this section">#</a></h3>
-<p>The top blocks of the confirmed chain and of the candidate chain.</p>
+<p>The strong tops: the top block of the confirmed chain, and of the
+candidate chain where it differs.</p>
 <pre><code>/v1/top
 </code></pre>
 <p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
-<pre><code class="language-json">{
-    &quot;confirmed&quot;: {
+<pre><code class="language-json">[
+    {
         &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
         &quot;height&quot;: 0,
         &quot;header&quot;: {
@@ -1022,28 +1042,19 @@ discoverable by interrogating the node over P2P.</p>
             &quot;timestamp&quot;: 1231006505,
             &quot;bits&quot;: 486604799,
             &quot;nonce&quot;: 2083236893
-        }
-    },
-    &quot;candidate&quot;: {
-        &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
-        &quot;height&quot;: 0,
-        &quot;header&quot;: {
-            &quot;hash&quot;: &quot;000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f&quot;,
-            &quot;version&quot;: 1,
-            &quot;previous&quot;: &quot;0000000000000000000000000000000000000000000000000000000000000000&quot;,
-            &quot;merkle_root&quot;: &quot;4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b&quot;,
-            &quot;timestamp&quot;: 1231006505,
-            &quot;bits&quot;: 486604799,
-            &quot;nonce&quot;: 2083236893
-        }
+        },
+        &quot;chain&quot;: &quot;confirmed&quot;
     }
-}
+]
 </code></pre>
-<p>Each top is its block hash, its height and its header. <code>data</code> is the
-confirmed top and then the candidate top, each its block hash (32 bytes),
-its height (4 bytes, little-endian) and its header (80 bytes), 232 bytes
-in all. For these tops, <code>text</code> is:</p>
-<pre><code>6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c
+<p>The array is the confirmed top, then the candidate top. When both are
+the same block it is one element, labeled <code>confirmed</code>. A caller that
+wants only the confirmed top reads the first. Each top is its block
+hash, its height, its header and its <code>chain</code>. <code>data</code> is each top in the
+same order, its block hash (32 bytes), its height (4 bytes,
+little-endian) and its header (80 bytes), 116 bytes each. For this top,
+<code>text</code> is:</p>
+<pre><code>6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c
 </code></pre>
 <p>The candidate chain is the chain of headers the node is working toward,
 and it runs ahead of the confirmed chain during sync. The two tops can be
@@ -1055,19 +1066,20 @@ either chain changes.</p>
 <pre><code>/v1/top/subscribe
 </code></pre>
 <p>Formats: <code>json</code>, <code>data</code>, <code>text</code>. Options: <code>stop</code>.</p>
-<p>The reply is the current tops, as for <code>top</code>. Over a websocket, both tops
+<p>The reply is the current tops, as for <code>top</code>. Over a websocket, the tops
 are sent again each time a block is confirmed, the confirmed chain is
 reorganized, headers are added to the candidate chain, or the candidate
 chain is regressed or disorganized:</p>
 <pre><code>→ /v1/top/subscribe
-← {&quot;confirmed&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:9,&quot;header&quot;:{…}},&quot;candidate&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12,&quot;header&quot;:{…}}}
-← {&quot;confirmed&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:10,&quot;header&quot;:{…}},&quot;candidate&quot;:{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12,&quot;header&quot;:{…}}}
+← [{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:9,&quot;header&quot;:{…},&quot;chain&quot;:&quot;confirmed&quot;},{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12,&quot;header&quot;:{…},&quot;chain&quot;:&quot;candidate&quot;}]
+← [{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:10,&quot;header&quot;:{…},&quot;chain&quot;:&quot;confirmed&quot;},{&quot;hash&quot;:&quot;…&quot;,&quot;height&quot;:12,&quot;header&quot;:{…},&quot;chain&quot;:&quot;candidate&quot;}]
 → /v1/top/subscribe?stop=true
 ←
 </code></pre>
 <h3 id="top_chain">top_chain<a class="anchor" href="#top_chain" aria-label="Link to this section">#</a></h3>
 <p>The top block of one chain.</p>
 <pre><code>/v1/top/{chain}
+/v1/headers/{chain}/top
 </code></pre>
 <p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
 <pre class="console"><code>$ curl &quot;http://localhost:8180/v1/top/confirmed?format=json&quot;
@@ -1083,7 +1095,8 @@ chain is regressed or disorganized:</p>
         &quot;timestamp&quot;: 1231006505,
         &quot;bits&quot;: 486604799,
         &quot;nonce&quot;: 2083236893
-    }
+    },
+    &quot;chain&quot;: &quot;confirmed&quot;
 }
 </code></pre>
 <p>The top is as for <code>top</code>, so <code>data</code> is 116 bytes.</p>
@@ -1096,6 +1109,15 @@ chain is regressed or disorganized:</p>
 0
 </code></pre>
 <p><code>data</code> is the height in 4 bytes, little-endian.</p>
+<h3 id="headers_top">headers_top<a class="anchor" href="#headers_top" aria-label="Link to this section">#</a></h3>
+<p>The top of every branch of the header tree.</p>
+<pre><code>/v1/headers/top
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<p>The strong tops, as for <code>top</code>, followed by the top of each weak branch,
+a stored branch that is on neither chain. A weak branch top has no
+<code>chain</code> field. <code>data</code> and <code>text</code> are each top in the same order, 116
+bytes each.</p>
 <h2 id="4-blocks">4. Blocks<a class="anchor" href="#4-blocks" aria-label="Link to this section">#</a></h2>
 <p>In the block paths below, <code>{block}</code> is <code>hash/{block hash}</code>,
 <code>confirmed/{height}</code> or <code>candidate/{height}</code>. A hash finds any stored
@@ -1305,7 +1327,7 @@ activation, and the other forks activate later in the chain.</p>
 order, the coinbase first.</p>
 <pre><code>/v1/block/{block}/txs/details
 </code></pre>
-<p>Formats: <code>json</code>.</p>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
 <pre class="console"><code>$ curl &quot;http://localhost:8180/v1/block/confirmed/1/txs/details?format=json&quot;
 </code></pre>
 <pre><code class="language-json">[
@@ -1363,6 +1385,45 @@ order, the coinbase first.</p>
 <p>A cluster is a set of the block's transactions joined by spends among
 them: a transaction that spends an output of another in the block is in
 its cluster.</p>
+<p><code>data</code> is a 36 byte record for each transaction, in the same order, its
+fields little-endian:</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Bytes</th>
+<th>Field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td><code>nominal</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>maximal</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>value</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>spend</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>fee</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>cluster</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>text</code> is the same bytes in hex. The other <code>json</code> fields follow from the
+sizes: <code>segregated</code> is <code>maximal</code> other than <code>nominal</code>, and <code>weight</code> and
+<code>virtual</code> are computed from both.</p>
 <h3 id="block_tx">block_tx<a class="anchor" href="#block_tx" aria-label="Link to this section">#</a></h3>
 <p>The transaction at a position in a block.</p>
 <pre><code>/v1/block/{block}/tx/{position}
@@ -1785,13 +1846,14 @@ block. <code>data</code> is the 32 byte hashes concatenated, in internal order.<
 <a href="#block_txs_details"><code>block_txs_details</code></a>.</p>
 <pre><code>/v1/template/{height}/txs/details
 </code></pre>
-<p>Formats: <code>json</code>.</p>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
 <p>Position 0 models the coinbase from the space reserved for it
-(<code>pool.coinbase_weight</code>): <code>weight</code> is the reservation, <code>maximal</code> its size
-with witness, <code>nominal</code> its size without the witness and its commitment
-(527 and 444 at the default 2000), and <code>value</code> and <code>spend</code> are the block
-reward, the subsidy and the template's fees. Its <code>cluster</code> is 0, and
-the clusters of the transactions follow from 1.</p>
+(<code>pool.coinbase_weight</code>): <code>maximal</code> is the size the reservation allows
+with witness, and <code>nominal</code> that less the witness and its commitment
+output (527 and 444 at the default 2000, so <code>weight</code> 1859 and <code>virtual</code>
+465). <code>value</code> and <code>spend</code> are the block reward, the subsidy and the
+template's fees. Its <code>cluster</code> is 0, and the clusters of the
+transactions follow from 1.</p>
 <h3 id="template_subscribe">template_subscribe<a class="anchor" href="#template_subscribe" aria-label="Link to this section">#</a></h3>
 <p>A notification for each new template. Websocket only.</p>
 <pre><code>/v1/template/subscribe
@@ -1805,6 +1867,23 @@ the clusters of the transactions follow from 1.</p>
 number, or four bytes little-endian as <code>data</code>, or their hex as <code>text</code>.
 While subscribed, the node keeps building templates, replacing them on
 each new block and as the pool changes (<code>pool.template_interval_seconds</code>).</p>
+<h3 id="txs_unconfirmed">txs_unconfirmed<a class="anchor" href="#txs_unconfirmed" aria-label="Link to this section">#</a></h3>
+<p>The transaction hashes of the confirmable transactions of the pool, in
+pool order.</p>
+<pre><code>/v1/txs/unconfirmed
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<p><code>data</code> is the 32 byte hashes concatenated, in internal order.</p>
+<h3 id="txs_unconfirmed_details">txs_unconfirmed_details<a class="anchor" href="#txs_unconfirmed_details" aria-label="Link to this section">#</a></h3>
+<p>The details of each confirmable transaction of the pool, in the order of
+<a href="#txs_unconfirmed"><code>txs_unconfirmed</code></a>, as for
+<a href="#block_txs_details"><code>block_txs_details</code></a>, with the time each was pooled.</p>
+<pre><code>/v1/txs/unconfirmed/details
+</code></pre>
+<p>Formats: <code>json</code>, <code>data</code>, <code>text</code>.</p>
+<p>There is no coinbase entry. Each object adds <code>time</code>, when the
+transaction was pooled, in Unix seconds. Its <code>data</code> record adds <code>time</code>
+as 4 more bytes, little-endian, 40 bytes in all.</p>
   </article>
 
   <nav class="pager"><a href="admin.html">&larr; Admin Console</a><a href="electrum.html">Electrum &rarr;</a></nav>

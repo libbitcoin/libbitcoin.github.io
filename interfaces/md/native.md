@@ -54,6 +54,8 @@ Every path, and the method it calls. `{chain}` is `confirmed` or
 | `/v1/top/subscribe` | [`top_subscribe`](#top_subscribe) |
 | `/v1/top/{chain}` | [`top_chain`](#top_chain) |
 | `/v1/top/{chain}/height` | [`top_height`](#top_height) |
+| `/v1/headers/top` | [`headers_top`](#headers_top) |
+| `/v1/headers/{chain}/top` | [`top_chain`](#top_chain) |
 | `/v1/block/{block}` | [`block`](#block) |
 | `/v1/block/{block}/header` | [`block_header`](#block_header) |
 | `/v1/block/{block}/header/context` | [`block_header_context`](#block_header_context) |
@@ -91,6 +93,12 @@ Every path, and the method it calls. `{chain}` is `confirmed` or
 | `/v1/template/{height}/txs` | [`template_txs`](#template_txs) |
 | `/v1/template/{height}/txs/details` | [`template_txs_details`](#template_txs_details) |
 | `/v1/template/subscribe` | [`template_subscribe`](#template_subscribe) |
+| `/v1/txs/unconfirmed` | [`txs_unconfirmed`](#txs_unconfirmed) |
+| `/v1/txs/unconfirmed/details` | [`txs_unconfirmed_details`](#txs_unconfirmed_details) |
+
+`/v1/headers`, `/v1/headers/{chain}`, `/v1/txs`, `/v1/txs/details`,
+`/v1/txs/confirmed` and `/v1/txs/confirmed/details` are reserved and
+return 501.
 
 ## 2. Calling pattern
 
@@ -165,7 +173,7 @@ there is no status (§2.6).
 | 404 | The object was not found |
 | 406 | The format is not supported by the method |
 | 500 | Store integrity fault |
-| 501 | A required index or feature is disabled (address index, client filters, transaction relay) |
+| 501 | A required index or feature is disabled (address index, client filters, transaction relay), or the path is reserved |
 | 503 | The transaction pool is not yet open |
 
 ### 2.5 Pruned blocks
@@ -211,8 +219,8 @@ async def main():
 asyncio.run(main())
 ```
 
-The first reply is the current confirmed and candidate tops, followed by
-both again each time either chain changes ([top_subscribe](#top_subscribe)).
+The first reply is the current tops, followed by the tops again each
+time either chain changes ([top_subscribe](#top_subscribe)).
 
 ## 3. Server
 
@@ -337,7 +345,8 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 
 ### top
 
-The top blocks of the confirmed chain and of the candidate chain.
+The strong tops: the top block of the confirmed chain, and of the
+candidate chain where it differs.
 
 ```
 /v1/top
@@ -346,8 +355,8 @@ The top blocks of the confirmed chain and of the candidate chain.
 Formats: `json`, `data`, `text`.
 
 ```json
-{
-    "confirmed": {
+[
+    {
         "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
         "height": 0,
         "header": {
@@ -358,31 +367,22 @@ Formats: `json`, `data`, `text`.
             "timestamp": 1231006505,
             "bits": 486604799,
             "nonce": 2083236893
-        }
-    },
-    "candidate": {
-        "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-        "height": 0,
-        "header": {
-            "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-            "version": 1,
-            "previous": "0000000000000000000000000000000000000000000000000000000000000000",
-            "merkle_root": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-            "timestamp": 1231006505,
-            "bits": 486604799,
-            "nonce": 2083236893
-        }
+        },
+        "chain": "confirmed"
     }
-}
+]
 ```
 
-Each top is its block hash, its height and its header. `data` is the
-confirmed top and then the candidate top, each its block hash (32 bytes),
-its height (4 bytes, little-endian) and its header (80 bytes), 232 bytes
-in all. For these tops, `text` is:
+The array is the confirmed top, then the candidate top. When both are
+the same block it is one element, labeled `confirmed`. A caller that
+wants only the confirmed top reads the first. Each top is its block
+hash, its height, its header and its `chain`. `data` is each top in the
+same order, its block hash (32 bytes), its height (4 bytes,
+little-endian) and its header (80 bytes), 116 bytes each. For this top,
+`text` is:
 
 ```
-6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c
+6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000000000000100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c
 ```
 
 The candidate chain is the chain of headers the node is working toward,
@@ -401,15 +401,15 @@ either chain changes.
 
 Formats: `json`, `data`, `text`. Options: `stop`.
 
-The reply is the current tops, as for `top`. Over a websocket, both tops
+The reply is the current tops, as for `top`. Over a websocket, the tops
 are sent again each time a block is confirmed, the confirmed chain is
 reorganized, headers are added to the candidate chain, or the candidate
 chain is regressed or disorganized:
 
 ```
 → /v1/top/subscribe
-← {"confirmed":{"hash":"…","height":9,"header":{…}},"candidate":{"hash":"…","height":12,"header":{…}}}
-← {"confirmed":{"hash":"…","height":10,"header":{…}},"candidate":{"hash":"…","height":12,"header":{…}}}
+← [{"hash":"…","height":9,"header":{…},"chain":"confirmed"},{"hash":"…","height":12,"header":{…},"chain":"candidate"}]
+← [{"hash":"…","height":10,"header":{…},"chain":"confirmed"},{"hash":"…","height":12,"header":{…},"chain":"candidate"}]
 → /v1/top/subscribe?stop=true
 ←
 ```
@@ -420,6 +420,7 @@ The top block of one chain.
 
 ```
 /v1/top/{chain}
+/v1/headers/{chain}/top
 ```
 
 Formats: `json`, `data`, `text`.
@@ -440,7 +441,8 @@ $ curl "http://localhost:8180/v1/top/confirmed?format=json"
         "timestamp": 1231006505,
         "bits": 486604799,
         "nonce": 2083236893
-    }
+    },
+    "chain": "confirmed"
 }
 ```
 
@@ -462,6 +464,21 @@ $ curl "http://localhost:8180/v1/top/candidate/height?format=json"
 ```
 
 `data` is the height in 4 bytes, little-endian.
+
+### headers_top
+
+The top of every branch of the header tree.
+
+```
+/v1/headers/top
+```
+
+Formats: `json`, `data`, `text`.
+
+The strong tops, as for `top`, followed by the top of each weak branch,
+a stored branch that is on neither chain. A weak branch top has no
+`chain` field. `data` and `text` are each top in the same order, 116
+bytes each.
 
 ## 4. Blocks
 
@@ -695,7 +712,7 @@ order, the coinbase first.
 /v1/block/{block}/txs/details
 ```
 
-Formats: `json`.
+Formats: `json`, `data`, `text`.
 
 ```
 $ curl "http://localhost:8180/v1/block/confirmed/1/txs/details?format=json"
@@ -730,6 +747,22 @@ $ curl "http://localhost:8180/v1/block/confirmed/1/txs/details?format=json"
 A cluster is a set of the block's transactions joined by spends among
 them: a transaction that spends an output of another in the block is in
 its cluster.
+
+`data` is a 36 byte record for each transaction, in the same order, its
+fields little-endian:
+
+| Bytes | Field |
+| ----- | ----- |
+| 4 | `nominal` |
+| 4 | `maximal` |
+| 8 | `value` |
+| 8 | `spend` |
+| 8 | `fee` |
+| 4 | `cluster` |
+
+`text` is the same bytes in hex. The other `json` fields follow from the
+sizes: `segregated` is `maximal` other than `nominal`, and `weight` and
+`virtual` are computed from both.
 
 ### block_tx
 
@@ -1339,14 +1372,15 @@ The details of each transaction of the template, in block order, as for
 /v1/template/{height}/txs/details
 ```
 
-Formats: `json`.
+Formats: `json`, `data`, `text`.
 
 Position 0 models the coinbase from the space reserved for it
-(`pool.coinbase_weight`): `weight` is the reservation, `maximal` its size
-with witness, `nominal` its size without the witness and its commitment
-(527 and 444 at the default 2000), and `value` and `spend` are the block
-reward, the subsidy and the template's fees. Its `cluster` is 0, and
-the clusters of the transactions follow from 1.
+(`pool.coinbase_weight`): `maximal` is the size the reservation allows
+with witness, and `nominal` that less the witness and its commitment
+output (527 and 444 at the default 2000, so `weight` 1859 and `virtual`
+465). `value` and `spend` are the block reward, the subsidy and the
+template's fees. Its `cluster` is 0, and the clusters of the
+transactions follow from 1.
 
 ### template_subscribe
 
@@ -1368,3 +1402,32 @@ The reply is empty, and each new template then sends its height: a JSON
 number, or four bytes little-endian as `data`, or their hex as `text`.
 While subscribed, the node keeps building templates, replacing them on
 each new block and as the pool changes (`pool.template_interval_seconds`).
+
+### txs_unconfirmed
+
+The transaction hashes of the confirmable transactions of the pool, in
+pool order.
+
+```
+/v1/txs/unconfirmed
+```
+
+Formats: `json`, `data`, `text`.
+
+`data` is the 32 byte hashes concatenated, in internal order.
+
+### txs_unconfirmed_details
+
+The details of each confirmable transaction of the pool, in the order of
+[`txs_unconfirmed`](#txs_unconfirmed), as for
+[`block_txs_details`](#block_txs_details), with the time each was pooled.
+
+```
+/v1/txs/unconfirmed/details
+```
+
+Formats: `json`, `data`, `text`.
+
+There is no coinbase entry. Each object adds `time`, when the
+transaction was pooled, in Unix seconds. Its `data` record adds `time`
+as 4 more bytes, little-endian, 40 bytes in all.

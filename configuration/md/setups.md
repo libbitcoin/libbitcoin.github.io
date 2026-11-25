@@ -187,7 +187,10 @@ Query options, besides `format`:
 
 Each block and template page has Previous and Next links across
 heights; Next from the confirmed top opens the template of the next
-block, and "Pool" in the navigation opens it directly. Its Details
+block. "Blocks" in the navigation draws the confirmed chain, the
+candidate headers above it and each stored weak branch beside it, with
+the template at the top, and "Transactions" lists the confirmable
+transactions of the pool, each with when it was received. A block or template page's Details
 section draws the block's or template's transactions as a treemap, area
 by virtual size and color by fee rate, outlined by cluster, with a panel
 for each transaction.
