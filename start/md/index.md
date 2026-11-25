@@ -57,7 +57,7 @@ height, see [Command Line](../configuration/command-line) and
 [Common Setups](../configuration/setups).
 
 The time a sync takes and the space its store needs are shown on the
-[Sync BS](../sync.html) and [Footprint](../footprint.html) pages.
+[Synchronize](../sync.html) and [Footprint](../footprint.html) pages.
 
 ## 3. Serve
 

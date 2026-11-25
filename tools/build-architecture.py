@@ -46,10 +46,11 @@ SITE_MENU = [
         ("configuration/bx.html", "BX Settings"),
     ]),
     ("Performance", [
-        ("sync.html", "Sync BS"),
+        ("sync.html", "Synchronize"),
         ("footprint.html", "Footprint"),
         ("computation.html", "Computation"),
         ("interface-performance.html", "Interfaces"),
+        ("mining.html", "Mining"),
     ]),
     ("Architecture", [
         ("architecture/index.html", "Overview"),
