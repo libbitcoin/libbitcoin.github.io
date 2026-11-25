@@ -1024,7 +1024,9 @@ descriptors, to a PSBT. <strong>Parameters:</strong> <code>psbt</code>, <code>de
 <p>A template of the block above the confirmed top, from the pool (BIP22,
 BIP145). <strong>Parameters:</strong> <code>template_request</code>, which must declare the
 <code>segwit</code> rule in <code>rules</code>. Only <code>template</code> mode is served, without
-proposals or long polling. Each transaction carries <code>data</code>, <code>txid</code>,
+proposals. A request carrying the <code>longpollid</code> of a previous result
+waits until the template is replaced, then answers with the new one; an
+id of an earlier top or template is answered at once. Each transaction carries <code>data</code>, <code>txid</code>,
 <code>hash</code>, <code>depends</code>, <code>fee</code>, <code>sigops</code> and <code>weight</code>, and the result carries
 <code>default_witness_commitment</code> once segwit is active. Until the node is
 current and pooling, the error is -10.</p>

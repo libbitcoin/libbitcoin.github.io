@@ -303,6 +303,9 @@ rate. It sends the maximum (21 million BTC) to a peer without a slot, and
 to every peer while not current, which asks for no transactions. It
 announces to a peer only packages that clear the peer's rate, and a fall
 of that rate sends the peer what then clears it.
+A peer that lowers its rate twice within `node.fee_filter_minutes`
+(default 60, 0 disables) is dropped, since each fall sends it the
+transactions that then clear.
 
 ### mempool
 

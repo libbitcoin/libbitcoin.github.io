@@ -812,7 +812,10 @@ parent paying for its child, or a child for its parent), not by its own
 rate. It sends the maximum (21 million BTC) to a peer without a slot, and
 to every peer while not current, which asks for no transactions. It
 announces to a peer only packages that clear the peer's rate, and a fall
-of that rate sends the peer what then clears it.</p>
+of that rate sends the peer what then clears it.
+A peer that lowers its rate twice within <code>node.fee_filter_minutes</code>
+(default 60, 0 disables) is dropped, since each fall sends it the
+transactions that then clear.</p>
 <h3 id="mempool">mempool<a class="anchor" href="#mempool" aria-label="Link to this section">#</a></h3>
 <p>Requests the hashes of the memory pool (BIP35), answered by <code>inv</code>.
 Ignored unless <code>peer.enable_memory_pool</code> is set. The answer is what the

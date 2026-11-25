@@ -984,7 +984,9 @@ $ curl "http://localhost:8180/v1/tx/0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68
 
 `value` is the total of the inputs, `spend` the total of the outputs, and
 `fee` their difference. `confirmed` is omitted for an unconfirmed
-transaction.
+transaction, which instead has `time`, when it was pooled, in Unix
+seconds. The time of a confirmed transaction is that of its block
+([`tx_header`](#tx_header)).
 
 ### tx_subscribe
 

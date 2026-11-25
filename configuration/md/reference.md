@@ -535,6 +535,8 @@ compact_timeout_seconds = 10
 currency_window_minutes = 1440
 # Block inbound peer/client (excluding admin) until current, defaults to 'true'.
 delay_inbound = true
+# Minimum time between a peer's fee filter decreases, else the peer is dropped, defaults to '60' (0 disables).
+fee_filter_minutes = 60
 # Limit block service to recent blocks, defaults to 'false'.
 limited_blocks = false
 # Maximum number of blocks to download concurrently, defaults to '50000' (0 disables).
@@ -1252,6 +1254,8 @@ The Stratum v1 mining interface ([Stratum v1](../interfaces/stratum-v1)).
 
 ```ini
 [stratum_v1]
+# The seconds to subscribe and authorize a channel, defaults to '15' (0 is unlimited).
+authorize_timeout_seconds = 15
 # IP address to bind, multiple allowed, defaults to empty (disabled).
 #bind =
 # The trusted client certificate directory (*.PEM), enables client authentication.
@@ -1268,14 +1272,14 @@ connect_timeout_seconds = 0
 connections = 0
 # The 'username:password[:method,...]' authorization (not secure), multiple allowed.
 #credential =
-# The maximum connection duration, defaults to '60'.
-expiration_minutes = 60
+# The maximum connection duration, defaults to '0'.
+expiration_minutes = 0
 # The bytes of coinbase extranonce assigned to each channel, defaults to '4'.
 extranonce1_size = 4
 # The bytes of coinbase extranonce rolled by the miner, defaults to '4'.
 extranonce2_size = 4
-# The idle timeout (http keep-alive), defaults to '10'.
-inactivity_minutes = 10
+# The idle timeout (http keep-alive), defaults to '0'.
+inactivity_minutes = 0
 # The password to decrypt the server private key file (.PEM), optional.
 key_pass =
 # The path to the server private key file (.PEM), defaults to empty.

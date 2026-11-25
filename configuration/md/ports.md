@@ -23,7 +23,7 @@ conflict.
 | Sparrow | `[sparrow]` | 8680 | 8643 |
 | Esplora | `[esplora]` | 8780 | 8743 |
 | Stratum v1 | `[stratum_v1]` | 8880 | 8843 |
-| Stratum v2 | `[stratum_v2]` | 8980 | – |
+| Stratum v2 | `[stratum_v2]` | 8980 | 8943 |
 
 P2P has no separate secure port. BIP324 encryption is negotiated on the
 same port, and offered by default (`node.provide_privacy`). ZMQ's secure

@@ -1557,7 +1557,9 @@ unconfirmed transaction returns 404.</p>
 </code></pre>
 <p><code>value</code> is the total of the inputs, <code>spend</code> the total of the outputs, and
 <code>fee</code> their difference. <code>confirmed</code> is omitted for an unconfirmed
-transaction.</p>
+transaction, which instead has <code>time</code>, when it was pooled, in Unix
+seconds. The time of a confirmed transaction is that of its block
+(<a href="#tx_header"><code>tx_header</code></a>).</p>
 <h3 id="tx_subscribe">tx_subscribe<a class="anchor" href="#tx_subscribe" aria-label="Link to this section">#</a></h3>
 <p>A notification for each new transaction. Websocket only.</p>
 <pre><code>/v1/tx/subscribe

@@ -1195,8 +1195,6 @@ bind = 0.0.0.0
 connections = 10
 payout_address = bc1q...
 minimum_difficulty = 230000
-expiration_minutes = 0
-inactivity_minutes = 60
 </code></pre>
 <p>Point the miner at <code>stratum+tcp://&lt;host&gt;:8880</code>, with any worker name and
 password. Each job is a template of the next block from the transaction
@@ -1208,8 +1206,8 @@ name, <code>&lt;address&gt;.&lt;worker&gt;</code>, is its payout.</p>
   near the miner's rate (hash rate times <code>share_interval_seconds</code>, 10,
   divided by 2<sup>32</sup>), here for about 100 TH/s; leave it at 1 for a
   small miner (<a href="../interfaces/stratum-v1.html#start-difficulty">Start difficulty</a>).</li>
-<li><code>expiration_minutes = 0</code> keeps a miner connected, and
-  <code>inactivity_minutes</code> must exceed the time between its shares.</li>
+<li>Connections have no time limits by default; a nonzero
+  <code>inactivity_minutes</code> must exceed the time between a miner's shares.</li>
 <li>Miners connect over raw TCP, which carries no credentials, so leave
   <code>credential</code> unset and limit access by <code>bind</code> address or firewall
   (<a href="services.html#3-authentication">Authentication</a>).</li>

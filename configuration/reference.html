@@ -872,6 +872,8 @@ compact_timeout_seconds = 10
 currency_window_minutes = 1440
 <span class="comment"># Block inbound peer/client (excluding admin) until current, defaults to 'true'.</span>
 delay_inbound = true
+<span class="comment"># Minimum time between a peer's fee filter decreases, else the peer is dropped, defaults to '60' (0 disables).</span>
+fee_filter_minutes = 60
 <span class="comment"># Limit block service to recent blocks, defaults to 'false'.</span>
 limited_blocks = false
 <span class="comment"># Maximum number of blocks to download concurrently, defaults to '50000' (0 disables).</span>
@@ -1530,6 +1532,8 @@ server = libbitcoin/4
 <h2 id="21-stratum_v1">21. <code>[stratum_v1]</code><a class="anchor" href="#21-stratum_v1" aria-label="Link to this section">#</a></h2>
 <p>The Stratum v1 mining interface (<a href="../interfaces/stratum-v1.html">Stratum v1</a>).</p>
 <pre><code class="language-ini"><span class="section">[stratum_v1]</span>
+<span class="comment"># The seconds to subscribe and authorize a channel, defaults to '15' (0 is unlimited).</span>
+authorize_timeout_seconds = 15
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
 <span class="comment">#bind =</span>
 <span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
@@ -1546,14 +1550,14 @@ connect_timeout_seconds = 0
 connections = 0
 <span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
 <span class="comment">#credential =</span>
-<span class="comment"># The maximum connection duration, defaults to '60'.</span>
-expiration_minutes = 60
+<span class="comment"># The maximum connection duration, defaults to '0'.</span>
+expiration_minutes = 0
 <span class="comment"># The bytes of coinbase extranonce assigned to each channel, defaults to '4'.</span>
 extranonce1_size = 4
 <span class="comment"># The bytes of coinbase extranonce rolled by the miner, defaults to '4'.</span>
 extranonce2_size = 4
-<span class="comment"># The idle timeout (http keep-alive), defaults to '10'.</span>
-inactivity_minutes = 10
+<span class="comment"># The idle timeout (http keep-alive), defaults to '0'.</span>
+inactivity_minutes = 0
 <span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
 key_pass =
 <span class="comment"># The path to the server private key file (.PEM), defaults to empty.</span>

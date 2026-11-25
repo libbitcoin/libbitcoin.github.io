@@ -901,8 +901,6 @@ bind = 0.0.0.0
 connections = 10
 payout_address = bc1q...
 minimum_difficulty = 230000
-expiration_minutes = 0
-inactivity_minutes = 60
 ```
 
 Point the miner at `stratum+tcp://<host>:8880`, with any worker name and
@@ -915,8 +913,8 @@ name, `<address>.<worker>`, is its payout.
   near the miner's rate (hash rate times `share_interval_seconds`, 10,
   divided by 2<sup>32</sup>), here for about 100 TH/s; leave it at 1 for a
   small miner ([Start difficulty](../interfaces/stratum-v1#start-difficulty)).
-- `expiration_minutes = 0` keeps a miner connected, and
-  `inactivity_minutes` must exceed the time between its shares.
+- Connections have no time limits by default; a nonzero
+  `inactivity_minutes` must exceed the time between a miner's shares.
 - Miners connect over raw TCP, which carries no credentials, so leave
   `credential` unset and limit access by `bind` address or firewall
   ([Authentication](services#3-authentication)).

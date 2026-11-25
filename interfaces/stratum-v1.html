@@ -452,6 +452,11 @@ and <code>safe</code> serves TLS with <code>cert_path</code> and <code>key_path<
 <td>Target seconds between shares (0 fixes the difficulty)</td>
 </tr>
 <tr>
+<td><code>stratum_v1.authorize_timeout_seconds</code></td>
+<td>15</td>
+<td>Seconds to subscribe and authorize before the connection is closed (0 is unlimited)</td>
+</tr>
+<tr>
 <td><code>pool.template_interval_seconds</code></td>
 <td>30</td>
 <td>Seconds between replacements of the template (0 disables)</td>
@@ -489,12 +494,14 @@ minimum_difficulty = 230000
 <a href="#miningsuggest_difficulty"><code>mining.suggest_difficulty</code></a>, which is
 floored at <code>minimum_difficulty</code>.</p>
 <h3 id="connection-limits">Connection limits<a class="anchor" href="#connection-limits" aria-label="Link to this section">#</a></h3>
-<p><code>expiration_minutes</code> (default 60) closes every connection after that
-time, and the miner reconnects with new jobs and its difficulty reset.
-<code>inactivity_minutes</code> (default 10) closes a connection from which nothing
-has been read for that time; jobs sent to the miner do not count. Set
-<code>expiration_minutes = 0</code> for miners, and raise <code>inactivity_minutes</code> above
-the longest expected time between shares
+<p>A connection that is not both subscribed and authorized within
+<code>authorize_timeout_seconds</code> (default 15) is closed.
+<code>expiration_minutes</code> closes every connection after that time, and the
+miner reconnects with new jobs and its difficulty reset.
+<code>inactivity_minutes</code> closes a connection from which nothing has been read
+for that time; jobs sent to the miner do not count. Both default to 0,
+no limit, for <code>[stratum_v1]</code>. A nonzero <code>inactivity_minutes</code> should
+exceed the longest expected time between shares
 (<a href="../configuration/services.html#5-limits">Service Settings</a>).</p>
 <h2 id="2-methods">2. Methods<a class="anchor" href="#2-methods" aria-label="Link to this section">#</a></h2>
 <div class="scroller"><table>
@@ -607,7 +614,8 @@ rolls (<code>extranonce2</code>).</p>
     &quot;error&quot;: null
 }
 </code></pre>
-<p>The prefix is fixed for the life of the connection.</p>
+<p>The prefix is random, neither a prefix of nor prefixed by that of any
+other connection, and fixed for the life of the connection.</p>
 <h3 id="miningauthorize">mining.authorize<a class="anchor" href="#miningauthorize" aria-label="Link to this section">#</a></h3>
 <p><strong>Parameters:</strong> <code>username</code>, <code>password</code> (optional or null, not
 checked).
