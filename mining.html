@@ -333,13 +333,44 @@
   </header>
 
   <nav class="menu">
+    <a href="#mining-jobs">Mining Jobs</a>
     <a href="#template-fees">Template Fees</a>
     <a href="#transaction-intake">Transaction Intake</a>
-    <a href="#mining-jobs">Mining Jobs</a>
     <a href="#block-to-template">Block to Template</a>
     <a href="#live-mainnet">Live Mainnet</a>
     <a href="#methodology">Methodology</a>
   </nav>
+
+  <section>
+    <h2 id="mining-jobs">Mining Jobs<a class="anchor" href="#mining-jobs" aria-label="Link to this section">#</a></h2>
+    <div class="gallery">
+      <figure class="shot">
+        <h3>Regtest stratum v1 block to first job</h3>
+        <a href="performance/pool-stratum-regtest-final.png"><img src="performance/pool-stratum-regtest-final.png" alt="Regtest stratum v1 block to first job" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Mainnet stratum v1 block connected to first job</h3>
+        <a href="performance/pool-stratum-mainnet-final.png"><img src="performance/pool-stratum-mainnet-final.png" alt="Mainnet stratum v1 block connected to first job" loading="lazy"></a>
+      </figure>
+    </div>
+    <p class="lede after">
+      A miner works a stale job from the moment a block is found until its pool sends a new one.
+      Libbitcoin serves <a href="interfaces/stratum-v1.html">stratum v1</a> itself. Bitcoin Core is
+      fronted by ckpool, which learns of a block by Bitcoin Core's interprocess
+      communication (IPC) mining interface, by ZMQ block notification, or by polling every 100 ms. On regtest, a miner mines 20
+      empty blocks 4 seconds apart, with 3,000 and then 10,000 independent transactions pooled,
+      and each stack's first mining.notify is timed from the miner's generateblock call. Every first
+      job carried the full template. Median, at 3,000 and 10,000 pooled: Libbitcoin 14 and 27 ms,
+      ckpool by IPC 150 and 272 ms, by ZMQ 376 and 1,400 ms, by polling 394 and 1,360 ms.
+    </p>
+    <p class="lede after">
+      A Libbitcoin job is the held template's coinbase parts and merkle branch. ckpool must have
+      Bitcoin Core produce the full getblocktemplate, then fetch and parse it; IPC skips only the
+      JSON and HTTP. On 55 mainnet blocks (977,441 to 977,495), Libbitcoin's first job followed its
+      block organized by a median 66 ms, and ckpool's (polling) followed Bitcoin Core's tip update
+      by 1,203 ms, on one probe clock.
+    </p>
+  </section>
 
   <section>
     <h2 id="template-fees">Template Fees<a class="anchor" href="#template-fees" aria-label="Link to this section">#</a></h2>
@@ -410,37 +441,6 @@
       The Libbitcoin regtest store has tables sized for the chain, as a mainnet store has. On a store
       with regtest default tables, holding 3.4 million chain transactions after the Monte Carlo
       trials, intake fell to 2,000 to 2,300 transactions per second from long hash chains.
-    </p>
-  </section>
-
-  <section>
-    <h2 id="mining-jobs">Mining Jobs<a class="anchor" href="#mining-jobs" aria-label="Link to this section">#</a></h2>
-    <div class="gallery">
-      <figure class="shot">
-        <h3>Regtest stratum v1 block to first job</h3>
-        <a href="performance/pool-stratum-regtest-final.png"><img src="performance/pool-stratum-regtest-final.png" alt="Regtest stratum v1 block to first job" loading="lazy"></a>
-      </figure>
-      <figure class="shot">
-        <h3>Mainnet stratum v1 block connected to first job</h3>
-        <a href="performance/pool-stratum-mainnet-final.png"><img src="performance/pool-stratum-mainnet-final.png" alt="Mainnet stratum v1 block connected to first job" loading="lazy"></a>
-      </figure>
-    </div>
-    <p class="lede after">
-      A miner works a stale job from the moment a block is found until its pool sends a new one.
-      Libbitcoin serves <a href="interfaces/stratum-v1.html">stratum v1</a> itself. Bitcoin Core is
-      fronted by ckpool, which learns of a block by Bitcoin Core's interprocess
-      communication (IPC) mining interface, by ZMQ block notification, or by polling every 100 ms. On regtest, a miner mines 20
-      empty blocks 4 seconds apart, with 3,000 and then 10,000 independent transactions pooled,
-      and each stack's first mining.notify is timed from the miner's generateblock call. Every first
-      job carried the full template. Median, at 3,000 and 10,000 pooled: Libbitcoin 14 and 27 ms,
-      ckpool by IPC 150 and 272 ms, by ZMQ 376 and 1,400 ms, by polling 394 and 1,360 ms.
-    </p>
-    <p class="lede after">
-      A Libbitcoin job is the held template's coinbase parts and merkle branch. ckpool must have
-      Bitcoin Core produce the full getblocktemplate, then fetch and parse it; IPC skips only the
-      JSON and HTTP. On 55 mainnet blocks (977,441 to 977,495), Libbitcoin's first job followed its
-      block organized by a median 66 ms, and ckpool's (polling) followed Bitcoin Core's tip update
-      by 1,203 ms, on one probe clock.
     </p>
   </section>
 
