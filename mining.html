@@ -360,15 +360,16 @@
       communication (IPC) mining interface, by ZMQ block notification, or by polling every 100 ms. On regtest, a miner mines 20
       empty blocks 4 seconds apart, with 3,000 and then 10,000 independent transactions pooled,
       and each stack's first mining.notify is timed from the miner's generateblock call. Every first
-      job carried the full template. Median, at 3,000 and 10,000 pooled: Libbitcoin 14 and 27 ms,
-      ckpool by IPC 150 and 272 ms, by ZMQ 376 and 1,400 ms, by polling 394 and 1,360 ms.
+      job carried the full template. Median, at 3,000 and 10,000 pooled: Libbitcoin 9 and 16 ms,
+      ckpool by IPC 96 and 215 ms, by ZMQ 266 and 1,191 ms, by polling 285 and 1,284 ms.
     </p>
     <p class="lede after">
       A Libbitcoin job is the held template's coinbase parts and merkle branch. ckpool must have
       Bitcoin Core produce the full getblocktemplate, then fetch and parse it; IPC skips only the
-      JSON and HTTP. On 55 mainnet blocks (977,441 to 977,495), Libbitcoin's first job followed its
-      block organized by a median 66 ms, and ckpool's (polling) followed Bitcoin Core's tip update
-      by 1,203 ms, on one probe clock.
+      JSON and HTTP. On 36 mainnet blocks (977,508 to 977,543), Libbitcoin's first job followed its
+      block organized by a median 47 ms, and ckpool's (polling) followed Bitcoin Core's tip update
+      by 480 ms, on one probe clock. Bitcoin Core's figure swings with its own block handling, about
+      260 ms on some blocks and 1,100 to 1,650 ms on many others.
     </p>
   </section>
 
@@ -413,7 +414,7 @@
       deep). Independent transactions and chains give identical templates. Conflicts without
       children are at parity (+0.003%), since each conflicting transaction draws its fee
       independently and the replacement rules usually end on the highest. Conflict trees gain
-      20.93% (+18.81 to +25.10%), where Bitcoin Core kept 2,915 of the 9,000 transactions. Every
+      20.93% (+18.81 to +25.10%), where Bitcoin Core kept 2,905 to 2,927 of the 9,000 transactions. Every
       template from both nodes, 400 in the Monte Carlo and 40 in the fixed workloads, passed Bitcoin
       Core's block validity test.
     </p>
@@ -430,12 +431,12 @@
     <p class="lede after">
       Each node in turn takes the same signed transactions over loopback P2P, announced by inv and
       served on getdata. Rate is transactions offered over the time to the last pool change, and CPU
-      is process CPU per pooled transaction. Libbitcoin takes 4,577 to 4,808 transactions per
-      second on every workload, 1.3 to 3.7 times Bitcoin Core's 1,265 to 3,410. On independent
-      transactions and chains it spends more CPU per transaction (349 to 356 &micro;s against 198 to
-      206). On conflicts and conflict trees, where Bitcoin Core keeps one transaction per conflicted
-      output, Libbitcoin spends less per transaction (369 and 360 &micro;s) than Bitcoin Core spends
-      per transaction it keeps (602 and 730).
+      is process CPU per pooled transaction. Libbitcoin takes 5,863 to 6,031 transactions per
+      second on every workload, 1.7 to 4.7 times Bitcoin Core's 1,278 to 3,452. On independent
+      transactions and chains it spends more CPU per transaction (241 and 242 &micro;s against 172
+      and 176). On conflicts and conflict trees, where Bitcoin Core keeps one transaction per
+      conflicted output, Libbitcoin spends less per transaction (246 and 243 &micro;s) than Bitcoin
+      Core spends per transaction it keeps (497 and 574).
     </p>
     <p class="lede after">
       The Libbitcoin regtest store has tables sized for the chain, as a mainnet store has. On a store
@@ -455,11 +456,10 @@
     <p class="lede after">
       Each mainnet block from organized to template issued, split by Libbitcoin's diagnostic events
       into pool indexing, chain state, other wait, template computation and issue. The median is
-      61 ms (40 to 117): pool indexing 19 ms, chain state 0.016 ms, other wait 0.085 ms,
-      computation 28 ms and issue 16 ms. The pool advances its chain state by one header per block
-      and reads the store only at start or on a reorganization. Computation varies from about 12 to
-      90 ms with the work of packing what lands at the block's tail, scaled by the processor clock,
-      since stratton's frequency governor runs timer-started builds near 1.2 GHz.
+      43 ms (29 to 184): pool indexing 12 ms, chain state 0.014 ms, other wait 0.108 ms,
+      computation 21 ms and issue 6 ms. The pool advances its chain state by one header per block
+      and reads the store only at start or on a reorganization. Computation varies with the work
+      of packing what lands at the block's tail.
     </p>
   </section>
 
@@ -481,14 +481,14 @@
     </div>
     <p class="lede after">
       Every 10 minutes, getblocktemplate from both nodes on the same machine at the same height.
-      The median template fee difference is +0.013%, Libbitcoin higher or equal in 34 of 57 rounds.
-      The live pool is flat, its template tail near the relay floor, so packing differences are
-      small; the gains appear where conflicts sit near the block boundary.
+      The median template fee difference is &minus;0.030%, Libbitcoin higher or equal in 16 of 39
+      rounds, ranging from &minus;1.2% to +2.0%. The live pool is flat, its template tail near the
+      relay floor, so packing differences are small either way.
     </p>
     <p class="lede after">
-      Median call times at the client: getblocktemplate 144.8 ms Libbitcoin and 160.5 ms Bitcoin
-      Core, getrawmempool 77.9 and 192.7 ms, getmempoolinfo 5.6 and 1.1 ms, and estimatesmartfee
-      39.9 and 8.0 ms. Bitcoin Core returns estimatesmartfee from a cached estimate, while
+      Median call times at the client: getblocktemplate 69.3 ms Libbitcoin and 105.7 ms Bitcoin
+      Core, getrawmempool 48.4 and 177.8 ms, getmempoolinfo 4.4 and 0.7 ms, and estimatesmartfee
+      25.9 and 5.0 ms. Bitcoin Core returns estimatesmartfee from a cached estimate, while
       Libbitcoin computes it in full from the pool on each call.
     </p>
   </section>
@@ -497,7 +497,7 @@
     <h2 id="methodology">Methodology<a class="anchor" href="#methodology" aria-label="Link to this section">#</a></h2>
     <p class="lede">
       Libbitcoin and <strong>Bitcoin Core 32.1</strong> run on the same machine, stratton (2 x Xeon
-      E5-2683 v4 32C/64T, 256 GB), and both reserve 2,332 WU and 400 sigops for the coinbase
+      E5-2683 v4 32C/64T, 256 GB, performance CPU governor), and both reserve 2,332 WU and 400 sigops for the coinbase
       (Libbitcoin <code>pool.coinbase_weight = 2000</code>, Bitcoin Core
       <code>blockreservedweight=2332</code>). Regtest runs use a third Bitcoin Core node as the
       miner, and run Bitcoin Core without its regtest consistency checks
