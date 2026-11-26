@@ -512,6 +512,14 @@
         <a href="performance/pool-scale-fees.png"><img src="performance/pool-scale-fees.png" alt="Template fee by pool size" loading="lazy"></a>
       </figure>
       <figure class="shot">
+        <h3>Template fee by pool size, conflict trees only</h3>
+        <a href="performance/pool-scale-trees-fees.png"><img src="performance/pool-scale-trees-fees.png" alt="Template fee by pool size, conflict trees only" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Intake and held by pool size, conflict trees only</h3>
+        <a href="performance/pool-scale-trees-intake.png"><img src="performance/pool-scale-trees-intake.png" alt="Intake and held by pool size, conflict trees only" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
         <h3>getrawmempool time by pool size</h3>
         <a href="performance/pool-scale-rpc.png"><img src="performance/pool-scale-rpc.png" alt="getrawmempool time by pool size" loading="lazy"></a>
       </figure>
@@ -523,6 +531,10 @@
         <h3>Template computation by pool size</h3>
         <a href="performance/pool-scale-template.png"><img src="performance/pool-scale-template.png" alt="Template computation by pool size" loading="lazy"></a>
       </figure>
+      <figure class="shot">
+        <h3>Template computation profile at 2 million pooled</h3>
+        <a href="performance/pool-scale-template-profile.png"><img src="performance/pool-scale-template-profile.png" alt="Template computation profile at 2 million pooled" loading="lazy"></a>
+      </figure>
     </div>
     <p class="lede after">
       On shelly, each node's pool grows in steps to 2,000,000 offered transactions (55% independent,
@@ -532,7 +544,8 @@
       Libbitcoin takes 10,100 to 12,500 offered transactions per second at every size, Bitcoin Core
       1,200 rising to 3,900. Libbitcoin holds every offered transaction (2,000,116 at the last
       step). Bitcoin Core holds one per conflict set through 1 million offered; at 2 million it
-      holds 1,501,508, 74,000 fewer, a shortfall not yet explained.
+      holds 1,501,508, 74,000 fewer, having stopped requesting announced transactions for a reason
+      not yet determined.
     </p>
     <p class="lede after">
       Libbitcoin's templates carry 0.3% to 0.8% more fee than Bitcoin Core's at every step (+0.42%
@@ -545,11 +558,27 @@
       mapped files and are resident only where touched, and its table bodies grow with the pool.
     </p>
     <p class="lede after">
+      A second ladder, on fresh pools, offers conflict trees only: two to four rival chains of two
+      to four transactions from one coin. Libbitcoin's template is ahead at every step, +25.9% at
+      25,000 offered, +18.2% at 75,000, +14.7% at 150,000, +12.4% at 250,000 and +10.4% at 500,000,
+      and every template passed Bitcoin Core's block validity test. At 1 and 2 million Bitcoin Core
+      requested only 88% and 58% of the announced transactions, so its pool there is incomplete
+      (hollow points). Libbitcoin takes 9,200 to 12,000 transactions per second at every size,
+      Bitcoin Core 2,000 rising to 4,600 through 500,000. Libbitcoin keeps every rival, Bitcoin
+      Core one rival chain per tree.
+    </p>
+    <p class="lede after">
       Template computation in Libbitcoin, timed in the running node, grows linearly at about 0.21 ms
       per thousand pooled transactions, to 428 ms at 2 million, and the time from block found to
       stratum job follows it, from 12 ms at 25,000 to 438 ms at 2 million. Each build resolves
       conflicts over every pooled transaction and packs from pool-sized state, so it scales with the
-      pool rather than the block. This is the open performance item.
+      pool rather than the block. Conflict trees are the expensive case, every tree a component to
+      resolve: block found to stratum job takes 464 ms at 1 million and 808 ms at 2 million in the
+      trees-only pool (dashed). Of a median 435 ms build at 2 million pooled, about 49% is
+      resolving conflicts, of which finding the row that owns an input, by binary search over the
+      pool, is 23.6%; packing is about 30%; and allocating and zeroing pool-sized state, with its
+      page faults, is about 16%. Every build redoes this for the whole pool, even when only the
+      chain height changed. This is the open performance item.
     </p>
   </section>
 
