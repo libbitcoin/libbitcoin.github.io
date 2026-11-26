@@ -338,6 +338,8 @@
     <a href="#transaction-intake">Transaction Intake</a>
     <a href="#block-to-template">Block to Template</a>
     <a href="#live-mainnet">Live Mainnet</a>
+    <a href="#large-pools">Large Pools</a>
+    <a href="#gpu">GPU</a>
     <a href="#methodology">Methodology</a>
   </nav>
 
@@ -495,6 +497,99 @@
   </section>
 
   <section>
+    <h2 id="large-pools">Large Pools<a class="anchor" href="#large-pools" aria-label="Link to this section">#</a></h2>
+    <div class="gallery">
+      <figure class="shot">
+        <h3>Transaction intake by pool size</h3>
+        <a href="performance/pool-scale-intake.png"><img src="performance/pool-scale-intake.png" alt="Transaction intake by pool size" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Transactions held by pool size</h3>
+        <a href="performance/pool-scale-held.png"><img src="performance/pool-scale-held.png" alt="Transactions held by pool size" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Template fee by pool size</h3>
+        <a href="performance/pool-scale-fees.png"><img src="performance/pool-scale-fees.png" alt="Template fee by pool size" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>getrawmempool time by pool size</h3>
+        <a href="performance/pool-scale-rpc.png"><img src="performance/pool-scale-rpc.png" alt="getrawmempool time by pool size" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Working set by pool size</h3>
+        <a href="performance/pool-scale-memory.png"><img src="performance/pool-scale-memory.png" alt="Working set by pool size" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Template computation by pool size</h3>
+        <a href="performance/pool-scale-template.png"><img src="performance/pool-scale-template.png" alt="Template computation by pool size" loading="lazy"></a>
+      </figure>
+    </div>
+    <p class="lede after">
+      On shelly, each node's pool grows in steps to 2,000,000 offered transactions (55% independent,
+      15% chains, 15% conflicts, 15% conflict trees, lognormal fee rates), each step announced over
+      P2P to Libbitcoin and then to Bitcoin Core. Neither node evicts: Libbitcoin's tables are sized
+      for 20 million transactions and Bitcoin Core runs with a 200 GB <code>maxmempool</code>.
+      Libbitcoin takes 10,100 to 12,500 offered transactions per second at every size, Bitcoin Core
+      1,200 rising to 3,900. Libbitcoin holds every offered transaction (2,000,116 at the last
+      step). Bitcoin Core holds one per conflict set through 1 million offered; at 2 million it
+      holds 1,501,508, 74,000 fewer, a shortfall not yet explained.
+    </p>
+    <p class="lede after">
+      Libbitcoin's templates carry 0.3% to 0.8% more fee than Bitcoin Core's at every step (+0.42%
+      at 2 million), and every template passed Bitcoin Core's block validity test. A block takes
+      about 7,700 transactions, the top 0.4% of a 2 million transaction pool by fee rate, so the
+      conflict trees that gain 21% where the block boundary falls among them seldom reach it here.
+      getrawmempool takes 1.0 s on Libbitcoin, listing 2.0 million transactions, and 4.9 s on
+      Bitcoin Core, listing 1.5 million. The working set rises from 0.35 to 0.89 GiB for Libbitcoin
+      and from 0.41 to 2.40 GiB for Bitcoin Core. Libbitcoin's table heads are sized at creation as
+      mapped files and are resident only where touched, and its table bodies grow with the pool.
+    </p>
+    <p class="lede after">
+      Template computation in Libbitcoin, timed in the running node, grows linearly at about 0.21 ms
+      per thousand pooled transactions, to 428 ms at 2 million, and the time from block found to
+      stratum job follows it, from 12 ms at 25,000 to 438 ms at 2 million. Each build resolves
+      conflicts over every pooled transaction and packs from pool-sized state, so it scales with the
+      pool rather than the block. This is the open performance item.
+    </p>
+  </section>
+
+  <section>
+    <h2 id="gpu">GPU<a class="anchor" href="#gpu" aria-label="Link to this section">#</a></h2>
+    <div class="gallery">
+      <figure class="shot">
+        <h3>Pool label and settle, CPU and GPU</h3>
+        <a href="performance/pool-gpu-kernels.png"><img src="performance/pool-gpu-kernels.png" alt="Pool label and settle, CPU and GPU" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Pool label and settle, GPU speedup</h3>
+        <a href="performance/pool-gpu-speedup.png"><img src="performance/pool-gpu-speedup.png" alt="Pool label and settle, GPU speedup" loading="lazy"></a>
+      </figure>
+      <figure class="shot">
+        <h3>Pool re-check on reorganization</h3>
+        <a href="performance/pool-scale-sweep.png"><img src="performance/pool-scale-sweep.png" alt="Pool re-check on reorganization" loading="lazy"></a>
+      </figure>
+    </div>
+    <p class="lede after">
+      The pool resolves conflicts in whole-column passes. <strong>Label</strong> groups conflicting
+      transactions into components: each transaction spending an output that another pooled
+      transaction also spends starts a label at its own row, and passes repeat, each row taking the
+      lowest label among itself, its parent and its rivals, until no label changes.
+      <strong>Settle</strong> marks the transactions that cannot confirm: each with a confirmed
+      rival, then each whose parent is marked, until nothing changes. On generated pools of 100,000
+      to 30 million rows, the fastest CPU vector width is compared with CUDA on an RTX PRO 6000,
+      transfer included. At 30 million rows, label takes 19.4 s on the CPU and 71 ms on the GPU
+      (274 times) with dense conflicts, 8.8 s and 71 ms (124 times) with sparse, and settle 1.7 s
+      and 61 ms (28 times) dense, 0.75 s and 62 ms (12 times) sparse.
+    </p>
+    <p class="lede after">
+      A one-block reorganization lowers the pool's chain height, so Libbitcoin re-checks every
+      pooled transaction against the new context. At 2,005,236 pooled this takes 595 to 686 ms on
+      the CPU and 37 to 40 ms on the GPU in the process that built the pool. In processes restarted
+      on the same store it took 172 to 208 ms on the GPU, a difference not yet explained.
+    </p>
+  </section>
+
+  <section>
     <h2 id="methodology">Methodology<a class="anchor" href="#methodology" aria-label="Link to this section">#</a></h2>
     <p class="lede">
       Libbitcoin and <strong>Bitcoin Core 32.1</strong> run on the same machine, stratton (2 x Xeon
@@ -503,6 +598,7 @@
       <code>blockreservedweight=2332</code>). Regtest runs use a third Bitcoin Core node as the
       miner, and run Bitcoin Core without its regtest consistency checks
       (<code>-checkmempool=0 -checkblockindex=0</code>).
+      Large pool and GPU runs use shelly (Threadripper PRO 9985WX 64C/128T, 512 GB, RTX PRO 6000).
     </p>
     <p class="lede after">
       Template validity is tested by Bitcoin Core's <code>generateblock</code> with each template's
