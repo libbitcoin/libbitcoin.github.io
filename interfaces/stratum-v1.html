@@ -366,8 +366,8 @@
 
   <article class="doc">
 <p>Stratum v1 is the mining protocol in common use, by which a pool gives
-work to miners and receives their shares. <code>bs</code> serves it on the
-<code>[stratum_v1]</code> binding as a solo pool: each job is a template of the next
+work to miners and receives their shares. <code>bs</code> serves it from the
+<code>[stratum_v1]</code> service as a solo pool: each job is a template of the next
 block from the <code>bs</code> transaction pool, its coinbase pays the miner's
 address (or the configured one), and a share that meets the network
 target is submitted as a block.</p>

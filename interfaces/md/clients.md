@@ -72,9 +72,10 @@ no server setting and are not listed. Node platforms such as Umbrel,
 Start9 and RaspiBlitz host a node and its clients rather than connect
 to one.
 
-[Stratum v1](stratum-v1) and [v2](stratum-v2) are planned for version 5.
-Their clients are mining devices and proxies, such as Bitaxe (AxeOS),
-cgminer, Braiins OS and the Stratum V2 reference translator.
+[Stratum v1](stratum-v1) clients are mining devices and proxies, such as
+Bitaxe (AxeOS), cgminer and Braiins OS. [Stratum v2](stratum-v2) is
+planned for version 5; its clients include the Stratum V2 reference
+translator.
 
 ## 3. Notes
 
