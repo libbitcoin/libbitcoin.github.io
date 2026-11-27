@@ -400,7 +400,8 @@ one port, and their secure forms share another:</p>
 frame. On <code>safe</code>, a TLS ClientHello is served as WSS and anything else
 as Noise, after which the connection is TCP or WS as on <code>bind</code>. Miners
 and proxies that implement the specification, such as the Stratum V2
-reference translator, connect with Noise over TCP on <code>safe</code>.</p>
+reference translator, connect with Noise over TCP on <code>safe</code>.
+Browser miners, which cannot open TCP connections, use WS or WSS.</p>
 <h2 id="1-setup">1. Setup<a class="anchor" href="#1-setup" aria-label="Link to this section">#</a></h2>
 <p>The service is disabled by default. Bind an address, allow connections,
 and optionally set the payout address. Noise requires a static secret

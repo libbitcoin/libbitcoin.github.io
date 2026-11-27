@@ -22,6 +22,7 @@ frame. On `safe`, a TLS ClientHello is served as WSS and anything else
 as Noise, after which the connection is TCP or WS as on `bind`. Miners
 and proxies that implement the specification, such as the Stratum V2
 reference translator, connect with Noise over TCP on `safe`.
+Browser miners, which cannot open TCP connections, use WS or WSS.
 
 ## 1. Setup
 
