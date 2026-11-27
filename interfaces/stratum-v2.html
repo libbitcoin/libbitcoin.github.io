@@ -365,174 +365,389 @@
   </nav>
 
   <article class="doc">
-<div class="banner"><strong>Stratum is planned for version 5.</strong></div>
-
 <p>Stratum v2 is the successor to <a href="stratum-v1.html">Stratum v1</a>: a binary
-protocol, encrypted and authenticated by the Noise protocol, over TCP/S.
-These are the messages of its mining protocol.</p>
-<h2 id="1-messages">1. Messages<a class="anchor" href="#1-messages" aria-label="Link to this section">#</a></h2>
+mining protocol, with channels, compact jobs and an encrypted,
+authenticated transport (Noise). <code>bs</code> serves its Mining protocol from
+the <code>[stratum_v2]</code> service as a solo pool: each job is a template of the
+next block from the <code>bs</code> transaction pool, its coinbase pays the address
+in the channel's user identity (or the configured one), and a share that
+meets the network target is submitted as a block. The Template
+Distribution and Job Declaration protocols are not served.</p>
+<p>Each connection is detected from its first bytes, so its protocols share
+one port, and their secure forms share another:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>Message</th>
-<th>Direction</th>
+<th>Port</th>
+<th>Default</th>
+<th>Protocols</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clear (<code>bind</code>)</td>
+<td>8980</td>
+<td>TCP, WS</td>
+</tr>
+<tr>
+<td>Secure (<code>safe</code>)</td>
+<td>8943</td>
+<td>Noise TCP, WSS, Noise WS</td>
+</tr>
+</tbody>
+</table></div>
+<p>Over TCP, frames are streamed; over WS, each binary message carries one
+frame. On <code>safe</code>, a TLS ClientHello is served as WSS and anything else
+as Noise, after which the connection is TCP or WS as on <code>bind</code>. Miners
+and proxies that implement the specification, such as the Stratum V2
+reference translator, connect with Noise over TCP on <code>safe</code>.</p>
+<h2 id="1-setup">1. Setup<a class="anchor" href="#1-setup" aria-label="Link to this section">#</a></h2>
+<p>The service is disabled by default. Bind an address, allow connections,
+and optionally set the payout address. Noise requires a static secret
+key and a certificate for it, both made with <a href="#noise-keys"><code>bx</code></a>:</p>
+<pre><code class="language-ini"><span class="section">[stratum_v2]</span>
+bind = 0.0.0.0:8980
+safe = 0.0.0.0:8943
+connections = 10
+payout_address = bc1q...
+noise_secret = &lt;server secret&gt;
+noise_certificate = &lt;certificate&gt;
+</code></pre>
+<p>Give miners the host, port 8943, and the authority public key, which
+they pin to authenticate the server. Without <code>payout_address</code>, the user
+identity of each channel is the payout: the miner opens the channel as
+<code>&lt;address&gt;</code> or <code>&lt;address&gt;.&lt;worker&gt;</code>. With <code>payout_address</code>, every block
+pays that address, and user identities are free.</p>
+<p>As with the other services, connections are refused until the chain is
+current (<a href="../configuration/services.html#until-current">Service Settings</a>).
+<code>safe</code> serves TLS with <code>cert_path</code> and <code>key_path</code>
+(<a href="../configuration/services.html#2-secure-connections">Secure connections</a>),
+Noise with <code>noise_secret</code>, or both on the same port.</p>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
 <th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><a href="#setup_connection"><code>setup_connection</code></a></td>
-<td>Miner to pool</td>
-<td>Opens the connection, with the protocol and versions</td>
+<td><code>stratum_v2.payout_address</code></td>
+<td>empty</td>
+<td>Address paid by the coinbase; empty, the user identity</td>
 </tr>
 <tr>
-<td><a href="#setup_connection_success"><code>setup_connection_success</code></a></td>
-<td>Pool to miner</td>
-<td>Accepts the connection</td>
+<td><code>stratum_v2.coinbase_tag</code></td>
+<td>empty</td>
+<td>Text carried by the coinbase input script (at most 75 bytes)</td>
 </tr>
 <tr>
-<td><a href="#setup_connection_error"><code>setup_connection_error</code></a></td>
-<td>Pool to miner</td>
-<td>Refuses the connection</td>
+<td><code>stratum_v2.extranonce_prefix_size</code></td>
+<td>4</td>
+<td>Coinbase extranonce bytes assigned to each extended channel (at least 4)</td>
 </tr>
 <tr>
-<td><a href="#open_standard_mining_channel"><code>open_standard_mining_channel</code></a></td>
-<td>Miner to pool</td>
-<td>Opens a channel for header-only mining</td>
+<td><code>stratum_v2.extranonce_size</code></td>
+<td>8</td>
+<td>Coinbase extranonce bytes rolled by an extended channel miner</td>
 </tr>
 <tr>
-<td><a href="#open_standard_mining_channel_success"><code>open_standard_mining_channel_success</code></a></td>
-<td>Pool to miner</td>
-<td>Accepts the channel</td>
+<td><code>stratum_v2.maximum_channels</code></td>
+<td>1024</td>
+<td>Mining channels open on a connection</td>
 </tr>
 <tr>
-<td><a href="#open_standard_mining_channel_error"><code>open_standard_mining_channel_error</code></a></td>
-<td>Pool to miner</td>
-<td>Refuses the channel</td>
+<td><code>stratum_v2.minimum_difficulty</code></td>
+<td>1</td>
+<td>Share difficulty floor of a channel</td>
 </tr>
 <tr>
-<td><a href="#open_extended_mining_channel"><code>open_extended_mining_channel</code></a></td>
-<td>Miner to pool</td>
-<td>Opens a channel in which the miner varies the extranonce</td>
+<td><code>stratum_v2.start_difficulty</code></td>
+<td>0</td>
+<td>Share difficulty of a new channel; 0, from the channel's nominal hash rate</td>
 </tr>
 <tr>
-<td><a href="#open_extended_mining_channel_success"><code>open_extended_mining_channel_success</code></a></td>
-<td>Pool to miner</td>
-<td>Accepts the channel</td>
+<td><code>stratum_v2.share_interval_seconds</code></td>
+<td>10</td>
+<td>Target seconds between shares (0 fixes the difficulty)</td>
 </tr>
 <tr>
-<td><a href="#open_extended_mining_channel_error"><code>open_extended_mining_channel_error</code></a></td>
-<td>Pool to miner</td>
-<td>Refuses the channel</td>
+<td><code>stratum_v2.authorize_timeout_seconds</code></td>
+<td>15</td>
+<td>Seconds to set up the connection and open a channel before it is closed (0 is unlimited)</td>
 </tr>
 <tr>
-<td><a href="#update_channel"><code>update_channel</code></a></td>
-<td>Miner to pool</td>
-<td>Updates the channel's hash rate and target</td>
+<td><code>stratum_v2.noise_secret</code></td>
+<td>empty</td>
+<td>Server static secret key; empty, no Noise</td>
 </tr>
 <tr>
-<td><a href="#update_channel_error"><code>update_channel_error</code></a></td>
-<td>Pool to miner</td>
-<td>Refuses the update</td>
+<td><code>stratum_v2.noise_certificate</code></td>
+<td>empty</td>
+<td>Certificate of the static key, issued by the authority</td>
 </tr>
 <tr>
-<td><a href="#close_channel"><code>close_channel</code></a></td>
-<td>Either</td>
-<td>Closes a channel</td>
+<td><code>stratum_v2.noise_authority</code></td>
+<td>empty</td>
+<td>Authority secret key, with which the server issues its own certificate</td>
 </tr>
 <tr>
-<td><a href="#set_target"><code>set_target</code></a></td>
-<td>Pool to miner</td>
-<td>Sets the share target</td>
+<td><code>stratum_v2.noise_authority_key</code></td>
+<td>empty</td>
+<td>Authority public key, against which the certificate is checked at startup</td>
 </tr>
 <tr>
-<td><a href="#new_mining_job"><code>new_mining_job</code></a></td>
-<td>Pool to miner</td>
-<td>Sends a job to a standard channel</td>
+<td><code>stratum_v2.noise_validity_days</code></td>
+<td>1</td>
+<td>Days either side of each handshake that a self-issued certificate is valid</td>
 </tr>
 <tr>
-<td><a href="#new_extended_mining_job"><code>new_extended_mining_job</code></a></td>
-<td>Pool to miner</td>
-<td>Sends a job to an extended channel</td>
+<td><code>pool.template_interval_seconds</code></td>
+<td>30</td>
+<td>Seconds between replacements of the template (0 disables)</td>
 </tr>
 <tr>
-<td><a href="#set_new_prev_hash"><code>set_new_prev_hash</code></a></td>
-<td>Pool to miner</td>
-<td>Starts mining on a new previous block</td>
-</tr>
-<tr>
-<td><a href="#set_custom_mining_job"><code>set_custom_mining_job</code></a></td>
-<td>Miner to pool</td>
-<td>Proposes a job built by the miner</td>
-</tr>
-<tr>
-<td><a href="#set_custom_mining_job_success"><code>set_custom_mining_job_success</code></a></td>
-<td>Pool to miner</td>
-<td>Accepts the job</td>
-</tr>
-<tr>
-<td><a href="#set_custom_mining_job_error"><code>set_custom_mining_job_error</code></a></td>
-<td>Pool to miner</td>
-<td>Refuses the job</td>
-</tr>
-<tr>
-<td><a href="#submit_shares"><code>submit_shares</code></a></td>
-<td>Miner to pool</td>
-<td>Submits shares</td>
-</tr>
-<tr>
-<td><a href="#submit_shares_success"><code>submit_shares_success</code></a></td>
-<td>Pool to miner</td>
-<td>Acknowledges shares</td>
-</tr>
-<tr>
-<td><a href="#submit_shares_error"><code>submit_shares_error</code></a></td>
-<td>Pool to miner</td>
-<td>Rejects shares</td>
-</tr>
-<tr>
-<td><a href="#reconnect"><code>reconnect</code></a></td>
-<td>Pool to miner</td>
-<td>Moves the miner to another server</td>
+<td><code>pool.template_fee_increase</code></td>
+<td>0</td>
+<td>Satoshis of fees a replacement template must add</td>
 </tr>
 </tbody>
 </table></div>
-<h2 id="2-connection">2. Connection<a class="anchor" href="#2-connection" aria-label="Link to this section">#</a></h2>
+<p>A standard channel is assigned the whole extranonce, prefix and rolled
+bytes together, so the two sizes together may not exceed 32 bytes.
+Startup fails if <code>extranonce_prefix_size</code> is below 4, <code>extranonce_size</code>
+or <code>maximum_channels</code> is zero, the extranonce exceeds 32 bytes, the tag
+exceeds 75 bytes, the coinbase input script would exceed 100 bytes, or
+the minimum difficulty is not positive. It also fails on any Noise
+setting that is malformed, on both or neither of <code>noise_authority</code> and
+<code>noise_certificate</code> with <code>noise_secret</code>, on a certificate that does not
+verify against <code>noise_authority_key</code>, and on <code>safe</code> binds with neither
+TLS nor Noise configured.</p>
+<p>With the service enabled, <code>pool.coinbase_weight</code> and
+<code>pool.coinbase_sigops</code> are derived from this coinbase, as for
+<a href="stratum-v1.html#1-setup">Stratum v1</a>, the larger of the two when both
+services are enabled.</p>
+<h3 id="noise-keys">Noise keys<a class="anchor" href="#noise-keys" aria-label="Link to this section">#</a></h3>
+<p>The transport is Noise_NX over secp256k1 with ElligatorSwift,
+ChaCha20-Poly1305 and SHA-256, as the specification defines. The server
+is known by its static key, and proves it with a certificate signed
+(BIP340) by an authority, whose public key the miner pins. Every key and
+certificate is Base58Check, in the same text forms as the Stratum V2
+reference implementation, so values move between the two unchanged.</p>
+<p>The secret keys are made from entropy, and the certificate on the
+authority's machine, so that the authority's secret need never be on the
+server (<a href="../client/commands.html#10-math">BX Commands</a>):</p>
+<pre class="console"><code>$ bx noise-new &lt;entropy&gt; &gt; authority.secret
+$ bx noise-new &lt;other entropy&gt; &gt; server.secret
+$ bx noise-public &lt; server.secret
+&lt;server public key&gt;
+$ bx noise-cert --days 30 &lt;server public key&gt; &lt; authority.secret
+&lt;certificate&gt;
+$ bx noise-public &lt; authority.secret
+&lt;authority public key&gt;
+</code></pre>
+<p>Configure <code>noise_secret</code> with the server secret and <code>noise_certificate</code>
+with the certificate, and give miners the authority public key, the
+string beginning <code>9</code> that the reference implementation also prints. A
+certificate is valid from <code>--valid_from</code> (default now) for <code>--days</code>
+(default 365), and must be reissued before it expires.</p>
+<p>Alternatively, <code>noise_authority</code> configures the authority's secret on the
+server, which then issues its own certificate at each handshake, valid
+<code>noise_validity_days</code> either side of it. This is simpler for testing, but
+places the authority's secret on the server. <code>noise_authority_key</code>, if
+set, is checked against the certificate at startup.</p>
+<h3 id="start-difficulty">Start difficulty<a class="anchor" href="#start-difficulty" aria-label="Link to this section">#</a></h3>
+<p>A channel starts at <code>start_difficulty</code> if set, otherwise at the rate of
+its nominal hash rate: the hash rate times <code>share_interval_seconds</code>
+divided by 2<sup>32</sup>. Its floor is the higher of
+<code>minimum_difficulty</code> and the difficulty of the channel's maximum target.
+Vardiff then adjusts it, as for <a href="stratum-v1.html#start-difficulty">Stratum v1</a>,
+and <a href="#update_channel"><code>update_channel</code></a> restarts it from a new hash rate
+when <code>start_difficulty</code> is 0.</p>
+<h3 id="connection-limits">Connection limits<a class="anchor" href="#connection-limits" aria-label="Link to this section">#</a></h3>
+<p>A connection that has not completed setup and opened a channel within
+<code>authorize_timeout_seconds</code> (default 15) is closed.
+<code>expiration_minutes</code> and <code>inactivity_minutes</code> default to 0, no limit, as
+for <a href="stratum-v1.html#connection-limits">Stratum v1</a>.</p>
+<p>With <code>credential</code> set, only a WS upgrade can carry a credential (HTTP
+basic authentication), and TCP connections are refused. Miners using TCP
+are therefore limited by Noise, <code>bind</code> address or firewall
+(<a href="../configuration/services.html#3-authentication">Authentication</a>).</p>
+<h2 id="2-messages">2. Messages<a class="anchor" href="#2-messages" aria-label="Link to this section">#</a></h2>
+<div class="scroller"><table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Direction</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#setup_connection"><code>setup_connection</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Mining protocol only</td>
+</tr>
+<tr>
+<td><a href="#setup_connection_success"><code>setup_connection_success</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#setup_connection_error"><code>setup_connection_error</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#open_standard_mining_channel"><code>open_standard_mining_channel</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Handled</td>
+</tr>
+<tr>
+<td><a href="#open_standard_mining_channel_success"><code>open_standard_mining_channel_success</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#open_extended_mining_channel"><code>open_extended_mining_channel</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Handled</td>
+</tr>
+<tr>
+<td><a href="#open_extended_mining_channel_success"><code>open_extended_mining_channel_success</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#open_mining_channel_error"><code>open_mining_channel_error</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#update_channel"><code>update_channel</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Handled</td>
+</tr>
+<tr>
+<td><a href="#update_channel_error"><code>update_channel_error</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#close_channel"><code>close_channel</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Handled</td>
+</tr>
+<tr>
+<td><a href="#set_target"><code>set_target</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#new_mining_job"><code>new_mining_job</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#new_extended_mining_job"><code>new_extended_mining_job</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#set_new_prev_hash"><code>set_new_prev_hash</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#submit_shares_standard"><code>submit_shares_standard</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Handled</td>
+</tr>
+<tr>
+<td><a href="#submit_shares_extended"><code>submit_shares_extended</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Handled</td>
+</tr>
+<tr>
+<td><a href="#submit_shares_success"><code>submit_shares_success</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#submit_shares_error"><code>submit_shares_error</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Sent</td>
+</tr>
+<tr>
+<td><a href="#set_custom_mining_job"><code>set_custom_mining_job</code></a></td>
+<td>Miner to <code>bs</code></td>
+<td>Not implemented (work selection refused)</td>
+</tr>
+<tr>
+<td><a href="#set_extranonce_prefix"><code>set_extranonce_prefix</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Not sent</td>
+</tr>
+<tr>
+<td><a href="#set_group_channel"><code>set_group_channel</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Not sent</td>
+</tr>
+<tr>
+<td><a href="#reconnect"><code>reconnect</code></a></td>
+<td><code>bs</code> to miner</td>
+<td>Not sent</td>
+</tr>
+</tbody>
+</table></div>
+<p>Jobs begin once a channel is open. Error reasons are the codes of the
+specification.</p>
+<h2 id="3-connection">3. Connection<a class="anchor" href="#3-connection" aria-label="Link to this section">#</a></h2>
 <h3 id="setup_connection">setup_connection<a class="anchor" href="#setup_connection" aria-label="Link to this section">#</a></h3>
 <p>Opens the connection, with the subprotocol, the range of versions and
-the flags of the features the miner supports.</p>
+the flags of the features the miner requires. <code>bs</code> serves the Mining
+protocol at version 2, and accepts the flags <code>REQUIRES_STANDARD_JOBS</code> and
+<code>REQUIRES_VERSION_ROLLING</code>.</p>
 <h3 id="setup_connection_success">setup_connection_success<a class="anchor" href="#setup_connection_success" aria-label="Link to this section">#</a></h3>
-<p>Accepts the connection, with the version and flags in use.</p>
+<p>Accepts the connection, at version 2, with no flags.</p>
 <h3 id="setup_connection_error">setup_connection_error<a class="anchor" href="#setup_connection_error" aria-label="Link to this section">#</a></h3>
-<p>Refuses the connection, with the reason.</p>
-<h3 id="reconnect">reconnect<a class="anchor" href="#reconnect" aria-label="Link to this section">#</a></h3>
-<p>Asks the miner to reconnect, to the given server and port.</p>
-<h2 id="3-channels">3. Channels<a class="anchor" href="#3-channels" aria-label="Link to this section">#</a></h2>
+<p>Refuses the connection, then closes it: <code>unsupported-protocol</code> for any
+subprotocol other than Mining, <code>protocol-version-mismatch</code> if version 2
+is outside the miner's range, and <code>unsupported-feature-flags</code>, with the
+flags, for any other flag, including <code>REQUIRES_WORK_SELECTION</code>.</p>
+<h2 id="4-channels">4. Channels<a class="anchor" href="#4-channels" aria-label="Link to this section">#</a></h2>
 <h3 id="open_standard_mining_channel">open_standard_mining_channel<a class="anchor" href="#open_standard_mining_channel" aria-label="Link to this section">#</a></h3>
-<p>Opens a channel in which the miner varies only the header, with its
-nominal hash rate and maximum target.</p>
+<p>Opens a channel in which the miner varies only the header, with its user
+identity, nominal hash rate and maximum target.</p>
 <h3 id="open_standard_mining_channel_success">open_standard_mining_channel_success<a class="anchor" href="#open_standard_mining_channel_success" aria-label="Link to this section">#</a></h3>
 <p>Accepts the standard channel, with its identifier, target and
-extranonce prefix.</p>
-<h3 id="open_standard_mining_channel_error">open_standard_mining_channel_error<a class="anchor" href="#open_standard_mining_channel_error" aria-label="Link to this section">#</a></h3>
-<p>Refuses the standard channel, with the reason.</p>
+extranonce prefix, which is the channel's whole extranonce.</p>
 <h3 id="open_extended_mining_channel">open_extended_mining_channel<a class="anchor" href="#open_extended_mining_channel" aria-label="Link to this section">#</a></h3>
-<p>Opens a channel in which the miner also varies part of the coinbase,
-with the size of the extranonce it needs.</p>
+<p>Opens a channel in which the miner also rolls part of the coinbase, with
+its user identity, nominal hash rate, maximum target and the least
+extranonce size it needs.</p>
 <h3 id="open_extended_mining_channel_success">open_extended_mining_channel_success<a class="anchor" href="#open_extended_mining_channel_success" aria-label="Link to this section">#</a></h3>
-<p>Accepts the extended channel, with its identifier, target and extranonce
-prefix and size.</p>
-<h3 id="open_extended_mining_channel_error">open_extended_mining_channel_error<a class="anchor" href="#open_extended_mining_channel_error" aria-label="Link to this section">#</a></h3>
-<p>Refuses the extended channel, with the reason.</p>
+<p>Accepts the extended channel, with its identifier, target, extranonce
+size (<code>extranonce_size</code>) and extranonce prefix.</p>
+<h3 id="open_mining_channel_error">open_mining_channel_error<a class="anchor" href="#open_mining_channel_error" aria-label="Link to this section">#</a></h3>
+<p>Refuses either kind of channel: <code>unknown-user</code> if the user identity is
+not an address and no <code>payout_address</code> is configured,
+<code>max-target-out-of-range</code> for a zero maximum target,
+<code>too-many-channels</code> beyond <code>maximum_channels</code>, and
+<code>min-extranonce-size-too-large</code> if an extended channel needs more than
+<code>extranonce_size</code>.</p>
 <h3 id="update_channel">update_channel<a class="anchor" href="#update_channel" aria-label="Link to this section">#</a></h3>
-<p>Updates a channel's nominal hash rate and maximum target.</p>
+<p>Updates a channel's nominal hash rate and maximum target. The maximum
+target sets the channel's floor, and with <code>start_difficulty</code> 0 the hash
+rate sets its difficulty, sent by <a href="#set_target"><code>set_target</code></a>.</p>
 <h3 id="update_channel_error">update_channel_error<a class="anchor" href="#update_channel_error" aria-label="Link to this section">#</a></h3>
-<p>Refuses the update, with the reason.</p>
+<p>Refuses the update: <code>invalid-channel-id</code> or <code>max-target-out-of-range</code>.</p>
 <h3 id="close_channel">close_channel<a class="anchor" href="#close_channel" aria-label="Link to this section">#</a></h3>
-<p>Closes a channel, with the reason.</p>
-<h2 id="4-work">4. Work<a class="anchor" href="#4-work" aria-label="Link to this section">#</a></h2>
+<p>Closes a channel.</p>
+<h2 id="5-work">5. Work<a class="anchor" href="#5-work" aria-label="Link to this section">#</a></h2>
 <h3 id="set_target">set_target<a class="anchor" href="#set_target" aria-label="Link to this section">#</a></h3>
-<p>Sets the target of the shares a channel submits.</p>
+<p>Sets the target of the shares a channel submits, as vardiff adjusts it.</p>
 <h3 id="new_mining_job">new_mining_job<a class="anchor" href="#new_mining_job" aria-label="Link to this section">#</a></h3>
 <p>Sends a job to a standard channel: its merkle root and version.</p>
 <h3 id="new_extended_mining_job">new_extended_mining_job<a class="anchor" href="#new_extended_mining_job" aria-label="Link to this section">#</a></h3>
@@ -541,19 +756,36 @@ the merkle path and the version.</p>
 <h3 id="set_new_prev_hash">set_new_prev_hash<a class="anchor" href="#set_new_prev_hash" aria-label="Link to this section">#</a></h3>
 <p>Starts mining on a new previous block, with its hash, time and target,
 for a job already sent.</p>
-<h3 id="set_custom_mining_job">set_custom_mining_job<a class="anchor" href="#set_custom_mining_job" aria-label="Link to this section">#</a></h3>
-<p>Proposes a job whose transactions the miner chose.</p>
-<h3 id="set_custom_mining_job_success">set_custom_mining_job_success<a class="anchor" href="#set_custom_mining_job_success" aria-label="Link to this section">#</a></h3>
-<p>Accepts the miner's job.</p>
-<h3 id="set_custom_mining_job_error">set_custom_mining_job_error<a class="anchor" href="#set_custom_mining_job_error" aria-label="Link to this section">#</a></h3>
-<p>Refuses the miner's job, with the reason.</p>
-<h3 id="submit_shares">submit_shares<a class="anchor" href="#submit_shares" aria-label="Link to this section">#</a></h3>
-<p>Submits shares: the channel, the job, the nonce, the time and the
-version, and on an extended channel the extranonce.</p>
+<h3 id="submit_shares_standard">submit_shares_standard<a class="anchor" href="#submit_shares_standard" aria-label="Link to this section">#</a></h3>
+<p>Submits a share on a standard channel: the channel, sequence number, job,
+nonce, time and version. Version bits may be rolled only within the
+general purpose bits (BIP320).</p>
+<h3 id="submit_shares_extended">submit_shares_extended<a class="anchor" href="#submit_shares_extended" aria-label="Link to this section">#</a></h3>
+<p>Submits a share on an extended channel, as for a standard channel, with
+the rolled extranonce, which must be exactly <code>extranonce_size</code> bytes.</p>
 <h3 id="submit_shares_success">submit_shares_success<a class="anchor" href="#submit_shares_success" aria-label="Link to this section">#</a></h3>
-<p>Acknowledges the shares accepted since the last acknowledgement.</p>
+<p>Acknowledges each accepted share, with its sequence number and the sum
+of its difficulty. A share is valid work whatever the outcome of a block
+it mines.</p>
 <h3 id="submit_shares_error">submit_shares_error<a class="anchor" href="#submit_shares_error" aria-label="Link to this section">#</a></h3>
-<p>Rejects a share, with the reason.</p>
+<p>Rejects a share: <code>invalid-channel-id</code>, <code>invalid-job-id</code>,
+<code>stale-share</code> for a job that has been replaced, <code>difficulty-too-low</code> or
+<code>duplicate-share</code>. A share that cannot be valid, with the wrong
+extranonce size (<code>invalid-extranonce-size</code>), version bits outside the
+general purpose bits (<code>invalid-version</code>) or an invalid header
+(<code>invalid-share</code>), is rejected and the connection closed.</p>
+<h2 id="6-not-served">6. Not served<a class="anchor" href="#6-not-served" aria-label="Link to this section">#</a></h2>
+<h3 id="set_custom_mining_job">set_custom_mining_job<a class="anchor" href="#set_custom_mining_job" aria-label="Link to this section">#</a></h3>
+<p>Proposes a job whose transactions the miner chose (work selection, with
+its success and error replies). A miner that requires work selection is
+refused at setup.</p>
+<h3 id="set_extranonce_prefix">set_extranonce_prefix<a class="anchor" href="#set_extranonce_prefix" aria-label="Link to this section">#</a></h3>
+<p>Changes a channel's extranonce prefix. Not sent; the prefix does not
+change.</p>
+<h3 id="set_group_channel">set_group_channel<a class="anchor" href="#set_group_channel" aria-label="Link to this section">#</a></h3>
+<p>Groups standard channels. Not sent; there are no group channels.</p>
+<h3 id="reconnect">reconnect<a class="anchor" href="#reconnect" aria-label="Link to this section">#</a></h3>
+<p>Moves the miner to another server. Not sent.</p>
   </article>
 
   <nav class="pager"><a href="stratum-v1.html">&larr; Stratum v1</a><a href="clients.html">Client Compatibility &rarr;</a></nav>

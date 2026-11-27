@@ -1532,6 +1532,8 @@ server = libbitcoin/4
 <h2 id="21-stratum_v1">21. <code>[stratum_v1]</code><a class="anchor" href="#21-stratum_v1" aria-label="Link to this section">#</a></h2>
 <p>The Stratum v1 mining interface (<a href="../interfaces/stratum-v1.html">Stratum v1</a>).</p>
 <pre><code class="language-ini"><span class="section">[stratum_v1]</span>
+<span class="comment"># The public [http|https://]host[:port] url, ws on its port, multiple allowed, defaults to empty (none).</span>
+<span class="comment">#advertise =</span>
 <span class="comment"># The seconds to subscribe and authorize a channel, defaults to '15' (0 is unlimited).</span>
 authorize_timeout_seconds = 15
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
@@ -1548,7 +1550,7 @@ compression = true
 connect_timeout_seconds = 0
 <span class="comment"># The required maximum number of connections, defaults to '0'.</span>
 connections = 0
-<span class="comment"># The 'username:password[:method,...]' authorization (not secure), multiple allowed.</span>
+<span class="comment"># The 'username:password' authorization (not secure), multiple allowed.</span>
 <span class="comment">#credential =</span>
 <span class="comment"># The maximum connection duration, defaults to '0'.</span>
 expiration_minutes = 0
@@ -1570,7 +1572,7 @@ maximum_buffer = 65536
 maximum_request = 8004096
 <span class="comment"># The minimum retained read buffer size, defaults to '4096'.</span>
 minimum_buffer = 4096
-<span class="comment"># The share difficulty assigned to a channel, and its floor, defaults to '1'.</span>
+<span class="comment"># The share difficulty floor of a channel, defaults to '1'.</span>
 minimum_difficulty = 1
 <span class="comment"># The address paid by the coinbase, defaults to empty (the worker name).</span>
 payout_address =
@@ -1580,6 +1582,76 @@ rate_limit = 0
 <span class="comment">#safe =</span>
 <span class="comment"># The target seconds between shares of a channel, defaults to '10' (0 fixes difficulty).</span>
 share_interval_seconds = 10
+<span class="comment"># The share difficulty of a new channel, defaults to '0' (automatic).</span>
+start_difficulty = 0
+</code></pre>
+<h2 id="22-stratum_v2">22. <code>[stratum_v2]</code><a class="anchor" href="#22-stratum_v2" aria-label="Link to this section">#</a></h2>
+<p>The Stratum v2 mining interface (<a href="../interfaces/stratum-v2.html">Stratum v2</a>).</p>
+<pre><code class="language-ini"><span class="section">[stratum_v2]</span>
+<span class="comment"># The public [http|https://]host[:port] url, ws on its port, multiple allowed, defaults to empty (none).</span>
+<span class="comment">#advertise =</span>
+<span class="comment"># The seconds to set up a connection and to open a channel, defaults to '15' (0 is unlimited).</span>
+authorize_timeout_seconds = 15
+<span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#bind =</span>
+<span class="comment"># The trusted client certificate directory (*.PEM), enables client authentication.</span>
+cert_auth =
+<span class="comment"># The path to the server certificate file (.PEM), defaults to empty.</span>
+cert_path =
+<span class="comment"># The text carried by the coinbase input script, defaults to empty.</span>
+coinbase_tag =
+<span class="comment"># Compress http response bodies as accepted by the request (gzip, deflate), defaults to 'true'.</span>
+compression = true
+<span class="comment"># The time limit for connection establishment, defaults to '0' (network controls).</span>
+connect_timeout_seconds = 0
+<span class="comment"># The required maximum number of connections, defaults to '0'.</span>
+connections = 0
+<span class="comment"># The 'username:password' authorization (not secure), multiple allowed.</span>
+<span class="comment">#credential =</span>
+<span class="comment"># The maximum connection duration, defaults to '0'.</span>
+expiration_minutes = 0
+<span class="comment"># The bytes of coinbase extranonce assigned to each channel, defaults to '4'.</span>
+extranonce_prefix_size = 4
+<span class="comment"># The bytes of coinbase extranonce rolled by an extended channel miner, defaults to '8'.</span>
+extranonce_size = 8
+<span class="comment"># The idle timeout (http keep-alive), defaults to '0'.</span>
+inactivity_minutes = 0
+<span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
+key_pass =
+<span class="comment"># The path to the server private key file (.PEM), defaults to empty.</span>
+key_path =
+<span class="comment"># The maximum write backlog of a channel, defaults to '1048576'.</span>
+maximum_backlog = 1048576
+<span class="comment"># The maximum json response buffer size, defaults to '65536'.</span>
+maximum_buffer = 65536
+<span class="comment"># The mining channels open on a connection, defaults to '1024'.</span>
+maximum_channels = 1024
+<span class="comment"># The maximum allowed request size, defaults to '8004096'.</span>
+maximum_request = 8004096
+<span class="comment"># The minimum retained read buffer size, defaults to '4096'.</span>
+minimum_buffer = 4096
+<span class="comment"># The share difficulty floor of a channel, defaults to '1'.</span>
+minimum_difficulty = 1
+<span class="comment"># The base58check Noise authority secret key that issues certificates, defaults to none.</span>
+noise_authority =
+<span class="comment"># The base58check Noise authority public key that verifies the certificate, defaults to none.</span>
+noise_authority_key =
+<span class="comment"># The base58check Noise certificate pre-issued by the authority, defaults to none.</span>
+noise_certificate =
+<span class="comment"># The base58check Noise static secret key, defaults to none (no Noise).</span>
+noise_secret =
+<span class="comment"># The days either side of issue that an issued certificate is valid, defaults to '1'.</span>
+noise_validity_days = 1
+<span class="comment"># The address paid by the coinbase, defaults to empty (the user identity).</span>
+payout_address =
+<span class="comment"># The send rate limit in bytes per second, defaults to '0' (network controls).</span>
+rate_limit = 0
+<span class="comment"># IP address to secure bind (tls and/or Noise, detected), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#safe =</span>
+<span class="comment"># The target seconds between shares of a channel, defaults to '10' (0 fixes difficulty).</span>
+share_interval_seconds = 10
+<span class="comment"># The share difficulty of a new channel, defaults to '0' (automatic).</span>
+start_difficulty = 0
 </code></pre>
   </article>
 

@@ -1254,6 +1254,8 @@ The Stratum v1 mining interface ([Stratum v1](../interfaces/stratum-v1)).
 
 ```ini
 [stratum_v1]
+# The public [http|https://]host[:port] url, ws on its port, multiple allowed, defaults to empty (none).
+#advertise =
 # The seconds to subscribe and authorize a channel, defaults to '15' (0 is unlimited).
 authorize_timeout_seconds = 15
 # IP address to bind, multiple allowed, defaults to empty (disabled).
@@ -1270,7 +1272,7 @@ compression = true
 connect_timeout_seconds = 0
 # The required maximum number of connections, defaults to '0'.
 connections = 0
-# The 'username:password[:method,...]' authorization (not secure), multiple allowed.
+# The 'username:password' authorization (not secure), multiple allowed.
 #credential =
 # The maximum connection duration, defaults to '0'.
 expiration_minutes = 0
@@ -1292,7 +1294,7 @@ maximum_buffer = 65536
 maximum_request = 8004096
 # The minimum retained read buffer size, defaults to '4096'.
 minimum_buffer = 4096
-# The share difficulty assigned to a channel, and its floor, defaults to '1'.
+# The share difficulty floor of a channel, defaults to '1'.
 minimum_difficulty = 1
 # The address paid by the coinbase, defaults to empty (the worker name).
 payout_address =
@@ -1302,4 +1304,78 @@ rate_limit = 0
 #safe =
 # The target seconds between shares of a channel, defaults to '10' (0 fixes difficulty).
 share_interval_seconds = 10
+# The share difficulty of a new channel, defaults to '0' (automatic).
+start_difficulty = 0
+```
+
+## 22. `[stratum_v2]`
+
+The Stratum v2 mining interface ([Stratum v2](../interfaces/stratum-v2)).
+
+```ini
+[stratum_v2]
+# The public [http|https://]host[:port] url, ws on its port, multiple allowed, defaults to empty (none).
+#advertise =
+# The seconds to set up a connection and to open a channel, defaults to '15' (0 is unlimited).
+authorize_timeout_seconds = 15
+# IP address to bind, multiple allowed, defaults to empty (disabled).
+#bind =
+# The trusted client certificate directory (*.PEM), enables client authentication.
+cert_auth =
+# The path to the server certificate file (.PEM), defaults to empty.
+cert_path =
+# The text carried by the coinbase input script, defaults to empty.
+coinbase_tag =
+# Compress http response bodies as accepted by the request (gzip, deflate), defaults to 'true'.
+compression = true
+# The time limit for connection establishment, defaults to '0' (network controls).
+connect_timeout_seconds = 0
+# The required maximum number of connections, defaults to '0'.
+connections = 0
+# The 'username:password' authorization (not secure), multiple allowed.
+#credential =
+# The maximum connection duration, defaults to '0'.
+expiration_minutes = 0
+# The bytes of coinbase extranonce assigned to each channel, defaults to '4'.
+extranonce_prefix_size = 4
+# The bytes of coinbase extranonce rolled by an extended channel miner, defaults to '8'.
+extranonce_size = 8
+# The idle timeout (http keep-alive), defaults to '0'.
+inactivity_minutes = 0
+# The password to decrypt the server private key file (.PEM), optional.
+key_pass =
+# The path to the server private key file (.PEM), defaults to empty.
+key_path =
+# The maximum write backlog of a channel, defaults to '1048576'.
+maximum_backlog = 1048576
+# The maximum json response buffer size, defaults to '65536'.
+maximum_buffer = 65536
+# The mining channels open on a connection, defaults to '1024'.
+maximum_channels = 1024
+# The maximum allowed request size, defaults to '8004096'.
+maximum_request = 8004096
+# The minimum retained read buffer size, defaults to '4096'.
+minimum_buffer = 4096
+# The share difficulty floor of a channel, defaults to '1'.
+minimum_difficulty = 1
+# The base58check Noise authority secret key that issues certificates, defaults to none.
+noise_authority =
+# The base58check Noise authority public key that verifies the certificate, defaults to none.
+noise_authority_key =
+# The base58check Noise certificate pre-issued by the authority, defaults to none.
+noise_certificate =
+# The base58check Noise static secret key, defaults to none (no Noise).
+noise_secret =
+# The days either side of issue that an issued certificate is valid, defaults to '1'.
+noise_validity_days = 1
+# The address paid by the coinbase, defaults to empty (the user identity).
+payout_address =
+# The send rate limit in bytes per second, defaults to '0' (network controls).
+rate_limit = 0
+# IP address to secure bind (tls and/or Noise, detected), multiple allowed, defaults to empty (disabled).
+#safe =
+# The target seconds between shares of a channel, defaults to '10' (0 fixes difficulty).
+share_interval_seconds = 10
+# The share difficulty of a new channel, defaults to '0' (automatic).
+start_difficulty = 0
 ```

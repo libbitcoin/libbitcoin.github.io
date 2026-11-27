@@ -19,6 +19,7 @@ how to call them, with examples and their responses.
 | [BTCD](btcd) | `[btcd]` | 8480 | 8443 | TCP/S, HTTP/S, WS/S |
 | [Esplora](esplora) | `[esplora]` | 8780 | 8743 | HTTP/S, WS/S |
 | [Stratum v1](stratum-v1) | `[stratum_v1]` | 8880 | 8843 | TCP/S, HTTP/S, WS/S |
+| [Stratum v2](stratum-v2) | `[stratum_v2]` | 8980 | 8943 | TCP, WS/S, Noise |
 
 Each service reaches all of its protocols on one port, and their secure
 forms (TLS, or CurveZMQ for ZMTPS) on another. P2P serves P2P and P2PS

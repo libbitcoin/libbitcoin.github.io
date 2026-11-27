@@ -444,7 +444,12 @@ and <code>safe</code> serves TLS with <code>cert_path</code> and <code>key_path<
 <tr>
 <td><code>stratum_v1.minimum_difficulty</code></td>
 <td>1</td>
-<td>Share difficulty first assigned, and its floor</td>
+<td>Share difficulty floor of a connection</td>
+</tr>
+<tr>
+<td><code>stratum_v1.start_difficulty</code></td>
+<td>0</td>
+<td>Share difficulty of a new connection; 0, <code>minimum_difficulty</code></td>
 </tr>
 <tr>
 <td><code>stratum_v1.share_interval_seconds</code></td>
@@ -480,7 +485,8 @@ no payout address (the largest address output, P2PKH for the sigops),
 and 608 and 0 with a P2WPKH payout address. A configured value governs,
 as for an external miner using <a href="bitcoind-rpc.html#getblocktemplate"><code>getblocktemplate</code></a>.</p>
 <h3 id="start-difficulty">Start difficulty<a class="anchor" href="#start-difficulty" aria-label="Link to this section">#</a></h3>
-<p>A connection starts at <code>minimum_difficulty</code>, which is also its floor.
+<p>A connection starts at <code>start_difficulty</code> if set, otherwise at
+<code>minimum_difficulty</code>, which is also its floor.
 At difficulty 1 a 100 TH/s machine finds tens of thousands of shares a
 second. Vardiff raises the difficulty fourfold every 16 shares, so it
 converges in seconds, but it opens with a flood of shares. For ASICs, set
@@ -807,7 +813,8 @@ the extranonce of <code>extranonce1</code> and <code>extranonce2</code>. Its inp
 not final (<code>fffffffe</code>) and its locktime is the previous height (BIP54). Its first output pays
 the subsidy and the template's fees to the payout address; the second
 commits to the block's witnesses (BIP141), with a null reserved value.</p>
-<p>The difficulty of a connection starts at <code>minimum_difficulty</code>. With a
+<p>The difficulty of a connection starts at <code>start_difficulty</code>, or
+<code>minimum_difficulty</code> if unset. With a
 nonzero <code>share_interval_seconds</code>, it is retargeted after 16 accepted
 shares, or at the first share after 16 intervals: by the ratio of the
 target interval to the observed one, limited to between a quarter and

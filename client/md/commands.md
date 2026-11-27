@@ -28,20 +28,20 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 
 ## 1. Commands
 
-109 commands, by category:
+121 commands, by category:
 
 | Category | Commands |
 | -------- | -------- |
-| [Wallet](#2-wallet) | 31 |
+| [Wallet](#2-wallet) | 41 |
 | [Key encryption](#3-key-encryption) | 9 |
 | [Stealth](#4-stealth) | 3 |
-| [Transaction](#5-transaction) | 8 |
+| [Transaction](#5-transaction) | 9 |
 | [Messaging](#6-messaging) | 2 |
-| [Online](#7-online) | 26 |
+| [Online](#7-online) | 20 |
 | [Encoding](#8-encoding) | 12 |
 | [Hash](#9-hash) | 6 |
-| [Math](#10-math) | 10 |
-| [Meta](#11-meta) | 2 |
+| [Math](#10-math) | 15 |
+| [Meta](#11-meta) | 4 |
 
 ## 2. Wallet
 
@@ -198,6 +198,9 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 | `ec-multiply-secrets` | Calculate the EC function (SECRET * SECRET) % curve-order. |
 | `match-address` | Determine whether the provided client filter probabilistically matches the provided payment address. |
 | `match-script` | Determine whether the provided client filter probabilistically matches the provided script. |
+| `noise-cert` | Create a Base58Check Stratum v2 Noise authority certificate for a server static public key, for use with a Libbitcoin server. |
+| `noise-new` | Create a Base58Check Stratum v2 Noise private key from entropy, for a server static key or an authority key. |
+| `noise-public` | Derive the Base58Check Stratum v2 Noise public key of a Noise private key, of a server static key or of an authority key for use by Stratum v2 miners. |
 | `satoshi-to-btc` | Convert satoshi to BTC. |
 | `tls-cert` | Create a self-signed PEM TLS certificate for a P-256 private key, for use with a Libbitcoin server. |
 | `tls-new` | Create a PEM P-256 TLS private key for use with a Libbitcoin server from entropy. |

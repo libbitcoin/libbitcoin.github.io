@@ -46,7 +46,8 @@ and `safe` serves TLS with `cert_path` and `key_path`
 | `stratum_v1.coinbase_tag` | empty | Text carried by the coinbase input script (at most 75 bytes) |
 | `stratum_v1.extranonce1_size` | 4 | Coinbase extranonce bytes assigned to each connection (at least 4) |
 | `stratum_v1.extranonce2_size` | 4 | Coinbase extranonce bytes rolled by the miner |
-| `stratum_v1.minimum_difficulty` | 1 | Share difficulty first assigned, and its floor |
+| `stratum_v1.minimum_difficulty` | 1 | Share difficulty floor of a connection |
+| `stratum_v1.start_difficulty` | 0 | Share difficulty of a new connection; 0, `minimum_difficulty` |
 | `stratum_v1.share_interval_seconds` | 10 | Target seconds between shares (0 fixes the difficulty) |
 | `stratum_v1.authorize_timeout_seconds` | 15 | Seconds to subscribe and authorize before the connection is closed (0 is unlimited) |
 | `pool.template_interval_seconds` | 30 | Seconds between replacements of the template (0 disables) |
@@ -67,7 +68,8 @@ as for an external miner using [`getblocktemplate`](bitcoind-rpc#getblocktemplat
 
 ### Start difficulty
 
-A connection starts at `minimum_difficulty`, which is also its floor.
+A connection starts at `start_difficulty` if set, otherwise at
+`minimum_difficulty`, which is also its floor.
 At difficulty 1 a 100 TH/s machine finds tens of thousands of shares a
 second. Vardiff raises the difficulty fourfold every 16 shares, so it
 converges in seconds, but it opens with a flood of shares. For ASICs, set
@@ -326,7 +328,8 @@ not final (`fffffffe`) and its locktime is the previous height (BIP54). Its firs
 the subsidy and the template's fees to the payout address; the second
 commits to the block's witnesses (BIP141), with a null reserved value.
 
-The difficulty of a connection starts at `minimum_difficulty`. With a
+The difficulty of a connection starts at `start_difficulty`, or
+`minimum_difficulty` if unset. With a
 nonzero `share_interval_seconds`, it is retargeted after 16 accepted
 shares, or at the first share after 16 intervals: by the ratio of the
 target interval to the observed one, limited to between a quarter and

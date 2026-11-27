@@ -1,8 +1,8 @@
 # Service Settings
 
 The client services (`[admin]`, `[native]`, `[bitcoind]`, `[electrum]`,
-`[btcd]`, `[sparrow]`, `[esplora]` and `[stratum_v1]`) share these
-settings.
+`[btcd]`, `[sparrow]`, `[esplora]`, `[stratum_v1]` and `[stratum_v2]`)
+share these settings.
 `[zmq]` shares the listening settings, and secures its
 connections using CurveZMQ rather than TLS ([Secure connections](#2-secure-connections)).
 

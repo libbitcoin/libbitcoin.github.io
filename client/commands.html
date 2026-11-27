@@ -384,7 +384,7 @@ $ bx ec-to-witness bc 03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bed
 bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </code></pre>
 <h2 id="1-commands">1. Commands<a class="anchor" href="#1-commands" aria-label="Link to this section">#</a></h2>
-<p>109 commands, by category:</p>
+<p>121 commands, by category:</p>
 <div class="scroller"><table>
 <thead>
 <tr>
@@ -395,7 +395,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tbody>
 <tr>
 <td><a href="#2-wallet">Wallet</a></td>
-<td>31</td>
+<td>41</td>
 </tr>
 <tr>
 <td><a href="#3-key-encryption">Key encryption</a></td>
@@ -407,7 +407,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </tr>
 <tr>
 <td><a href="#5-transaction">Transaction</a></td>
-<td>8</td>
+<td>9</td>
 </tr>
 <tr>
 <td><a href="#6-messaging">Messaging</a></td>
@@ -415,7 +415,7 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </tr>
 <tr>
 <td><a href="#7-online">Online</a></td>
-<td>26</td>
+<td>20</td>
 </tr>
 <tr>
 <td><a href="#8-encoding">Encoding</a></td>
@@ -427,11 +427,11 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 </tr>
 <tr>
 <td><a href="#10-math">Math</a></td>
-<td>10</td>
+<td>15</td>
 </tr>
 <tr>
 <td><a href="#11-meta">Meta</a></td>
-<td>2</td>
+<td>4</td>
 </tr>
 </tbody>
 </table></div>
@@ -975,6 +975,18 @@ bc1qhm6697d9d2224vfyt8mj4kw03ncec7a7fdafvt
 <tr>
 <td><code>match-script</code></td>
 <td>Determine whether the provided client filter probabilistically matches the provided script.</td>
+</tr>
+<tr>
+<td><code>noise-cert</code></td>
+<td>Create a Base58Check Stratum v2 Noise authority certificate for a server static public key, for use with a Libbitcoin server.</td>
+</tr>
+<tr>
+<td><code>noise-new</code></td>
+<td>Create a Base58Check Stratum v2 Noise private key from entropy, for a server static key or an authority key.</td>
+</tr>
+<tr>
+<td><code>noise-public</code></td>
+<td>Derive the Base58Check Stratum v2 Noise public key of a Noise private key, of a server static key or of an authority key for use by Stratum v2 miners.</td>
 </tr>
 <tr>
 <td><code>satoshi-to-btc</code></td>
