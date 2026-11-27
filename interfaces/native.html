@@ -1211,6 +1211,7 @@ the soft forks active at its height.</p>
         &quot;count&quot;: 1,
         &quot;validated&quot;: true,
         &quot;confirmed&quot;: true,
+        &quot;candidate&quot;: false,
         &quot;confirmable&quot;: true,
         &quot;unconfirmable&quot;: false
     },
@@ -1236,7 +1237,13 @@ the soft forks active at its height.</p>
     }
 }
 </code></pre>
-<p><code>state</code> is present once the block's transactions are stored. <code>forks</code> shows
+<p><code>state</code> is present once the block's transactions are stored. <code>confirmed</code>
+is true for a block of the confirmed chain, and <code>candidate</code> for a block
+of the candidate chain that is not confirmed; a block with neither is on
+no chain. <code>confirmable</code> is true once the block has passed confirmation,
+and <code>unconfirmable</code> once it has failed; a block with neither has not yet
+been confirmed or rejected. A block below a checkpoint or milestone is
+validated and confirmable without being checked. <code>forks</code> shows
 each soft fork as active or not at the block's height. BIP30, BIP42 and BIP90
 are configured forks, active at every height when configured
 (<a href="../architecture/system/chain.html#43-activation">Activation</a>). The mainnet
@@ -1556,10 +1563,13 @@ unconfirmed transaction returns 404.</p>
 }
 </code></pre>
 <p><code>value</code> is the total of the inputs, <code>spend</code> the total of the outputs, and
-<code>fee</code> their difference. <code>confirmed</code> is omitted for an unconfirmed
-transaction, which instead has <code>time</code>, when it was pooled, in Unix
-seconds. The time of a confirmed transaction is that of its block
-(<a href="#tx_header"><code>tx_header</code></a>).</p>
+<code>fee</code> their difference. <code>confirmed</code> is present only for a transaction
+in a block of the confirmed chain. Any other transaction has <code>time</code>,
+when it was pooled, in Unix seconds, if it is in the pool, and
+<code>confirmable: true</code> if it can confirm; a coinbase is never confirmable.
+Without either <code>confirmed</code> or <code>confirmable</code>, a transaction cannot
+confirm, or for a coinbase is not confirmed. The time of a confirmed
+transaction is that of its block (<a href="#tx_header"><code>tx_header</code></a>).</p>
 <h3 id="tx_subscribe">tx_subscribe<a class="anchor" href="#tx_subscribe" aria-label="Link to this section">#</a></h3>
 <p>A notification for each new transaction. Websocket only.</p>
 <pre><code>/v1/tx/subscribe

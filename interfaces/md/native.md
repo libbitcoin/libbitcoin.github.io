@@ -604,6 +604,7 @@ $ curl "http://localhost:8180/v1/block/confirmed/1/header/context?format=json"
         "count": 1,
         "validated": true,
         "confirmed": true,
+        "candidate": false,
         "confirmable": true,
         "unconfirmable": false
     },
@@ -630,7 +631,13 @@ $ curl "http://localhost:8180/v1/block/confirmed/1/header/context?format=json"
 }
 ```
 
-`state` is present once the block's transactions are stored. `forks` shows
+`state` is present once the block's transactions are stored. `confirmed`
+is true for a block of the confirmed chain, and `candidate` for a block
+of the candidate chain that is not confirmed; a block with neither is on
+no chain. `confirmable` is true once the block has passed confirmation,
+and `unconfirmable` once it has failed; a block with neither has not yet
+been confirmed or rejected. A block below a checkpoint or milestone is
+validated and confirmable without being checked. `forks` shows
 each soft fork as active or not at the block's height. BIP30, BIP42 and BIP90
 are configured forks, active at every height when configured
 ([Activation](../architecture/system/chain#43-activation)). The mainnet
@@ -983,10 +990,13 @@ $ curl "http://localhost:8180/v1/tx/0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68
 ```
 
 `value` is the total of the inputs, `spend` the total of the outputs, and
-`fee` their difference. `confirmed` is omitted for an unconfirmed
-transaction, which instead has `time`, when it was pooled, in Unix
-seconds. The time of a confirmed transaction is that of its block
-([`tx_header`](#tx_header)).
+`fee` their difference. `confirmed` is present only for a transaction
+in a block of the confirmed chain. Any other transaction has `time`,
+when it was pooled, in Unix seconds, if it is in the pool, and
+`confirmable: true` if it can confirm; a coinbase is never confirmable.
+Without either `confirmed` or `confirmable`, a transaction cannot
+confirm, or for a coinbase is not confirmed. The time of a confirmed
+transaction is that of its block ([`tx_header`](#tx_header)).
 
 ### tx_subscribe
 
