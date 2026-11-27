@@ -1,7 +1,7 @@
 # Bitcoind JSON-RPC
 
 The bitcoind JSON-RPC interface is a drop-in for the node methods of
-bitcoind's JSON-RPC interface, served on the `[bitcoind]` binding with
+bitcoind's JSON-RPC interface, served by the `[bitcoind]` service with
 the [bitcoind REST](bitcoind-rest) interface. It serves no wallet or
 signing methods; keys never reach the server.
 

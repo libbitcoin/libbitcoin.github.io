@@ -366,10 +366,10 @@
 
   <article class="doc">
 <p>The bitcoind REST interface is a drop-in for the REST interface of
-bitcoind, served on the <code>[bitcoind]</code> binding alongside the bitcoind
+bitcoind, served by the <code>[bitcoind]</code> service alongside the bitcoind
 JSON-RPC interface. Unlike bitcoind, it is always enabled, and it is
-protected by the binding's credentials and certificates.</p>
-<p>It is reached on the same ports as the bitcoind JSON-RPC interface:</p>
+protected by the service's credentials and certificates.</p>
+<p>It is reached on the ports of the <code>[bitcoind]</code> service:</p>
 <div class="scroller"><table>
 <thead>
 <tr>

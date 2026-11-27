@@ -62,7 +62,7 @@ The time a sync takes and the space its store needs are shown on the
 ## 3. Serve
 
 The admin console is served by default, on the local machine only. Each
-other interface is enabled by an address and a connection limit. This
+other service is enabled by an address and a connection limit. This
 configuration also serves the block explorer locally, and Electrum
 wallets on the network:
 
@@ -80,14 +80,14 @@ connections = 100
 $ bs --config bs.cfg
 ```
 
-| Interface | Address |
-| --------- | ------- |
+| Service | Address |
+| ------- | ------- |
 | Admin console | `http://localhost:8080` in a browser |
 | Block explorer | `http://localhost:8180` in a browser |
 | Electrum, Sparrow | The server's address and port 8580, without SSL |
 
 The admin console is available at once, and shows the sync's progress.
-The block explorer and the other interfaces accept connections once the
+The block explorer and the other services accept connections once the
 node is current.
 
 ## 4. Next

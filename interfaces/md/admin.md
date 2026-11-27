@@ -7,7 +7,7 @@ The embedded console is a page of this interface, and can be replaced
 with a custom site (see [Configuration
 §5.5](../configuration/setups#5-admin-site)).
 
-The admin interface is enabled by default, on the local machine only
+The admin service is enabled by default, on the local machine only
 (`127.0.0.1`, clear port). Its protocols share one port, and their secure
 forms share another:
 

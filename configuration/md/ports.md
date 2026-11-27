@@ -81,7 +81,7 @@ cert_path = server.pem
 key_path = server.key
 ```
 
-And this RPC interface listens on the local machine and on one private
+And this RPC service listens on the local machine and on one private
 network address only:
 
 ```ini

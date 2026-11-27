@@ -1,11 +1,11 @@
 # Bitcoind REST
 
 The bitcoind REST interface is a drop-in for the REST interface of
-bitcoind, served on the `[bitcoind]` binding alongside the bitcoind
+bitcoind, served by the `[bitcoind]` service alongside the bitcoind
 JSON-RPC interface. Unlike bitcoind, it is always enabled, and it is
-protected by the binding's credentials and certificates.
+protected by the service's credentials and certificates.
 
-It is reached on the same ports as the bitcoind JSON-RPC interface:
+It is reached on the ports of the `[bitcoind]` service:
 
 | Port | Default | Protocols |
 | ---- | ------- | --------- |

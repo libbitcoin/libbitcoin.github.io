@@ -365,8 +365,8 @@
   </nav>
 
   <article class="doc">
-<p><code>bs</code> serves each interface on its own port, with its own credentials and
-certificates. The <a href="../interfaces.html">interfaces page</a> shows the coverage
+<p><code>bs</code> serves each interface as its own service, on its own port, with its
+own credentials and certificates. The <a href="../interfaces.html">interfaces page</a> shows the coverage
 of every interface, and how each method compares with its reference
 implementation. These pages document the methods of each interface:
 how to call them, with examples and their responses.</p>
@@ -453,14 +453,14 @@ how to call them, with examples and their responses.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Each interface reaches all of its protocols on one port, and their secure
+<p>Each service reaches all of its protocols on one port, and their secure
 forms (TLS, or CurveZMQ for ZMTPS) on another. P2P serves P2P and P2PS
 (BIP324) on one port.</p>
 <p><a href="clients.html">Client Compatibility</a> records which clients have been run
 against each interface.</p>
 <p><a href="deviations.html">Standards Deviations</a> records where the interfaces depart
 from HTTP, TLS, WebSocket, JSON and JSON-RPC, and for which clients.</p>
-<p>To enable an interface, and to secure it, see
+<p>To enable a service, and to secure it, see
 <a href="../configuration/index.html">Configuration</a>.</p>
   </article>
 

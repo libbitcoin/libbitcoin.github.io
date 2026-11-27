@@ -6,7 +6,7 @@ spenders and addresses, and serves each object as JSON, as raw bytes, or
 as hex text.
 It also serves the embedded block explorer (see
 [Configuration](../configuration/setups#6-block-explorer)). The
-[admin interface](admin) serves it as well, on the admin port. By default
+[admin service](admin) serves it as well, on the admin port. By default
 (`node.delay_inbound`) the native port refuses connections until the chain
 is current, while the admin port serves it from the start.
 

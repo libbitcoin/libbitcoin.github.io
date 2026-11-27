@@ -1,7 +1,7 @@
 # Interfaces
 
-`bs` serves each interface on its own port, with its own credentials and
-certificates. The [interfaces page](../interfaces.html) shows the coverage
+`bs` serves each interface as its own service, on its own port, with its
+own credentials and certificates. The [interfaces page](../interfaces.html) shows the coverage
 of every interface, and how each method compares with its reference
 implementation. These pages document the methods of each interface:
 how to call them, with examples and their responses.
@@ -19,7 +19,7 @@ how to call them, with examples and their responses.
 | [BTCD](btcd) | `[btcd]` | 8480 | 8443 | TCP/S, HTTP/S, WS/S |
 | [Esplora](esplora) | `[esplora]` | 8780 | 8743 | HTTP/S, WS/S |
 
-Each interface reaches all of its protocols on one port, and their secure
+Each service reaches all of its protocols on one port, and their secure
 forms (TLS, or CurveZMQ for ZMTPS) on another. P2P serves P2P and P2PS
 (BIP324) on one port.
 
@@ -29,5 +29,5 @@ against each interface.
 [Standards Deviations](deviations) records where the interfaces depart
 from HTTP, TLS, WebSocket, JSON and JSON-RPC, and for which clients.
 
-To enable an interface, and to secure it, see
+To enable a service, and to secure it, see
 [Configuration](../configuration/index).

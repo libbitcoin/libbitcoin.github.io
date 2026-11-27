@@ -397,7 +397,7 @@ height, see <a href="../configuration/command-line.html">Command Line</a> and
 <a href="../sync.html">Synchronize</a> and <a href="../footprint.html">Footprint</a> pages.</p>
 <h2 id="3-serve">3. Serve<a class="anchor" href="#3-serve" aria-label="Link to this section">#</a></h2>
 <p>The admin console is served by default, on the local machine only. Each
-other interface is enabled by an address and a connection limit. This
+other service is enabled by an address and a connection limit. This
 configuration also serves the block explorer locally, and Electrum
 wallets on the network:</p>
 <pre><code class="language-ini"><span class="section">[native]</span>
@@ -413,7 +413,7 @@ connections = 100
 <div class="scroller"><table>
 <thead>
 <tr>
-<th>Interface</th>
+<th>Service</th>
 <th>Address</th>
 </tr>
 </thead>
@@ -433,7 +433,7 @@ connections = 100
 </tbody>
 </table></div>
 <p>The admin console is available at once, and shows the sync's progress.
-The block explorer and the other interfaces accept connections once the
+The block explorer and the other services accept connections once the
 node is current.</p>
 <h2 id="4-next">4. Next<a class="anchor" href="#4-next" aria-label="Link to this section">#</a></h2>
 <ul>

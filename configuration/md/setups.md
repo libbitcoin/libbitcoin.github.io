@@ -89,7 +89,7 @@ checkpoint = 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f:0
 
 ## 5. Admin site
 
-`bs` serves its own administrative site. The admin interface also serves
+`bs` serves its own administrative site. The admin service also serves
 the full native REST interface, which the site uses, so `[native]` need
 not be enabled. It is enabled by default, for the local machine only
 (`127.0.0.1`), on port 8080 on mainnet ([Conventional Ports](ports)). Setting `bind`
@@ -129,8 +129,8 @@ The admin interface is libbitcoin's own, and provides:
 
 ## 6. Block explorer
 
-The native REST interface serves the block explorer. Here it is limited
-to the local machine:
+The native REST interface serves the block explorer. Here its service is
+limited to the local machine:
 
 ```ini
 [native]
@@ -233,7 +233,7 @@ Beyond the standard Electrum transports (TCP and TLS), `bs` provides:
 
 ## 8. Bitcoind RPC
 
-The RPC interface listens on its default port, 8280, here limited to
+The RPC service listens on its default port, 8280, here limited to
 the local machine.
 
 ```ini
@@ -263,7 +263,7 @@ Beyond the standard bitcoind interfaces (JSON-RPC over HTTP, and REST),
 
 ## 9. BTCD RPC
 
-The btcd RPC interface listens on its default port, 8480, here limited
+The btcd RPC service listens on its default port, 8480, here limited
 to the local machine:
 
 ```ini
@@ -309,7 +309,7 @@ the client keys listed in `zmq.cert`.
 
 ## 11. Esplora
 
-The Esplora interface, on its assigned port:
+The Esplora service, on its assigned port:
 
 ```ini
 [esplora]
