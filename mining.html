@@ -544,8 +544,8 @@
       Libbitcoin takes 10,100 to 12,500 offered transactions per second at every size, Bitcoin Core
       1,200 rising to 3,900. Libbitcoin holds every offered transaction (2,000,116 at the last
       step). Bitcoin Core holds one per conflict set through 1 million offered; at 2 million it
-      holds 1,501,508, 74,000 fewer, having stopped requesting announced transactions for a reason
-      not yet determined.
+      holds 1,501,508, 74,000 fewer, because a defect in the test harness delivered it only 938,965
+      of the 1,000,015 transactions announced in that step.
     </p>
     <p class="lede after">
       Libbitcoin's templates carry 0.3% to 0.8% more fee than Bitcoin Core's at every step (+0.42%
@@ -561,9 +561,9 @@
       A second ladder, on fresh pools, offers conflict trees only: two to four rival chains of two
       to four transactions from one coin. Libbitcoin's template is ahead at every step, +25.9% at
       25,000 offered, +18.2% at 75,000, +14.7% at 150,000, +12.4% at 250,000 and +10.4% at 500,000,
-      and every template passed Bitcoin Core's block validity test. At 1 and 2 million Bitcoin Core
-      requested only 88% and 58% of the announced transactions, so its pool there is incomplete
-      (hollow points). Libbitcoin takes 9,200 to 12,000 transactions per second at every size,
+      and every template passed Bitcoin Core's block validity test. At 1 and 2 million a defect in
+      the test harness delivered Bitcoin Core only 88% and 58% of the announced transactions, so its
+      pool there is incomplete (hollow points), until these steps are rerun. Libbitcoin takes 9,200 to 12,000 transactions per second at every size,
       Bitcoin Core 2,000 rising to 4,600 through 500,000. Libbitcoin keeps every rival, Bitcoin
       Core one rival chain per tree.
     </p>
