@@ -484,13 +484,13 @@
     <p class="lede after">
       Every 10 minutes, getblocktemplate from both nodes on the same machine at the same height.
       Over every round since November 25, 2026 00:21 UTC, the median template fee difference is
-      +0.019%, Libbitcoin higher or equal in 142 of 238 rounds. The live pool is flat, its template
+      +0.012%, Libbitcoin higher or equal in 166 of 302 rounds. The live pool is flat, its template
       tail near the relay floor, so packing differences are usually small.
     </p>
     <p class="lede after">
-      Median call times at the client, over 175 rounds: getblocktemplate 97.2 ms Libbitcoin and
-      107.5 ms Bitcoin Core, getrawmempool 44.4 and 174.9 ms, getmempoolinfo 4.7 and 0.7 ms, and
-      estimatesmartfee 40.4 and 6.2 ms. getblocktemplate time is mostly JSON-RPC over HTTP and
+      Median call times at the client, over 239 rounds: getblocktemplate 94.1 ms Libbitcoin and
+      107.4 ms Bitcoin Core, getrawmempool 45.5 and 178.1 ms, getmempoolinfo 5.0 and 0.7 ms, and
+      estimatesmartfee 43.1 and 5.6 ms. getblocktemplate time is mostly JSON-RPC over HTTP and
       serialization of the template, not template computation. Bitcoin Core returns
       estimatesmartfee from a cached estimate, while Libbitcoin computes it in full from the pool on each call.
     </p>
