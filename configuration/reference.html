@@ -1350,6 +1350,8 @@ server = libbitcoin/4
 <h2 id="18-electrum">18. <code>[electrum]</code><a class="anchor" href="#18-electrum" aria-label="Link to this section">#</a></h2>
 <p>The Electrum protocol server.</p>
 <pre><code class="language-ini"><span class="section">[electrum]</span>
+<span class="comment"># Allow requests from opaque origin (see CORS), defaults to 'false'.</span>
+allow_opaque_origin = false
 <span class="comment"># String returned by server.banner, defaults to empty.</span>
 banner_message =
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
@@ -1370,6 +1372,8 @@ connections = 0
 donation_address =
 <span class="comment"># The maximum connection duration, defaults to '60'.</span>
 expiration_minutes = 60
+<span class="comment"># The host name (http verification), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#host =</span>
 <span class="comment"># The idle timeout (http keep-alive), defaults to '10'.</span>
 inactivity_minutes = 10
 <span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
@@ -1394,6 +1398,8 @@ minimum_buffer = 4096
 <span class="comment">#more_bind =</span>
 <span class="comment"># Advertised secure host:port at which another server can be reached (defaults to empty).</span>
 <span class="comment">#more_safe =</span>
+<span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#origin =</span>
 <span class="comment"># The seconds between unrequested pings, defaults to '0' (disabled).</span>
 ping_interval_seconds = 0
 <span class="comment"># The hex characters of unrequested ping data, defaults to '0'.</span>
@@ -1416,6 +1422,8 @@ server_name = Libbitcoin 4.0
 <h2 id="19-sparrow">19. <code>[sparrow]</code><a class="anchor" href="#19-sparrow" aria-label="Link to this section">#</a></h2>
 <p>The Electrum protocol server with silent payment extensions, for Sparrow.</p>
 <pre><code class="language-ini"><span class="section">[sparrow]</span>
+<span class="comment"># Allow requests from opaque origin (see CORS), defaults to 'false'.</span>
+allow_opaque_origin = false
 <span class="comment"># String returned by server.banner, defaults to empty.</span>
 banner_message =
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
@@ -1436,6 +1444,8 @@ connections = 0
 donation_address =
 <span class="comment"># The maximum connection duration, defaults to '60'.</span>
 expiration_minutes = 60
+<span class="comment"># The host name (http verification), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#host =</span>
 <span class="comment"># The idle timeout (http keep-alive), defaults to '10'.</span>
 inactivity_minutes = 10
 <span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
@@ -1460,6 +1470,8 @@ minimum_buffer = 4096
 <span class="comment">#more_bind =</span>
 <span class="comment"># Advertised secure host:port at which another server can be reached (defaults to empty).</span>
 <span class="comment">#more_safe =</span>
+<span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#origin =</span>
 <span class="comment"># The seconds between unrequested pings, defaults to '0' (disabled).</span>
 ping_interval_seconds = 0
 <span class="comment"># The hex characters of unrequested ping data, defaults to '0'.</span>
@@ -1534,6 +1546,8 @@ server = libbitcoin/4
 <pre><code class="language-ini"><span class="section">[stratum_v1]</span>
 <span class="comment"># The public [http|https://]host[:port] url, ws on its port, multiple allowed, defaults to empty (none).</span>
 <span class="comment">#advertise =</span>
+<span class="comment"># Allow requests from opaque origin (see CORS), defaults to 'false'.</span>
+allow_opaque_origin = false
 <span class="comment"># The seconds to subscribe and authorize a channel, defaults to '15' (0 is unlimited).</span>
 authorize_timeout_seconds = 15
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
@@ -1558,6 +1572,8 @@ expiration_minutes = 0
 extranonce1_size = 4
 <span class="comment"># The bytes of coinbase extranonce rolled by the miner, defaults to '4'.</span>
 extranonce2_size = 4
+<span class="comment"># The host name (http verification), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#host =</span>
 <span class="comment"># The idle timeout (http keep-alive), defaults to '0'.</span>
 inactivity_minutes = 0
 <span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
@@ -1574,6 +1590,8 @@ maximum_request = 8004096
 minimum_buffer = 4096
 <span class="comment"># The share difficulty floor of a channel, defaults to '1'.</span>
 minimum_difficulty = 1
+<span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#origin =</span>
 <span class="comment"># The address paid by the coinbase, defaults to empty (the worker name).</span>
 payout_address =
 <span class="comment"># The send rate limit in bytes per second, defaults to '0' (network controls).</span>
@@ -1590,6 +1608,8 @@ start_difficulty = 0
 <pre><code class="language-ini"><span class="section">[stratum_v2]</span>
 <span class="comment"># The public [http|https://]host[:port] url, ws on its port, multiple allowed, defaults to empty (none).</span>
 <span class="comment">#advertise =</span>
+<span class="comment"># Allow requests from opaque origin (see CORS), defaults to 'false'.</span>
+allow_opaque_origin = false
 <span class="comment"># The seconds to set up a connection and to open a channel, defaults to '15' (0 is unlimited).</span>
 authorize_timeout_seconds = 15
 <span class="comment"># IP address to bind, multiple allowed, defaults to empty (disabled).</span>
@@ -1614,6 +1634,8 @@ expiration_minutes = 0
 extranonce_prefix_size = 4
 <span class="comment"># The bytes of coinbase extranonce rolled by an extended channel miner, defaults to '8'.</span>
 extranonce_size = 8
+<span class="comment"># The host name (http verification), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#host =</span>
 <span class="comment"># The idle timeout (http keep-alive), defaults to '0'.</span>
 inactivity_minutes = 0
 <span class="comment"># The password to decrypt the server private key file (.PEM), optional.</span>
@@ -1642,6 +1664,8 @@ noise_certificate =
 noise_secret =
 <span class="comment"># The days either side of issue that an issued certificate is valid, defaults to '1'.</span>
 noise_validity_days = 1
+<span class="comment"># The allowed origin (see CORS), multiple allowed, defaults to empty (disabled).</span>
+<span class="comment">#origin =</span>
 <span class="comment"># The address paid by the coinbase, defaults to empty (the user identity).</span>
 payout_address =
 <span class="comment"># The send rate limit in bytes per second, defaults to '0' (network controls).</span>
