@@ -543,6 +543,10 @@
         <h3>Template computation profile at 2 million pooled</h3>
         <a href="performance/pool-scale-template-profile.png"><img src="performance/pool-scale-template-profile.png" alt="Template computation profile at 2 million pooled" loading="lazy"></a>
       </figure>
+      <figure class="shot">
+        <h3>Template time by pool size, by pool shape</h3>
+        <a href="performance/pool-template-sweep.png"><img src="performance/pool-template-sweep.png" alt="Template time by pool size, by pool shape" loading="lazy"></a>
+      </figure>
     </div>
     <p class="lede after">
       On shelly, each node's pool grows in steps to 2,000,000 offered transactions (55% independent,
@@ -603,7 +607,17 @@
       resolving conflicts, of which finding the row that owns an input, by binary search over the
       pool, is 23.6%; packing is about 30%; and allocating and zeroing pool-sized state, with its
       page faults, is about 16%. Every build redoes this for the whole pool, even when only the
-      chain height changed. This is the open performance item.
+      chain height changed.
+    </p>
+    <p class="lede after">
+      On stratton, each pool shape was fed to a fresh store in steps from 25,000 to 2 million
+      transactions. A build maps each input to its row once, scores each distinct outcome of a
+      conflict component once, and resolves components in parallel on all cores, then packs the
+      block on one thread. Template time is linear in the pool: from 500,000 to 2 million it holds
+      at about 0.26 ms per thousand pooled transactions in conflict forests, 0.13 ms in conflict
+      trees and 0.19 ms in the mixed pool. At 2 million a template takes 529 ms in conflict
+      forests, 259 ms in conflict trees and 389 ms in the mixed pool. Below 500,000 the fixed cost
+      of each parallel build is a larger share.
     </p>
   </section>
 
