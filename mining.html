@@ -539,16 +539,16 @@
         <a href="performance/pool-scale-memory.png"><img src="performance/pool-scale-memory.png" alt="Working set by pool size" loading="lazy"></a>
       </figure>
       <figure class="shot">
-        <h3>Template computation by pool size</h3>
-        <a href="performance/pool-scale-template.png"><img src="performance/pool-scale-template.png" alt="Template computation by pool size" loading="lazy"></a>
+        <h3>Template time by pool size</h3>
+        <a href="performance/pool-template-sweep.png"><img src="performance/pool-template-sweep.png" alt="Template time by pool size" loading="lazy"></a>
       </figure>
       <figure class="shot">
-        <h3>Template computation profile at 2 million pooled</h3>
-        <a href="performance/pool-scale-template-profile.png"><img src="performance/pool-scale-template-profile.png" alt="Template computation profile at 2 million pooled" loading="lazy"></a>
+        <h3>Block found to stratum job by pool size</h3>
+        <a href="performance/pool-scale-template.png"><img src="performance/pool-scale-template.png" alt="Block found to stratum job by pool size" loading="lazy"></a>
       </figure>
       <figure class="shot">
-        <h3>Template time by pool size, by pool shape</h3>
-        <a href="performance/pool-template-sweep.png"><img src="performance/pool-template-sweep.png" alt="Template time by pool size, by pool shape" loading="lazy"></a>
+        <h3>Template time profile at 2 million pooled</h3>
+        <a href="performance/pool-scale-template-profile.png"><img src="performance/pool-scale-template-profile.png" alt="Template time profile at 2 million pooled" loading="lazy"></a>
       </figure>
     </div>
     <p class="lede after">
@@ -599,28 +599,29 @@
       rejections for Bitcoin Core while Libbitcoin admits every one.
     </p>
     <p class="lede after">
-      Template computation in Libbitcoin, timed in the running node, grows linearly at about 0.21 ms
-      per thousand pooled transactions, to 413 ms at 2 million, and the time from block found to
-      stratum job follows it, from 13 ms at 25,000 to 424 ms at 2 million. Each build, on one
-      CPU thread, resolves conflicts over every pooled transaction and packs from pool-sized state, so it scales with the
-      pool rather than the block. Conflict trees are the expensive case, every tree a component to
-      resolve: block found to stratum job takes 435 ms at 1 million and 794 ms at 2 million in the
-      trees-only pool (dashed), and in conflict forests, where resolution cost grows with the
-      conflict points per component, 1,129 ms at 1 million and 2,335 ms at 2 million (dotted). Of a median 435 ms build at 2 million pooled, about 49% is
-      resolving conflicts, of which finding the row that owns an input, by binary search over the
-      pool, is 23.6%; packing is about 30%; and allocating and zeroing pool-sized state, with its
-      page faults, is about 16%. Every build redoes this for the whole pool, even when only the
-      chain height changed.
-    </p>
-    <p class="lede after">
       On stratton, each pool shape was fed to a fresh store in steps from 25,000 to 2 million
-      transactions. A build maps each input to its row once, scores each distinct outcome of a
+      transactions, with independent transactions, which have nothing to resolve, as the
+      reference. A build maps each input to its row once, scores each distinct outcome of a
       conflict component once, and resolves components in parallel on all cores, then packs the
       block on one thread. Template time is linear in the pool: from 500,000 to 2 million it holds
       at about 0.26 ms per thousand pooled transactions in conflict forests, 0.13 ms in conflict
-      trees and 0.19 ms in the mixed pool. At 2 million a template takes 529 ms in conflict
-      forests, 259 ms in conflict trees and 389 ms in the mixed pool. Below 500,000 the fixed cost
-      of each parallel build is a larger share.
+      trees, 0.19 ms in the mixed pool and 0.18 ms for independent transactions. At 2 million a
+      template takes 536 ms in conflict forests, 256 ms in conflict trees, 401 ms in the mixed
+      pool and 399 ms for independent transactions. Below 500,000 the fixed cost of each parallel
+      build is a larger share.
+    </p>
+    <p class="lede after">
+      Packing dominates the build and covers every row left after resolution, so independent
+      transactions take as long as the mixed pool and longer than conflict trees: resolution
+      excludes each losing rival and its descendants, leaving fewer rows to pack. Of a median
+      380 ms build at 2 million in the mixed pool, reading the pool columns takes 8 ms and
+      resolution 23 ms of wall time (416 ms of CPU, on average 18 of 64 threads busy). Packing
+      takes about 262 ms on one thread: forming clusters 86 ms, holding closures 53 ms, and
+      offers, heaps and closure 123 ms. Page faults, zeroing and copies take 94 ms, as each build
+      allocates and releases pool-sized working vectors. The time from block found to stratum job
+      trails the template build by 9 to 29 ms at every step, 565 ms in conflict forests, 284 ms in
+      conflict trees, 422 ms in the mixed pool and 414 ms for independent transactions at 2
+      million, and every block produced a job.
     </p>
   </section>
 
