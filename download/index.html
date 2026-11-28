@@ -596,16 +596,41 @@ released, and should not be run. On Windows, <code>gpg</code> is provided by
 </tr>
 </tbody>
 </table></div>
+<h3 id="34-platform-signatures">3.4 Platform signatures<a class="anchor" href="#34-platform-signatures" aria-label="Link to this section">#</a></h3>
+<p>The macOS and Windows builds of <code>bs</code> and <code>selector</code> are also signed for
+their platform, so that it runs them without a malware warning. The macOS
+builds are signed with an Apple Developer ID and notarized by Apple:</p>
+<pre class="console"><code>$ codesign -dv --verbose=2 bs-macos-arm64
+...
+Authority=Developer ID Application: Phillip Mienk (4BXGU349P5)
+</code></pre>
+<p>The Windows builds carry an Authenticode signature from Phillip Mienk,
+issued by Microsoft ID Verified CS AOC CA 03, shown under the file's
+Properties, Digital Signatures, or in PowerShell:</p>
+<pre><code>&gt; Get-AuthenticodeSignature bs-windows-x64.exe
+
+SignerCertificate                         Status   Path
+-----------------                         ------   ----
+6CD73EC81635E567CE8DD2237EEAF4CF2373613F  Valid    bs-windows-x64.exe
+</code></pre>
+<p>The signing certificate is valid for only a few days, so its thumbprint
+(<code>SignerCertificate</code>) differs from release to release. The signature is
+countersigned with a Microsoft timestamp, so it remains valid after the
+certificate expires.</p>
+<p>A platform signature shows who signed the file, not that it is the one
+released. Verify the release signature as above.</p>
 <h2 id="4-running-a-build">4. Running a build<a class="anchor" href="#4-running-a-build" aria-label="Link to this section">#</a></h2>
 <p>On Linux and macOS, make the build executable, and rename it if
 convenient:</p>
 <pre class="console"><code>$ chmod +x bs-linux-x64
 $ mv bs-linux-x64 bs
 </code></pre>
-<p>On macOS, a downloaded file is quarantined, and is refused until the
-quarantine is removed:</p>
-<pre class="console"><code>$ xattr -d com.apple.quarantine bs-macos-arm64
-</code></pre>
+<p>A browser does not keep a file's executable permission, so this is needed
+once for each download.</p>
+<p>On macOS, run the build from Terminal, as above. It is a command-line
+program, so macOS does not open it from Finder, and double-clicking it
+shows "Apple could not verify ... is free of malware" for any such
+program. On Windows, run it from a command prompt or PowerShell.</p>
 <p>Then continue from <a href="../start/index.html#2-sync">Quick Start §2</a>.</p>
   </article>
 

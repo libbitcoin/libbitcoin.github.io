@@ -188,6 +188,38 @@ The releases page also shows the SHA-256 of each file:
 | macOS | `shasum -a 256 bs-macos-arm64` |
 | Windows | `certutil -hashfile bs-windows-x64.exe SHA256` |
 
+### 3.4 Platform signatures
+
+The macOS and Windows builds of `bs` and `selector` are also signed for
+their platform, so that it runs them without a malware warning. The macOS
+builds are signed with an Apple Developer ID and notarized by Apple:
+
+```
+$ codesign -dv --verbose=2 bs-macos-arm64
+...
+Authority=Developer ID Application: Phillip Mienk (4BXGU349P5)
+```
+
+The Windows builds carry an Authenticode signature from Phillip Mienk,
+issued by Microsoft ID Verified CS AOC CA 03, shown under the file's
+Properties, Digital Signatures, or in PowerShell:
+
+```
+> Get-AuthenticodeSignature bs-windows-x64.exe
+
+SignerCertificate                         Status   Path
+-----------------                         ------   ----
+6CD73EC81635E567CE8DD2237EEAF4CF2373613F  Valid    bs-windows-x64.exe
+```
+
+The signing certificate is valid for only a few days, so its thumbprint
+(`SignerCertificate`) differs from release to release. The signature is
+countersigned with a Microsoft timestamp, so it remains valid after the
+certificate expires.
+
+A platform signature shows who signed the file, not that it is the one
+released. Verify the release signature as above.
+
 ## 4. Running a build
 
 On Linux and macOS, make the build executable, and rename it if
@@ -198,11 +230,12 @@ $ chmod +x bs-linux-x64
 $ mv bs-linux-x64 bs
 ```
 
-On macOS, a downloaded file is quarantined, and is refused until the
-quarantine is removed:
+A browser does not keep a file's executable permission, so this is needed
+once for each download.
 
-```
-$ xattr -d com.apple.quarantine bs-macos-arm64
-```
+On macOS, run the build from Terminal, as above. It is a command-line
+program, so macOS does not open it from Finder, and double-clicking it
+shows "Apple could not verify ... is free of malware" for any such
+program. On Windows, run it from a command prompt or PowerShell.
 
 Then continue from [Quick Start §2](../start/index#2-sync).
