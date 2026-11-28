@@ -307,6 +307,16 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
         "ltc_time_warp_patch": false,
         "ltc_retarget_overflow_patch": false,
         "ltc_scrypt_proof_of_work": false
+    },
+    "server": {
+        "native": {
+            "advertise": ["http://explorer.example.com:8180"]
+        },
+        "stratum_v1": {
+            "advertise": ["ws://pool.example.com:8880"],
+            "payout_address": "bc1q...",
+            "coinbase_tag": null
+        }
     }
 }
 ```
@@ -342,6 +352,10 @@ $ curl "http://localhost:8180/v1/configuration?format=json"
 | `network.protocol_maximum` | `peer.protocol_maximum` |
 | `network.protocol_minimum` | `peer.protocol_minimum` |
 | `forks.*` | Each `[forks]` setting of the same name |
+| `server.*` | Each enabled service with `advertise` set, by section name |
+| `server.*.advertise` | Its `advertise` URLs |
+| `server.stratum_v1.payout_address`, `server.stratum_v2.payout_address` | `payout_address`, or `null` if empty |
+| `server.stratum_v1.coinbase_tag`, `server.stratum_v2.coinbase_tag` | `coinbase_tag`, or `null` if empty |
 
 ### top
 

@@ -112,6 +112,30 @@ are admin REST queries rendered as HTML, the default for a browser request.
 The same paths return data when JSON is requested, with `format=json` or an
 `Accept: application/json` header.
 
+The site's navigation is Mining, Logs, Events and Explorer, and its
+title opens the Overview. Mining lists each stratum mining channel by
+service, with its hash rate, shares and rejections, and the blocks found
+([`mining_subscribe`](../interfaces/admin#mining_subscribe)). A
+channel's dot is blue while it runs, amber after a rejected share, red
+after an invalid share and green once it has submitted a block, and the
+Mining link turns green on a new block. Faults are always subscribed:
+the Logs link turns red while any is uncleared, until Clear faults.
+Logs shows faults only by default, filtered at the server by the
+selected levels. Pausing ends the subscription, and nothing logged while
+paused is replayed. Logs and Events keep the newest 1,000 entries of
+each level or event. With browser notifications enabled, which require
+https or localhost, each new block or fault raises one.
+
+The Explorer link, and the Overview's top, pool size and fee rate, open
+the block explorer at an http or https `native.advertise` URL, of the
+page's scheme if there is one. Without one, or with `[native]`
+disabled, they are disabled:
+
+```ini
+[native]
+advertise = http://explorer.example.com:8180
+```
+
 To serve a custom admin site from a directory instead of the embedded site,
 set `folders.admin`. A request for `/` returns `admin.default`
 (`index.html`).
@@ -119,8 +143,8 @@ set `folders.admin`. A request for `/` returns `admin.default`
 The admin interface is libbitcoin's own, and provides:
 
 - HTTP and websocket on each port. Over a websocket, each frame is one
-  request path, and `log_subscribe` and `event_subscribe` stream the
-  node's log and events.
+  request path, `log_subscribe` and `event_subscribe` stream the node's
+  log and events, and `mining_subscribe` its stratum mining channels.
 - The full [native interface](../interfaces/native), under the `[admin]`
   settings.
 - TLS on its `safe` addresses ([Secure connections](services#2-secure-connections)), with optional client certificates
@@ -194,6 +218,17 @@ transactions of the pool, each with when it was received. A block or template pa
 section draws the block's or template's transactions as a treemap, area
 by virtual size and color by fee rate, outlined by cluster, with a panel
 for each transaction.
+
+An input or output path, such as `/v1/output/{tx hash}/{index}`, opens
+its transaction's page with that row highlighted. An input or output
+shows its script type, its script as mnemonic or hex, its witness stack
+and its sequence, an OP_RETURN output shows as Unspendable, and clicking
+its number copies its point (`{tx hash}:{index}`).
+
+The web miner (`/v1/miner`) mines in the browser over the advertised
+`stratum_v1` WS/WSS URL, or `stratum_v2` where it is advertised and
+chosen in its settings. A page served over https can reach only a WSS
+service.
 
 To serve a custom block explorer from a directory instead of the embedded
 site, set `folders.native`. A request for `/` returns `native.default`
@@ -920,3 +955,5 @@ name, `<address>.<worker>`, is its payout.
   ([Authentication](services#3-authentication)).
 - Like the other services, the binding accepts connections only once the
   chain is current ([Until current](services#until-current)).
+- The admin site's Mining page shows each miner's hash rate and shares,
+  and the blocks found ([Admin site](#5-admin-site)).

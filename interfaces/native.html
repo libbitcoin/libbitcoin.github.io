@@ -896,6 +896,16 @@ discoverable by interrogating the node over P2P.</p>
         &quot;ltc_time_warp_patch&quot;: false,
         &quot;ltc_retarget_overflow_patch&quot;: false,
         &quot;ltc_scrypt_proof_of_work&quot;: false
+    },
+    &quot;server&quot;: {
+        &quot;native&quot;: {
+            &quot;advertise&quot;: [&quot;http://explorer.example.com:8180&quot;]
+        },
+        &quot;stratum_v1&quot;: {
+            &quot;advertise&quot;: [&quot;ws://pool.example.com:8880&quot;],
+            &quot;payout_address&quot;: &quot;bc1q...&quot;,
+            &quot;coinbase_tag&quot;: null
+        }
     }
 }
 </code></pre>
@@ -1022,6 +1032,22 @@ discoverable by interrogating the node over P2P.</p>
 <tr>
 <td><code>forks.*</code></td>
 <td>Each <code>[forks]</code> setting of the same name</td>
+</tr>
+<tr>
+<td><code>server.*</code></td>
+<td>Each enabled service with <code>advertise</code> set, by section name</td>
+</tr>
+<tr>
+<td><code>server.*.advertise</code></td>
+<td>Its <code>advertise</code> URLs</td>
+</tr>
+<tr>
+<td><code>server.stratum_v1.payout_address</code>, <code>server.stratum_v2.payout_address</code></td>
+<td><code>payout_address</code>, or <code>null</code> if empty</td>
+</tr>
+<tr>
+<td><code>server.stratum_v1.coinbase_tag</code>, <code>server.stratum_v2.coinbase_tag</code></td>
+<td><code>coinbase_tag</code>, or <code>null</code> if empty</td>
 </tr>
 </tbody>
 </table></div>

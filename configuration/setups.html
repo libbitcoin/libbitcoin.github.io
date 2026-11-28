@@ -482,14 +482,34 @@ was loaded from. Its pages
 are admin REST queries rendered as HTML, the default for a browser request.
 The same paths return data when JSON is requested, with <code>format=json</code> or an
 <code>Accept: application/json</code> header.</p>
+<p>The site's navigation is Mining, Logs, Events and Explorer, and its
+title opens the Overview. Mining lists each stratum mining channel by
+service, with its hash rate, shares and rejections, and the blocks found
+(<a href="../interfaces/admin.html#mining_subscribe"><code>mining_subscribe</code></a>). A
+channel's dot is blue while it runs, amber after a rejected share, red
+after an invalid share and green once it has submitted a block, and the
+Mining link turns green on a new block. Faults are always subscribed:
+the Logs link turns red while any is uncleared, until Clear faults.
+Logs shows faults only by default, filtered at the server by the
+selected levels. Pausing ends the subscription, and nothing logged while
+paused is replayed. Logs and Events keep the newest 1,000 entries of
+each level or event. With browser notifications enabled, which require
+https or localhost, each new block or fault raises one.</p>
+<p>The Explorer link, and the Overview's top, pool size and fee rate, open
+the block explorer at an http or https <code>native.advertise</code> URL, of the
+page's scheme if there is one. Without one, or with <code>[native]</code>
+disabled, they are disabled:</p>
+<pre><code class="language-ini"><span class="section">[native]</span>
+advertise = http://explorer.example.com:8180
+</code></pre>
 <p>To serve a custom admin site from a directory instead of the embedded site,
 set <code>folders.admin</code>. A request for <code>/</code> returns <code>admin.default</code>
 (<code>index.html</code>).</p>
 <p>The admin interface is libbitcoin's own, and provides:</p>
 <ul>
 <li>HTTP and websocket on each port. Over a websocket, each frame is one
-  request path, and <code>log_subscribe</code> and <code>event_subscribe</code> stream the
-  node's log and events.</li>
+  request path, <code>log_subscribe</code> and <code>event_subscribe</code> stream the node's
+  log and events, and <code>mining_subscribe</code> its stratum mining channels.</li>
 <li>The full <a href="../interfaces/native.html">native interface</a>, under the <code>[admin]</code>
   settings.</li>
 <li>TLS on its <code>safe</code> addresses (<a href="services.html#2-secure-connections">Secure connections</a>), with optional client certificates
@@ -593,6 +613,15 @@ transactions of the pool, each with when it was received. A block or template pa
 section draws the block's or template's transactions as a treemap, area
 by virtual size and color by fee rate, outlined by cluster, with a panel
 for each transaction.</p>
+<p>An input or output path, such as <code>/v1/output/{tx hash}/{index}</code>, opens
+its transaction's page with that row highlighted. An input or output
+shows its script type, its script as mnemonic or hex, its witness stack
+and its sequence, an OP_RETURN output shows as Unspendable, and clicking
+its number copies its point (<code>{tx hash}:{index}</code>).</p>
+<p>The web miner (<code>/v1/miner</code>) mines in the browser over the advertised
+<code>stratum_v1</code> WS/WSS URL, or <code>stratum_v2</code> where it is advertised and
+chosen in its settings. A page served over https can reach only a WSS
+service.</p>
 <p>To serve a custom block explorer from a directory instead of the embedded
 site, set <code>folders.native</code>. A request for <code>/</code> returns <code>native.default</code>
 (<code>index.html</code>).</p>
@@ -1213,6 +1242,8 @@ name, <code>&lt;address&gt;.&lt;worker&gt;</code>, is its payout.</p>
   (<a href="services.html#3-authentication">Authentication</a>).</li>
 <li>Like the other services, the binding accepts connections only once the
   chain is current (<a href="services.html#until-current">Until current</a>).</li>
+<li>The admin site's Mining page shows each miner's hash rate and shares,
+  and the blocks found (<a href="#5-admin-site">Admin site</a>).</li>
 </ul>
   </article>
 

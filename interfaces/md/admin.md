@@ -1,7 +1,8 @@
 # Admin Console
 
-The admin interface streams the node's log and events over websocket,
-served on the `[admin]` binding. It also serves the full
+The admin interface streams the node's log and events, and the mining
+channels of the stratum services, over websocket, served on the
+`[admin]` binding. It also serves the full
 [native interface](native), so the console needs only this one address.
 The embedded console is a page of this interface, and can be replaced
 with a custom site (see [Configuration
@@ -22,6 +23,8 @@ forms share another:
 | ---- | ------ |
 | `/v1/log/subscribe?filter={levels}` | [`log_subscribe`](#log_subscribe) |
 | `/v1/event/subscribe?filter={events}` | [`event_subscribe`](#event_subscribe) |
+| `/v1/mining` | [`mining`](#mining) |
+| `/v1/mining/subscribe` | [`mining_subscribe`](#mining_subscribe) |
 
 Every path of the [native interface](native#1-paths) is also served,
 with the same responses and websocket subscriptions. Any other path is a
@@ -55,8 +58,8 @@ A subscription is made over a websocket, which connects on the same port.
 
 - Each text frame is one request path, such as
   `/v1/log/subscribe?filter=127`.
-- Each request is answered by one frame, `{"previous": N}`, the filter it
-  replaced.
+- Each log or event request is answered by one frame,
+  `{"previous": N}`, the filter it replaced.
 - Matching log messages and events then follow, one per frame.
 - A filter of 0, or no filter, ends the subscription.
 - The log and event subscriptions of a connection are independent.
@@ -124,7 +127,7 @@ Each response carries one of these statuses
 | 403 | The credential does not permit the method, or the origin is not allowed |
 | 404 | A console file was not found |
 | 405 | Any method other than `GET` |
-| 406 | JSON was not requested |
+| 406 | JSON was not requested, or `mining_subscribe` was not over a websocket |
 
 Over a websocket, an invalid path is answered with 400 and the connection
 is kept. An invalid filter or format, or a method the credential does not
@@ -132,13 +135,13 @@ permit, is answered with an error and closes the connection.
 
 ### 2.6 Credentials
 
-A credential's method list names `log_subscribe`, `event_subscribe` and
-the native method names (see
+A credential's method list names `log_subscribe`, `event_subscribe`,
+`mining`, `mining_subscribe` and the native method names (see
 [Configuration §7.3](../configuration/services#3-authentication)). A
 credential with no method list permits every method. One with a list
 permits only those named, so for the console it names `log_subscribe`,
-`event_subscribe`, `configuration`, `top`, `top_subscribe`,
-`block_header` and `fees`.
+`event_subscribe`, `mining_subscribe`, `configuration`, `top`,
+`top_subscribe`, `block_header` and `fees`.
 
 ## 3. Methods
 
@@ -242,3 +245,82 @@ the count of requested transactions that a peer did not send.
 ```
 
 `time` is in milliseconds since the epoch.
+
+### mining
+
+The mining channels of the stratum services, and the blocks they found.
+
+```
+/v1/mining
+```
+
+```json
+{
+    "channels": [
+        {
+            "id": "00000000000000a3:0",
+            "service": "stratum_v1",
+            "transport": "tcp",
+            "address": "192.168.1.20:51234",
+            "client": "cgminer/4.11.1",
+            "workers": ["bc1q....bitaxe"],
+            "connected": 1792987200123,
+            "difficulty": 4096,
+            "hashrate": 1210000000000,
+            "accepted": 1712,
+            "rejected": 3,
+            "rejections": {"low_difficulty": 1, "job_not_found": 2},
+            "last_share": 1792990801456,
+            "shares": [
+                {"time": 1792990801456, "height": 920001, "difficulty": 4096, "result": "accepted"}
+            ],
+            "history": [[1792990740000, 1190000000000], [1792990800000, 1230000000000]]
+        }
+    ],
+    "blocks": [
+        {"hash": "00000000000000000001...", "height": 919990, "time": 1792987900000, "channel": "00000000000000a3:0"}
+    ]
+}
+```
+
+`channels` has one entry per Stratum v1 connection and per Stratum v2
+channel. `blocks` has the last 10 blocks found through stratum and
+accepted by the node, newest first, each with the `id` of its channel.
+
+| Field | Meaning |
+| ----- | ------- |
+| `id` | The connection, as 16 hex characters, and the channel (0 for Stratum v1) |
+| `service` | `stratum_v1` or `stratum_v2` |
+| `transport` | `tcp`, `tls`, `ws`, `wss` or `noise` |
+| `address` | The miner's address and port |
+| `client` | The user agent of `mining.subscribe` (v1), or the vendor and firmware of `SetupConnection` (v2) |
+| `workers` | The authorized worker names (v1), or the channel's user identity (v2) |
+| `connected` | When the channel opened |
+| `difficulty` | The current share difficulty |
+| `hashrate` | Hashes per second, the mean of `history` |
+| `accepted`, `rejected` | Shares accepted and rejected |
+| `rejections` | Rejected shares, by result |
+| `last_share` | When the last share was received, or `null` |
+| `shares` | The last 20 shares, newest first |
+| `history` | The rate of each completed minute, to 30, as `[minute, hashes per second]` |
+
+A share's `result` is `accepted`, `submitted` (accepted, and it mined a
+block), `duplicate`, `low_difficulty`, `invalid`, `stale` (a job
+no longer current, v2 only) or `job_not_found`. A minute's rate is the
+work of its accepted shares, difficulty times 2<sup>32</sup> hashes,
+over 60 seconds, so a channel shows 0 for its first minute.
+
+Times are in milliseconds since the epoch. The registry is held in
+memory: a channel is removed when it or its connection closes, and the
+channels and blocks start empty when the node starts.
+
+### mining_subscribe
+
+Responds with [`mining`](#mining), and pushes it again every 5 seconds,
+or within a second of a mining channel opening or closing.
+
+```
+/v1/mining/subscribe
+```
+
+It is served over a websocket only. Over HTTP/S it returns 406.
