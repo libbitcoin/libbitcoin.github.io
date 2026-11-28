@@ -371,7 +371,8 @@
       JSON and HTTP. On 36 mainnet blocks (977,508 to 977,543), Libbitcoin's first job followed its
       block organized by a median 47 ms, and ckpool's (polling) followed Bitcoin Core's tip update
       by 480 ms, on one probe clock. Bitcoin Core's figure swings with its own block handling, about
-      260 ms on some blocks and 1,100 to 1,650 ms on many others.
+      260 ms on some blocks and 1,100 to 1,650 ms on many others. These were measured on
+      November 25, 2026, before the current parallel template build.
     </p>
   </section>
 
@@ -461,7 +462,9 @@
       43 ms (29 to 184): pool indexing 12 ms, chain state 0.014 ms, other wait 0.108 ms,
       computation 21 ms and issue 6 ms. The pool advances its chain state by one header per block
       and reads the store only at start or on a reorganization. Computation varies with the work
-      of packing what lands at the block's tail.
+      of packing what lands at the block's tail. This was measured on November 25, 2026, before
+      the current parallel template build. From the regtest mixed pool, computation is estimated
+      at 12 to 14 ms with it, an estimate rather than a mainnet measurement.
     </p>
   </section>
 
